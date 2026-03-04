@@ -9,30 +9,9 @@ import EmojiGrid from "@/components/landing/EmojiGrid";
 import AfristallLogo from "@/components/AfristallLogo";
 import { toast } from "sonner";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { CategoryPicker, type CategorySelection, serializeCategories } from "@/components/CategoryPicker";
 
 const CITIES = ["Kampala", "Nairobi", "Lagos", "Accra", "Dar es Salaam", "Kigali", "Other"];
-
-const PRODUCT_CATEGORIES = [
-  { label: "Food & Drinks", icon: "🍲" },
-  { label: "Fashion & Clothes", icon: "👗" },
-  { label: "Beauty & Skincare", icon: "✨" },
-  { label: "Phones & Electronics", icon: "📱" },
-  { label: "Home & Decor", icon: "🏠" },
-  { label: "Plants & Garden", icon: "🌿" },
-  { label: "Other", icon: "📦" },
-];
-
-const SERVICE_CATEGORIES = [
-  { label: "Delivery", icon: "🚚" },
-  { label: "Repairs", icon: "🔧" },
-  { label: "Tutoring", icon: "📚" },
-  { label: "Cleaning", icon: "🧹" },
-  { label: "Photography", icon: "📸" },
-  { label: "Catering", icon: "🍽️" },
-  { label: "Beauty Services", icon: "💅" },
-  { label: "Design", icon: "🎨" },
-  { label: "Other", icon: "🔧" },
-];
 
 const COUNTRY_CODES = [
   { code: "+256", country: "🇺🇬 Uganda" },
@@ -72,7 +51,7 @@ const Signup = () => {
   const [checkingSlug, setCheckingSlug] = useState(false);
   const slugCheckTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [city, setCity] = useState("");
-  const [category, setCategory] = useState("");
+  const [categorySelection, setCategorySelection] = useState<CategorySelection>({});
   const [businessType, setBusinessType] = useState<"product" | "service" | "both">("product");
   const [profilePicture, setProfilePicture] = useState<File | null>(null);
   const [profilePicturePreview, setProfilePicturePreview] = useState("");
@@ -126,7 +105,7 @@ const Signup = () => {
 
   const handleBusinessTypeChange = (type: "product" | "service" | "both") => {
     setBusinessType(type);
-    setCategory("");
+    setCategorySelection({});
   };
 
   const validateStep1 = () => {
@@ -142,7 +121,7 @@ const Signup = () => {
     if (!storeSlug.trim()) { toast.error("Store slug is required"); return false; }
     if (!/^[a-z0-9-]+$/.test(storeSlug)) { toast.error("Slug can only contain lowercase letters, numbers, and hyphens"); return false; }
     if (slugAvailable === false) { toast.error("This URL is already taken — try another"); return false; }
-    if (!category) { toast.error("Please select a category"); return false; }
+    if (Object.keys(categorySelection).length === 0) { toast.error("Please select at least one category"); return false; }
     return true;
   };
 
@@ -224,7 +203,7 @@ const Signup = () => {
           store_name: storeName.trim(),
           store_slug: storeSlug.trim(),
           city: city || null,
-          category,
+          category: serializeCategories(categorySelection),
           business_type: businessType,
           whatsapp_number: fullWhatsapp,
           profile_picture_url: profilePictureUrl,
@@ -242,9 +221,9 @@ const Signup = () => {
     }
   };
 
-  const activeCategories = businessType === "service" ? SERVICE_CATEGORIES
-    : businessType === "both" ? [...PRODUCT_CATEGORIES, ...SERVICE_CATEGORIES.filter(s => s.label !== "Other")]
-    : PRODUCT_CATEGORIES;
+  const categoryFilter = businessType === "service" ? "services"
+    : businessType === "product" ? "products"
+    : "all";
 
   return (
     <div className="relative flex min-h-screen flex-col items-center justify-center px-4 py-8 overflow-hidden">
@@ -455,40 +434,14 @@ const Signup = () => {
                     : businessType === "both" ? "What do you sell or offer?" 
                     : "What do you sell?"}
                 </Label>
-                {businessType === "service" ? (
-                  <Select value={category} onValueChange={setCategory}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select a service category" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {SERVICE_CATEGORIES.map((cat) => (
-                        <SelectItem key={cat.label} value={cat.label}>
-                          <span className="flex items-center gap-2">
-                            <span>{cat.icon}</span> {cat.label}
-                          </span>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                ) : (
-                  <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
-                    {activeCategories.map((cat) => (
-                      <button
-                        key={cat.label}
-                        type="button"
-                        onClick={() => setCategory(cat.label)}
-                        className={`flex flex-col items-center gap-1 rounded-lg border-2 p-3 text-center transition-colors ${
-                          category === cat.label
-                            ? "border-primary bg-primary/5"
-                            : "border-border hover:border-primary/30"
-                        }`}
-                      >
-                        <span className="text-2xl">{cat.icon}</span>
-                        <span className="text-xs font-medium leading-tight">{cat.label}</span>
-                      </button>
-                    ))}
-                  </div>
-                )}
+                <p className="text-xs text-muted-foreground mb-1">
+                  Select one or more categories. Expand to pick subcategories.
+                </p>
+                <CategoryPicker
+                  value={categorySelection}
+                  onChange={setCategorySelection}
+                  filter={categoryFilter}
+                />
               </div>
 
               <div className="flex gap-2">
