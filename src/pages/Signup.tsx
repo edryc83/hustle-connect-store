@@ -44,6 +44,7 @@ const Signup = () => {
   const [showPassword, setShowPassword] = useState(false);
 
   // Step 2
+  const [firstName, setFirstName] = useState("");
   const [storeName, setStoreName] = useState("");
   const [storeSlug, setStoreSlug] = useState("");
   const [slugEdited, setSlugEdited] = useState(false);
@@ -75,13 +76,17 @@ const Signup = () => {
     }, 500);
   };
 
-  const handleStoreNameChange = (value: string) => {
-    setStoreName(value);
+  const handleFirstNameChange = (value: string) => {
+    setFirstName(value);
     if (!slugEdited) {
       const newSlug = slugify(value);
       setStoreSlug(newSlug);
       checkSlugAvailability(newSlug);
     }
+  };
+
+  const handleStoreNameChange = (value: string) => {
+    setStoreName(value);
   };
 
   const handleSlugChange = (value: string) => {
@@ -117,6 +122,7 @@ const Signup = () => {
   };
 
   const validateStep2 = () => {
+    if (!firstName.trim()) { toast.error("First name is required"); return false; }
     if (!storeName.trim()) { toast.error("Store name is required"); return false; }
     if (!storeSlug.trim()) { toast.error("Store slug is required"); return false; }
     if (!/^[a-z0-9-]+$/.test(storeSlug)) { toast.error("Slug can only contain lowercase letters, numbers, and hyphens"); return false; }
@@ -200,6 +206,7 @@ const Signup = () => {
       const { error: profileError } = await supabase
         .from("profiles")
         .update({
+          first_name: firstName.trim(),
           store_name: storeName.trim(),
           store_slug: storeSlug.trim(),
           city: city || null,
@@ -326,6 +333,18 @@ const Signup = () => {
               <p className="text-sm text-muted-foreground mt-1">Tell us about what you sell</p>
             </div>
             <div className="space-y-4">
+              <div className="space-y-1.5">
+                <Label htmlFor="firstName">First name</Label>
+                <Input
+                  id="firstName"
+                  placeholder="e.g. Aisha"
+                  value={firstName}
+                  onChange={(e) => handleFirstNameChange(e.target.value)}
+                  maxLength={30}
+                />
+                <p className="text-xs text-muted-foreground">Used for your store URL</p>
+              </div>
+
               <div className="space-y-1.5">
                 <Label htmlFor="storeName">Store name</Label>
                 <Input
