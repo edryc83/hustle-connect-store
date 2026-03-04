@@ -5,7 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Store, Mail, Phone, Eye, EyeOff } from "lucide-react";
+import { Mail, Phone, Eye, EyeOff } from "lucide-react";
+import AfristallLogo from "@/components/AfristallLogo";
 import { toast } from "sonner";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
@@ -75,7 +76,7 @@ const Login = () => {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-secondary/30 px-4">
       <Link to="/" className="mb-8 flex items-center gap-2">
-        <Store className="h-7 w-7 text-primary" />
+        <AfristallLogo />
         <span className="text-xl font-extrabold tracking-tight">
           Afri<span className="text-primary">stall</span>
         </span>

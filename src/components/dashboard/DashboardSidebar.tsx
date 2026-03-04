@@ -1,7 +1,8 @@
-import { Package, LayoutDashboard, Settings, LogOut, Store } from "lucide-react";
+import { Package, LayoutDashboard, Settings, LogOut } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
+import AfristallLogo from "@/components/AfristallLogo";
 import {
   Sidebar,
   SidebarContent,
@@ -39,7 +40,7 @@ export function DashboardSidebar() {
         <SidebarGroup>
           <SidebarGroupLabel>
             <div className="flex items-center gap-2">
-              <Store className="h-4 w-4 text-primary" />
+              <AfristallLogo className="h-4 w-4" />
               {!collapsed && <span className="font-bold">Afristall</span>}
             </div>
           </SidebarGroupLabel>
