@@ -428,6 +428,9 @@ const DashboardSettings = () => {
           </Button>
         </CardContent>
       </div>
+
+      {/* WhatsApp Test */}
+      <WhatsAppTestCard whatsappNumber={whatsappNumber} storeName={storeName} />
     </div>
   );
 };
