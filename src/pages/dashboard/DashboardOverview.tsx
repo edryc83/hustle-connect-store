@@ -159,8 +159,15 @@ const DashboardOverview = () => {
         </div>
       )}
 
+      {/* AI Captions */}
+      <CaptionGenerator
+        storeName={storeName}
+        storeSlug={storeSlug}
+        category={category}
+        productCount={productCount}
+      />
 
-      {/* Quick actions */}
+
       <div className="flex gap-3">
         <Button asChild className="rounded-xl">
           <Link to="/dashboard/products" className="gap-2">
