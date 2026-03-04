@@ -22,6 +22,7 @@ const DashboardSettings = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [generating, setGenerating] = useState(false);
+  const [firstName, setFirstName] = useState("");
   const [storeName, setStoreName] = useState("");
   const [whatsappNumber, setWhatsappNumber] = useState("");
   const [city, setCity] = useState("");
@@ -34,11 +35,12 @@ const DashboardSettings = () => {
     if (!user) return;
     supabase
       .from("profiles")
-      .select("store_name, whatsapp_number, city, store_bio, category, delivery_areas, currency")
+      .select("first_name, store_name, whatsapp_number, city, store_bio, category, delivery_areas, currency")
       .eq("id", user.id)
       .single()
       .then(({ data }) => {
         if (data) {
+          setFirstName((data as any).first_name ?? "");
           setStoreName(data.store_name ?? "");
           setWhatsappNumber(data.whatsapp_number ?? "");
           setCity(data.city ?? "");
@@ -76,6 +78,7 @@ const DashboardSettings = () => {
     const { error } = await supabase
       .from("profiles")
       .update({
+        first_name: firstName.trim() || null,
         store_name: storeName.trim(),
         whatsapp_number: whatsappNumber.trim(),
         city: city.trim(),
@@ -96,6 +99,19 @@ const DashboardSettings = () => {
   return (
     <div className="max-w-lg space-y-6">
       <h1 className="text-2xl font-bold">Settings</h1>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-base">Your Profile</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="space-y-1.5">
+            <Label>First Name</Label>
+            <Input value={firstName} onChange={(e) => setFirstName(e.target.value)} placeholder="e.g. John" />
+          </div>
+        </CardContent>
+      </Card>
+
       <Card>
         <CardHeader>
           <CardTitle className="text-base">Store Details</CardTitle>

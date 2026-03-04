@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Store, MapPin, ImageIcon, ShoppingBag, Share2, Copy, Check } from "lucide-react";
+import { Store, MapPin, ImageIcon, ShoppingBag, Share2, Copy, Check, Wrench } from "lucide-react";
 import { categoriesToDisplay } from "@/components/CategoryPicker";
 import { formatPrice } from "@/lib/currency";
 import AfristallLogo from "@/components/AfristallLogo";
@@ -15,6 +15,7 @@ import { toast } from "sonner";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { OrderModal } from "@/components/storefront/OrderModal";
+import { Badge } from "@/components/ui/badge";
 import type { Tables } from "@/integrations/supabase/types";
 
 type Product = Tables<"products">;
@@ -196,7 +197,7 @@ const Storefront = () => {
         ) : (
           <>
             <p className="mb-4 text-sm text-muted-foreground">
-              {products.length} product{products.length !== 1 ? "s" : ""}
+              {products.length} listing{products.length !== 1 ? "s" : ""}
             </p>
             <div className="grid gap-4 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
               {products.map((product) => (
@@ -215,9 +216,22 @@ const Storefront = () => {
                       />
                     ) : (
                       <div className="flex h-full w-full items-center justify-center">
-                        <ImageIcon className="h-8 w-8 text-muted-foreground/30" />
+                        {(product as any).listing_type === "service"
+                          ? <Wrench className="h-8 w-8 text-muted-foreground/30" />
+                          : <ImageIcon className="h-8 w-8 text-muted-foreground/30" />
+                        }
                       </div>
                     )}
+                    <div className="absolute top-1.5 left-1.5 flex flex-col gap-1">
+                      {(product as any).listing_type === "service" && (
+                        <Badge variant="secondary" className="text-[10px] px-1.5 py-0">Service</Badge>
+                      )}
+                      {(product as any).condition && (
+                        <Badge variant="outline" className="text-[10px] px-1.5 py-0 bg-background/80">
+                          {(product as any).condition === "new" ? "New" : (product as any).condition === "used" ? "Used" : "Refurbished"}
+                        </Badge>
+                      )}
+                    </div>
                   </div>
                   <CardContent className="p-3">
                     <p className="font-medium text-sm truncate">{product.name}</p>

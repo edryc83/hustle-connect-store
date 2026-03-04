@@ -10,7 +10,7 @@ import AfristallLogo from "@/components/AfristallLogo";
 const DashboardOverview = () => {
   const { user } = useAuth();
   const [productCount, setProductCount] = useState(0);
-  const [storeName, setStoreName] = useState("");
+  const [firstName, setFirstName] = useState("");
   const [storeSlug, setStoreSlug] = useState("");
 
   useEffect(() => {
@@ -19,10 +19,11 @@ const DashboardOverview = () => {
     const fetchData = async () => {
       const [{ count }, { data: profile }] = await Promise.all([
         supabase.from("products").select("*", { count: "exact", head: true }).eq("user_id", user.id),
-        supabase.from("profiles").select("store_name, store_slug").eq("id", user.id).single(),
+        supabase.from("profiles").select("store_name, store_slug, first_name").eq("id", user.id).single(),
       ]);
       setProductCount(count ?? 0);
-      setStoreName(profile?.store_name ?? "");
+      const name = (profile as any)?.first_name || profile?.store_name || user.email?.split("@")[0]?.split(/[._]/)[0] || "";
+      setFirstName(name.charAt(0).toUpperCase() + name.slice(1));
       setStoreSlug(profile?.store_slug ?? "");
     };
 
@@ -33,7 +34,7 @@ const DashboardOverview = () => {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold">
-          Welcome back{user?.email ? `, ${user.email.split("@")[0].split(/[._]/)[0].charAt(0).toUpperCase()}${user.email.split("@")[0].split(/[._]/)[0].slice(1)}` : ""} 👋
+          Welcome back{firstName ? `, ${firstName}` : ""} 👋
         </h1>
         <p className="text-muted-foreground text-sm">Here's how your store is doing.</p>
       </div>
@@ -41,7 +42,7 @@ const DashboardOverview = () => {
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Products</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">Listings</CardTitle>
             <Package className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
@@ -71,12 +72,12 @@ const DashboardOverview = () => {
       <div className="flex gap-3">
         <Button asChild>
           <Link to="/dashboard/products" className="gap-2">
-            <Package className="h-4 w-4" /> View Products
+            <Package className="h-4 w-4" /> View Listings
           </Link>
         </Button>
         <Button asChild variant="outline">
           <Link to="/dashboard/products?add=true" className="gap-2">
-            <Plus className="h-4 w-4" /> Add Product
+            <Plus className="h-4 w-4" /> Add Listing
           </Link>
         </Button>
       </div>
