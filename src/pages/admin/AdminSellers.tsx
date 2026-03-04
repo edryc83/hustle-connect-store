@@ -170,15 +170,18 @@ export default function AdminSellers() {
                       )}
                     </TableCell>
                     <TableCell className="text-right">
-                      {s.store_slug ? (
-                        <Button variant="ghost" size="sm" className="h-7 text-xs" asChild>
-                          <a href={`/${s.store_slug}`} target="_blank" rel="noopener noreferrer">
-                            <ExternalLink className="h-3 w-3 mr-1" /> View
-                          </a>
+                      <div className="flex items-center justify-end gap-1">
+                        {s.store_slug && (
+                          <Button variant="ghost" size="sm" className="h-7 text-xs" asChild>
+                            <a href={`/${s.store_slug}`} target="_blank" rel="noopener noreferrer">
+                              <ExternalLink className="h-3 w-3 mr-1" /> View
+                            </a>
+                          </Button>
+                        )}
+                        <Button variant="ghost" size="sm" className="h-7 text-xs text-destructive hover:text-destructive hover:bg-destructive/10" onClick={() => setDeleteTarget(s)}>
+                          <Trash2 className="h-3 w-3" />
                         </Button>
-                      ) : (
-                        <span className="text-xs text-muted-foreground">—</span>
-                      )}
+                      </div>
                     </TableCell>
                   </TableRow>
                 );
