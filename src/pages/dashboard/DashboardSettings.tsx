@@ -217,6 +217,31 @@ const DashboardSettings = () => {
     <div className="max-w-lg space-y-6">
       <h1 className="text-2xl font-bold">Settings</h1>
 
+      {/* Store Completeness */}
+      {(() => {
+        const completeness =
+          (profilePicUrl ? 20 : 0) +
+          (storeName ? 20 : 0) +
+          (whatsappNumber ? 20 : 0) +
+          (productCount >= 1 ? 20 : 0) +
+          (productCount >= 3 ? 20 : 0);
+        const msg = completeness <= 40
+          ? "Your store isn't ready yet — buyers need products to order"
+          : completeness < 100
+            ? "Almost there! Add more products to boost your store"
+            : "🎉 Your store is ready to share!";
+        return (
+          <div className="rounded-2xl border border-border/50 bg-card/60 backdrop-blur-xl p-5 shadow-sm space-y-3">
+            <div className="flex items-center justify-between">
+              <span className="text-sm font-medium text-muted-foreground">Store Completeness</span>
+              <span className="text-sm font-bold text-primary">{completeness}%</span>
+            </div>
+            <Progress value={completeness} className="h-2.5 bg-muted" />
+            <p className="text-xs text-muted-foreground">{msg}</p>
+          </div>
+        );
+      })()}
+
       <div className="rounded-2xl border border-border/50 bg-card/60 backdrop-blur-xl">
         <CardHeader>
           <CardTitle className="text-base">Your Profile</CardTitle>
