@@ -42,6 +42,7 @@ function getFormattedDate() {
 
 const DashboardOverview = () => {
   const { user } = useAuth();
+  const isInstalled = useIsInstalledPWA();
   const [productCount, setProductCount] = useState(0);
   const [firstName, setFirstName] = useState("");
   const [storeSlug, setStoreSlug] = useState("");
