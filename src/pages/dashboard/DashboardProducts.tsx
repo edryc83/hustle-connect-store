@@ -25,7 +25,7 @@ type Product = Tables<"products">;
 
 const LISTING_TYPES = [
   { value: "product", label: "Product" },
-  { value: "service", label: "Package" },
+  { value: "service", label: "Service" },
 ];
 
 const CONDITIONS = [
@@ -309,7 +309,7 @@ const DashboardProducts = () => {
                     {generatingDesc ? "Generating…" : "AI Generate"}
                   </Button>
                 </div>
-                <Textarea id="productDesc" placeholder={listingType === "service" ? "What does this package include?" : "What makes this product special?"} value={description} onChange={(e) => setDescription(e.target.value)} rows={3} />
+                <Textarea id="productDesc" placeholder={listingType === "service" ? "What does this service package include?" : "What makes this product special?"} value={description} onChange={(e) => setDescription(e.target.value)} rows={3} />
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="productVariants">Variants / Options</Label>
@@ -355,7 +355,7 @@ const DashboardProducts = () => {
           <CardContent className="flex flex-col items-center gap-3 text-center">
             <Package className="h-12 w-12 text-muted-foreground/50" />
             <p className="text-lg font-medium">No listings yet</p>
-            <p className="text-sm text-muted-foreground">Add your first product or package to start selling!</p>
+            <p className="text-sm text-muted-foreground">Add your first product or service to start selling!</p>
             <Button className="mt-2 gap-2" onClick={openAdd}><Plus className="h-4 w-4" /> Add Listing</Button>
           </CardContent>
         </div>
@@ -460,7 +460,7 @@ function ListingRow({
             <Star className="h-2.5 w-2.5 mr-0.5 fill-current" /> Featured
           </Badge>
         )}
-        {isService && <Badge variant="secondary" className="text-[10px] px-1.5 py-0">Package</Badge>}
+        {isService && <Badge variant="secondary" className="text-[10px] px-1.5 py-0">Service</Badge>}
         {(product as any).condition && (
           <Badge variant="outline" className="text-[10px] px-1.5 py-0">
             {(product as any).condition === "new" ? "New" : (product as any).condition === "used" ? "Used" : "Refurbished"}

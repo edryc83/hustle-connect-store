@@ -427,7 +427,7 @@ const Signup = () => {
                 <div className="grid grid-cols-3 gap-2">
                   {([
                     { value: "product" as const, label: "Products", emoji: "📦" },
-                    { value: "service" as const, label: "Packages", emoji: "🔧" },
+                    { value: "service" as const, label: "Services", emoji: "🔧" },
                     { value: "both" as const, label: "Both", emoji: "📦🔧" },
                   ]).map((t) => (
                     <button
@@ -449,7 +449,7 @@ const Signup = () => {
 
               <div className="space-y-1.5">
                 <Label>
-                  {businessType === "service" ? "What packages do you offer?" 
+                  {businessType === "service" ? "What services do you offer?" 
                     : businessType === "both" ? "What do you sell or offer?" 
                     : "What do you sell?"}
                 </Label>
