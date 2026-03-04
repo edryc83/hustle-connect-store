@@ -188,7 +188,7 @@ const DashboardOverview = () => {
               window.location.href = "/dashboard/settings#install-app";
             }
           }}
-          className="flex w-full items-center gap-3 rounded-2xl border border-border/40 bg-card/40 backdrop-blur-xl p-4 shadow-sm hover:bg-card/60 transition-colors text-left"
+          className="flex w-full items-center gap-3 rounded-2xl border-2 border-primary bg-primary/5 backdrop-blur-xl p-4 shadow-sm hover:bg-primary/10 transition-colors text-left animate-[pulse_2s_cubic-bezier(0.4,0,0.6,1)_infinite] ring-2 ring-primary/30"
         >
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
             <Download className="h-5 w-5 text-primary" />
