@@ -82,6 +82,7 @@ const DashboardSettings = () => {
         store_bio: storeBio.trim() || null,
         category: serializeCategories(categories) || null,
         delivery_areas: deliveryAreas.trim() || null,
+        currency: currency,
       } as any)
       .eq("id", user.id);
     if (error) toast.error("Failed to save");
