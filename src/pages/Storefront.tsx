@@ -151,6 +151,7 @@ function ProductCard({
 
 const StorefrontInner = () => {
   const { addItem } = useCart();
+  const { theme, toggleTheme } = useTheme();
   const { storeSlug, productId } = useParams<{ storeSlug: string; productId?: string }>();
   const navigate = useNavigate();
   const [profile, setProfile] = useState<Profile | null>(null);
