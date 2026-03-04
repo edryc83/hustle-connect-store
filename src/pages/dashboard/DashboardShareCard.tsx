@@ -4,19 +4,21 @@ import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Download, Loader2, Sparkles, Copy, Share2, Check, Palette, Image as ImageIcon, Upload, X, Camera } from "lucide-react";
+import { Download, Loader2, Sparkles, Copy, Share2, Check, Palette, Image as ImageIcon, Upload, X, Camera, ArrowLeft, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
 
 /* ───────── Types ───────── */
 
-type CategoryId = "editorial" | "spotlight" | "brandcard" | "collage";
-
-interface DesignVariant {
+interface DesignTemplate {
   id: string;
   name: string;
+  category: string;
   defaultHeadline: string;
   defaultSubtitle: string;
-  thumb: string; // emoji or short label for the thumbnail
+  previewBg: string;        // CSS bg for the thumbnail card
+  previewTextColor: string;  // text color for the thumbnail
+  previewAccent: string;     // accent element color
+  previewLayout: "full-bleed" | "split" | "centered" | "grid";
 }
 
 interface Product {
@@ -25,34 +27,23 @@ interface Product {
   image_url: string | null;
 }
 
-/* ───────── Template Data ───────── */
+/* ───────── All 9 Design Templates ───────── */
 
-const CATEGORIES: { id: CategoryId; label: string; desc: string }[] = [
-  { id: "editorial", label: "Editorial", desc: "Full photo + bold text" },
-  { id: "spotlight", label: "Spotlight", desc: "Product hero shot" },
-  { id: "brandcard", label: "Brand Card", desc: "Clean & minimal" },
-  { id: "collage", label: "Collage", desc: "Multi-product grid" },
+const TEMPLATES: DesignTemplate[] = [
+  // Editorial
+  { id: "editorial-highlight", name: "Highlight", category: "Editorial", defaultHeadline: "No limits.\nNo compromise.", defaultSubtitle: "Just everyday essentials, done properly.", previewBg: "linear-gradient(135deg, #1a1a1a 0%, #333 100%)", previewTextColor: "#fff", previewAccent: "#FF6B35", previewLayout: "full-bleed" },
+  { id: "editorial-magazine", name: "Magazine", category: "Editorial", defaultHeadline: "NEW\nCOLLECTION", defaultSubtitle: "Curated pieces you'll love.", previewBg: "linear-gradient(180deg, #0a0a0a 0%, #2a1a10 100%)", previewTextColor: "#fff", previewAccent: "#d4a574", previewLayout: "full-bleed" },
+  { id: "editorial-minimal", name: "Minimal", category: "Editorial", defaultHeadline: "SHOP\nNOW", defaultSubtitle: "Discover what's trending.", previewBg: "linear-gradient(180deg, #111 0%, #222 100%)", previewTextColor: "#fff", previewAccent: "#FF6B35", previewLayout: "full-bleed" },
+  // Spotlight
+  { id: "spotlight-hero", name: "Hero Shot", category: "Spotlight", defaultHeadline: "FEATURED\nPRODUCT", defaultSubtitle: "The one everyone's talking about.", previewBg: "linear-gradient(180deg, #f5f3ef 0%, #ece8e0 100%)", previewTextColor: "#1a1a1a", previewAccent: "#FF6B35", previewLayout: "split" },
+  { id: "spotlight-split", name: "Split View", category: "Spotlight", defaultHeadline: "BEST\nSELLER", defaultSubtitle: "See why it's #1.", previewBg: "linear-gradient(180deg, #1a1a2e 50%, #fff 50%)", previewTextColor: "#fff", previewAccent: "#FF6B35", previewLayout: "split" },
+  // Brand Card
+  { id: "brand-profile", name: "Profile Card", category: "Brand Card", defaultHeadline: "VISIT\nMY STORE", defaultSubtitle: "Quality products, great prices.", previewBg: "#ffffff", previewTextColor: "#111827", previewAccent: "#FF6B35", previewLayout: "centered" },
+  { id: "brand-elegant", name: "Elegant Dark", category: "Brand Card", defaultHeadline: "EXPLORE\nOUR RANGE", defaultSubtitle: "Something for everyone.", previewBg: "linear-gradient(180deg, #1a1a2e 0%, #0d0d1a 100%)", previewTextColor: "#fff", previewAccent: "#d4a574", previewLayout: "centered" },
+  // Collage
+  { id: "collage-grid", name: "Grid Layout", category: "Collage", defaultHeadline: "NEW ARRIVALS", defaultSubtitle: "Fresh stock just dropped!", previewBg: "#faf9f7", previewTextColor: "#111827", previewAccent: "#FF6B35", previewLayout: "grid" },
+  { id: "collage-mosaic", name: "Mosaic", category: "Collage", defaultHeadline: "TOP PICKS", defaultSubtitle: "Our best sellers, curated for you.", previewBg: "#faf9f7", previewTextColor: "#111827", previewAccent: "#FF8F5E", previewLayout: "grid" },
 ];
-
-const DESIGN_VARIANTS: Record<CategoryId, DesignVariant[]> = {
-  editorial: [
-    { id: "ed-1", name: "Highlight", defaultHeadline: "No limits.\nNo compromise.", defaultSubtitle: "Just everyday essentials, done properly.", thumb: "📰" },
-    { id: "ed-2", name: "Magazine", defaultHeadline: "NEW\nCOLLECTION", defaultSubtitle: "Curated pieces you'll love.", thumb: "📖" },
-    { id: "ed-3", name: "Minimal", defaultHeadline: "SHOP\nNOW", defaultSubtitle: "Discover what's trending.", thumb: "✨" },
-  ],
-  spotlight: [
-    { id: "sp-1", name: "Hero", defaultHeadline: "FEATURED\nPRODUCT", defaultSubtitle: "The one everyone's talking about.", thumb: "🔥" },
-    { id: "sp-2", name: "Split", defaultHeadline: "BEST\nSELLER", defaultSubtitle: "See why it's #1.", thumb: "⚡" },
-  ],
-  brandcard: [
-    { id: "bc-1", name: "Profile", defaultHeadline: "VISIT\nMY STORE", defaultSubtitle: "Quality products, great prices.", thumb: "🤍" },
-    { id: "bc-2", name: "Elegant", defaultHeadline: "EXPLORE\nOUR RANGE", defaultSubtitle: "Something for everyone.", thumb: "🖤" },
-  ],
-  collage: [
-    { id: "co-1", name: "Grid", defaultHeadline: "NEW ARRIVALS", defaultSubtitle: "Fresh stock just dropped!", thumb: "🎨" },
-    { id: "co-2", name: "Mosaic", defaultHeadline: "TOP PICKS", defaultSubtitle: "Our best sellers, curated for you.", thumb: "🧩" },
-  ],
-};
 
 const BG_COLORS = [
   { label: "Black", value: "#000000" },
@@ -77,13 +68,9 @@ const parseCategory = (raw: string | null | undefined): string => {
   if (!raw) return "";
   try {
     const parsed = JSON.parse(raw);
-    if (typeof parsed === "object" && parsed !== null) {
-      return Object.keys(parsed)[0] || "";
-    }
+    if (typeof parsed === "object" && parsed !== null) return Object.keys(parsed)[0] || "";
     return String(parsed);
-  } catch {
-    return raw;
-  }
+  } catch { return raw; }
 };
 
 /* ───────── Component ───────── */
@@ -101,9 +88,11 @@ const DashboardShareCard = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // Flow state
+  const [step, setStep] = useState<"select" | "edit">("select");
+  const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null);
+
   // Design state
-  const [activeCategory, setActiveCategory] = useState<CategoryId | null>(null);
-  const [activeVariantId, setActiveVariantId] = useState<string | null>(null);
   const [selectedProductImage, setSelectedProductImage] = useState<string | null>(null);
   const [customUploadedImage, setCustomUploadedImage] = useState<string | null>(null);
   const [headline, setHeadline] = useState("");
@@ -120,10 +109,7 @@ const DashboardShareCard = () => {
   const caption = `🛍️ Visit my store → ${storeUrl}`;
   const activeImage = customUploadedImage || selectedProductImage;
   const productsWithImages = products.filter(p => p.image_url);
-
-  const activeVariant = activeCategory && activeVariantId
-    ? DESIGN_VARIANTS[activeCategory].find(v => v.id === activeVariantId) ?? null
-    : null;
+  const selectedTemplate = TEMPLATES.find(t => t.id === selectedTemplateId) ?? null;
 
   // ── Fetch data ──
   useEffect(() => {
@@ -147,21 +133,22 @@ const DashboardShareCard = () => {
     fetchData();
   }, [user]);
 
-  // ── When category changes, auto-select first variant ──
-  useEffect(() => {
-    if (!activeCategory) return;
-    const variants = DESIGN_VARIANTS[activeCategory];
-    const v = variants[0];
-    setActiveVariantId(v.id);
-    setHeadline(v.defaultHeadline);
-    setSubtitle(v.defaultSubtitle);
-  }, [activeCategory]);
+  // ── Select template and go to editor ──
+  const handleSelectTemplate = (t: DesignTemplate) => {
+    setSelectedTemplateId(t.id);
+  };
 
-  // ── When variant changes, update default text ──
-  const selectVariant = (v: DesignVariant) => {
-    setActiveVariantId(v.id);
-    setHeadline(v.defaultHeadline);
-    setSubtitle(v.defaultSubtitle);
+  const goToEditor = () => {
+    if (!selectedTemplate) return;
+    setHeadline(selectedTemplate.defaultHeadline);
+    setSubtitle(selectedTemplate.defaultSubtitle);
+    setBgColor("#000000");
+    setTintFilter("normal");
+    setStep("edit");
+  };
+
+  const goBack = () => {
+    setStep("select");
   };
 
   // ── Image upload ──
@@ -206,8 +193,7 @@ const DashboardShareCard = () => {
 
   const drawFullBleed = (ctx: CanvasRenderingContext2D, img: HTMLImageElement, W: number, H: number) => {
     const scale = Math.max(W / img.width, H / img.height);
-    const sw = img.width * scale;
-    const sh = img.height * scale;
+    const sw = img.width * scale; const sh = img.height * scale;
     ctx.drawImage(img, (W - sw) / 2, (H - sh) / 2, sw, sh);
   };
 
@@ -218,16 +204,13 @@ const DashboardShareCard = () => {
     else if (filter === "cool") { ctx.fillStyle = "rgba(50,100,255,0.15)"; ctx.fillRect(0, 0, W, H); }
     else if (filter === "bw") {
       ctx.globalCompositeOperation = "saturation";
-      ctx.fillStyle = "hsl(0,0%,50%)";
-      ctx.fillRect(0, 0, W, H);
+      ctx.fillStyle = "hsl(0,0%,50%)"; ctx.fillRect(0, 0, W, H);
       ctx.globalCompositeOperation = "source-over";
     } else if (filter === "sepia") {
       ctx.globalCompositeOperation = "saturation";
-      ctx.fillStyle = "hsl(0,0%,50%)";
-      ctx.fillRect(0, 0, W, H);
+      ctx.fillStyle = "hsl(0,0%,50%)"; ctx.fillRect(0, 0, W, H);
       ctx.globalCompositeOperation = "source-over";
-      ctx.fillStyle = "rgba(180,120,60,0.25)";
-      ctx.fillRect(0, 0, W, H);
+      ctx.fillStyle = "rgba(180,120,60,0.25)"; ctx.fillRect(0, 0, W, H);
     }
     ctx.restore();
   };
@@ -287,375 +270,274 @@ const DashboardShareCard = () => {
   };
 
   const drawBranding = async (
-    ctx: CanvasRenderingContext2D, W: number, H: number,
+    ctx: CanvasRenderingContext2D, W: number, _H: number,
     profileImg: HTMLImageElement | null, displayName: string, letter: string,
     position: "top" | "bottom" = "top", light = true
   ) => {
     const color = light ? "#ffffff" : "#111827";
-    const subColor = light ? "rgba(255,255,255,0.7)" : "rgba(0,0,0,0.5)";
 
-    // Load Afristall logo
     let logoImg: HTMLImageElement | null = null;
     try { logoImg = await loadImage("/logo.jpeg"); } catch {}
 
     if (position === "top") {
       const y = 70;
-      const x = 70;
-      // Afristall logo
       if (logoImg) {
-        ctx.save();
-        ctx.beginPath(); ctx.roundRect(x, y, 50, 50, 10); ctx.clip();
-        ctx.drawImage(logoImg, x, y, 50, 50);
-        ctx.restore();
-        ctx.fillStyle = color;
-        ctx.font = "bold 28px system-ui, sans-serif";
+        ctx.save(); ctx.beginPath(); ctx.roundRect(70, y, 50, 50, 10); ctx.clip();
+        ctx.drawImage(logoImg, 70, y, 50, 50); ctx.restore();
+        ctx.fillStyle = color; ctx.font = "bold 28px system-ui, sans-serif";
         ctx.textAlign = "left"; ctx.textBaseline = "middle";
-        ctx.fillText("afristall", x + 62, y + 25);
+        ctx.fillText("afristall", 132, y + 25);
       }
-
-      // Profile pic + store name on the right
       const rightX = W - 70;
       if (profileImg) {
         drawCircularImage(ctx, profileImg, rightX - 25, y + 25, 25, 2, light ? "#ffffff" : "#e5e7eb");
-        ctx.fillStyle = color;
-        ctx.font = "600 24px system-ui, sans-serif";
+        ctx.fillStyle = color; ctx.font = "600 24px system-ui, sans-serif";
         ctx.textAlign = "right"; ctx.textBaseline = "middle";
         ctx.fillText(displayName, rightX - 60, y + 25);
       } else {
-        ctx.fillStyle = color;
-        ctx.font = "600 24px system-ui, sans-serif";
+        drawCircularPlaceholder(ctx, rightX - 25, y + 25, 25, letter, light ? "rgba(255,255,255,0.2)" : "#e5e7eb", color, 2, light ? "#ffffff" : "#e5e7eb");
+        ctx.fillStyle = color; ctx.font = "600 24px system-ui, sans-serif";
         ctx.textAlign = "right"; ctx.textBaseline = "middle";
-        ctx.fillText(displayName, rightX, y + 25);
+        ctx.fillText(displayName, rightX - 60, y + 25);
       }
     } else {
-      // Bottom branding bar
-      const y = H - 100;
-      const cx = W / 2;
+      const y = _H - 100;
       if (logoImg) {
-        ctx.save();
-        ctx.beginPath(); ctx.roundRect(cx - 130, y, 40, 40, 8); ctx.clip();
-        ctx.drawImage(logoImg, cx - 130, y, 40, 40);
-        ctx.restore();
+        ctx.save(); ctx.beginPath(); ctx.roundRect(W / 2 - 130, y, 40, 40, 8); ctx.clip();
+        ctx.drawImage(logoImg, W / 2 - 130, y, 40, 40); ctx.restore();
       }
-      ctx.fillStyle = color;
-      ctx.font = "bold 28px system-ui, sans-serif";
+      ctx.fillStyle = color; ctx.font = "bold 28px system-ui, sans-serif";
       ctx.textAlign = "center"; ctx.textBaseline = "middle";
-      ctx.fillText(storeUrl, cx, y + 20);
-      ctx.fillStyle = subColor;
+      ctx.fillText(storeUrl, W / 2, y + 20);
+      ctx.fillStyle = light ? "rgba(255,255,255,0.5)" : "rgba(0,0,0,0.4)";
       ctx.font = "20px system-ui, sans-serif";
-      ctx.fillText("Powered by Afristall", cx, y + 55);
+      ctx.fillText("Powered by Afristall", W / 2, y + 55);
     }
   };
 
   const renderCanvas = useCallback(async () => {
     const canvas = canvasRef.current;
-    if (!canvas || loading || !activeCategory || !activeVariantId) return;
+    if (!canvas || loading || !selectedTemplate) return;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    const W = 1080;
-    const H = 1920;
-    canvas.width = W;
-    canvas.height = H;
+    const W = 1080; const H = 1920;
+    canvas.width = W; canvas.height = H;
 
     let profileImg: HTMLImageElement | null = null;
     if (profilePicUrl) { try { profileImg = await loadImage(profilePicUrl); } catch {} }
-
     const displayName = storeName || "My Store";
     const letter = displayName[0].toUpperCase();
 
-    // Background color base
-    ctx.fillStyle = bgColor;
-    ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = bgColor; ctx.fillRect(0, 0, W, H);
 
-    /* ──────── EDITORIAL ──────── */
-    if (activeCategory === "editorial") {
-      // Full-bleed image
-      if (activeImage) {
-        try { const img = await loadImage(activeImage); drawFullBleed(ctx, img, W, H); } catch {}
-      }
+    const tid = selectedTemplate.id;
+
+    /* ──────── EDITORIAL TEMPLATES ──────── */
+    if (tid === "editorial-highlight") {
+      if (activeImage) { try { const img = await loadImage(activeImage); drawFullBleed(ctx, img, W, H); } catch {} }
       applyTint(ctx, W, H, tintFilter);
-
-      if (activeVariantId === "ed-1") {
-        // Highlight: dark gradient bottom, bold text with white bg highlights
-        const ov = ctx.createLinearGradient(0, H * 0.25, 0, H);
-        ov.addColorStop(0, "rgba(0,0,0,0)"); ov.addColorStop(0.5, "rgba(0,0,0,0.2)"); ov.addColorStop(1, "rgba(0,0,0,0.7)");
-        ctx.fillStyle = ov; ctx.fillRect(0, 0, W, H);
-
-        await drawBranding(ctx, W, H, profileImg, displayName, letter, "top", true);
-
-        // Headline with highlight boxes
-        const lines = headline.split("\n");
-        let hlY = H * 0.50;
-        ctx.font = "bold 108px system-ui, sans-serif";
-        ctx.textAlign = "left"; ctx.textBaseline = "top";
-        for (const line of lines) {
-          if (!line.trim()) { hlY += 120; continue; }
-          const m = ctx.measureText(line);
-          ctx.fillStyle = "rgba(255,255,255,0.9)";
-          ctx.beginPath(); ctx.roundRect(60, hlY - 10, m.width + 40, 130, 10); ctx.fill();
-          ctx.fillStyle = "#0a0a0a"; ctx.fillText(line, 80, hlY);
-          hlY += 140;
-        }
-
-        ctx.fillStyle = "#ffffff"; ctx.font = "italic 40px Georgia, serif";
-        ctx.textAlign = "left"; ctx.textBaseline = "top"; ctx.globalAlpha = 0.95;
-        drawMultiline(ctx, subtitle, 80, hlY + 30, W - 160, 54, "left");
-        ctx.globalAlpha = 1;
-
-        await drawBranding(ctx, W, H, profileImg, displayName, letter, "bottom", true);
-
-      } else if (activeVariantId === "ed-2") {
-        // Magazine: top-heavy text, centered, large serif
-        const ov = ctx.createLinearGradient(0, 0, 0, H * 0.5);
-        ov.addColorStop(0, "rgba(0,0,0,0.65)"); ov.addColorStop(1, "rgba(0,0,0,0)");
-        ctx.fillStyle = ov; ctx.fillRect(0, 0, W, H);
-        const ov2 = ctx.createLinearGradient(0, H * 0.7, 0, H);
-        ov2.addColorStop(0, "rgba(0,0,0,0)"); ov2.addColorStop(1, "rgba(0,0,0,0.5)");
-        ctx.fillStyle = ov2; ctx.fillRect(0, 0, W, H);
-
-        await drawBranding(ctx, W, H, profileImg, displayName, letter, "top", true);
-
-        ctx.fillStyle = "#ffffff"; ctx.font = "bold 120px Georgia, serif";
-        ctx.textAlign = "center"; ctx.textBaseline = "top";
-        drawMultiline(ctx, headline, W / 2, 200, W - 120, 140, "center");
-
-        ctx.fillStyle = "#ffffff"; ctx.font = "36px system-ui, sans-serif";
-        ctx.globalAlpha = 0.85;
-        drawMultiline(ctx, subtitle, W / 2, H - 250, W - 160, 48, "center");
-        ctx.globalAlpha = 1;
-
-        await drawBranding(ctx, W, H, profileImg, displayName, letter, "bottom", true);
-
-      } else {
-        // ed-3 Minimal: centered, clean
-        const ov = ctx.createLinearGradient(0, H * 0.5, 0, H);
-        ov.addColorStop(0, "rgba(0,0,0,0)"); ov.addColorStop(1, "rgba(0,0,0,0.6)");
-        ctx.fillStyle = ov; ctx.fillRect(0, 0, W, H);
-
-        await drawBranding(ctx, W, H, profileImg, displayName, letter, "top", true);
-
-        ctx.fillStyle = "#ffffff"; ctx.font = "bold 100px system-ui, sans-serif";
-        ctx.textAlign = "center"; ctx.textBaseline = "middle";
-        drawMultiline(ctx, headline, W / 2, H * 0.65, W - 160, 120, "center");
-
-        ctx.font = "34px system-ui, sans-serif"; ctx.globalAlpha = 0.85;
-        drawMultiline(ctx, subtitle, W / 2, H * 0.65 + 180, W - 160, 46, "center");
-        ctx.globalAlpha = 1;
-
-        await drawBranding(ctx, W, H, profileImg, displayName, letter, "bottom", true);
+      const ov = ctx.createLinearGradient(0, H * 0.25, 0, H);
+      ov.addColorStop(0, "rgba(0,0,0,0)"); ov.addColorStop(0.5, "rgba(0,0,0,0.2)"); ov.addColorStop(1, "rgba(0,0,0,0.75)");
+      ctx.fillStyle = ov; ctx.fillRect(0, 0, W, H);
+      await drawBranding(ctx, W, H, profileImg, displayName, letter, "top", true);
+      const lines = headline.split("\n");
+      let hlY = H * 0.52;
+      ctx.font = "bold 108px system-ui, sans-serif"; ctx.textBaseline = "top";
+      for (const line of lines) {
+        if (!line.trim()) { hlY += 120; continue; }
+        const m = ctx.measureText(line);
+        ctx.fillStyle = "rgba(255,255,255,0.92)";
+        ctx.beginPath(); ctx.roundRect(60, hlY - 10, m.width + 40, 130, 10); ctx.fill();
+        ctx.fillStyle = "#0a0a0a"; ctx.textAlign = "left"; ctx.fillText(line, 80, hlY);
+        hlY += 140;
       }
+      ctx.fillStyle = "#ffffff"; ctx.font = "italic 40px Georgia, serif";
+      ctx.globalAlpha = 0.95;
+      drawMultiline(ctx, subtitle, 80, hlY + 30, W - 160, 54, "left");
+      ctx.globalAlpha = 1;
+      await drawBranding(ctx, W, H, profileImg, displayName, letter, "bottom", true);
 
-    /* ──────── SPOTLIGHT ──────── */
-    } else if (activeCategory === "spotlight") {
-      if (activeVariantId === "sp-1") {
-        // Hero: light bg, large product image, text below
-        ctx.fillStyle = bgColor === "#000000" ? "#f5f3ef" : bgColor;
-        ctx.fillRect(0, 0, W, H);
+    } else if (tid === "editorial-magazine") {
+      if (activeImage) { try { const img = await loadImage(activeImage); drawFullBleed(ctx, img, W, H); } catch {} }
+      applyTint(ctx, W, H, tintFilter);
+      const ov = ctx.createLinearGradient(0, 0, 0, H * 0.5);
+      ov.addColorStop(0, "rgba(0,0,0,0.65)"); ov.addColorStop(1, "rgba(0,0,0,0)");
+      ctx.fillStyle = ov; ctx.fillRect(0, 0, W, H);
+      const ov2 = ctx.createLinearGradient(0, H * 0.7, 0, H);
+      ov2.addColorStop(0, "rgba(0,0,0,0)"); ov2.addColorStop(1, "rgba(0,0,0,0.6)");
+      ctx.fillStyle = ov2; ctx.fillRect(0, 0, W, H);
+      await drawBranding(ctx, W, H, profileImg, displayName, letter, "top", true);
+      ctx.fillStyle = "#ffffff"; ctx.font = "bold 120px Georgia, serif"; ctx.textBaseline = "top";
+      drawMultiline(ctx, headline, W / 2, 200, W - 120, 140, "center");
+      ctx.fillStyle = "#ffffff"; ctx.font = "36px system-ui, sans-serif"; ctx.globalAlpha = 0.85;
+      drawMultiline(ctx, subtitle, W / 2, H - 250, W - 160, 48, "center");
+      ctx.globalAlpha = 1;
+      await drawBranding(ctx, W, H, profileImg, displayName, letter, "bottom", true);
 
-        await drawBranding(ctx, W, H, profileImg, displayName, letter, "top", false);
+    } else if (tid === "editorial-minimal") {
+      if (activeImage) { try { const img = await loadImage(activeImage); drawFullBleed(ctx, img, W, H); } catch {} }
+      applyTint(ctx, W, H, tintFilter);
+      const ov = ctx.createLinearGradient(0, H * 0.5, 0, H);
+      ov.addColorStop(0, "rgba(0,0,0,0)"); ov.addColorStop(1, "rgba(0,0,0,0.65)");
+      ctx.fillStyle = ov; ctx.fillRect(0, 0, W, H);
+      await drawBranding(ctx, W, H, profileImg, displayName, letter, "top", true);
+      ctx.fillStyle = "#ffffff"; ctx.font = "bold 100px system-ui, sans-serif"; ctx.textBaseline = "middle";
+      drawMultiline(ctx, headline, W / 2, H * 0.65, W - 160, 120, "center");
+      ctx.font = "34px system-ui, sans-serif"; ctx.globalAlpha = 0.85;
+      drawMultiline(ctx, subtitle, W / 2, H * 0.65 + 180, W - 160, 46, "center");
+      ctx.globalAlpha = 1;
+      await drawBranding(ctx, W, H, profileImg, displayName, letter, "bottom", true);
 
-        // Two-tone headline
-        const words = headline.replace(/\n/g, " ").split(" ");
-        const mid = Math.ceil(words.length / 2);
-        ctx.font = "bold 80px system-ui, sans-serif";
-        ctx.textAlign = "center"; ctx.textBaseline = "middle";
-        ctx.fillStyle = "#FF6B35"; ctx.fillText(words.slice(0, mid).join(" ").toUpperCase(), W / 2, 220);
-        ctx.fillStyle = "#1a1a1a"; ctx.fillText(words.slice(mid).join(" ").toUpperCase(), W / 2, 310);
-
-        // Product image
-        if (activeImage) {
-          try {
-            const img = await loadImage(activeImage);
-            const imgTop = 400; const imgH = H - imgTop - 340; const imgW = W - 120;
-            ctx.save(); ctx.beginPath(); ctx.roundRect(60, imgTop, imgW, imgH, 40); ctx.clip();
-            const scale = Math.max(imgW / img.width, imgH / img.height);
-            const sw = img.width * scale; const sh = img.height * scale;
-            ctx.drawImage(img, 60 + (imgW - sw) / 2, imgTop + (imgH - sh) / 2, sw, sh);
-            ctx.restore();
-            applyTint(ctx, W, H, tintFilter);
-          } catch {}
-        }
-
-        ctx.fillStyle = "#666666"; ctx.font = "32px system-ui, sans-serif"; ctx.textAlign = "center";
-        drawMultiline(ctx, subtitle, W / 2, H - 220, W - 160, 42, "center");
-
-        ctx.fillStyle = "#FF6B35"; ctx.font = "bold 32px system-ui, sans-serif";
-        ctx.textBaseline = "middle"; ctx.fillText(storeUrl, W / 2, H - 70);
-
-      } else {
-        // sp-2 Split: image top half, text bottom half
-        const splitY = H * 0.55;
-        if (activeImage) {
-          try {
-            const img = await loadImage(activeImage);
-            ctx.save(); ctx.beginPath(); ctx.rect(0, 0, W, splitY); ctx.clip();
-            drawFullBleed(ctx, img, W, splitY);
-            ctx.restore();
-            applyTint(ctx, W, H, tintFilter);
-          } catch {}
-        }
-
-        ctx.fillStyle = bgColor === "#000000" ? "#ffffff" : bgColor;
-        ctx.fillRect(0, splitY, W, H - splitY);
-
-        await drawBranding(ctx, W, H, profileImg, displayName, letter, "top", true);
-
-        const textY = splitY + 60;
-        ctx.fillStyle = "#1a1a1a"; ctx.font = "bold 90px system-ui, sans-serif";
-        ctx.textAlign = "left"; ctx.textBaseline = "top";
-        drawMultiline(ctx, headline, 70, textY, W - 140, 110, "left");
-
-        ctx.fillStyle = "#6b7280"; ctx.font = "32px system-ui, sans-serif";
-        drawMultiline(ctx, subtitle, 70, textY + 260, W - 140, 44, "left");
-
-        // Bottom bar
-        const barH = 100;
-        ctx.fillStyle = "#FF6B35"; ctx.fillRect(0, H - barH, W, barH);
-        ctx.fillStyle = "#ffffff"; ctx.font = "bold 32px system-ui, sans-serif";
-        ctx.textAlign = "center"; ctx.textBaseline = "middle";
-        ctx.fillText(storeUrl, W / 2, H - barH / 2);
+    /* ──────── SPOTLIGHT TEMPLATES ──────── */
+    } else if (tid === "spotlight-hero") {
+      ctx.fillStyle = bgColor === "#000000" ? "#f5f3ef" : bgColor; ctx.fillRect(0, 0, W, H);
+      await drawBranding(ctx, W, H, profileImg, displayName, letter, "top", false);
+      const words = headline.replace(/\n/g, " ").split(" ");
+      const mid = Math.ceil(words.length / 2);
+      ctx.font = "bold 80px system-ui, sans-serif"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+      ctx.fillStyle = "#FF6B35"; ctx.fillText(words.slice(0, mid).join(" ").toUpperCase(), W / 2, 220);
+      ctx.fillStyle = "#1a1a1a"; ctx.fillText(words.slice(mid).join(" ").toUpperCase(), W / 2, 310);
+      if (activeImage) {
+        try {
+          const img = await loadImage(activeImage);
+          const imgTop = 400; const imgH = H - imgTop - 340; const imgW = W - 120;
+          ctx.save(); ctx.beginPath(); ctx.roundRect(60, imgTop, imgW, imgH, 40); ctx.clip();
+          const scale = Math.max(imgW / img.width, imgH / img.height);
+          const sw = img.width * scale; const sh = img.height * scale;
+          ctx.drawImage(img, 60 + (imgW - sw) / 2, imgTop + (imgH - sh) / 2, sw, sh);
+          ctx.restore();
+          applyTint(ctx, W, H, tintFilter);
+        } catch {}
       }
+      ctx.fillStyle = "#666666"; ctx.font = "32px system-ui, sans-serif"; ctx.textAlign = "center";
+      drawMultiline(ctx, subtitle, W / 2, H - 220, W - 160, 42, "center");
+      ctx.fillStyle = "#FF6B35"; ctx.font = "bold 32px system-ui, sans-serif"; ctx.textBaseline = "middle";
+      ctx.fillText(storeUrl, W / 2, H - 70);
 
-    /* ──────── BRAND CARD ──────── */
-    } else if (activeCategory === "brandcard") {
-      if (activeVariantId === "bc-1") {
-        // Profile card: white bg, large rounded image, name below
-        ctx.fillStyle = bgColor === "#000000" ? "#ffffff" : bgColor;
-        ctx.fillRect(0, 0, W, H);
-
-        const imgPad = 80; const imgTop = 160; const imgW = W - imgPad * 2; const imgH = H * 0.48;
-        if (activeImage || profileImg) {
-          const img = activeImage ? await loadImage(activeImage).catch(() => profileImg) : profileImg;
-          if (img) {
-            ctx.save(); ctx.beginPath(); ctx.roundRect(imgPad, imgTop, imgW, imgH, 32); ctx.clip();
-            const scale = Math.max(imgW / img.width, imgH / img.height);
-            const sw = img.width * scale; const sh = img.height * scale;
-            ctx.drawImage(img, imgPad + (imgW - sw) / 2, imgTop + (imgH - sh) / 2, sw, sh);
-            ctx.restore();
-            applyTint(ctx, W, H, tintFilter);
-          }
-        } else {
-          ctx.fillStyle = "#f3f4f6"; ctx.beginPath(); ctx.roundRect(imgPad, imgTop, imgW, imgH, 32); ctx.fill();
-          drawCircularPlaceholder(ctx, W / 2, imgTop + imgH / 2, 100, letter, "#e5e7eb", "#9ca3af");
-        }
-
-        // Afristall logo at top
-        let logoImg: HTMLImageElement | null = null;
-        try { logoImg = await loadImage("/logo.jpeg"); } catch {}
-        if (logoImg) {
-          ctx.save(); ctx.beginPath(); ctx.roundRect(imgPad, 70, 45, 45, 10); ctx.clip();
-          ctx.drawImage(logoImg, imgPad, 70, 45, 45); ctx.restore();
-          ctx.fillStyle = "#1a1a1a"; ctx.font = "bold 26px system-ui, sans-serif";
-          ctx.textAlign = "left"; ctx.textBaseline = "middle"; ctx.fillText("afristall", imgPad + 55, 92);
-        }
-
-        const textTop = imgTop + imgH + 50;
-        ctx.fillStyle = "#111827"; ctx.font = "bold 64px system-ui, sans-serif";
-        ctx.textAlign = "left"; ctx.textBaseline = "top";
-        drawMultiline(ctx, headline, imgPad, textTop, imgW, 78, "left");
-
-        ctx.fillStyle = "#6b7280"; ctx.font = "32px system-ui, sans-serif";
-        drawMultiline(ctx, subtitle, imgPad, textTop + 180, imgW, 44, "left");
-
-        // Profile pic + name at bottom
-        const bY = H - 180;
-        if (profileImg) {
-          drawCircularImage(ctx, profileImg, imgPad + 30, bY, 30, 3, "#e5e7eb");
-          ctx.fillStyle = "#111827"; ctx.font = "600 28px system-ui, sans-serif";
-          ctx.textAlign = "left"; ctx.textBaseline = "middle";
-          ctx.fillText(displayName, imgPad + 75, bY);
-        }
-
-        const barH = 110;
-        const grad = ctx.createLinearGradient(0, H - barH, W, H);
-        grad.addColorStop(0, "#FF6B35"); grad.addColorStop(1, "#FF8F5E");
-        ctx.fillStyle = grad; ctx.fillRect(0, H - barH, W, barH);
-        ctx.fillStyle = "#ffffff"; ctx.font = "bold 34px system-ui, sans-serif";
-        ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText(storeUrl, W / 2, H - barH / 2);
-
-      } else {
-        // bc-2 Elegant: dark theme
-        ctx.fillStyle = bgColor === "#000000" || bgColor === "#ffffff" ? "#1a1a2e" : bgColor;
-        ctx.fillRect(0, 0, W, H);
-
-        const imgPad = 80; const imgTop = 160; const imgW = W - imgPad * 2; const imgH = H * 0.45;
-        if (activeImage || profileImg) {
-          const img = activeImage ? await loadImage(activeImage).catch(() => profileImg) : profileImg;
-          if (img) {
-            ctx.save(); ctx.beginPath(); ctx.roundRect(imgPad, imgTop, imgW, imgH, 32); ctx.clip();
-            const scale = Math.max(imgW / img.width, imgH / img.height);
-            const sw = img.width * scale; const sh = img.height * scale;
-            ctx.drawImage(img, imgPad + (imgW - sw) / 2, imgTop + (imgH - sh) / 2, sw, sh);
-            ctx.restore();
-            applyTint(ctx, W, H, tintFilter);
-          }
-        }
-
-        await drawBranding(ctx, W, H, profileImg, displayName, letter, "top", true);
-
-        const textTop = imgTop + imgH + 50;
-        ctx.fillStyle = "#ffffff"; ctx.font = "bold 64px system-ui, sans-serif";
-        ctx.textAlign = "left"; ctx.textBaseline = "top";
-        drawMultiline(ctx, headline, imgPad, textTop, imgW, 78, "left");
-
-        ctx.fillStyle = "rgba(255,255,255,0.7)"; ctx.font = "32px system-ui, sans-serif";
-        drawMultiline(ctx, subtitle, imgPad, textTop + 180, imgW, 44, "left");
-
-        await drawBranding(ctx, W, H, profileImg, displayName, letter, "bottom", true);
+    } else if (tid === "spotlight-split") {
+      const splitY = H * 0.55;
+      if (activeImage) {
+        try {
+          const img = await loadImage(activeImage);
+          ctx.save(); ctx.beginPath(); ctx.rect(0, 0, W, splitY); ctx.clip();
+          drawFullBleed(ctx, img, W, splitY); ctx.restore();
+          applyTint(ctx, W, H, tintFilter);
+        } catch {}
       }
+      ctx.fillStyle = bgColor === "#000000" ? "#ffffff" : bgColor;
+      ctx.fillRect(0, splitY, W, H - splitY);
+      await drawBranding(ctx, W, H, profileImg, displayName, letter, "top", true);
+      const textY = splitY + 60;
+      ctx.fillStyle = "#1a1a1a"; ctx.font = "bold 90px system-ui, sans-serif"; ctx.textBaseline = "top";
+      drawMultiline(ctx, headline, 70, textY, W - 140, 110, "left");
+      ctx.fillStyle = "#6b7280"; ctx.font = "32px system-ui, sans-serif";
+      drawMultiline(ctx, subtitle, 70, textY + 260, W - 140, 44, "left");
+      const barH = 100;
+      ctx.fillStyle = "#FF6B35"; ctx.fillRect(0, H - barH, W, barH);
+      ctx.fillStyle = "#ffffff"; ctx.font = "bold 32px system-ui, sans-serif";
+      ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText(storeUrl, W / 2, H - barH / 2);
 
-    /* ──────── COLLAGE ──────── */
-    } else if (activeCategory === "collage") {
-      ctx.fillStyle = bgColor === "#000000" ? "#faf9f7" : bgColor;
+    /* ──────── BRAND CARD TEMPLATES ──────── */
+    } else if (tid === "brand-profile") {
+      ctx.fillStyle = bgColor === "#000000" ? "#ffffff" : bgColor; ctx.fillRect(0, 0, W, H);
+      const imgPad = 80; const imgTop = 160; const imgW = W - imgPad * 2; const imgH = H * 0.48;
+      if (activeImage || profileImg) {
+        const img = activeImage ? await loadImage(activeImage).catch(() => profileImg) : profileImg;
+        if (img) {
+          ctx.save(); ctx.beginPath(); ctx.roundRect(imgPad, imgTop, imgW, imgH, 32); ctx.clip();
+          const scale = Math.max(imgW / img.width, imgH / img.height);
+          const sw = img.width * scale; const sh = img.height * scale;
+          ctx.drawImage(img, imgPad + (imgW - sw) / 2, imgTop + (imgH - sh) / 2, sw, sh);
+          ctx.restore(); applyTint(ctx, W, H, tintFilter);
+        }
+      } else {
+        ctx.fillStyle = "#f3f4f6"; ctx.beginPath(); ctx.roundRect(imgPad, imgTop, imgW, imgH, 32); ctx.fill();
+        drawCircularPlaceholder(ctx, W / 2, imgTop + imgH / 2, 100, letter, "#e5e7eb", "#9ca3af");
+      }
+      let logoImg: HTMLImageElement | null = null;
+      try { logoImg = await loadImage("/logo.jpeg"); } catch {}
+      if (logoImg) {
+        ctx.save(); ctx.beginPath(); ctx.roundRect(imgPad, 70, 45, 45, 10); ctx.clip();
+        ctx.drawImage(logoImg, imgPad, 70, 45, 45); ctx.restore();
+        ctx.fillStyle = "#1a1a1a"; ctx.font = "bold 26px system-ui, sans-serif";
+        ctx.textAlign = "left"; ctx.textBaseline = "middle"; ctx.fillText("afristall", imgPad + 55, 92);
+      }
+      const textTop = imgTop + imgH + 50;
+      ctx.fillStyle = "#111827"; ctx.font = "bold 64px system-ui, sans-serif"; ctx.textBaseline = "top";
+      drawMultiline(ctx, headline, imgPad, textTop, imgW, 78, "left");
+      ctx.fillStyle = "#6b7280"; ctx.font = "32px system-ui, sans-serif";
+      drawMultiline(ctx, subtitle, imgPad, textTop + 180, imgW, 44, "left");
+      const bY = H - 180;
+      if (profileImg) {
+        drawCircularImage(ctx, profileImg, imgPad + 30, bY, 30, 3, "#e5e7eb");
+        ctx.fillStyle = "#111827"; ctx.font = "600 28px system-ui, sans-serif"; ctx.textAlign = "left"; ctx.textBaseline = "middle";
+        ctx.fillText(displayName, imgPad + 75, bY);
+      }
+      const barH2 = 110;
+      const grad = ctx.createLinearGradient(0, H - barH2, W, H);
+      grad.addColorStop(0, "#FF6B35"); grad.addColorStop(1, "#FF8F5E");
+      ctx.fillStyle = grad; ctx.fillRect(0, H - barH2, W, barH2);
+      ctx.fillStyle = "#ffffff"; ctx.font = "bold 34px system-ui, sans-serif";
+      ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText(storeUrl, W / 2, H - barH2 / 2);
+
+    } else if (tid === "brand-elegant") {
+      ctx.fillStyle = bgColor === "#000000" || bgColor === "#ffffff" ? "#1a1a2e" : bgColor;
       ctx.fillRect(0, 0, W, H);
+      const imgPad = 80; const imgTop = 160; const imgW = W - imgPad * 2; const imgH = H * 0.45;
+      if (activeImage || profileImg) {
+        const img = activeImage ? await loadImage(activeImage).catch(() => profileImg) : profileImg;
+        if (img) {
+          ctx.save(); ctx.beginPath(); ctx.roundRect(imgPad, imgTop, imgW, imgH, 32); ctx.clip();
+          const scale = Math.max(imgW / img.width, imgH / img.height);
+          const sw = img.width * scale; const sh = img.height * scale;
+          ctx.drawImage(img, imgPad + (imgW - sw) / 2, imgTop + (imgH - sh) / 2, sw, sh);
+          ctx.restore(); applyTint(ctx, W, H, tintFilter);
+        }
+      }
+      await drawBranding(ctx, W, H, profileImg, displayName, letter, "top", true);
+      const textTop = imgTop + imgH + 50;
+      ctx.fillStyle = "#ffffff"; ctx.font = "bold 64px system-ui, sans-serif"; ctx.textBaseline = "top";
+      drawMultiline(ctx, headline, imgPad, textTop, imgW, 78, "left");
+      ctx.fillStyle = "rgba(255,255,255,0.7)"; ctx.font = "32px system-ui, sans-serif";
+      drawMultiline(ctx, subtitle, imgPad, textTop + 180, imgW, 44, "left");
+      await drawBranding(ctx, W, H, profileImg, displayName, letter, "bottom", true);
 
-      // Header
+    /* ──────── COLLAGE TEMPLATES ──────── */
+    } else if (tid === "collage-grid" || tid === "collage-mosaic") {
+      ctx.fillStyle = bgColor === "#000000" ? "#faf9f7" : bgColor; ctx.fillRect(0, 0, W, H);
       const headerH = 200;
       if (profileImg) {
         drawCircularImage(ctx, profileImg, 100, headerH / 2, 40, 3, "#e5e7eb");
         ctx.fillStyle = "#111827"; ctx.font = "bold 36px system-ui, sans-serif";
-        ctx.textAlign = "left"; ctx.textBaseline = "middle";
-        ctx.fillText(displayName, 155, headerH / 2);
+        ctx.textAlign = "left"; ctx.textBaseline = "middle"; ctx.fillText(displayName, 155, headerH / 2);
       } else {
         drawCircularPlaceholder(ctx, 100, headerH / 2, 40, letter, "#f3f4f6", "#9ca3af", 3, "#e5e7eb");
         ctx.fillStyle = "#111827"; ctx.font = "bold 36px system-ui, sans-serif";
-        ctx.textAlign = "left"; ctx.textBaseline = "middle";
-        ctx.fillText(displayName, 155, headerH / 2);
+        ctx.textAlign = "left"; ctx.textBaseline = "middle"; ctx.fillText(displayName, 155, headerH / 2);
       }
-
-      // Afristall logo top right
       let logoImg2: HTMLImageElement | null = null;
       try { logoImg2 = await loadImage("/logo.jpeg"); } catch {}
       if (logoImg2) {
         ctx.save(); ctx.beginPath(); ctx.roundRect(W - 120, headerH / 2 - 20, 40, 40, 8); ctx.clip();
         ctx.drawImage(logoImg2, W - 120, headerH / 2 - 20, 40, 40); ctx.restore();
       }
-
-      const gridTop = headerH + 10;
-      const gridPad = 16; const gap = 12;
-      const gridW = W - gridPad * 2;
-      const gridBottom = H - 320;
-      const gridH = gridBottom - gridTop;
-      const rad = 20;
+      const gridTop = headerH + 10; const gridPad = 16; const gap = 12;
+      const gridW = W - gridPad * 2; const gridBottom = H - 320; const gridH = gridBottom - gridTop; const rad = 20;
       const collageImages = productsWithImages.slice(0, 4);
       const imgCount = collageImages.length;
-
       const drawRounded = async (url: string, x: number, y: number, w: number, h: number) => {
         try {
           const img = await loadImage(url);
           ctx.save(); ctx.beginPath(); ctx.roundRect(x, y, w, h, rad); ctx.clip();
           const scale = Math.max(w / img.width, h / img.height);
           const sw = img.width * scale; const sh = img.height * scale;
-          ctx.drawImage(img, x + (w - sw) / 2, y + (h - sh) / 2, sw, sh);
-          ctx.restore();
+          ctx.drawImage(img, x + (w - sw) / 2, y + (h - sh) / 2, sw, sh); ctx.restore();
         } catch {
           ctx.fillStyle = "#e5e7eb"; ctx.beginPath(); ctx.roundRect(x, y, w, h, rad); ctx.fill();
         }
       };
-
-      if (activeVariantId === "co-1") {
-        // Grid: 2x2
+      if (tid === "collage-grid") {
         if (imgCount >= 4) {
           const cW = (gridW - gap) / 2; const cH = (gridH - gap) / 2;
           await drawRounded(collageImages[0].image_url!, gridPad, gridTop, cW, cH);
@@ -666,7 +548,6 @@ const DashboardShareCard = () => {
           await drawRounded(collageImages[0].image_url!, gridPad, gridTop, gridW, gridH);
         }
       } else {
-        // co-2 Mosaic: 1 large left, 2 stacked right
         if (imgCount >= 3) {
           const leftW = Math.round(gridW * 0.55); const rightW = gridW - leftW - gap;
           const rightH = (gridH - gap) / 2;
@@ -677,18 +558,11 @@ const DashboardShareCard = () => {
           await drawRounded(collageImages[0].image_url!, gridPad, gridTop, gridW, gridH);
         }
       }
-
       applyTint(ctx, W, H, tintFilter);
-
-      // Bottom text
-      ctx.fillStyle = "#111827"; ctx.font = "bold 52px system-ui, sans-serif";
-      ctx.textAlign = "center"; ctx.textBaseline = "top";
+      ctx.fillStyle = "#111827"; ctx.font = "bold 52px system-ui, sans-serif"; ctx.textBaseline = "top";
       drawMultiline(ctx, headline.replace(/\n/g, " "), W / 2, gridBottom + 30, W - 120, 62, "center");
-
       ctx.fillStyle = "#6b7280"; ctx.font = "30px system-ui, sans-serif";
       drawMultiline(ctx, subtitle, W / 2, gridBottom + 110, W - 120, 42, "center");
-
-      // URL pill
       const pillW = 500; const pillH = 80; const pillX = (W - pillW) / 2; const pillY = H - pillH - 40;
       const pGrad = ctx.createLinearGradient(pillX, pillY, pillX + pillW, pillY);
       pGrad.addColorStop(0, "#FF6B35"); pGrad.addColorStop(1, "#FF8F5E");
@@ -696,11 +570,11 @@ const DashboardShareCard = () => {
       ctx.fillStyle = "#ffffff"; ctx.font = "bold 30px system-ui, sans-serif";
       ctx.textBaseline = "middle"; ctx.textAlign = "center"; ctx.fillText(storeUrl, W / 2, pillY + pillH / 2);
     }
-  }, [profilePicUrl, storeName, storeSlug, headline, subtitle, activeCategory, activeVariantId, activeImage, bgColor, tintFilter, loading, products, productsWithImages, storeUrl]);
+  }, [profilePicUrl, storeName, storeSlug, headline, subtitle, selectedTemplate, activeImage, bgColor, tintFilter, loading, products, productsWithImages, storeUrl]);
 
   useEffect(() => {
-    if (activeCategory && activeVariantId) renderCanvas();
-  }, [renderCanvas, activeCategory, activeVariantId]);
+    if (step === "edit" && selectedTemplate) renderCanvas();
+  }, [renderCanvas, step, selectedTemplate]);
 
   const downloadOrShare = async () => {
     const canvas = canvasRef.current;
@@ -734,185 +608,267 @@ const DashboardShareCard = () => {
     );
   }
 
-  return (
-    <div className="space-y-6 pb-24 md:pb-6">
-      {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold flex items-center gap-2">
-          <Palette className="h-6 w-6 text-primary" /> Design Studio
-        </h1>
-        <p className="text-sm text-muted-foreground mt-1">Create branded cards for WhatsApp Status & Instagram Stories</p>
-      </div>
-
-      {/* Category pills */}
-      <div className="flex gap-2 overflow-x-auto pb-1">
-        {CATEGORIES.map((cat) => (
-          <button
-            key={cat.id}
-            onClick={() => setActiveCategory(cat.id)}
-            className={`shrink-0 rounded-full px-5 py-2.5 text-sm font-semibold transition-all ${
-              activeCategory === cat.id
-                ? "bg-primary text-primary-foreground shadow-md"
-                : "bg-muted text-muted-foreground hover:bg-muted/80"
-            }`}
-          >
-            {cat.label}
-          </button>
-        ))}
-      </div>
-
-      {/* Design variants grid */}
-      {activeCategory && (
+  /* ───────── STEP 1: Template Selection ───────── */
+  if (step === "select") {
+    const categories = [...new Set(TEMPLATES.map(t => t.category))];
+    return (
+      <div className="space-y-6 pb-24 md:pb-6">
         <div>
-          <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Designs</Label>
-          <div className="grid grid-cols-3 gap-3 mt-2">
-            {DESIGN_VARIANTS[activeCategory].map((v) => (
-              <button
-                key={v.id}
-                onClick={() => selectVariant(v)}
-                className={`rounded-2xl border-2 p-4 text-center transition-all ${
-                  activeVariantId === v.id
-                    ? "border-primary bg-primary/10 shadow-md shadow-primary/10"
-                    : "border-border/50 bg-card/60 hover:border-primary/30"
-                }`}
-              >
-                <div className="text-2xl mb-1">{v.thumb}</div>
-                <div className="text-xs font-semibold">{v.name}</div>
-              </button>
-            ))}
+          <h1 className="text-2xl font-bold flex items-center gap-2">
+            <Palette className="h-6 w-6 text-primary" /> Design Studio
+          </h1>
+          <p className="text-sm text-muted-foreground mt-1">Create branded cards for WhatsApp Status & Instagram Stories</p>
+        </div>
+
+        {/* Guide text */}
+        <div className="rounded-2xl border border-primary/20 bg-primary/5 p-4">
+          <p className="text-sm font-medium text-foreground">👋 Select your preferred design to get started</p>
+          <p className="text-xs text-muted-foreground mt-1">Pick a template that matches your brand's vibe, then customize it with your own images and text.</p>
+        </div>
+
+        {categories.map((cat) => (
+          <div key={cat}>
+            <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">{cat}</h2>
+            <div className="grid grid-cols-2 gap-3">
+              {TEMPLATES.filter(t => t.category === cat).map((t) => (
+                <button
+                  key={t.id}
+                  onClick={() => handleSelectTemplate(t)}
+                  className={`relative rounded-2xl border-2 overflow-hidden transition-all aspect-[9/14] group ${
+                    selectedTemplateId === t.id
+                      ? "border-primary ring-2 ring-primary/30 shadow-lg shadow-primary/10 scale-[1.02]"
+                      : "border-border/50 hover:border-primary/40 hover:shadow-md"
+                  }`}
+                >
+                  {/* Preview card */}
+                  <div
+                    className="absolute inset-0 flex flex-col items-center justify-center p-4"
+                    style={{ background: t.previewBg }}
+                  >
+                    {/* Mini layout preview */}
+                    {t.previewLayout === "full-bleed" && (
+                      <div className="w-full h-full flex flex-col justify-between relative">
+                        {/* Simulated photo area */}
+                        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/60 rounded-lg" />
+                        <div className="relative z-10 flex justify-between items-start p-2">
+                          <div className="flex items-center gap-1">
+                            <div className="h-4 w-4 rounded bg-white/30" />
+                            <div className="h-2 w-8 rounded-full bg-white/40" />
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <div className="h-3 w-3 rounded-full" style={{ backgroundColor: t.previewAccent }} />
+                          </div>
+                        </div>
+                        <div className="relative z-10 p-3 space-y-1.5">
+                          <div className="h-3 w-3/4 rounded-sm" style={{ backgroundColor: t.previewAccent }} />
+                          <div className="h-3 w-1/2 rounded-sm" style={{ backgroundColor: t.previewAccent, opacity: 0.7 }} />
+                          <div className="h-1.5 w-full rounded-full bg-white/30 mt-2" />
+                          <div className="h-1.5 w-2/3 rounded-full bg-white/20" />
+                        </div>
+                      </div>
+                    )}
+                    {t.previewLayout === "split" && (
+                      <div className="w-full h-full flex flex-col">
+                        <div className="flex-1 rounded-t-lg" style={{ background: `linear-gradient(135deg, ${t.previewAccent}40, ${t.previewAccent}20)` }} />
+                        <div className="h-2/5 p-3 flex flex-col justify-center" style={{ backgroundColor: t.previewTextColor === "#fff" ? "#1a1a2e" : "#ffffff" }}>
+                          <div className="h-3 w-3/4 rounded-sm mb-1.5" style={{ backgroundColor: t.previewAccent }} />
+                          <div className="h-3 w-1/2 rounded-sm mb-2" style={{ backgroundColor: t.previewAccent, opacity: 0.6 }} />
+                          <div className="h-1.5 w-full rounded-full" style={{ backgroundColor: t.previewTextColor === "#fff" ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.1)" }} />
+                        </div>
+                      </div>
+                    )}
+                    {t.previewLayout === "centered" && (
+                      <div className="w-full h-full flex flex-col items-center justify-center gap-2 p-3">
+                        <div className="w-3/4 aspect-square rounded-xl" style={{ background: `linear-gradient(135deg, ${t.previewAccent}30, ${t.previewAccent}10)`, border: `1px solid ${t.previewAccent}30` }} />
+                        <div className="h-3 w-2/3 rounded-sm" style={{ backgroundColor: t.previewTextColor, opacity: 0.8 }} />
+                        <div className="h-1.5 w-1/2 rounded-full" style={{ backgroundColor: t.previewTextColor, opacity: 0.3 }} />
+                        <div className="h-6 w-3/4 rounded-full mt-1" style={{ backgroundColor: t.previewAccent }} />
+                      </div>
+                    )}
+                    {t.previewLayout === "grid" && (
+                      <div className="w-full h-full flex flex-col gap-1.5 p-2">
+                        <div className="flex items-center gap-1 mb-1">
+                          <div className="h-4 w-4 rounded-full" style={{ backgroundColor: t.previewAccent, opacity: 0.5 }} />
+                          <div className="h-2 w-10 rounded-full" style={{ backgroundColor: t.previewTextColor, opacity: 0.4 }} />
+                        </div>
+                        <div className="flex-1 grid grid-cols-2 gap-1">
+                          {[1,2,3,4].map(i => (
+                            <div key={i} className="rounded-lg" style={{ background: `linear-gradient(135deg, ${t.previewAccent}${i*10+10}, ${t.previewAccent}${i*5+5})` }} />
+                          ))}
+                        </div>
+                        <div className="h-5 w-2/3 mx-auto rounded-full" style={{ backgroundColor: t.previewAccent }} />
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Name overlay */}
+                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-3 pt-8">
+                    <p className="text-white text-xs font-bold">{t.name}</p>
+                    <p className="text-white/60 text-[10px]">{t.category}</p>
+                  </div>
+
+                  {/* Selected check */}
+                  {selectedTemplateId === t.id && (
+                    <div className="absolute top-2 right-2 h-6 w-6 rounded-full bg-primary flex items-center justify-center">
+                      <Check className="h-3.5 w-3.5 text-primary-foreground" />
+                    </div>
+                  )}
+                </button>
+              ))}
+            </div>
+          </div>
+        ))}
+
+        {/* Next button */}
+        {selectedTemplateId && (
+          <div className="sticky bottom-20 md:bottom-4 z-40">
+            <Button onClick={goToEditor} className="w-full rounded-2xl h-12 text-base gap-2 shadow-lg shadow-primary/20">
+              Next – Customize Design <ArrowRight className="h-5 w-5" />
+            </Button>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  /* ───────── STEP 2: Editor ───────── */
+  return (
+    <div className="space-y-5 pb-24 md:pb-6">
+      {/* Back button + title */}
+      <div className="flex items-center gap-3">
+        <Button variant="ghost" size="icon" onClick={goBack} className="shrink-0 rounded-xl">
+          <ArrowLeft className="h-5 w-5" />
+        </Button>
+        <div>
+          <h1 className="text-lg font-bold">{selectedTemplate?.name} Design</h1>
+          <p className="text-xs text-muted-foreground">Customize your card</p>
+        </div>
+      </div>
+
+      {/* Canvas preview — click to change image */}
+      <div className="flex justify-center">
+        <div className="relative group w-full max-w-xs cursor-pointer" onClick={() => fileInputRef.current?.click()}>
+          <canvas
+            ref={canvasRef}
+            className="w-full rounded-2xl border border-border/50 shadow-lg"
+            style={{ aspectRatio: "9/16" }}
+          />
+          <div className="absolute inset-0 rounded-2xl bg-black/0 group-hover:bg-black/30 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100">
+            <div className="bg-white/90 rounded-full px-4 py-2 flex items-center gap-2 text-sm font-medium text-foreground shadow-lg">
+              <Camera className="h-4 w-4" /> Tap to change image
+            </div>
           </div>
         </div>
-      )}
+      </div>
+      <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
 
-      {/* Design area */}
-      {activeVariant && (
-        <>
-          {/* Canvas preview — click to change image */}
-          <div className="flex justify-center">
-            <div className="relative group w-full max-w-xs cursor-pointer" onClick={() => fileInputRef.current?.click()}>
-              <canvas
-                ref={canvasRef}
-                className="w-full rounded-2xl border border-border/50 shadow-lg"
-                style={{ aspectRatio: "9/16" }}
-              />
-              <div className="absolute inset-0 rounded-2xl bg-black/0 group-hover:bg-black/30 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100">
-                <div className="bg-white/90 rounded-full px-4 py-2 flex items-center gap-2 text-sm font-medium text-foreground shadow-lg">
-                  <Camera className="h-4 w-4" /> Tap to change image
-                </div>
-              </div>
-            </div>
-          </div>
-          <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
-
-          {/* Image picker row */}
-          <div>
-            <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
-              <ImageIcon className="h-3.5 w-3.5" /> Images
-            </Label>
-            <div className="grid grid-cols-5 gap-2 mt-2">
+      {/* Image picker row */}
+      <div>
+        <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
+          <ImageIcon className="h-3.5 w-3.5" /> Images
+        </Label>
+        <div className="grid grid-cols-5 gap-2 mt-2">
+          <button
+            onClick={() => fileInputRef.current?.click()}
+            className="rounded-xl border-2 border-dashed border-border/50 hover:border-primary/40 aspect-square flex flex-col items-center justify-center gap-1 text-muted-foreground hover:text-primary transition-colors"
+            disabled={uploading}
+          >
+            {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <><Upload className="h-4 w-4" /><span className="text-[9px] font-medium">Upload</span></>}
+          </button>
+          {customUploadedImage && (
+            <div className="relative">
+              <button onClick={() => setCustomUploadedImage(null)} className="absolute -top-1 -right-1 z-10 h-4 w-4 rounded-full bg-destructive text-destructive-foreground flex items-center justify-center"><X className="h-2.5 w-2.5" /></button>
               <button
-                onClick={() => fileInputRef.current?.click()}
-                className="rounded-xl border-2 border-dashed border-border/50 hover:border-primary/40 aspect-square flex flex-col items-center justify-center gap-1 text-muted-foreground hover:text-primary transition-colors"
-                disabled={uploading}
+                onClick={() => { setCustomUploadedImage(customUploadedImage); setSelectedProductImage(null); }}
+                className={`rounded-xl border-2 overflow-hidden aspect-square w-full ${activeImage === customUploadedImage ? "border-primary ring-2 ring-primary/20" : "border-border/50"}`}
               >
-                {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <><Upload className="h-4 w-4" /><span className="text-[9px] font-medium">Upload</span></>}
+                <img src={customUploadedImage} alt="Uploaded" className="w-full h-full object-cover" />
               </button>
-              {customUploadedImage && (
-                <div className="relative">
-                  <button onClick={() => setCustomUploadedImage(null)} className="absolute -top-1 -right-1 z-10 h-4 w-4 rounded-full bg-destructive text-destructive-foreground flex items-center justify-center"><X className="h-2.5 w-2.5" /></button>
-                  <button
-                    onClick={() => { setCustomUploadedImage(customUploadedImage); setSelectedProductImage(null); }}
-                    className={`rounded-xl border-2 overflow-hidden aspect-square w-full ${activeImage === customUploadedImage ? "border-primary ring-2 ring-primary/20" : "border-border/50"}`}
-                  >
-                    <img src={customUploadedImage} alt="Uploaded" className="w-full h-full object-cover" />
-                  </button>
-                </div>
-              )}
-              {productsWithImages.slice(0, customUploadedImage ? 3 : 4).map((p) => (
-                <button
-                  key={p.id}
-                  onClick={() => { setSelectedProductImage(p.image_url); setCustomUploadedImage(null); }}
-                  className={`rounded-xl border-2 overflow-hidden aspect-square ${activeImage === p.image_url && !customUploadedImage ? "border-primary ring-2 ring-primary/20" : "border-border/50 hover:border-primary/30"}`}
-                >
-                  <img src={p.image_url!} alt={p.name} className="w-full h-full object-cover" />
-                </button>
-              ))}
             </div>
-          </div>
+          )}
+          {productsWithImages.slice(0, customUploadedImage ? 3 : 4).map((p) => (
+            <button
+              key={p.id}
+              onClick={() => { setSelectedProductImage(p.image_url); setCustomUploadedImage(null); }}
+              className={`rounded-xl border-2 overflow-hidden aspect-square ${activeImage === p.image_url && !customUploadedImage ? "border-primary ring-2 ring-primary/20" : "border-border/50 hover:border-primary/30"}`}
+            >
+              <img src={p.image_url!} alt={p.name} className="w-full h-full object-cover" />
+            </button>
+          ))}
+        </div>
+      </div>
 
-          {/* Background color */}
-          <div>
-            <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Background</Label>
-            <div className="flex gap-2 mt-2">
-              {BG_COLORS.map((c) => (
-                <button
-                  key={c.value}
-                  onClick={() => setBgColor(c.value)}
-                  className={`h-8 w-8 rounded-full border-2 transition-all ${bgColor === c.value ? "border-primary ring-2 ring-primary/20 scale-110" : "border-border/50"}`}
-                  style={{ backgroundColor: c.value }}
-                  title={c.label}
-                />
-              ))}
-            </div>
-          </div>
+      {/* Background color */}
+      <div>
+        <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Background</Label>
+        <div className="flex gap-2 mt-2">
+          {BG_COLORS.map((c) => (
+            <button
+              key={c.value}
+              onClick={() => setBgColor(c.value)}
+              className={`h-8 w-8 rounded-full border-2 transition-all ${bgColor === c.value ? "border-primary ring-2 ring-primary/20 scale-110" : "border-border/50"}`}
+              style={{ backgroundColor: c.value }}
+              title={c.label}
+            />
+          ))}
+        </div>
+      </div>
 
-          {/* Tint filter */}
-          <div>
-            <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Image Tint</Label>
-            <div className="flex gap-2 mt-2">
-              {TINT_FILTERS.map((t) => (
-                <button
-                  key={t.value}
-                  onClick={() => setTintFilter(t.value)}
-                  className={`rounded-full px-3 py-1.5 text-xs font-medium transition-all ${tintFilter === t.value ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-muted/80"}`}
-                >
-                  {t.label}
-                </button>
-              ))}
-            </div>
-          </div>
+      {/* Tint filter */}
+      <div>
+        <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Image Tint</Label>
+        <div className="flex gap-2 mt-2">
+          {TINT_FILTERS.map((t) => (
+            <button
+              key={t.value}
+              onClick={() => setTintFilter(t.value)}
+              className={`rounded-full px-3 py-1.5 text-xs font-medium transition-all ${tintFilter === t.value ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-muted/80"}`}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
+      </div>
 
-          {/* Text editing */}
-          <div className="rounded-2xl border border-border/50 bg-card/60 backdrop-blur-xl p-5 space-y-4">
-            <h3 className="text-sm font-semibold">Customize Text</h3>
-            <div>
-              <Label className="text-xs">Headline</Label>
-              <textarea
-                value={headline}
-                onChange={(e) => setHeadline(e.target.value)}
-                placeholder="e.g. SHOP NOW"
-                maxLength={120}
-                rows={3}
-                className="mt-1 flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 resize-none"
-              />
-            </div>
-            <div>
-              <div className="flex items-center justify-between mb-1">
-                <Label className="text-xs">Subtitle</Label>
-                <Button variant="ghost" size="sm" className="h-7 gap-1.5 text-xs text-primary" onClick={generateAIText} disabled={generatingMsg}>
-                  {generatingMsg ? <Loader2 className="h-3 w-3 animate-spin" /> : <Sparkles className="h-3 w-3" />} AI Generate
-                </Button>
-              </div>
-              <Input value={subtitle} onChange={(e) => setSubtitle(e.target.value)} placeholder="e.g. Quality products, great prices." maxLength={120} />
-            </div>
-          </div>
-
-          {/* Actions */}
-          <div className="space-y-3">
-            <Button onClick={downloadOrShare} className="w-full rounded-2xl gap-2 h-12 text-base">
-              {typeof navigator !== "undefined" && navigator.canShare ? <><Share2 className="h-5 w-5" /> Share Card</> : <><Download className="h-5 w-5" /> Download Card</>}
+      {/* Text editing */}
+      <div className="rounded-2xl border border-border/50 bg-card/60 backdrop-blur-xl p-5 space-y-4">
+        <h3 className="text-sm font-semibold">Customize Text</h3>
+        <div>
+          <Label className="text-xs">Headline</Label>
+          <textarea
+            value={headline}
+            onChange={(e) => setHeadline(e.target.value)}
+            placeholder="e.g. SHOP NOW"
+            maxLength={120}
+            rows={3}
+            className="mt-1 flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 resize-none"
+          />
+        </div>
+        <div>
+          <div className="flex items-center justify-between mb-1">
+            <Label className="text-xs">Subtitle</Label>
+            <Button variant="ghost" size="sm" className="h-7 gap-1.5 text-xs text-primary" onClick={generateAIText} disabled={generatingMsg}>
+              {generatingMsg ? <Loader2 className="h-3 w-3 animate-spin" /> : <Sparkles className="h-3 w-3" />} AI Generate
             </Button>
-            <div className="rounded-2xl border border-border/50 bg-card/60 backdrop-blur-xl p-4 space-y-3">
-              <Label className="text-xs text-muted-foreground uppercase tracking-wider">Caption</Label>
-              <p className="text-sm leading-relaxed">{caption}</p>
-              <Button variant="outline" size="sm" className="w-full rounded-xl gap-1.5" onClick={copyCaption}>
-                {captionCopied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
-                {captionCopied ? "Copied!" : "Copy Caption"}
-              </Button>
-            </div>
           </div>
-        </>
-      )}
+          <Input value={subtitle} onChange={(e) => setSubtitle(e.target.value)} placeholder="e.g. Quality products, great prices." maxLength={120} />
+        </div>
+      </div>
+
+      {/* Actions */}
+      <div className="space-y-3">
+        <Button onClick={downloadOrShare} className="w-full rounded-2xl gap-2 h-12 text-base">
+          {typeof navigator !== "undefined" && navigator.canShare ? <><Share2 className="h-5 w-5" /> Share Card</> : <><Download className="h-5 w-5" /> Download Card</>}
+        </Button>
+        <div className="rounded-2xl border border-border/50 bg-card/60 backdrop-blur-xl p-4 space-y-3">
+          <Label className="text-xs text-muted-foreground uppercase tracking-wider">Caption</Label>
+          <p className="text-sm leading-relaxed">{caption}</p>
+          <Button variant="outline" size="sm" className="w-full rounded-xl gap-1.5" onClick={copyCaption}>
+            {captionCopied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+            {captionCopied ? "Copied!" : "Copy Caption"}
+          </Button>
+        </div>
+      </div>
     </div>
   );
 };
