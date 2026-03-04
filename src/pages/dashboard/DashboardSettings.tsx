@@ -6,22 +6,46 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
+import { Sparkles, Loader2 } from "lucide-react";
+
+const CATEGORIES = [
+  "Fashion & Clothing",
+  "Electronics & Gadgets",
+  "Food & Beverages",
+  "Beauty & Cosmetics",
+  "Home & Living",
+  "Health & Wellness",
+  "Books & Stationery",
+  "Art & Crafts",
+  "Sports & Fitness",
+  "Agriculture & Farm Produce",
+  "Auto & Motor Parts",
+  "Baby & Kids",
+  "Phones & Accessories",
+  "Jewelry & Accessories",
+  "Services",
+  "Other",
+];
 
 const DashboardSettings = () => {
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [generating, setGenerating] = useState(false);
   const [storeName, setStoreName] = useState("");
   const [whatsappNumber, setWhatsappNumber] = useState("");
   const [city, setCity] = useState("");
   const [storeBio, setStoreBio] = useState("");
+  const [category, setCategory] = useState("");
+  const [deliveryAreas, setDeliveryAreas] = useState("");
 
   useEffect(() => {
     if (!user) return;
     supabase
       .from("profiles")
-      .select("store_name, whatsapp_number, city, store_bio")
+      .select("store_name, whatsapp_number, city, store_bio, category, delivery_areas")
       .eq("id", user.id)
       .single()
       .then(({ data }) => {
@@ -30,10 +54,30 @@ const DashboardSettings = () => {
           setWhatsappNumber(data.whatsapp_number ?? "");
           setCity(data.city ?? "");
           setStoreBio((data as any).store_bio ?? "");
+          setCategory(data.category ?? "");
+          setDeliveryAreas((data as any).delivery_areas ?? "");
         }
         setLoading(false);
       });
   }, [user]);
+
+  const handleGenerateBio = async () => {
+    setGenerating(true);
+    try {
+      const res = await supabase.functions.invoke("generate-bio", {
+        body: { storeName, category, city },
+      });
+      if (res.error) throw res.error;
+      const bio = res.data?.bio;
+      if (bio) {
+        setStoreBio(bio);
+        toast.success("Bio generated!");
+      }
+    } catch {
+      toast.error("Failed to generate bio");
+    }
+    setGenerating(false);
+  };
 
   const handleSave = async () => {
     if (!user) return;
@@ -45,6 +89,8 @@ const DashboardSettings = () => {
         whatsapp_number: whatsappNumber.trim(),
         city: city.trim(),
         store_bio: storeBio.trim() || null,
+        category: category || null,
+        delivery_areas: deliveryAreas.trim() || null,
       } as any)
       .eq("id", user.id);
     if (error) toast.error("Failed to save");
@@ -66,8 +112,36 @@ const DashboardSettings = () => {
             <Label>Store Name</Label>
             <Input value={storeName} onChange={(e) => setStoreName(e.target.value)} />
           </div>
+
           <div className="space-y-1.5">
-            <Label>Store Bio / Welcome Message</Label>
+            <Label>Category</Label>
+            <Select value={category} onValueChange={setCategory}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select what you sell" />
+              </SelectTrigger>
+              <SelectContent>
+                {CATEGORIES.map((cat) => (
+                  <SelectItem key={cat} value={cat}>{cat}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-1.5">
+            <div className="flex items-center justify-between">
+              <Label>Store Bio / Welcome Message</Label>
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                className="h-7 gap-1 text-xs text-primary"
+                onClick={handleGenerateBio}
+                disabled={generating}
+              >
+                {generating ? <Loader2 className="h-3 w-3 animate-spin" /> : <Sparkles className="h-3 w-3" />}
+                {generating ? "Generating…" : "AI Generate"}
+              </Button>
+            </div>
             <Textarea
               value={storeBio}
               onChange={(e) => setStoreBio(e.target.value)}
@@ -77,14 +151,29 @@ const DashboardSettings = () => {
             />
             <p className="text-xs text-muted-foreground">{storeBio.length}/300 — shown on your storefront</p>
           </div>
+
           <div className="space-y-1.5">
             <Label>WhatsApp Number</Label>
             <Input value={whatsappNumber} onChange={(e) => setWhatsappNumber(e.target.value)} />
           </div>
+
           <div className="space-y-1.5">
             <Label>City</Label>
             <Input value={city} onChange={(e) => setCity(e.target.value)} />
           </div>
+
+          <div className="space-y-1.5">
+            <Label>Delivery Areas</Label>
+            <Textarea
+              value={deliveryAreas}
+              onChange={(e) => setDeliveryAreas(e.target.value)}
+              placeholder="e.g. Kampala CBD, Ntinda, Kololo, Nakawa, Entebbe"
+              rows={2}
+              maxLength={500}
+            />
+            <p className="text-xs text-muted-foreground">Comma-separated locations you deliver to</p>
+          </div>
+
           <Button onClick={handleSave} disabled={saving}>
             {saving ? "Saving…" : "Save Changes"}
           </Button>
