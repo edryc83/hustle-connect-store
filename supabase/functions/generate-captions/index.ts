@@ -35,7 +35,7 @@ Deno.serve(async (req) => {
     const userPrompt = `Write 3 short WhatsApp status captions for a seller.
 
 Store: ${storeName || "a small business"}
-Products: ${productCount ? `${productCount} listings` : "various items"}${category ? `, sells ${category}` : ""}
+Products: ${productCount ? `${productCount} products` : "various items"}${category ? `, sells ${category}` : ""}
 Time: ${timeOfDay}, ${dayName}${monthVibe ? `, ${monthVibe}` : ""}
 Link: ${link}
 
