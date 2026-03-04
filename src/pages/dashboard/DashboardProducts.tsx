@@ -333,12 +333,18 @@ const DashboardProducts = () => {
         </Card>
       ) : (
         <div className="space-y-6">
+          {/* Tip */}
+          <div className="rounded-lg bg-muted/60 border border-border/40 px-4 py-2.5 text-xs text-muted-foreground flex items-center gap-2">
+            <Star className="h-3.5 w-3.5 text-primary shrink-0" />
+            <span>Tap <strong>★</strong> to feature a listing (up to 6). Featured items appear first on your storefront.</span>
+          </div>
+
           {/* Featured section */}
           {featured.length > 0 && (
             <section className="space-y-2">
               <div className="flex items-center gap-2">
                 <Star className="h-4 w-4 text-primary fill-primary" />
-                <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Featured</h2>
+                <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Featured ({featured.length}/6)</h2>
               </div>
               <div className="space-y-2">
                 {featured.map((product) => (
@@ -424,15 +430,15 @@ function ListingRow({
         )}
       </div>
 
-      {/* Actions */}
-      <div className="flex items-center gap-1 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+      {/* Actions — always visible */}
+      <div className="flex items-center gap-1 shrink-0">
         <Button size="icon" variant={isFeatured ? "default" : "ghost"} className="h-7 w-7" onClick={() => onToggleFeatured(product)} title="Toggle featured">
           <Star className={`h-3.5 w-3.5 ${isFeatured ? "fill-current" : ""}`} />
         </Button>
-        <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => onEdit(product)}>
+        <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => onEdit(product)} title="Edit">
           <Pencil className="h-3.5 w-3.5" />
         </Button>
-        <Button size="icon" variant="ghost" className="h-7 w-7 text-destructive hover:text-destructive" onClick={() => onDelete(product.id)}>
+        <Button size="icon" variant="ghost" className="h-7 w-7 text-destructive hover:text-destructive" onClick={() => onDelete(product.id)} title="Delete">
           <Trash2 className="h-3.5 w-3.5" />
         </Button>
       </div>
