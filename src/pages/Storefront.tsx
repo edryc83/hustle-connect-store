@@ -12,6 +12,8 @@ import { useTheme } from "@/hooks/useTheme";
 import { useAuth } from "@/hooks/useAuth";
 import { CartProvider, useCart } from "@/hooks/useCart";
 import { WishlistProvider, useWishlist } from "@/hooks/useWishlist";
+import { BuyerAttributePicker, BuyerCakeMessageInput, BuyerPersonalisationInput } from "@/components/storefront/BuyerAttributePicker";
+import { getCategoryByValue, buildAttributeLines, parseTextToOptions } from "@/lib/productAttributes";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -193,6 +195,71 @@ function ProductDetailView({
   const { toggle, isWished } = useWishlist();
   const [selectedImg, setSelectedImg] = useState(0);
   const [qty, setQty] = useState(1);
+  const [attrSelections, setAttrSelections] = useState<Record<string, string | string[]>>({});
+  const [attrTextInputs, setAttrTextInputs] = useState<Record<string, string>>({});
+  const [cakeMessage, setCakeMessage] = useState("");
+  const [personalisation, setPersonalisation] = useState("");
+
+  const attrs = (product as any).attributes as Record<string, any> | null;
+  const hasAttributes = attrs && attrs.product_type;
+
+  const handleAttrSelect = (key: string, value: string | string[]) => {
+    setAttrSelections((prev) => ({ ...prev, [key]: value }));
+  };
+  const handleAttrText = (key: string, value: string) => {
+    setAttrTextInputs((prev) => ({ ...prev, [key]: value }));
+  };
+
+  // Check if required selectable attributes are filled
+  const getSelectableFields = () => {
+    if (!hasAttributes || !attrs) return [];
+    const category = getCategoryByValue(attrs.product_type);
+    if (!category) return [];
+    return category.fields.filter((f) => {
+      const val = attrs[f.key];
+      if (!val) return false;
+      if (f.type === "toggle" || f.type === "number") return false; // info-only
+      if (Array.isArray(val) && val.length === 0) return false;
+      if (typeof val === "string" && !val.trim()) return false;
+      // For text fields, check if they parse to multiple options
+      if (f.type === "text") {
+        const opts = parseTextToOptions(val);
+        return opts.length > 0;
+      }
+      return true;
+    });
+  };
+
+  const buildWhatsAppMessage = () => {
+    const dp = Number(displayPrice);
+    const lines: string[] = [
+      `🛍️ New Order from Afristall`,
+      ``,
+      `Store: ${profile.store_name || storeSlug}`,
+      `Product: ${product.name}${qty > 1 ? ` x${qty}` : ""}`,
+      `Price: ${formatPrice(dp * qty, currency)}`,
+    ];
+
+    if (hasAttributes && attrs) {
+      const allTextInputs = { ...attrTextInputs };
+      if (cakeMessage) allTextInputs["cake_message_text"] = cakeMessage;
+      if (personalisation) allTextInputs["personalisation_text"] = personalisation;
+
+      const attrLines = buildAttributeLines(attrs, attrSelections, allTextInputs);
+      if (attrLines.length > 0) {
+        lines.push(``, `📋 Order Details:`);
+        lines.push(...attrLines);
+        if (cakeMessage) lines.push(`- Message on cake: "${cakeMessage}"`);
+        if (personalisation) lines.push(`- Personalisation: ${personalisation}`);
+      }
+    }
+
+    if (visitorName) lines.push(``, `👤 Customer: ${visitorName}`);
+    if (product.image_url) lines.push(``, `📷 ${product.image_url}`);
+    lines.push(``, `🔗 ${window.location.origin}/${storeSlug}`);
+
+    return lines.join("\n");
+  };
 
   const displayPrice = product.discount_price ?? product.price;
   const hasDiscount = !!product.discount_price;
@@ -305,6 +372,30 @@ function ProductDetailView({
           </div>
         )}
 
+        {/* Dynamic Attribute Selectors */}
+        {hasAttributes && attrs && (
+          <div className="rounded-2xl border border-border/60 bg-card p-4 space-y-4">
+            <p className="text-sm font-semibold">Customize your order</p>
+            <BuyerAttributePicker
+              attributes={attrs}
+              selections={attrSelections}
+              textInputs={attrTextInputs}
+              onSelectionChange={handleAttrSelect}
+              onTextInputChange={handleAttrText}
+            />
+            <BuyerCakeMessageInput
+              attributes={attrs}
+              value={cakeMessage}
+              onChange={setCakeMessage}
+            />
+            <BuyerPersonalisationInput
+              attributes={attrs}
+              value={personalisation}
+              onChange={setPersonalisation}
+            />
+          </div>
+        )}
+
         {/* Quantity Controls + Add to Cart */}
         <div className="rounded-2xl border border-border/60 bg-card p-4 space-y-4">
           <div className="flex items-center justify-between">
@@ -345,18 +436,31 @@ function ProductDetailView({
               variant="outline"
               className="gap-2 text-base"
               onClick={() => {
+                // Validate required attribute selections
+                if (hasAttributes && attrs) {
+                  const selectableFields = getSelectableFields();
+                  for (const field of selectableFields) {
+                    const sel = attrSelections[field.key];
+                    const txt = attrTextInputs[field.key];
+                    if (!sel && !txt) {
+                      toast.error(`Please select a ${field.label.toLowerCase()} before ordering`);
+                      return;
+                    }
+                    if (typeof sel === "string" && !sel.trim()) {
+                      toast.error(`Please select a ${field.label.toLowerCase()} before ordering`);
+                      return;
+                    }
+                  }
+                }
+
                 const cleanNumber = (profile.whatsapp_number ?? "").replace(/[^0-9+]/g, "");
-                const dp = Number(displayPrice);
-                const message = [
-                  `🛒 Hi! I'd like to order *${product.name}*${qty > 1 ? ` x${qty}` : ""} (${formatPrice(dp * qty, currency)}) from your Afristall store.`,
-                  product.image_url ? `\n📷 ${product.image_url}` : null,
-                ].filter(Boolean).join("\n");
+                const message = buildWhatsAppMessage();
                 supabase.from("orders").insert({
                   seller_id: profile.id,
                   product_id: product.id,
                   product_name: product.name,
                   quantity: qty,
-                  total: dp * qty,
+                  total: Number(displayPrice) * qty,
                   customer_name: visitorName || "Store visitor",
                   customer_phone: visitorName || "WhatsApp order",
                 } as any).then(() => {});

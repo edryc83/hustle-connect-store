@@ -21,6 +21,7 @@ import { toast } from "sonner";
 import { formatPrice } from "@/lib/currency";
 import { Badge } from "@/components/ui/badge";
 import type { Tables } from "@/integrations/supabase/types";
+import { ProductAttributeForm } from "@/components/dashboard/ProductAttributeForm";
 
 type Product = Tables<"products">;
 
@@ -66,6 +67,7 @@ const DashboardProducts = () => {
   const [existingImages, setExistingImages] = useState<string[]>([]);
   const [listingType, setListingType] = useState("product");
   const [condition, setCondition] = useState("");
+  const [attributes, setAttributes] = useState<Record<string, any>>({});
 
   const fetchProducts = async () => {
     if (!user) return;
@@ -102,7 +104,7 @@ const DashboardProducts = () => {
   const resetForm = () => {
     setName(""); setPrice(""); setDiscountPrice(""); setDescription(""); setVariantsText("");
     setImageFiles([]); setImagePreviews([]); setExistingImages([]);
-    setEditingProduct(null); setListingType("product"); setCondition("");
+    setEditingProduct(null); setListingType("product"); setCondition(""); setAttributes({});
   };
 
   const openAdd = () => { resetForm(); setDialogOpen(true); };
@@ -117,6 +119,7 @@ const DashboardProducts = () => {
     setExistingImages(productImages[product.id] ?? (product.image_url ? [product.image_url] : []));
     setListingType((product as any).listing_type ?? "product");
     setCondition((product as any).condition ?? "");
+    setAttributes((product as any).attributes ?? {});
     setEditingProduct(null);
     setDialogOpen(true);
   };
@@ -132,6 +135,7 @@ const DashboardProducts = () => {
     setImageFiles([]); setImagePreviews([]);
     setListingType((product as any).listing_type ?? "product");
     setCondition((product as any).condition ?? "");
+    setAttributes((product as any).attributes ?? {});
     setDialogOpen(true);
   };
 
@@ -190,6 +194,7 @@ const DashboardProducts = () => {
         description: description.trim() || null, variants_text: variantsText.trim() || null,
         image_url: allImages[0] ?? null, listing_type: listingType,
         condition: listingType === "product" ? (condition || null) : null,
+        attributes: Object.keys(attributes).length > 0 ? attributes : null,
       } as any;
 
       let productId: string;
@@ -348,6 +353,15 @@ const DashboardProducts = () => {
                 <Label htmlFor="productVariants">Variants / Options</Label>
                 <Input id="productVariants" placeholder="e.g. Small, Medium, Large" value={variantsText} onChange={(e) => setVariantsText(e.target.value)} />
               </div>
+              {/* Dynamic Product Attributes */}
+              {listingType === "product" && (
+                <div className="space-y-1.5">
+                  <Label className="text-sm font-semibold flex items-center gap-1.5">
+                    📋 Product Options <span className="text-muted-foreground font-normal text-xs">(optional)</span>
+                  </Label>
+                  <ProductAttributeForm attributes={attributes} onChange={setAttributes} />
+                </div>
+              )}
               <Button className="w-full" onClick={handleSave} disabled={saving}>
                 {saving ? "Saving…" : editingProduct ? `Update ${terms.singular}` : `Add ${terms.singular}`}
               </Button>
