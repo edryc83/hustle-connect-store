@@ -39,6 +39,8 @@ const DashboardOverview = () => {
   const [storeName, setStoreName] = useState("");
   const [profilePicUrl, setProfilePicUrl] = useState("");
   const [whatsappNumber, setWhatsappNumber] = useState("");
+  const [category, setCategory] = useState("");
+  const [products, setProducts] = useState<{ id: string; name: string; image_url: string | null }[]>([]);
   const [bannerDismissed, setBannerDismissed] = useState(
     () => localStorage.getItem("afristall_banner_dismissed") === "true"
   );
@@ -52,8 +54,8 @@ const DashboardOverview = () => {
       const [{ count }, { count: orders }, { data: profile }, { data: productsData }] = await Promise.all([
         supabase.from("products").select("*", { count: "exact", head: true }).eq("user_id", user.id),
         supabase.from("orders").select("*", { count: "exact", head: true }).eq("seller_id", user.id),
-        supabase.from("profiles").select("store_name, store_slug, first_name, profile_picture_url, view_count, whatsapp_number").eq("id", user.id).single(),
-        supabase.from("products").select("whatsapp_taps").eq("user_id", user.id),
+        supabase.from("profiles").select("store_name, store_slug, first_name, profile_picture_url, view_count, whatsapp_number, category").eq("id", user.id).single(),
+        supabase.from("products").select("id, name, image_url, whatsapp_taps").eq("user_id", user.id),
       ]);
       setProductCount(count ?? 0);
       setOrderCount(orders ?? 0);
@@ -65,6 +67,8 @@ const DashboardOverview = () => {
       setProfilePicUrl(p?.profile_picture_url ?? "");
       setViewCount(p?.view_count ?? 0);
       setWhatsappNumber(p?.whatsapp_number ?? "");
+      setCategory(p?.category ?? "");
+      setProducts((productsData ?? []).map((pr: any) => ({ id: pr.id, name: pr.name, image_url: pr.image_url })));
       const totalTaps = (productsData ?? []).reduce((sum: number, pr: any) => sum + (pr.whatsapp_taps ?? 0), 0);
       setWhatsappTaps(totalTaps);
     };
@@ -255,6 +259,8 @@ const DashboardOverview = () => {
         storeName={storeName}
         storeSlug={storeSlug}
         profilePicUrl={profilePicUrl}
+        category={category}
+        products={products}
       />
     </div>
   );

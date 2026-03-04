@@ -6,37 +6,16 @@ import { Label } from "@/components/ui/label";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
-import { Share2, Download, Loader2, Camera, Sparkles, Sun, Moon } from "lucide-react";
+import { Download, Loader2, Sparkles, Copy, Share2, Check } from "lucide-react";
 import { toast } from "sonner";
 
-type CardTheme = "light" | "dark";
+type TemplateId = 1 | 2 | 3;
 
-const themes = {
-  light: {
-    bg: "#ffffff",
-    accentFrom: "#FF6B35",
-    accentTo: "#FF8F5E",
-    name: "#111827",
-    msg: "#6b7280",
-    pillBg: "#FFF3ED",
-    pillText: "#FF6B35",
-    branding: "#d1d5db",
-    placeholderBg: "#f3f4f6",
-    placeholderText: "#9ca3af",
-  },
-  dark: {
-    bg: "#1a1a2e",
-    accentFrom: "#FF6B35",
-    accentTo: "#FF8F5E",
-    name: "#f9fafb",
-    msg: "#9ca3af",
-    pillBg: "#FF6B3522",
-    pillText: "#FF8F5E",
-    branding: "#4b5563",
-    placeholderBg: "#2a2a3e",
-    placeholderText: "#6b7280",
-  },
-};
+interface Product {
+  id: string;
+  name: string;
+  image_url: string | null;
+}
 
 interface ShareCardModalProps {
   open: boolean;
@@ -44,23 +23,49 @@ interface ShareCardModalProps {
   storeName: string;
   storeSlug: string;
   profilePicUrl: string;
+  category: string;
+  products: Product[];
 }
 
-export function ShareCardModal({ open, onOpenChange, storeName, storeSlug, profilePicUrl }: ShareCardModalProps) {
+const TEMPLATE_LABELS: Record<TemplateId, { name: string; desc: string }> = {
+  1: { name: "Clean", desc: "White & minimal" },
+  2: { name: "Bold", desc: "Orange energy" },
+  3: { name: "Product", desc: "Feature an item" },
+};
+
+export function ShareCardModal({
+  open, onOpenChange, storeName, storeSlug, profilePicUrl, category, products,
+}: ShareCardModalProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [cardGenerated, setCardGenerated] = useState(false);
-  const [customImage, setCustomImage] = useState<string | null>(null);
+  const [selectedTemplate, setSelectedTemplate] = useState<TemplateId>(1);
+  const [selectedProductImage, setSelectedProductImage] = useState<string | null>(null);
   const [cardMessage, setCardMessage] = useState("");
   const [generatingMsg, setGeneratingMsg] = useState(false);
-  const [cardTheme, setCardTheme] = useState<CardTheme>("light");
+  const [cardGenerated, setCardGenerated] = useState(false);
+  const [captionCopied, setCaptionCopied] = useState(false);
+
+  const storeUrl = `afristall.com/${storeSlug}`;
+  const caption = `🛍️ Visit my store for ${category || "amazing products"} → ${storeUrl}`;
 
   useEffect(() => {
     if (open) {
       setCardGenerated(false);
-      setCustomImage(null);
       setCardMessage("");
+      setSelectedProductImage(null);
     }
   }, [open]);
+
+  useEffect(() => {
+    setCardGenerated(false);
+  }, [selectedTemplate]);
+
+  // Set default product image when switching to template 3
+  useEffect(() => {
+    if (selectedTemplate === 3 && !selectedProductImage && products.length > 0) {
+      const first = products.find(p => p.image_url);
+      if (first) setSelectedProductImage(first.image_url);
+    }
+  }, [selectedTemplate, products, selectedProductImage]);
 
   const generateAIMessage = async () => {
     setGeneratingMsg(true);
@@ -70,175 +75,298 @@ export function ShareCardModal({ open, onOpenChange, storeName, storeSlug, profi
       });
       if (res.error) throw res.error;
       const msg = res.data?.message;
-      if (msg) setCardMessage(msg);
+      if (msg) { setCardMessage(msg); setCardGenerated(false); }
     } catch {
       toast.error("Failed to generate message");
     }
     setGeneratingMsg(false);
   };
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    if (file.size > 5 * 1024 * 1024) { toast.error("Image must be under 5MB"); return; }
-    const reader = new FileReader();
-    reader.onload = () => setCustomImage(reader.result as string);
-    reader.readAsDataURL(file);
+  const loadImage = (src: string): Promise<HTMLImageElement> =>
+    new Promise((resolve, reject) => {
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+      img.onload = () => resolve(img);
+      img.onerror = reject;
+      img.src = src;
+    });
+
+  const drawCircularImage = (
+    ctx: CanvasRenderingContext2D, img: HTMLImageElement,
+    cx: number, cy: number, radius: number, borderWidth = 0, borderColor = "#fff"
+  ) => {
+    if (borderWidth > 0) {
+      ctx.beginPath();
+      ctx.arc(cx, cy, radius + borderWidth, 0, Math.PI * 2);
+      ctx.fillStyle = borderColor;
+      ctx.fill();
+    }
+    ctx.save();
+    ctx.beginPath();
+    ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+    ctx.clip();
+    const scale = Math.max((radius * 2) / img.width, (radius * 2) / img.height);
+    const sw = img.width * scale;
+    const sh = img.height * scale;
+    ctx.drawImage(img, cx - sw / 2, cy - sh / 2, sw, sh);
+    ctx.restore();
   };
 
-  const imageToUse = customImage || profilePicUrl;
-  const storeUrl = `afristall.com/${storeSlug}`;
+  const drawCircularPlaceholder = (
+    ctx: CanvasRenderingContext2D, cx: number, cy: number, radius: number,
+    letter: string, bgColor: string, textColor: string, borderWidth = 0, borderColor = "#fff"
+  ) => {
+    if (borderWidth > 0) {
+      ctx.beginPath();
+      ctx.arc(cx, cy, radius + borderWidth, 0, Math.PI * 2);
+      ctx.fillStyle = borderColor;
+      ctx.fill();
+    }
+    ctx.beginPath();
+    ctx.arc(cx, cy, radius, 0, Math.PI * 2);
+    ctx.fillStyle = bgColor;
+    ctx.fill();
+    ctx.fillStyle = textColor;
+    ctx.font = `bold ${radius}px system-ui, sans-serif`;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText(letter, cx, cy);
+  };
 
-  const generateCard = useCallback(() => {
+  const wrapText = (
+    ctx: CanvasRenderingContext2D, text: string,
+    x: number, y: number, maxWidth: number, lineHeight: number
+  ) => {
+    const words = text.split(" ");
+    let line = "";
+    let currentY = y;
+    for (const word of words) {
+      const test = line + (line ? " " : "") + word;
+      if (ctx.measureText(test).width > maxWidth && line) {
+        ctx.fillText(line, x, currentY);
+        line = word;
+        currentY += lineHeight;
+      } else {
+        line = test;
+      }
+    }
+    if (line) ctx.fillText(line, x, currentY);
+    return currentY;
+  };
+
+  const generateCard = useCallback(async () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    const W = 720;
-    const H = 1280;
+    const W = 1080;
+    const H = 1920;
     canvas.width = W;
     canvas.height = H;
-    const t = themes[cardTheme];
 
-    // Background
-    if (cardTheme === "dark") {
-      const grad = ctx.createLinearGradient(0, 0, 0, H);
-      grad.addColorStop(0, "#1a1a2e");
-      grad.addColorStop(1, "#16213e");
-      ctx.fillStyle = grad;
-    } else {
-      ctx.fillStyle = t.bg;
+    let profileImg: HTMLImageElement | null = null;
+    if (profilePicUrl) {
+      try { profileImg = await loadImage(profilePicUrl); } catch {}
     }
-    ctx.fillRect(0, 0, W, H);
 
-    // Top accent bar
-    const topGrad = ctx.createLinearGradient(0, 0, W, 0);
-    topGrad.addColorStop(0, t.accentFrom);
-    topGrad.addColorStop(1, t.accentTo);
-    ctx.fillStyle = topGrad;
-    ctx.fillRect(0, 0, W, 6);
+    const msg = cardMessage || "Click the link below to visit my shop! 👇";
+    const displayName = storeName || "My Store";
+    const letter = (displayName)[0].toUpperCase();
 
-    const drawContent = (img?: HTMLImageElement) => {
-      const imgSize = 200;
-      const imgY = 180;
-      const imgX = (W - imgSize) / 2;
+    if (selectedTemplate === 1) {
+      // ---- TEMPLATE 1: Clean White ----
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, W, H);
 
-      // Rounded rect clip for image
-      const radius = 24;
-      ctx.save();
-      ctx.beginPath();
-      ctx.moveTo(imgX + radius, imgY);
-      ctx.lineTo(imgX + imgSize - radius, imgY);
-      ctx.quadraticCurveTo(imgX + imgSize, imgY, imgX + imgSize, imgY + radius);
-      ctx.lineTo(imgX + imgSize, imgY + imgSize - radius);
-      ctx.quadraticCurveTo(imgX + imgSize, imgY + imgSize, imgX + imgSize - radius, imgY + imgSize);
-      ctx.lineTo(imgX + radius, imgY + imgSize);
-      ctx.quadraticCurveTo(imgX, imgY + imgSize, imgX, imgY + imgSize - radius);
-      ctx.lineTo(imgX, imgY + radius);
-      ctx.quadraticCurveTo(imgX, imgY, imgX + radius, imgY);
-      ctx.closePath();
-      ctx.clip();
-
-      if (img) {
-        const scale = Math.max(imgSize / img.width, imgSize / img.height);
-        const sw = img.width * scale;
-        const sh = img.height * scale;
-        ctx.drawImage(img, imgX - (sw - imgSize) / 2, imgY - (sh - imgSize) / 2, sw, sh);
+      // Profile pic
+      const picRadius = 120;
+      const picY = 480;
+      if (profileImg) {
+        drawCircularImage(ctx, profileImg, W / 2, picY, picRadius, 6, "#f3f4f6");
       } else {
-        ctx.fillStyle = t.placeholderBg;
-        ctx.fillRect(imgX, imgY, imgSize, imgSize);
-        ctx.fillStyle = t.placeholderText;
-        ctx.font = "bold 72px system-ui, sans-serif";
-        ctx.textAlign = "center";
-        ctx.fillText((storeName || "S")[0].toUpperCase(), W / 2, imgY + imgSize / 2 + 24);
+        drawCircularPlaceholder(ctx, W / 2, picY, picRadius, letter, "#f3f4f6", "#9ca3af", 6, "#e5e7eb");
       }
-      ctx.restore();
-
-      ctx.shadowColor = "transparent";
 
       // Store name
-      const nameY = imgY + imgSize + 60;
-      ctx.fillStyle = t.name;
-      ctx.font = "bold 44px system-ui, sans-serif";
+      ctx.fillStyle = "#111827";
+      ctx.font = "bold 64px system-ui, sans-serif";
       ctx.textAlign = "center";
-      ctx.fillText(storeName || "My Store", W / 2, nameY);
+      ctx.textBaseline = "middle";
+      ctx.fillText(displayName, W / 2, picY + picRadius + 80);
+
+      // Category pill
+      if (category) {
+        const pillY = picY + picRadius + 140;
+        ctx.font = "bold 32px system-ui, sans-serif";
+        const pillW = ctx.measureText(category).width + 60;
+        ctx.beginPath();
+        ctx.roundRect((W - pillW) / 2, pillY - 22, pillW, 52, 26);
+        ctx.fillStyle = "#FFF3ED";
+        ctx.fill();
+        ctx.fillStyle = "#FF6B35";
+        ctx.fillText(category, W / 2, pillY + 4);
+      }
 
       // Card message
-      const msgY = nameY + 50;
-      ctx.fillStyle = t.msg;
-      ctx.font = "28px system-ui, sans-serif";
-      const msg = cardMessage || "Click the link below to visit my shop! 👇";
-      const words = msg.split(" ");
-      let line = "";
-      let lineY = msgY;
-      for (const word of words) {
-        const test = line + (line ? " " : "") + word;
-        if (ctx.measureText(test).width > W - 120) {
-          ctx.fillText(line, W / 2, lineY);
-          line = word;
-          lineY += 38;
-        } else {
-          line = test;
+      const msgY = picY + picRadius + 240;
+      ctx.fillStyle = "#6b7280";
+      ctx.font = "32px system-ui, sans-serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "top";
+      wrapText(ctx, msg, W / 2, msgY, W - 160, 46);
+
+      // Orange bottom bar
+      const barH = 140;
+      const grad = ctx.createLinearGradient(0, H - barH, W, H);
+      grad.addColorStop(0, "#FF6B35");
+      grad.addColorStop(1, "#FF8F5E");
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, H - barH, W, barH);
+
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "bold 36px system-ui, sans-serif";
+      ctx.textBaseline = "middle";
+      ctx.fillText(storeUrl, W / 2, H - barH / 2);
+
+    } else if (selectedTemplate === 2) {
+      // ---- TEMPLATE 2: Bold Orange ----
+      ctx.fillStyle = "#FF6B35";
+      ctx.fillRect(0, 0, W, H);
+
+      // Profile pic with white border
+      const picRadius = 110;
+      const picY = 520;
+      if (profileImg) {
+        drawCircularImage(ctx, profileImg, W / 2, picY, picRadius, 8, "#ffffff");
+      } else {
+        drawCircularPlaceholder(ctx, W / 2, picY, picRadius, letter, "#ffffff", "#FF6B35", 8, "#ffffff");
+      }
+
+      // SHOP NOW 🔥
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "bold 80px system-ui, sans-serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "middle";
+      ctx.fillText("SHOP NOW 🔥", W / 2, picY + picRadius + 100);
+
+      // Store name
+      ctx.font = "44px system-ui, sans-serif";
+      ctx.fillText(displayName, W / 2, picY + picRadius + 180);
+
+      // Card message
+      ctx.font = "30px system-ui, sans-serif";
+      ctx.globalAlpha = 0.9;
+      ctx.textBaseline = "top";
+      wrapText(ctx, msg, W / 2, picY + picRadius + 240, W - 160, 44);
+      ctx.globalAlpha = 1;
+
+      // URL at bottom
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "bold 34px system-ui, sans-serif";
+      ctx.textBaseline = "middle";
+      ctx.fillText(storeUrl, W / 2, H - 120);
+
+      // Powered by
+      ctx.globalAlpha = 0.7;
+      ctx.font = "22px system-ui, sans-serif";
+      ctx.fillText("Powered by Afristall", W / 2, H - 60);
+      ctx.globalAlpha = 1;
+
+    } else {
+      // ---- TEMPLATE 3: Product Focus ----
+      ctx.fillStyle = "#1a1a2e";
+      ctx.fillRect(0, 0, W, H);
+
+      // Product image fills top 60%
+      const productH = Math.round(H * 0.6);
+      if (selectedProductImage) {
+        try {
+          const prodImg = await loadImage(selectedProductImage);
+          const scale = Math.max(W / prodImg.width, productH / prodImg.height);
+          const sw = prodImg.width * scale;
+          const sh = prodImg.height * scale;
+          ctx.drawImage(prodImg, (W - sw) / 2, (productH - sh) / 2, sw, sh);
+        } catch {
+          ctx.fillStyle = "#2a2a3e";
+          ctx.fillRect(0, 0, W, productH);
+          ctx.fillStyle = "#6b7280";
+          ctx.font = "bold 40px system-ui, sans-serif";
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.fillText("No product image", W / 2, productH / 2);
         }
       }
-      if (line) ctx.fillText(line, W / 2, lineY);
 
-      // URL pill
-      const urlY = lineY + 70;
-      ctx.font = "bold 26px system-ui, sans-serif";
-      const urlWidth = ctx.measureText(storeUrl).width + 48;
-      const pillX = (W - urlWidth) / 2;
-      const pillH = 48;
+      // Dark gradient overlay bottom 40%
+      const gradStart = productH - 200;
+      const grad = ctx.createLinearGradient(0, gradStart, 0, H);
+      grad.addColorStop(0, "rgba(0,0,0,0)");
+      grad.addColorStop(0.3, "rgba(0,0,0,0.7)");
+      grad.addColorStop(1, "rgba(0,0,0,0.95)");
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, gradStart, W, H - gradStart);
 
-      ctx.fillStyle = t.pillBg;
-      ctx.beginPath();
-      ctx.roundRect(pillX, urlY - 30, urlWidth, pillH, 24);
-      ctx.fill();
+      // Profile pic small circle bottom-left
+      const smallRadius = 48;
+      const ppX = 80 + smallRadius;
+      const ppY = H - 260;
+      if (profileImg) {
+        drawCircularImage(ctx, profileImg, ppX, ppY, smallRadius, 4, "#ffffff");
+      } else {
+        drawCircularPlaceholder(ctx, ppX, ppY, smallRadius, letter, "#374151", "#d1d5db", 4, "#ffffff");
+      }
 
-      ctx.fillStyle = t.pillText;
-      ctx.fillText(storeUrl, W / 2, urlY);
+      // Store name next to pic
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "bold 40px system-ui, sans-serif";
+      ctx.textAlign = "left";
+      ctx.textBaseline = "middle";
+      ctx.fillText(displayName, ppX + smallRadius + 24, ppY - 10);
 
-      // Branding
-      ctx.fillStyle = t.branding;
-      ctx.font = "20px system-ui, sans-serif";
-      ctx.fillText("Powered by Afristall", W / 2, H - 60);
+      // Category below name
+      if (category) {
+        ctx.font = "28px system-ui, sans-serif";
+        ctx.globalAlpha = 0.7;
+        ctx.fillText(category, ppX + smallRadius + 24, ppY + 30);
+        ctx.globalAlpha = 1;
+      }
 
-      setCardGenerated(true);
-    };
+      // Card message
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "30px system-ui, sans-serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "top";
+      ctx.globalAlpha = 0.9;
+      wrapText(ctx, msg, W / 2, H - 160, W - 120, 42);
+      ctx.globalAlpha = 1;
 
-    if (imageToUse) {
-      const img = new Image();
-      img.crossOrigin = "anonymous";
-      img.onload = () => drawContent(img);
-      img.onerror = () => drawContent();
-      img.src = imageToUse;
-    } else {
-      drawContent();
+      // URL at bottom
+      ctx.fillStyle = "#FF6B35";
+      ctx.font = "bold 32px system-ui, sans-serif";
+      ctx.textBaseline = "middle";
+      ctx.textAlign = "center";
+      ctx.fillText(storeUrl, W / 2, H - 50);
     }
-  }, [imageToUse, storeName, storeSlug, cardMessage, cardTheme]);
 
-  const shareOrDownload = async () => {
+    setCardGenerated(true);
+  }, [profilePicUrl, storeName, storeSlug, category, cardMessage, selectedTemplate, selectedProductImage]);
+
+  const downloadOrShare = async () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-
     canvas.toBlob(async (blob) => {
       if (!blob) return;
-      const file = new File([blob], `${storeSlug}-store-card.png`, { type: "image/png" });
-
+      const file = new File([blob], `${storeSlug}-card.png`, { type: "image/png" });
       if (navigator.canShare?.({ files: [file] })) {
         try {
-          await navigator.share({
-            files: [file],
-            title: storeName,
-            text: cardMessage || `Check out ${storeName} on Afristall! ${window.location.origin}/${storeSlug}`,
-          });
+          await navigator.share({ files: [file], title: storeName, text: caption });
         } catch { /* cancelled */ }
       } else {
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
-        a.download = `${storeSlug}-store-card.png`;
+        a.download = `${storeSlug}-card.png`;
         a.click();
         URL.revokeObjectURL(url);
         toast.success("Card downloaded!");
@@ -246,57 +374,69 @@ export function ShareCardModal({ open, onOpenChange, storeName, storeSlug, profi
     }, "image/png");
   };
 
+  const copyCaption = async () => {
+    await navigator.clipboard.writeText(caption);
+    setCaptionCopied(true);
+    toast.success("Caption copied!");
+    setTimeout(() => setCaptionCopied(false), 2000);
+  };
+
+  const productsWithImages = products.filter(p => p.image_url);
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-sm">
+      <DialogContent className="max-w-sm max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Create Status Card</DialogTitle>
+          <DialogTitle>Create Share Card</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
-          {/* Theme toggle */}
+          {/* Template selector */}
           <div>
-            <Label className="text-xs">Card Style</Label>
-            <div className="flex gap-2 mt-1.5">
-              <Button
-                variant={cardTheme === "light" ? "default" : "outline"}
-                size="sm"
-                className="rounded-xl gap-1.5 flex-1"
-                onClick={() => { setCardTheme("light"); setCardGenerated(false); }}
-              >
-                <Sun className="h-3.5 w-3.5" /> Light
-              </Button>
-              <Button
-                variant={cardTheme === "dark" ? "default" : "outline"}
-                size="sm"
-                className="rounded-xl gap-1.5 flex-1"
-                onClick={() => { setCardTheme("dark"); setCardGenerated(false); }}
-              >
-                <Moon className="h-3.5 w-3.5" /> Dark
-              </Button>
+            <Label className="text-xs">Choose Template</Label>
+            <div className="grid grid-cols-3 gap-2 mt-1.5">
+              {([1, 2, 3] as TemplateId[]).map((id) => (
+                <button
+                  key={id}
+                  onClick={() => setSelectedTemplate(id)}
+                  className={`rounded-xl border-2 p-3 text-center transition-all ${
+                    selectedTemplate === id
+                      ? "border-primary bg-primary/10 shadow-sm"
+                      : "border-border/50 bg-card/60 hover:border-primary/30"
+                  }`}
+                >
+                  <div className={`mx-auto mb-1.5 h-8 w-8 rounded-lg ${
+                    id === 1 ? "bg-white border border-border" :
+                    id === 2 ? "bg-[#FF6B35]" :
+                    "bg-gradient-to-b from-muted to-foreground/80"
+                  }`} />
+                  <div className="text-xs font-semibold">{TEMPLATE_LABELS[id].name}</div>
+                  <div className="text-[10px] text-muted-foreground">{TEMPLATE_LABELS[id].desc}</div>
+                </button>
+              ))}
             </div>
           </div>
 
-          {/* Image selector */}
-          <div>
-            <Label className="text-xs">Card Image</Label>
-            <div className="flex items-center gap-3 mt-1.5">
-              <div className="relative h-14 w-14 rounded-xl overflow-hidden border border-border bg-muted shrink-0">
-                {imageToUse ? (
-                  <img src={imageToUse} alt="" className="h-full w-full object-cover" />
-                ) : (
-                  <div className="flex items-center justify-center h-full text-muted-foreground text-lg font-bold">
-                    {(storeName || "S")[0]}
-                  </div>
-                )}
+          {/* Product picker for template 3 */}
+          {selectedTemplate === 3 && productsWithImages.length > 0 && (
+            <div>
+              <Label className="text-xs">Select Product Image</Label>
+              <div className="grid grid-cols-4 gap-2 mt-1.5">
+                {productsWithImages.map((p) => (
+                  <button
+                    key={p.id}
+                    onClick={() => { setSelectedProductImage(p.image_url); setCardGenerated(false); }}
+                    className={`rounded-lg border-2 overflow-hidden aspect-square ${
+                      selectedProductImage === p.image_url
+                        ? "border-primary ring-2 ring-primary/20"
+                        : "border-border/50"
+                    }`}
+                  >
+                    <img src={p.image_url!} alt={p.name} className="w-full h-full object-cover" />
+                  </button>
+                ))}
               </div>
-              <label className="cursor-pointer">
-                <Button variant="outline" size="sm" className="gap-1.5 pointer-events-none rounded-xl">
-                  <Camera className="h-3.5 w-3.5" /> Change Image
-                </Button>
-                <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
-              </label>
             </div>
-          </div>
+          )}
 
           {/* Message */}
           <div>
@@ -314,9 +454,9 @@ export function ShareCardModal({ open, onOpenChange, storeName, storeSlug, profi
             </div>
             <Input
               value={cardMessage}
-              onChange={(e) => setCardMessage(e.target.value)}
+              onChange={(e) => { setCardMessage(e.target.value); setCardGenerated(false); }}
               placeholder="e.g. Visit my shop for amazing deals! 🛍️"
-              maxLength={100}
+              maxLength={120}
             />
           </div>
 
@@ -327,21 +467,33 @@ export function ShareCardModal({ open, onOpenChange, storeName, storeSlug, profi
             style={{ aspectRatio: "9/16" }}
           />
 
+          {/* Generate / Download */}
           {!cardGenerated ? (
             <Button onClick={generateCard} className="w-full rounded-xl gap-2">
               Generate Card
             </Button>
           ) : (
-            <div className="grid grid-cols-2 gap-3">
-              <Button onClick={generateCard} variant="outline" className="rounded-xl">
-                Regenerate
-              </Button>
-              <Button onClick={shareOrDownload} className="rounded-xl gap-2">
-                {typeof navigator !== "undefined" && navigator.canShare ? (
-                  <><Share2 className="h-4 w-4" /> Share</>
-                ) : (
-                  <><Download className="h-4 w-4" /> Download</>
-                )}
+            <Button onClick={downloadOrShare} className="w-full rounded-xl gap-2">
+              {typeof navigator !== "undefined" && navigator.canShare ? (
+                <><Share2 className="h-4 w-4" /> Share Card</>
+              ) : (
+                <><Download className="h-4 w-4" /> Download Card</>
+              )}
+            </Button>
+          )}
+
+          {/* Caption section */}
+          {cardGenerated && (
+            <div className="rounded-xl border border-border/50 bg-muted/30 p-3 space-y-2">
+              <Label className="text-xs text-muted-foreground">Copy Caption</Label>
+              <p className="text-sm">{caption}</p>
+              <Button
+                variant="outline" size="sm"
+                className="w-full rounded-xl gap-1.5"
+                onClick={copyCaption}
+              >
+                {captionCopied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+                {captionCopied ? "Copied!" : "Copy Caption"}
               </Button>
             </div>
           )}
