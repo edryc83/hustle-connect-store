@@ -127,7 +127,7 @@ const Signup = () => {
 
   const handleBusinessTypeChange = (type: "product" | "service" | "both") => {
     setBusinessType(type);
-    setCategory("");
+    setCategorySelection({});
   };
 
   const validateStep1 = () => {
@@ -143,7 +143,7 @@ const Signup = () => {
     if (!storeSlug.trim()) { toast.error("Store slug is required"); return false; }
     if (!/^[a-z0-9-]+$/.test(storeSlug)) { toast.error("Slug can only contain lowercase letters, numbers, and hyphens"); return false; }
     if (slugAvailable === false) { toast.error("This URL is already taken — try another"); return false; }
-    if (!category) { toast.error("Please select a category"); return false; }
+    if (Object.keys(categorySelection).length === 0) { toast.error("Please select at least one category"); return false; }
     return true;
   };
 
@@ -225,7 +225,7 @@ const Signup = () => {
           store_name: storeName.trim(),
           store_slug: storeSlug.trim(),
           city: city || null,
-          category,
+          category: serializeCategories(categorySelection),
           business_type: businessType,
           whatsapp_number: fullWhatsapp,
           profile_picture_url: profilePictureUrl,
@@ -243,9 +243,9 @@ const Signup = () => {
     }
   };
 
-  const activeCategories = businessType === "service" ? SERVICE_CATEGORIES
-    : businessType === "both" ? [...PRODUCT_CATEGORIES, ...SERVICE_CATEGORIES.filter(s => s.label !== "Other")]
-    : PRODUCT_CATEGORIES;
+  const categoryFilter = businessType === "service" ? "services"
+    : businessType === "product" ? "products"
+    : "all";
 
   return (
     <div className="relative flex min-h-screen flex-col items-center justify-center px-4 py-8 overflow-hidden">
@@ -456,40 +456,14 @@ const Signup = () => {
                     : businessType === "both" ? "What do you sell or offer?" 
                     : "What do you sell?"}
                 </Label>
-                {businessType === "service" ? (
-                  <Select value={category} onValueChange={setCategory}>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select a service category" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {SERVICE_CATEGORIES.map((cat) => (
-                        <SelectItem key={cat.label} value={cat.label}>
-                          <span className="flex items-center gap-2">
-                            <span>{cat.icon}</span> {cat.label}
-                          </span>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                ) : (
-                  <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
-                    {activeCategories.map((cat) => (
-                      <button
-                        key={cat.label}
-                        type="button"
-                        onClick={() => setCategory(cat.label)}
-                        className={`flex flex-col items-center gap-1 rounded-lg border-2 p-3 text-center transition-colors ${
-                          category === cat.label
-                            ? "border-primary bg-primary/5"
-                            : "border-border hover:border-primary/30"
-                        }`}
-                      >
-                        <span className="text-2xl">{cat.icon}</span>
-                        <span className="text-xs font-medium leading-tight">{cat.label}</span>
-                      </button>
-                    ))}
-                  </div>
-                )}
+                <p className="text-xs text-muted-foreground mb-1">
+                  Select one or more categories. Expand to pick subcategories.
+                </p>
+                <CategoryPicker
+                  value={categorySelection}
+                  onChange={setCategorySelection}
+                  filter={categoryFilter}
+                />
               </div>
 
               <div className="flex gap-2">
