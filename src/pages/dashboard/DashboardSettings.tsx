@@ -25,6 +25,7 @@ const DashboardSettings = () => {
   const [generating, setGenerating] = useState(false);
   const [uploadingPic, setUploadingPic] = useState(false);
   const [firstName, setFirstName] = useState("");
+  const [usernameError, setUsernameError] = useState("");
   const [profilePicUrl, setProfilePicUrl] = useState("");
   const [storeName, setStoreName] = useState("");
   const [whatsappNumber, setWhatsappNumber] = useState("");
@@ -38,12 +39,12 @@ const DashboardSettings = () => {
     if (!user) return;
     supabase
       .from("profiles")
-      .select("first_name, profile_picture_url, store_name, whatsapp_number, city, store_bio, category, delivery_areas, currency")
+      .select("first_name, profile_picture_url, store_name, store_slug, whatsapp_number, city, store_bio, category, delivery_areas, currency")
       .eq("id", user.id)
       .single()
       .then(({ data }) => {
         if (data) {
-          setFirstName((data as any).first_name ?? "");
+          setFirstName((data as any).store_slug ?? (data as any).first_name ?? "");
           setProfilePicUrl(data.profile_picture_url ?? "");
           setStoreName(data.store_name ?? "");
           setWhatsappNumber(data.whatsapp_number ?? "");
@@ -107,13 +108,39 @@ const DashboardSettings = () => {
     setGenerating(false);
   };
 
+  const slugify = (val: string) => val.toLowerCase().replace(/[^a-z0-9_-]/g, "").slice(0, 30);
+
+  const handleUsernameChange = (val: string) => {
+    const slug = slugify(val);
+    setFirstName(slug);
+    setUsernameError("");
+  };
+
   const handleSave = async () => {
     if (!user) return;
+    const username = firstName.trim();
+    if (!username) { toast.error("Username is required"); return; }
+
+    // Check uniqueness
+    const { data: existing } = await supabase
+      .from("profiles")
+      .select("id")
+      .eq("store_slug", username)
+      .neq("id", user.id)
+      .maybeSingle();
+
+    if (existing) {
+      setUsernameError("This username is already taken");
+      toast.error("Username is already taken");
+      return;
+    }
+
     setSaving(true);
     const { error } = await supabase
       .from("profiles")
       .update({
-        first_name: firstName.trim() || null,
+        first_name: username,
+        store_slug: username,
         store_name: storeName.trim(),
         whatsapp_number: whatsappNumber.trim(),
         city: city.trim(),
@@ -177,7 +204,17 @@ const DashboardSettings = () => {
 
           <div className="space-y-1.5">
             <Label>Username</Label>
-            <Input value={firstName} onChange={(e) => setFirstName(e.target.value)} placeholder="e.g. johndoe" />
+            <div className="flex items-center gap-1.5">
+              <span className="text-sm text-muted-foreground">afristall.com/</span>
+              <Input
+                value={firstName}
+                onChange={(e) => handleUsernameChange(e.target.value)}
+                placeholder="e.g. johndoe"
+                className={usernameError ? "border-destructive" : ""}
+              />
+            </div>
+            {usernameError && <p className="text-xs text-destructive">{usernameError}</p>}
+            <p className="text-xs text-muted-foreground">This is your store URL. Only lowercase letters, numbers, hyphens and underscores.</p>
           </div>
         </CardContent>
       </div>
