@@ -4,14 +4,18 @@ import { Button } from "@/components/ui/button";
 interface WhatsAppTestCardProps {
   whatsappNumber: string;
   storeName: string;
+  storeSlug?: string;
 }
 
-export default function WhatsAppTestCard({ whatsappNumber, storeName }: WhatsAppTestCardProps) {
+export default function WhatsAppTestCard({ whatsappNumber, storeName, storeSlug }: WhatsAppTestCardProps) {
   if (!whatsappNumber) return null;
 
   const cleanNumber = whatsappNumber.replace(/[^0-9+]/g, "").replace(/^\+/, "");
+  const ogProxyUrl = storeSlug
+    ? `https://${import.meta.env.VITE_SUPABASE_PROJECT_ID}.supabase.co/functions/v1/og-store?slug=${storeSlug}`
+    : `${window.location.origin}/${storeSlug || ""}`;
   const testMessage = encodeURIComponent(
-    `Hi! I'm interested in ordering from ${storeName || "your store"} on Afristall 🛒`
+    `🛍️ Check out ${storeName || "my store"} on Afristall — order directly on WhatsApp!\n${ogProxyUrl}`
   );
   const whatsappUrl = `https://wa.me/${cleanNumber}?text=${testMessage}`;
 

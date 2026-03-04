@@ -66,6 +66,9 @@ const DashboardOverview = () => {
   const { day, date, month } = getFormattedDate();
 
   const storeUrl = `${window.location.origin}/${storeSlug}`;
+  const ogProxyUrl = storeSlug
+    ? `https://${import.meta.env.VITE_SUPABASE_PROJECT_ID}.supabase.co/functions/v1/og-store?slug=${storeSlug}`
+    : storeUrl;
 
   const dismissBanner = () => {
     setBannerDismissed(true);
@@ -82,10 +85,13 @@ const DashboardOverview = () => {
   const shareStore = async () => {
     if (navigator.share) {
       try {
-        await navigator.share({ title: storeName, text: "Check out my store on Afristall!", url: storeUrl });
+        await navigator.share({ title: storeName, text: `🛍️ Check out ${storeName || "my store"} on Afristall — order directly on WhatsApp!`, url: ogProxyUrl });
       } catch { /* user cancelled */ }
     } else {
-      copyLink();
+      await navigator.clipboard.writeText(ogProxyUrl);
+      setCopied(true);
+      toast.success("Share link copied!");
+      setTimeout(() => setCopied(false), 2000);
     }
   };
 
