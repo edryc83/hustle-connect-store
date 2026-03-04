@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Eye, EyeOff, ArrowRight, ArrowLeft, Upload, Check, MapPin, MessageCircle, Package, Wrench } from "lucide-react";
+import { Eye, EyeOff, ArrowRight, ArrowLeft, Upload, Check, MapPin, MessageCircle, ExternalLink } from "lucide-react";
 import EmojiGrid from "@/components/landing/EmojiGrid";
 import AfristallLogo from "@/components/AfristallLogo";
 import { toast } from "sonner";
@@ -12,7 +12,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 
 const CITIES = ["Kampala", "Nairobi", "Lagos", "Accra", "Dar es Salaam", "Kigali", "Other"];
 
-const CATEGORIES = [
+const PRODUCT_CATEGORIES = [
   { label: "Food & Drinks", icon: "🍲" },
   { label: "Fashion & Clothes", icon: "👗" },
   { label: "Beauty & Skincare", icon: "✨" },
@@ -20,6 +20,18 @@ const CATEGORIES = [
   { label: "Home & Decor", icon: "🏠" },
   { label: "Plants & Garden", icon: "🌿" },
   { label: "Other", icon: "📦" },
+];
+
+const SERVICE_CATEGORIES = [
+  { label: "Delivery", icon: "🚚" },
+  { label: "Repairs", icon: "🔧" },
+  { label: "Tutoring", icon: "📚" },
+  { label: "Cleaning", icon: "🧹" },
+  { label: "Photography", icon: "📸" },
+  { label: "Catering", icon: "🍽️" },
+  { label: "Beauty Services", icon: "💅" },
+  { label: "Design", icon: "🎨" },
+  { label: "Other", icon: "🔧" },
 ];
 
 const COUNTRY_CODES = [
@@ -46,7 +58,7 @@ const Signup = () => {
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
 
-  // Step 1 — Email only
+  // Step 1
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -55,6 +67,7 @@ const Signup = () => {
   // Step 2
   const [storeName, setStoreName] = useState("");
   const [storeSlug, setStoreSlug] = useState("");
+  const [slugEdited, setSlugEdited] = useState(false);
   const [city, setCity] = useState("");
   const [category, setCategory] = useState("");
   const [businessType, setBusinessType] = useState<"product" | "service" | "both">("product");
@@ -67,6 +80,13 @@ const Signup = () => {
 
   const handleStoreNameChange = (value: string) => {
     setStoreName(value);
+    if (!slugEdited) {
+      setStoreSlug(slugify(value));
+    }
+  };
+
+  const handleSlugChange = (value: string) => {
+    setSlugEdited(true);
     setStoreSlug(slugify(value));
   };
 
@@ -80,6 +100,11 @@ const Signup = () => {
       setProfilePicture(file);
       setProfilePicturePreview(URL.createObjectURL(file));
     }
+  };
+
+  const handleBusinessTypeChange = (type: "product" | "service" | "both") => {
+    setBusinessType(type);
+    setCategory("");
   };
 
   const validateStep1 = () => {
@@ -98,12 +123,39 @@ const Signup = () => {
     return true;
   };
 
+  const validateStep3 = () => {
+    if (!whatsappNumber.trim()) {
+      toast.error("WhatsApp number is required — buyers will contact you here");
+      return false;
+    }
+    if (whatsappNumber.replace(/\D/g, "").length < 6) {
+      toast.error("Enter a valid phone number");
+      return false;
+    }
+    return true;
+  };
+
+  const getFullWhatsApp = () => {
+    return whatsappCountryCode + whatsappNumber.replace(/^0+/, "").replace(/\D/g, "");
+  };
+
+  const testWhatsApp = () => {
+    if (!whatsappNumber.trim()) {
+      toast.error("Enter your WhatsApp number first");
+      return;
+    }
+    const cleanNumber = getFullWhatsApp().replace(/^\+/, "");
+    const testMessage = encodeURIComponent(
+      `Hi! I'm interested in ordering from ${storeName || "your store"} on Afristall 🛒`
+    );
+    window.open(`https://wa.me/${cleanNumber}?text=${testMessage}`, "_blank");
+  };
+
   const handleSubmit = async () => {
+    if (!validateStep3()) return;
     setLoading(true);
     try {
-      const fullWhatsapp = whatsappNumber.trim()
-        ? whatsappCountryCode + whatsappNumber.replace(/^0+/, "")
-        : null;
+      const fullWhatsapp = getFullWhatsApp();
 
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: email.trim(),
@@ -150,6 +202,10 @@ const Signup = () => {
       setLoading(false);
     }
   };
+
+  const activeCategories = businessType === "service" ? SERVICE_CATEGORIES
+    : businessType === "both" ? [...PRODUCT_CATEGORIES, ...SERVICE_CATEGORIES.filter(s => s.label !== "Other")]
+    : PRODUCT_CATEGORIES;
 
   return (
     <div className="relative flex min-h-screen flex-col items-center justify-center px-4 py-8 overflow-hidden">
@@ -271,10 +327,13 @@ const Signup = () => {
                     id="storeSlug"
                     placeholder="my-store"
                     value={storeSlug}
-                    onChange={(e) => setStoreSlug(slugify(e.target.value))}
+                    onChange={(e) => handleSlugChange(e.target.value)}
                     maxLength={40}
                   />
                 </div>
+                <p className="text-xs text-muted-foreground">
+                  ✏️ You can edit this — use your name or shop name
+                </p>
               </div>
 
               <div className="space-y-1.5">
@@ -325,7 +384,7 @@ const Signup = () => {
                     <button
                       key={t.value}
                       type="button"
-                      onClick={() => setBusinessType(t.value)}
+                      onClick={() => handleBusinessTypeChange(t.value)}
                       className={`flex flex-col items-center gap-1 rounded-lg border-2 p-3 text-center transition-colors ${
                         businessType === t.value
                           ? "border-primary bg-primary/5"
@@ -340,24 +399,45 @@ const Signup = () => {
               </div>
 
               <div className="space-y-1.5">
-                <Label>What do you sell?</Label>
-                <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
-                  {CATEGORIES.map((cat) => (
-                    <button
-                      key={cat.label}
-                      type="button"
-                      onClick={() => setCategory(cat.label)}
-                      className={`flex flex-col items-center gap-1 rounded-lg border-2 p-3 text-center transition-colors ${
-                        category === cat.label
-                          ? "border-primary bg-primary/5"
-                          : "border-border hover:border-primary/30"
-                      }`}
-                    >
-                      <span className="text-2xl">{cat.icon}</span>
-                      <span className="text-xs font-medium leading-tight">{cat.label}</span>
-                    </button>
-                  ))}
-                </div>
+                <Label>
+                  {businessType === "service" ? "What services do you offer?" 
+                    : businessType === "both" ? "What do you sell or offer?" 
+                    : "What do you sell?"}
+                </Label>
+                {businessType === "service" ? (
+                  <Select value={category} onValueChange={setCategory}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select a service category" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {SERVICE_CATEGORIES.map((cat) => (
+                        <SelectItem key={cat.label} value={cat.label}>
+                          <span className="flex items-center gap-2">
+                            <span>{cat.icon}</span> {cat.label}
+                          </span>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                ) : (
+                  <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+                    {activeCategories.map((cat) => (
+                      <button
+                        key={cat.label}
+                        type="button"
+                        onClick={() => setCategory(cat.label)}
+                        className={`flex flex-col items-center gap-1 rounded-lg border-2 p-3 text-center transition-colors ${
+                          category === cat.label
+                            ? "border-primary bg-primary/5"
+                            : "border-border hover:border-primary/30"
+                        }`}
+                      >
+                        <span className="text-2xl">{cat.icon}</span>
+                        <span className="text-xs font-medium leading-tight">{cat.label}</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
               </div>
 
               <div className="flex gap-2">
@@ -386,11 +466,11 @@ const Signup = () => {
             </div>
             <div className="space-y-4">
               <div className="rounded-lg bg-primary/5 border border-primary/10 p-3 text-sm text-muted-foreground">
-                💡 You can also skip this and add it later in settings.
+                💡 Buyers will message you on this number when they order.
               </div>
 
               <div className="space-y-1.5">
-                <Label htmlFor="whatsapp">WhatsApp number <span className="text-muted-foreground font-normal">(optional)</span></Label>
+                <Label htmlFor="whatsapp">WhatsApp number</Label>
                 <div className="flex gap-2">
                   <Select value={whatsappCountryCode} onValueChange={setWhatsappCountryCode}>
                     <SelectTrigger className="w-[130px]">
@@ -414,6 +494,18 @@ const Signup = () => {
                   />
                 </div>
               </div>
+
+              {whatsappNumber.trim() && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full rounded-xl gap-2 border-primary/30 hover:bg-primary/5"
+                  onClick={testWhatsApp}
+                >
+                  <ExternalLink className="h-4 w-4" />
+                  Test WhatsApp — see what buyers see
+                </Button>
+              )}
 
               <div className="flex gap-2">
                 <Button variant="outline" onClick={() => setStep(2)} className="gap-1">
