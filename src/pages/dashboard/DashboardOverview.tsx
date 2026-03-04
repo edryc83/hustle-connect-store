@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import AfristallLogo from "@/components/AfristallLogo";
 import { toast } from "sonner";
-import { ShareCardModal } from "@/components/dashboard/ShareCardModal";
+
 
 function getGreeting(): { text: string; emoji: string } {
   const hour = new Date().getHours();
@@ -45,7 +45,7 @@ const DashboardOverview = () => {
     () => localStorage.getItem("afristall_banner_dismissed") === "true"
   );
   const [copied, setCopied] = useState(false);
-  const [shareModalOpen, setShareModalOpen] = useState(false);
+  
 
   useEffect(() => {
     if (!user) return;
@@ -220,10 +220,12 @@ const DashboardOverview = () => {
           <Button
             variant="outline"
             className="w-full rounded-xl border-primary/30 hover:bg-primary/10 gap-2"
-            onClick={() => setShareModalOpen(true)}
+            asChild
           >
-            <Smartphone className="h-4 w-4" />
-            Share to WhatsApp Status
+            <Link to="/dashboard/share" className="gap-2">
+              <Smartphone className="h-4 w-4" />
+              Share to WhatsApp Status
+            </Link>
           </Button>
         </div>
       )}
@@ -252,16 +254,6 @@ const DashboardOverview = () => {
         </Button>
       </div>
 
-      {/* WhatsApp Status Card Modal */}
-      <ShareCardModal
-        open={shareModalOpen}
-        onOpenChange={setShareModalOpen}
-        storeName={storeName}
-        storeSlug={storeSlug}
-        profilePicUrl={profilePicUrl}
-        category={category}
-        products={products}
-      />
     </div>
   );
 };
