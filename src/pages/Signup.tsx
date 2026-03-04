@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -68,6 +68,9 @@ const Signup = () => {
   const [storeName, setStoreName] = useState("");
   const [storeSlug, setStoreSlug] = useState("");
   const [slugEdited, setSlugEdited] = useState(false);
+  const [slugAvailable, setSlugAvailable] = useState<boolean | null>(null);
+  const [checkingSlug, setCheckingSlug] = useState(false);
+  const slugCheckTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [city, setCity] = useState("");
   const [category, setCategory] = useState("");
   const [businessType, setBusinessType] = useState<"product" | "service" | "both">("product");
@@ -78,16 +81,35 @@ const Signup = () => {
   const [whatsappCountryCode, setWhatsappCountryCode] = useState("+256");
   const [whatsappNumber, setWhatsappNumber] = useState("");
 
+  const checkSlugAvailability = (slug: string) => {
+    if (slugCheckTimer.current) clearTimeout(slugCheckTimer.current);
+    if (!slug || slug.length < 2) { setSlugAvailable(null); return; }
+    setCheckingSlug(true);
+    slugCheckTimer.current = setTimeout(async () => {
+      const { data } = await supabase
+        .from("profiles")
+        .select("id")
+        .eq("store_slug", slug)
+        .maybeSingle();
+      setSlugAvailable(data === null);
+      setCheckingSlug(false);
+    }, 500);
+  };
+
   const handleStoreNameChange = (value: string) => {
     setStoreName(value);
     if (!slugEdited) {
-      setStoreSlug(slugify(value));
+      const newSlug = slugify(value);
+      setStoreSlug(newSlug);
+      checkSlugAvailability(newSlug);
     }
   };
 
   const handleSlugChange = (value: string) => {
     setSlugEdited(true);
-    setStoreSlug(slugify(value));
+    const newSlug = slugify(value);
+    setStoreSlug(newSlug);
+    checkSlugAvailability(newSlug);
   };
 
   const handleProfilePicture = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -119,6 +141,7 @@ const Signup = () => {
     if (!storeName.trim()) { toast.error("Store name is required"); return false; }
     if (!storeSlug.trim()) { toast.error("Store slug is required"); return false; }
     if (!/^[a-z0-9-]+$/.test(storeSlug)) { toast.error("Slug can only contain lowercase letters, numbers, and hyphens"); return false; }
+    if (slugAvailable === false) { toast.error("This URL is already taken — try another"); return false; }
     if (!category) { toast.error("Please select a category"); return false; }
     return true;
   };
