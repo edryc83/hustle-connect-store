@@ -11,18 +11,7 @@ import AfristallLogo from "@/components/AfristallLogo";
 import { toast } from "sonner";
 import DailySellingTip from "@/components/dashboard/DailySellingTip";
 import CaptionGenerator from "@/components/dashboard/CaptionGenerator";
-
-function useIsInstalledPWA() {
-  const [installed, setInstalled] = useState(false);
-  useEffect(() => {
-    const mq = window.matchMedia("(display-mode: standalone)");
-    setInstalled(mq.matches || (navigator as any).standalone === true);
-    const handler = (e: MediaQueryListEvent) => setInstalled(e.matches);
-    mq.addEventListener("change", handler);
-    return () => mq.removeEventListener("change", handler);
-  }, []);
-  return installed;
-}
+import { useInstallPrompt } from "@/hooks/useInstallPrompt";
 
 function getGreeting(): { text: string; emoji: string } {
   const hour = new Date().getHours();
@@ -42,7 +31,7 @@ function getFormattedDate() {
 
 const DashboardOverview = () => {
   const { user } = useAuth();
-  const isInstalled = useIsInstalledPWA();
+  const { canInstall, isInstalled, promptInstall } = useInstallPrompt();
   const [productCount, setProductCount] = useState(0);
   const [firstName, setFirstName] = useState("");
   const [storeSlug, setStoreSlug] = useState("");
@@ -144,19 +133,27 @@ const DashboardOverview = () => {
 
       {/* Install app banner — hidden once installed */}
       {!isInstalled && (
-        <Link
-          to="/dashboard/settings#install-app"
-          className="flex items-center gap-3 rounded-2xl border border-border/50 bg-card/60 backdrop-blur-xl p-4 shadow-sm hover:bg-muted/40 transition-colors"
+        <button
+          onClick={async () => {
+            if (canInstall) {
+              await promptInstall();
+            } else {
+              window.location.href = "/dashboard/settings#install-app";
+            }
+          }}
+          className="flex w-full items-center gap-3 rounded-2xl border border-border/50 bg-card/60 backdrop-blur-xl p-4 shadow-sm hover:bg-muted/40 transition-colors text-left"
         >
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
             <Download className="h-5 w-5 text-primary" />
           </div>
           <div className="flex-1">
             <p className="text-sm font-semibold">Install Afristall App</p>
-            <p className="text-xs text-muted-foreground">Add to home screen for quick access</p>
+            <p className="text-xs text-muted-foreground">
+              {canInstall ? "Tap to install now" : "Add to home screen for quick access"}
+            </p>
           </div>
-          <span className="text-xs text-primary font-medium">How →</span>
-        </Link>
+          <span className="text-xs text-primary font-medium">{canInstall ? "Install" : "How →"}</span>
+        </button>
       )}
 
       {/* Onboarding banner */}
