@@ -47,15 +47,20 @@ const Login = () => {
 
     setLoading(true);
     try {
-      const credentials: { email?: string; phone?: string; password: string } = { password };
-
+      let error;
       if (authMode === "email") {
-        credentials.email = email.trim();
+        const result = await supabase.auth.signInWithPassword({
+          email: email.trim(),
+          password,
+        });
+        error = result.error;
       } else {
-        credentials.phone = phoneCountryCode + phone.replace(/^0+/, "");
+        const result = await supabase.auth.signInWithPassword({
+          phone: phoneCountryCode + phone.replace(/^0+/, ""),
+          password,
+        });
+        error = result.error;
       }
-
-      const { error } = await supabase.auth.signInWithPassword(credentials);
       if (error) throw error;
 
       toast.success("Welcome back! 👋");

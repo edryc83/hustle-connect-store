@@ -147,18 +147,25 @@ const Signup = () => {
       const fullWhatsapp = whatsappCountryCode + whatsappNumber.replace(/^0+/, "");
 
       // Sign up with Supabase Auth
-      const signUpData: { email?: string; phone?: string; password: string; options?: any } = {
-        password,
-        options: { emailRedirectTo: window.location.origin },
-      };
+      let authData;
+      let authError;
 
       if (authMode === "email") {
-        signUpData.email = email.trim();
+        const result = await supabase.auth.signUp({
+          email: email.trim(),
+          password,
+          options: { emailRedirectTo: window.location.origin },
+        });
+        authData = result.data;
+        authError = result.error;
       } else {
-        signUpData.phone = phoneCountryCode + phone.replace(/^0+/, "");
+        const result = await supabase.auth.signUp({
+          phone: phoneCountryCode + phone.replace(/^0+/, ""),
+          password,
+        });
+        authData = result.data;
+        authError = result.error;
       }
-
-      const { data: authData, error: authError } = await supabase.auth.signUp(signUpData);
 
       if (authError) throw authError;
       if (!authData.user) throw new Error("Signup failed");
