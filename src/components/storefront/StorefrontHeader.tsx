@@ -21,7 +21,7 @@ interface StorefrontHeaderProps {
 
 export function StorefrontHeader({ profile, visitorName }: StorefrontHeaderProps) {
   const greeting = getTimeGreeting();
-  const welcomeMessage = profile.store_bio || defaultWelcome;
+  const welcomeMessage = (profile as any).welcome_message || profile.store_bio || defaultWelcome;
 
   return (
     <header className="bg-background">
