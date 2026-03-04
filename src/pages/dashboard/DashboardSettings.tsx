@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Sparkles, Loader2, Camera } from "lucide-react";
+import { Sparkles, Loader2, Camera, ImagePlus } from "lucide-react";
 import { CURRENCY_OPTIONS } from "@/lib/currency";
 import AfristallLogo from "@/components/AfristallLogo";
 import {
@@ -18,17 +18,26 @@ import {
   deserializeCategories,
 } from "@/components/CategoryPicker";
 
+const COUNTRIES = [
+  "Uganda", "Kenya", "Nigeria", "Ghana", "Tanzania", "Rwanda",
+  "South Africa", "Ethiopia", "Cameroon", "Senegal", "Other",
+];
+
 const DashboardSettings = () => {
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [generating, setGenerating] = useState(false);
   const [uploadingPic, setUploadingPic] = useState(false);
+  const [uploadingCover, setUploadingCover] = useState(false);
   const [firstName, setFirstName] = useState("");
   const [usernameError, setUsernameError] = useState("");
   const [profilePicUrl, setProfilePicUrl] = useState("");
+  const [coverPhotoUrl, setCoverPhotoUrl] = useState("");
   const [storeName, setStoreName] = useState("");
   const [whatsappNumber, setWhatsappNumber] = useState("");
+  const [country, setCountry] = useState("");
+  const [district, setDistrict] = useState("");
   const [city, setCity] = useState("");
   const [storeBio, setStoreBio] = useState("");
   const [categories, setCategories] = useState<CategorySelection>({});
@@ -40,21 +49,25 @@ const DashboardSettings = () => {
     if (!user) return;
     supabase
       .from("profiles")
-      .select("first_name, profile_picture_url, store_name, store_slug, whatsapp_number, city, store_bio, category, delivery_areas, currency, welcome_message")
+      .select("first_name, profile_picture_url, store_name, store_slug, whatsapp_number, city, store_bio, category, delivery_areas, currency, welcome_message, cover_photo_url, country, district")
       .eq("id", user.id)
       .single()
       .then(({ data }) => {
         if (data) {
-          setFirstName((data as any).store_slug ?? (data as any).first_name ?? "");
-          setProfilePicUrl(data.profile_picture_url ?? "");
-          setStoreName(data.store_name ?? "");
-          setWhatsappNumber(data.whatsapp_number ?? "");
-          setCity(data.city ?? "");
-          setStoreBio((data as any).store_bio ?? "");
-          setCategories(deserializeCategories(data.category));
-          setDeliveryAreas((data as any).delivery_areas ?? "");
-          setCurrency((data as any).currency ?? "UGX");
-          setWelcomeMessage((data as any).welcome_message ?? "");
+          const d = data as any;
+          setFirstName(d.store_slug ?? d.first_name ?? "");
+          setProfilePicUrl(d.profile_picture_url ?? "");
+          setCoverPhotoUrl(d.cover_photo_url ?? "");
+          setStoreName(d.store_name ?? "");
+          setWhatsappNumber(d.whatsapp_number ?? "");
+          setCountry(d.country ?? "");
+          setDistrict(d.district ?? "");
+          setCity(d.city ?? "");
+          setStoreBio(d.store_bio ?? "");
+          setCategories(deserializeCategories(d.category));
+          setDeliveryAreas(d.delivery_areas ?? "");
+          setCurrency(d.currency ?? "UGX");
+          setWelcomeMessage(d.welcome_message ?? "");
         }
         setLoading(false);
       });
@@ -91,6 +104,37 @@ const DashboardSettings = () => {
     setUploadingPic(false);
   };
 
+  const handleCoverPhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !user) return;
+    if (file.size > 5 * 1024 * 1024) { toast.error("Image must be under 5MB"); return; }
+
+    setUploadingCover(true);
+    try {
+      const ext = file.name.split(".").pop();
+      const path = `${user.id}/cover.${ext}`;
+      const { error: uploadErr } = await supabase.storage
+        .from("store-images")
+        .upload(path, file, { upsert: true });
+      if (uploadErr) throw uploadErr;
+
+      const { data: urlData } = supabase.storage.from("store-images").getPublicUrl(path);
+      const newUrl = `${urlData.publicUrl}?t=${Date.now()}`;
+
+      const { error: updateErr } = await supabase
+        .from("profiles")
+        .update({ cover_photo_url: urlData.publicUrl } as any)
+        .eq("id", user.id);
+      if (updateErr) throw updateErr;
+
+      setCoverPhotoUrl(newUrl);
+      toast.success("Cover photo updated!");
+    } catch {
+      toast.error("Failed to upload cover photo");
+    }
+    setUploadingCover(false);
+  };
+
   const handleGenerateBio = async () => {
     setGenerating(true);
     try {
@@ -123,7 +167,6 @@ const DashboardSettings = () => {
     const username = firstName.trim();
     if (!username) { toast.error("Username is required"); return; }
 
-    // Check uniqueness
     const { data: existing } = await supabase
       .from("profiles")
       .select("id")
@@ -145,6 +188,8 @@ const DashboardSettings = () => {
         store_slug: username,
         store_name: storeName.trim(),
         whatsapp_number: whatsappNumber.trim(),
+        country: country.trim() || null,
+        district: district.trim() || null,
         city: city.trim(),
         store_bio: storeBio.trim() || null,
         category: serializeCategories(categories) || null,
@@ -170,6 +215,38 @@ const DashboardSettings = () => {
           <CardTitle className="text-base">Your Profile</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
+          {/* Cover Photo */}
+          <div className="space-y-1.5">
+            <Label>Cover Photo</Label>
+            <div className="relative group rounded-xl overflow-hidden border border-border/50 bg-muted/30 h-32">
+              {coverPhotoUrl ? (
+                <img src={coverPhotoUrl} alt="Cover" className="w-full h-full object-cover" />
+              ) : (
+                <div className="flex items-center justify-center h-full text-muted-foreground">
+                  <ImagePlus className="h-8 w-8" />
+                </div>
+              )}
+              <label className="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
+                {uploadingCover ? (
+                  <Loader2 className="h-6 w-6 text-white animate-spin" />
+                ) : (
+                  <div className="text-center text-white">
+                    <Camera className="h-6 w-6 mx-auto" />
+                    <span className="text-xs mt-1 block">Change cover</span>
+                  </div>
+                )}
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleCoverPhotoChange}
+                  disabled={uploadingCover}
+                />
+              </label>
+            </div>
+            <p className="text-xs text-muted-foreground">Recommended: 1200×400px. Shown on your store & explore cards.</p>
+          </div>
+
           {/* Profile Picture */}
           <div className="flex items-center gap-4">
             <div className="relative group">
@@ -280,9 +357,33 @@ const DashboardSettings = () => {
             <Input value={whatsappNumber} onChange={(e) => setWhatsappNumber(e.target.value)} />
           </div>
 
+          {/* Location */}
           <div className="space-y-1.5">
-            <Label>City</Label>
-            <Input value={city} onChange={(e) => setCity(e.target.value)} />
+            <Label>Country</Label>
+            <Select value={country} onValueChange={setCountry}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select country" />
+              </SelectTrigger>
+              <SelectContent>
+                {COUNTRIES.map((c) => (
+                  <SelectItem key={c} value={c}>{c}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+
+          <div className="space-y-1.5">
+            <Label>District / State</Label>
+            <Input
+              value={district}
+              onChange={(e) => setDistrict(e.target.value)}
+              placeholder="e.g. Wakiso, Lagos Island, Westlands"
+            />
+          </div>
+
+          <div className="space-y-1.5">
+            <Label>City / Town</Label>
+            <Input value={city} onChange={(e) => setCity(e.target.value)} placeholder="e.g. Kampala, Nairobi, Lagos" />
           </div>
 
           <div className="space-y-1.5">
