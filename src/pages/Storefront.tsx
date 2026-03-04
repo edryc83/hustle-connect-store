@@ -1,12 +1,14 @@
 import { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Store, ShoppingBag, Share2, Copy, Check, Star } from "lucide-react";
+import { Store, ShoppingBag, Share2, Copy, Check, Star, ShoppingCart } from "lucide-react";
 import { formatPrice } from "@/lib/currency";
 import AfristallLogo from "@/components/AfristallLogo";
 import { ProductImageCarousel } from "@/components/storefront/ProductImageCarousel";
 import { StorefrontHeader } from "@/components/storefront/StorefrontHeader";
 import { VisitorNameModal } from "@/components/storefront/VisitorNameModal";
+import { CartDrawer } from "@/components/storefront/CartDrawer";
+import { CartProvider, useCart } from "@/hooks/useCart";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -75,6 +77,15 @@ function ProductCard({
   currency: string;
   onClick: () => void;
 }) {
+  const { addItem } = useCart();
+
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const imageUrl = images[0] || product.image_url || undefined;
+    addItem(product, imageUrl);
+    toast.success(`${product.name} added to cart`);
+  };
+
   return (
     <Card
       className="group cursor-pointer overflow-hidden border-0 shadow-sm transition-all hover:shadow-lg hover:-translate-y-0.5"
@@ -101,6 +112,14 @@ function ProductCard({
             </Badge>
           )}
         </div>
+        {/* Add to cart button */}
+        <button
+          onClick={handleAddToCart}
+          className="absolute bottom-2 right-2 flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-md opacity-0 group-hover:opacity-100 transition-opacity hover:bg-primary/90"
+          title="Add to cart"
+        >
+          <ShoppingCart className="h-4 w-4" />
+        </button>
       </div>
       <CardContent className="p-3 space-y-0.5">
         <p className="font-semibold text-sm truncate">{product.name}</p>
@@ -122,7 +141,8 @@ function ProductCard({
   );
 }
 
-const Storefront = () => {
+const StorefrontInner = () => {
+  const { addItem } = useCart();
   const { storeSlug, productId } = useParams<{ storeSlug: string; productId?: string }>();
   const navigate = useNavigate();
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -302,29 +322,47 @@ const Storefront = () => {
             </div>
           )}
 
-          <Button
-            size="lg"
-            className="w-full gap-2 text-base"
-            onClick={() => {
-              const cleanNumber = (profile.whatsapp_number ?? "").replace(/[^0-9+]/g, "");
-              const displayPrice = (viewProduct as any).discount_price ? Number((viewProduct as any).discount_price) : Number(viewProduct.price);
-              const message = `🛒 Hi! I'd like to order *${viewProduct.name}* (${formatPrice(displayPrice, currency)}) from your Afristall store.`;
-              supabase.from("orders").insert({
-                seller_id: profile.id,
-                product_id: viewProduct.id,
-                product_name: viewProduct.name,
-                quantity: 1,
-                total: Number(viewProduct.price),
-                customer_name: visitorName || "Store visitor",
-                customer_phone: visitorName || "WhatsApp order",
-              } as any).then(() => {});
-              supabase.rpc("increment_whatsapp_taps", { p_id: viewProduct.id }).then(() => {});
-              window.open(`https://wa.me/${cleanNumber.replace("+", "")}?text=${encodeURIComponent(message)}`, "_blank");
-            }}
-          >
-            <span className="text-lg">💬</span>
-            Order via WhatsApp
-          </Button>
+          <div className="flex gap-3">
+            <Button
+              size="lg"
+              className="flex-1 gap-2 text-base"
+              onClick={() => {
+                const imageUrl = imgs[0] || viewProduct.image_url || undefined;
+                addItem(viewProduct, imageUrl);
+                toast.success(`${viewProduct.name} added to cart`);
+              }}
+            >
+              <ShoppingCart className="h-5 w-5" />
+              Add to Cart
+            </Button>
+            <Button
+              size="lg"
+              variant="outline"
+              className="gap-2 text-base"
+              onClick={() => {
+                const cleanNumber = (profile.whatsapp_number ?? "").replace(/[^0-9+]/g, "");
+                const displayPrice = (viewProduct as any).discount_price ? Number((viewProduct as any).discount_price) : Number(viewProduct.price);
+                const message = [
+                  `🛒 Hi! I'd like to order *${viewProduct.name}* (${formatPrice(displayPrice, currency)}) from your Afristall store.`,
+                  viewProduct.image_url ? `\n📷 ${viewProduct.image_url}` : null,
+                ].filter(Boolean).join("\n");
+                supabase.from("orders").insert({
+                  seller_id: profile.id,
+                  product_id: viewProduct.id,
+                  product_name: viewProduct.name,
+                  quantity: 1,
+                  total: Number(viewProduct.price),
+                  customer_name: visitorName || "Store visitor",
+                  customer_phone: visitorName || "WhatsApp order",
+                } as any).then(() => {});
+                supabase.rpc("increment_whatsapp_taps", { p_id: viewProduct.id }).then(() => {});
+                window.open(`https://wa.me/${cleanNumber.replace("+", "")}?text=${encodeURIComponent(message)}`, "_blank");
+              }}
+            >
+              <span className="text-lg">💬</span>
+              WhatsApp
+            </Button>
+          </div>
 
           <div className="border-t pt-4">
             <Link to={`/${storeSlug}`} className="flex items-center gap-3">
@@ -349,6 +387,15 @@ const Storefront = () => {
             Powered by <span className="font-semibold">Afri<span className="text-primary">stall</span></span>
           </Link>
         </footer>
+
+        {/* Cart Drawer */}
+        <CartDrawer
+          currency={currency}
+          whatsappNumber={profile.whatsapp_number ?? ""}
+          storeName={profile.store_name ?? "Store"}
+          sellerId={profile.id}
+          visitorName={visitorName}
+        />
       </div>
     );
   }
@@ -427,8 +474,23 @@ const Storefront = () => {
           Powered by <span className="font-semibold">Afri<span className="text-primary">stall</span></span>
         </Link>
       </footer>
+
+      {/* Cart Drawer */}
+      <CartDrawer
+        currency={currency}
+        whatsappNumber={profile.whatsapp_number ?? ""}
+        storeName={profile.store_name ?? "Store"}
+        sellerId={profile.id}
+        visitorName={visitorName}
+      />
     </div>
   );
 };
+
+const Storefront = () => (
+  <CartProvider>
+    <StorefrontInner />
+  </CartProvider>
+);
 
 export default Storefront;
