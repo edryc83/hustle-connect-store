@@ -1,4 +1,4 @@
-import { Package, LayoutDashboard, Settings, LogOut } from "lucide-react";
+import { Package, LayoutDashboard, Settings, LogOut, ClipboardList } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
@@ -19,7 +19,8 @@ import { Button } from "@/components/ui/button";
 
 const navItems = [
   { title: "Overview", url: "/dashboard", icon: LayoutDashboard },
-  { title: "Products", url: "/dashboard/products", icon: Package },
+  { title: "Listings", url: "/dashboard/products", icon: Package },
+  { title: "Orders", url: "/dashboard/orders", icon: ClipboardList },
   { title: "Settings", url: "/dashboard/settings", icon: Settings },
 ];
 

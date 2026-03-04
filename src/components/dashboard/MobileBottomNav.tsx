@@ -1,9 +1,10 @@
-import { LayoutDashboard, Package, Settings } from "lucide-react";
+import { LayoutDashboard, Package, Settings, ClipboardList } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 
 const navItems = [
   { title: "Overview", url: "/dashboard", icon: LayoutDashboard },
-  { title: "Products", url: "/dashboard/products", icon: Package },
+  { title: "Listings", url: "/dashboard/products", icon: Package },
+  { title: "Orders", url: "/dashboard/orders", icon: ClipboardList },
   { title: "Settings", url: "/dashboard/settings", icon: Settings },
 ];
 
