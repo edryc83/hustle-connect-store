@@ -34,12 +34,13 @@ const DashboardSettings = () => {
   const [categories, setCategories] = useState<CategorySelection>({});
   const [deliveryAreas, setDeliveryAreas] = useState("");
   const [currency, setCurrency] = useState("UGX");
+  const [welcomeMessage, setWelcomeMessage] = useState("");
 
   useEffect(() => {
     if (!user) return;
     supabase
       .from("profiles")
-      .select("first_name, profile_picture_url, store_name, store_slug, whatsapp_number, city, store_bio, category, delivery_areas, currency")
+      .select("first_name, profile_picture_url, store_name, store_slug, whatsapp_number, city, store_bio, category, delivery_areas, currency, welcome_message")
       .eq("id", user.id)
       .single()
       .then(({ data }) => {
@@ -53,6 +54,7 @@ const DashboardSettings = () => {
           setCategories(deserializeCategories(data.category));
           setDeliveryAreas((data as any).delivery_areas ?? "");
           setCurrency((data as any).currency ?? "UGX");
+          setWelcomeMessage((data as any).welcome_message ?? "");
         }
         setLoading(false);
       });
@@ -148,6 +150,7 @@ const DashboardSettings = () => {
         category: serializeCategories(categories) || null,
         delivery_areas: deliveryAreas.trim() || null,
         currency: currency,
+        welcome_message: welcomeMessage.trim() || null,
       } as any)
       .eq("id", user.id);
     if (error) toast.error("Failed to save");
@@ -258,6 +261,18 @@ const DashboardSettings = () => {
               maxLength={300}
             />
             <p className="text-xs text-muted-foreground">{storeBio.length}/300 — shown on your storefront</p>
+          </div>
+
+          <div className="space-y-1.5">
+            <Label>Welcome Message</Label>
+            <Textarea
+              value={welcomeMessage}
+              onChange={(e) => setWelcomeMessage(e.target.value)}
+              placeholder="e.g. Thanks for stopping by! Browse around and hit me up on WhatsApp to order 🧡"
+              rows={2}
+              maxLength={200}
+            />
+            <p className="text-xs text-muted-foreground">{welcomeMessage.length}/200 — greeting visitors see when they open your store</p>
           </div>
 
           <div className="space-y-1.5">
