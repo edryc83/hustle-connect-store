@@ -100,7 +100,7 @@ const DashboardShareCard = () => {
   /* ───────── STEP 2: Polotno Editor ───────── */
   if (step === "edit" && selectedTemplate) {
     return (
-      <PolotnoEditor
+      <FabricEditor
         template={selectedTemplate}
         storeName={storeName}
         storeSlug={storeSlug}
