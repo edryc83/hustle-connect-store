@@ -50,13 +50,25 @@ export function DashboardLayout({ children }: { children: ReactNode }) {
                 </span>
               </div>
             </div>
-            <button
-              onClick={toggleTheme}
-              className="flex h-9 w-9 items-center justify-center rounded-full border bg-card/60 backdrop-blur-sm text-muted-foreground hover:text-foreground transition-colors"
-              aria-label="Toggle theme"
-            >
-              {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-            </button>
+            <div className="flex items-center gap-2">
+              {storeSlug && (
+                <Link
+                  to={`/${storeSlug}`}
+                  target="_blank"
+                  className="flex h-9 w-9 items-center justify-center rounded-full border bg-card/60 backdrop-blur-sm text-muted-foreground hover:text-foreground transition-colors"
+                  title="Preview your store"
+                >
+                  <Eye className="h-4 w-4" />
+                </Link>
+              )}
+              <button
+                onClick={toggleTheme}
+                className="flex h-9 w-9 items-center justify-center rounded-full border bg-card/60 backdrop-blur-sm text-muted-foreground hover:text-foreground transition-colors"
+                aria-label="Toggle theme"
+              >
+                {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+              </button>
+            </div>
           </header>
 
           <main className="flex-1 p-4 md:p-6 pb-20 md:pb-6">
