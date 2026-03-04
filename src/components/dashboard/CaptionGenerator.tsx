@@ -47,20 +47,22 @@ const CaptionGenerator = ({ storeName, storeSlug, category, productCount }: Prop
   };
 
   return (
-    <div className="space-y-3">
-      <div className="flex items-center justify-between">
-        <div>
-          <span className="text-sm font-medium">For your status 🔥</span>
-          <p className="text-[11px] text-muted-foreground">Tap copy → paste on WhatsApp status → stays up for 24hrs</p>
+    <div className="space-y-3 pt-2">
+      <div className="border-t border-border/50 pt-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <span className="text-base font-semibold">For your WhatsApp status 🔥</span>
+            <p className="text-xs text-muted-foreground mt-0.5">Tap copy → paste on WhatsApp status → stays up for 24hrs</p>
+          </div>
+          <button
+            onClick={fetchCaptions}
+            disabled={loading}
+            className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
+          >
+            <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`} />
+            New
+          </button>
         </div>
-        <button
-          onClick={fetchCaptions}
-          disabled={loading}
-          className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
-        >
-          <RefreshCw className={`h-3 w-3 ${loading ? "animate-spin" : ""}`} />
-          New
-        </button>
       </div>
 
       <div className="space-y-2">
