@@ -21,6 +21,7 @@ import { toast } from "sonner";
 import { formatPrice } from "@/lib/currency";
 import { Badge } from "@/components/ui/badge";
 import type { Tables } from "@/integrations/supabase/types";
+import { ProductAttributeForm } from "@/components/dashboard/ProductAttributeForm";
 
 type Product = Tables<"products">;
 
@@ -352,6 +353,15 @@ const DashboardProducts = () => {
                 <Label htmlFor="productVariants">Variants / Options</Label>
                 <Input id="productVariants" placeholder="e.g. Small, Medium, Large" value={variantsText} onChange={(e) => setVariantsText(e.target.value)} />
               </div>
+              {/* Dynamic Product Attributes */}
+              {listingType === "product" && (
+                <div className="space-y-1.5">
+                  <Label className="text-sm font-semibold flex items-center gap-1.5">
+                    📋 Product Options <span className="text-muted-foreground font-normal text-xs">(optional)</span>
+                  </Label>
+                  <ProductAttributeForm attributes={attributes} onChange={setAttributes} />
+                </div>
+              )}
               <Button className="w-full" onClick={handleSave} disabled={saving}>
                 {saving ? "Saving…" : editingProduct ? `Update ${terms.singular}` : `Add ${terms.singular}`}
               </Button>
