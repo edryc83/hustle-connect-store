@@ -810,6 +810,7 @@ const StorefrontInner = () => {
             onChange={setFilters}
             totalCount={products.length}
             filteredCount={filteredProducts.length}
+            products={products}
           />
         )}
 
