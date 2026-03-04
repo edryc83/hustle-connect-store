@@ -13,6 +13,14 @@ import { useEffect, useState } from "react";
 export function DashboardLayout({ children }: { children: ReactNode }) {
   const { user, loading } = useAuth();
   const { theme, toggleTheme } = useTheme();
+  const [storeSlug, setStoreSlug] = useState("");
+
+  useEffect(() => {
+    if (!user) return;
+    supabase.from("profiles").select("store_slug").eq("id", user.id).single().then(({ data }) => {
+      setStoreSlug((data as any)?.store_slug ?? "");
+    });
+  }, [user]);
 
   if (loading) {
     return (
