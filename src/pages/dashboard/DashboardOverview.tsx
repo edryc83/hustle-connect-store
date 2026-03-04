@@ -33,7 +33,7 @@ const DashboardOverview = () => {
     <div className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold">
-          Welcome back{storeName ? `, ${storeName}` : ""} 👋
+          Welcome back{user?.email ? `, ${user.email.split("@")[0].split(/[._]/)[0].charAt(0).toUpperCase()}${user.email.split("@")[0].split(/[._]/)[0].slice(1)}` : ""} 👋
         </h1>
         <p className="text-muted-foreground text-sm">Here's how your store is doing.</p>
       </div>
