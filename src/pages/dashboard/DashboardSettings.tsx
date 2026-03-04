@@ -39,12 +39,12 @@ const DashboardSettings = () => {
     if (!user) return;
     supabase
       .from("profiles")
-      .select("first_name, profile_picture_url, store_name, whatsapp_number, city, store_bio, category, delivery_areas, currency")
+      .select("first_name, profile_picture_url, store_name, store_slug, whatsapp_number, city, store_bio, category, delivery_areas, currency")
       .eq("id", user.id)
       .single()
       .then(({ data }) => {
         if (data) {
-          setFirstName((data as any).first_name ?? "");
+          setFirstName((data as any).store_slug ?? (data as any).first_name ?? "");
           setProfilePicUrl(data.profile_picture_url ?? "");
           setStoreName(data.store_name ?? "");
           setWhatsappNumber(data.whatsapp_number ?? "");
