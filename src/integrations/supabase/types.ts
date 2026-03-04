@@ -253,6 +253,10 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_delete_seller: {
+        Args: { _admin_id: string; _seller_id: string }
+        Returns: undefined
+      }
       increment_store_views: { Args: { slug: string }; Returns: undefined }
       increment_whatsapp_taps: { Args: { p_id: string }; Returns: undefined }
       is_admin: { Args: { _user_id: string }; Returns: boolean }

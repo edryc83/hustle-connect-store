@@ -3,8 +3,11 @@ import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Search, ExternalLink, MapPin } from "lucide-react";
+import { Search, ExternalLink, MapPin, Trash2 } from "lucide-react";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { toast } from "@/components/ui/sonner";
+import { useAdmin } from "@/hooks/useAdmin";
 import AfristallLogo from "@/components/AfristallLogo";
 
 type SellerProfile = {
@@ -31,6 +34,9 @@ export default function AdminSellers() {
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [productCounts, setProductCounts] = useState<Record<string, number>>({});
+  const [deleteTarget, setDeleteTarget] = useState<SellerProfile | null>(null);
+  const [deleting, setDeleting] = useState(false);
+  const { user } = useAdmin();
 
   const fetchSellers = async () => {
     setLoading(true);
@@ -56,6 +62,23 @@ export default function AdminSellers() {
   };
 
   useEffect(() => { fetchSellers(); }, []);
+
+  const handleDelete = async () => {
+    if (!deleteTarget || !user) return;
+    setDeleting(true);
+    const { error } = await (supabase.rpc as any)("admin_delete_seller", {
+      _admin_id: user.id,
+      _seller_id: deleteTarget.id,
+    });
+    setDeleting(false);
+    setDeleteTarget(null);
+    if (error) {
+      toast.error("Failed to delete seller");
+    } else {
+      toast.success("Seller deleted successfully");
+      fetchSellers();
+    }
+  };
 
   const filtered = sellers.filter((s) => {
     const q = search.toLowerCase();
@@ -104,7 +127,7 @@ export default function AdminSellers() {
                 <TableHead className="text-center">Products</TableHead>
                 <TableHead className="text-center">Views</TableHead>
                 <TableHead className="text-center">Status</TableHead>
-                <TableHead className="text-right">Store</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -147,15 +170,18 @@ export default function AdminSellers() {
                       )}
                     </TableCell>
                     <TableCell className="text-right">
-                      {s.store_slug ? (
-                        <Button variant="ghost" size="sm" className="h-7 text-xs" asChild>
-                          <a href={`/${s.store_slug}`} target="_blank" rel="noopener noreferrer">
-                            <ExternalLink className="h-3 w-3 mr-1" /> View
-                          </a>
+                      <div className="flex items-center justify-end gap-1">
+                        {s.store_slug && (
+                          <Button variant="ghost" size="sm" className="h-7 text-xs" asChild>
+                            <a href={`/${s.store_slug}`} target="_blank" rel="noopener noreferrer">
+                              <ExternalLink className="h-3 w-3 mr-1" /> View
+                            </a>
+                          </Button>
+                        )}
+                        <Button variant="ghost" size="sm" className="h-7 text-xs text-destructive hover:text-destructive hover:bg-destructive/10" onClick={() => setDeleteTarget(s)}>
+                          <Trash2 className="h-3 w-3" />
                         </Button>
-                      ) : (
-                        <span className="text-xs text-muted-foreground">—</span>
-                      )}
+                      </div>
                     </TableCell>
                   </TableRow>
                 );
@@ -169,6 +195,23 @@ export default function AdminSellers() {
           </Table>
         </div>
       )}
+
+      <AlertDialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete seller?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete <strong>{deleteTarget?.store_name || deleteTarget?.first_name || "this seller"}</strong> and all their products, images, and orders. This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={deleting}>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} disabled={deleting} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              {deleting ? "Deleting…" : "Delete"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
