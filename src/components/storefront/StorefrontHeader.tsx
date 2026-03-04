@@ -1,4 +1,4 @@
-import { MapPin, MessageCircle, Share2 } from "lucide-react";
+import { MapPin, MessageCircle } from "lucide-react";
 import AfristallLogo from "@/components/AfristallLogo";
 import { Button } from "@/components/ui/button";
 import type { Tables } from "@/integrations/supabase/types";
