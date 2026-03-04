@@ -10,6 +10,8 @@ import {
 } from "lucide-react";
 import AfristallLogo from "@/components/AfristallLogo";
 import { toast } from "sonner";
+import DailySellingTip from "@/components/dashboard/DailySellingTip";
+import WhatsAppTestCard from "@/components/dashboard/WhatsAppTestCard";
 
 
 function getGreeting(): { text: string; emoji: string } {
@@ -239,6 +241,12 @@ const DashboardOverview = () => {
         <Progress value={completeness} className="h-2.5 bg-muted" />
         <p className="text-xs text-muted-foreground">{completenessMessage}</p>
       </div>
+
+      {/* Daily selling tip */}
+      <DailySellingTip />
+
+      {/* WhatsApp test */}
+      <WhatsAppTestCard whatsappNumber={whatsappNumber} storeName={storeName} />
 
       {/* Quick actions */}
       <div className="flex gap-3">
