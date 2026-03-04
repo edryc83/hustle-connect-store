@@ -10,7 +10,8 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Sparkles, Loader2, Camera, ImagePlus } from "lucide-react";
+import { Sparkles, Loader2, Camera, ImagePlus, Bot } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
 import WallpaperPicker from "@/components/dashboard/WallpaperPicker";
 import WhatsAppTestCard from "@/components/dashboard/WhatsAppTestCard";
 import { CURRENCY_OPTIONS } from "@/lib/currency";
@@ -65,13 +66,14 @@ const DashboardSettings = () => {
   const [welcomeMessage, setWelcomeMessage] = useState("");
   const [instagramUrl, setInstagramUrl] = useState("");
   const [tiktokUrl, setTiktokUrl] = useState("");
+  const [aiAssistantEnabled, setAiAssistantEnabled] = useState(true);
   const [productCount, setProductCount] = useState(0);
 
   useEffect(() => {
     if (!user) return;
     supabase
       .from("profiles")
-      .select("first_name, profile_picture_url, store_name, store_slug, whatsapp_number, city, store_bio, category, delivery_areas, currency, welcome_message, cover_photo_url, country, district, street, shop_number, building, is_online_only, instagram_url, tiktok_url")
+      .select("first_name, profile_picture_url, store_name, store_slug, whatsapp_number, city, store_bio, category, delivery_areas, currency, welcome_message, cover_photo_url, country, district, street, shop_number, building, is_online_only, instagram_url, tiktok_url, ai_assistant_enabled")
       .eq("id", user.id)
       .single()
       .then(({ data }) => {
@@ -91,6 +93,7 @@ const DashboardSettings = () => {
           setIsOnlineOnly(d.is_online_only ?? false);
           setInstagramUrl(d.instagram_url ?? "");
           setTiktokUrl(d.tiktok_url ?? "");
+          setAiAssistantEnabled(d.ai_assistant_enabled !== false);
           setCategories(deserializeCategories(d.category));
           setDeliveryAreas(d.delivery_areas ?? "");
           setCurrency(d.currency ?? "UGX");
@@ -231,6 +234,7 @@ const DashboardSettings = () => {
         welcome_message: welcomeMessage.trim() || null,
         instagram_url: instagramUrl.trim() || null,
         tiktok_url: tiktokUrl.trim() || null,
+        ai_assistant_enabled: aiAssistantEnabled,
       } as any)
       .eq("id", user.id);
     if (error) toast.error("Failed to save");
@@ -541,6 +545,22 @@ const DashboardSettings = () => {
           </Button>
         </CardContent>
       </div>
+
+      {/* AI Store Assistant Toggle */}
+      <Card className="border-border/50 bg-card/60 backdrop-blur-xl">
+        <CardContent className="flex items-center justify-between py-5 px-5">
+          <div className="flex items-center gap-3">
+            <div className="h-10 w-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: "#FF6B35" }}>
+              <Bot className="h-5 w-5 text-white" />
+            </div>
+            <div>
+              <p className="text-sm font-semibold">AI Store Assistant</p>
+              <p className="text-xs text-muted-foreground">Let AI answer buyer questions 24/7 and hand orders to your WhatsApp</p>
+            </div>
+          </div>
+          <Switch checked={aiAssistantEnabled} onCheckedChange={setAiAssistantEnabled} />
+        </CardContent>
+      </Card>
 
       {/* WhatsApp Test */}
       <WhatsAppTestCard whatsappNumber={whatsappNumber} storeName={storeName} storeSlug={firstName} />

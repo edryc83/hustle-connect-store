@@ -181,6 +181,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          ai_assistant_enabled: boolean
           building: string | null
           business_type: string | null
           category: string | null
@@ -210,6 +211,7 @@ export type Database = {
           whatsapp_number: string | null
         }
         Insert: {
+          ai_assistant_enabled?: boolean
           building?: string | null
           business_type?: string | null
           category?: string | null
@@ -239,6 +241,7 @@ export type Database = {
           whatsapp_number?: string | null
         }
         Update: {
+          ai_assistant_enabled?: boolean
           building?: string | null
           business_type?: string | null
           category?: string | null

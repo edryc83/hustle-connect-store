@@ -8,3 +8,6 @@ verify_jwt = false
 
 [functions.og-store]
 verify_jwt = false
+
+[functions.store-assistant]
+verify_jwt = false
