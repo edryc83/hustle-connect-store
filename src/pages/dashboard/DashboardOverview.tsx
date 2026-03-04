@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import {
   Package, Eye, MessageCircle, ClipboardList, CalendarDays,
-  Copy, Share2, X, Plus, Smartphone,
+  Copy, Share2, X, Plus,
 } from "lucide-react";
 import AfristallLogo from "@/components/AfristallLogo";
 import { toast } from "sonner";
