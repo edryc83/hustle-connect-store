@@ -8,7 +8,7 @@ const Navbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
-    <nav className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <nav className="sticky top-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-xl">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
         <Link to="/" className="flex items-center gap-2">
           <AfristallLogo />
@@ -23,10 +23,10 @@ const Navbar = () => {
             <Button variant="ghost" size="sm">Explore Stores</Button>
           </Link>
           <Link to="/login">
-            <Button variant="outline" size="sm">Sign In</Button>
+            <Button variant="outline" size="sm" className="border-border/50 bg-card/40 backdrop-blur-sm">Sign In</Button>
           </Link>
           <Link to="/signup">
-            <Button size="sm">Create Your Store</Button>
+            <Button size="sm" className="shadow-sm shadow-primary/20">Create Your Store</Button>
           </Link>
         </div>
 
@@ -41,7 +41,7 @@ const Navbar = () => {
 
       {/* Mobile menu */}
       {mobileOpen && (
-        <div className="border-t bg-background px-4 pb-4 pt-2 sm:hidden">
+        <div className="border-t border-border/50 bg-background/95 backdrop-blur-xl px-4 pb-4 pt-2 sm:hidden">
           <div className="flex flex-col gap-2">
             <Link to="/explore" onClick={() => setMobileOpen(false)}>
               <Button variant="ghost" className="w-full justify-start">Explore Stores</Button>

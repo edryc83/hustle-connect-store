@@ -95,3 +95,18 @@
     @apply bg-background text-foreground font-sans;
   }
 }
+
+@keyframes emoji-pulse {
+  0%, 100% {
+    opacity: 0.4;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.15);
+  }
+}
+
+.animate-emoji-pulse {
+  animation: emoji-pulse 3s ease-in-out infinite;
+}

@@ -1,32 +1,11 @@
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
 import { MapPin } from "lucide-react";
 
 const stores = [
-  {
-    name: "Mama Aisha's Kitchen",
-    category: "Food & Drinks",
-    city: "Kampala",
-    image: "🍲",
-  },
-  {
-    name: "StyleHaus Nairobi",
-    category: "Fashion & Clothes",
-    city: "Nairobi",
-    image: "👗",
-  },
-  {
-    name: "GlowUp Beauty",
-    category: "Beauty & Skincare",
-    city: "Lagos",
-    image: "✨",
-  },
-  {
-    name: "TechZone Accra",
-    category: "Phones & Electronics",
-    city: "Accra",
-    image: "📱",
-  },
+  { name: "Mama Aisha's Kitchen", category: "Food & Drinks", city: "Kampala", image: "🍲" },
+  { name: "StyleHaus Nairobi", category: "Fashion & Clothes", city: "Nairobi", image: "👗" },
+  { name: "GlowUp Beauty", category: "Beauty & Skincare", city: "Lagos", image: "✨" },
+  { name: "TechZone Accra", category: "Phones & Electronics", city: "Accra", image: "📱" },
 ];
 
 const ExampleStores = () => (
@@ -41,21 +20,29 @@ const ExampleStores = () => (
 
       <div className="mt-12 grid gap-5 grid-cols-2 lg:grid-cols-4">
         {stores.map((store) => (
-          <Card key={store.name} className="overflow-hidden hover:shadow-md transition-shadow cursor-pointer">
-            <div className="flex h-28 items-center justify-center bg-secondary text-5xl">
-              {store.image}
-            </div>
-            <CardContent className="p-4">
-              <h3 className="font-semibold text-foreground text-sm sm:text-base truncate">{store.name}</h3>
-              <div className="mt-2 flex items-center gap-1 text-xs text-muted-foreground">
-                <MapPin className="h-3 w-3" />
-                {store.city}
+          <div
+            key={store.name}
+            className="group relative overflow-hidden rounded-2xl border border-border/50 bg-card/60 backdrop-blur-xl shadow-sm hover:shadow-md hover:border-primary/20 transition-all duration-300 cursor-pointer"
+          >
+            {/* Glow on hover */}
+            <div className="absolute inset-0 bg-primary/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+            
+            <div className="relative z-10">
+              <div className="flex h-28 items-center justify-center bg-secondary/50 text-5xl group-hover:scale-110 transition-transform duration-300">
+                {store.image}
               </div>
-              <Badge variant="secondary" className="mt-2 text-xs">
-                {store.category}
-              </Badge>
-            </CardContent>
-          </Card>
+              <div className="p-4">
+                <h3 className="font-semibold text-foreground text-sm sm:text-base truncate">{store.name}</h3>
+                <div className="mt-2 flex items-center gap-1 text-xs text-muted-foreground">
+                  <MapPin className="h-3 w-3" />
+                  {store.city}
+                </div>
+                <Badge variant="secondary" className="mt-2 text-xs">
+                  {store.category}
+                </Badge>
+              </div>
+            </div>
+          </div>
         ))}
       </div>
     </div>
