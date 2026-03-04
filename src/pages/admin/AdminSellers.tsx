@@ -34,6 +34,9 @@ export default function AdminSellers() {
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(true);
   const [productCounts, setProductCounts] = useState<Record<string, number>>({});
+  const [deleteTarget, setDeleteTarget] = useState<SellerProfile | null>(null);
+  const [deleting, setDeleting] = useState(false);
+  const { user } = useAdmin();
 
   const fetchSellers = async () => {
     setLoading(true);
