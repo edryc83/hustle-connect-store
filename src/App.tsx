@@ -22,6 +22,7 @@ import AdminAnalyticsPage from "./pages/admin/AdminAnalytics";
 import Storefront from "./pages/Storefront";
 import Explore from "./pages/Explore";
 import ResetPassword from "./pages/ResetPassword";
+import SuperAdminLogin from "./pages/SuperAdminLogin";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -50,6 +51,7 @@ const App = () => (
               <Route path="/admin/orders" element={<AdminLayout><AdminOrders /></AdminLayout>} />
               <Route path="/admin/analytics" element={<AdminLayout><AdminAnalyticsPage /></AdminLayout>} />
 
+              <Route path="/superadmin" element={<SuperAdminLogin />} />
               <Route path="/explore" element={<Explore />} />
               <Route path="/:storeSlug" element={<Storefront />} />
               <Route path="/:storeSlug/:productId" element={<Storefront />} />

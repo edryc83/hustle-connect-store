@@ -18,7 +18,7 @@ export function AdminLayout({ children }: { children: ReactNode }) {
     );
   }
 
-  if (!isAdmin) return <Navigate to="/login" replace />;
+  if (!isAdmin) return <Navigate to="/superadmin" replace />;
 
   return (
     <SidebarProvider>
