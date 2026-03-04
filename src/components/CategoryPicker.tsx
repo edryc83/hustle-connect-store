@@ -3,7 +3,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Label } from "@/components/ui/label";
 import { ChevronDown, ChevronRight } from "lucide-react";
 
-export const CATEGORY_DATA: Record<string, string[]> = {
+export const PRODUCT_CATEGORY_DATA: Record<string, string[]> = {
   "Fashion & Clothing": ["Men's Wear", "Women's Wear", "Kids' Wear", "Shoes", "Bags", "Dresses", "Vintage"],
   "Electronics & Gadgets": ["Phones", "Laptops", "Accessories", "Chargers & Cables", "Speakers", "TVs"],
   "Food & Beverages": ["Fresh Produce", "Snacks", "Drinks", "Baked Goods", "Spices", "Catering"],
@@ -18,19 +18,48 @@ export const CATEGORY_DATA: Record<string, string[]> = {
   "Baby & Kids": ["Clothing", "Toys", "Feeding", "Diapers"],
   "Phones & Accessories": ["Cases", "Screen Protectors", "Earphones", "Power Banks"],
   "Jewelry & Accessories": ["Necklaces", "Bracelets", "Watches", "Rings", "Sunglasses"],
-  "Services": ["Delivery", "Repairs", "Tutoring", "Cleaning", "Photography"],
   "Other": [],
 };
+
+export const SERVICE_CATEGORY_DATA: Record<string, string[]> = {
+  "Delivery & Logistics": ["Dispatch Riders", "Courier Services", "Food Delivery", "Moving Services"],
+  "Repairs & Maintenance": ["Phone Repair", "Electronics Repair", "Plumbing", "Electrical", "Appliance Repair"],
+  "Beauty & Grooming": ["Hair Styling", "Barbing", "Makeup Artist", "Nail Technician", "Spa & Massage"],
+  "Cleaning Services": ["Home Cleaning", "Office Cleaning", "Laundry", "Carpet Cleaning", "Fumigation"],
+  "Photography & Videography": ["Events", "Portraits", "Product Photography", "Drone", "Video Editing"],
+  "Catering & Events": ["Event Catering", "Small Chops", "Cake Making", "Event Planning", "Decoration"],
+  "Education & Tutoring": ["Academic Tutoring", "Music Lessons", "Language Classes", "Test Prep", "Online Courses"],
+  "Design & Creative": ["Graphic Design", "Web Design", "Interior Design", "Fashion Design", "Branding"],
+  "IT & Tech Services": ["Web Development", "App Development", "IT Support", "Social Media Management", "SEO"],
+  "Health & Fitness": ["Personal Training", "Yoga", "Nutrition Coaching", "Physiotherapy"],
+  "Tailoring & Fashion": ["Custom Clothing", "Alterations", "Traditional Wear", "Uniforms"],
+  "Auto Services": ["Car Wash", "Mechanic", "Auto Electrician", "Panel Beating", "Towing"],
+  "Legal & Professional": ["Legal Advice", "Accounting", "Consulting", "Tax Filing"],
+  "Real Estate": ["Property Management", "House Hunting", "Valuation", "Short-let Apartments"],
+  "Other": [],
+};
+
+export const ALL_CATEGORY_DATA: Record<string, string[]> = {
+  ...PRODUCT_CATEGORY_DATA,
+  ...SERVICE_CATEGORY_DATA,
+};
+
+export const CATEGORY_DATA = ALL_CATEGORY_DATA;
 
 export type CategorySelection = Record<string, string[]>;
 
 interface CategoryPickerProps {
   value: CategorySelection;
   onChange: (val: CategorySelection) => void;
+  filter?: "products" | "services" | "all";
 }
 
-export function CategoryPicker({ value, onChange }: CategoryPickerProps) {
+export function CategoryPicker({ value, onChange, filter = "all" }: CategoryPickerProps) {
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
+
+  const categorySource = filter === "products" ? PRODUCT_CATEGORY_DATA
+    : filter === "services" ? SERVICE_CATEGORY_DATA
+    : CATEGORY_DATA;
 
   const toggleExpand = (cat: string) =>
     setExpanded((prev) => ({ ...prev, [cat]: !prev[cat] }));
@@ -60,7 +89,7 @@ export function CategoryPicker({ value, onChange }: CategoryPickerProps) {
 
   return (
     <div className="space-y-1 max-h-64 overflow-y-auto rounded-md border p-2">
-      {Object.entries(CATEGORY_DATA).map(([cat, subs]) => (
+      {Object.entries(categorySource).map(([cat, subs]) => (
         <div key={cat}>
           <div className="flex items-center gap-2 py-1.5 px-1 rounded hover:bg-accent/50 cursor-pointer">
             {subs.length > 0 && (
