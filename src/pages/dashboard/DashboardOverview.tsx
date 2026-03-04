@@ -151,9 +151,7 @@ const DashboardOverview = () => {
         </div>
         <div>
           <h1 className="text-2xl font-bold leading-tight">
-            {greeting.text} {greeting.emoji}
-            <br />
-            <span className="text-foreground">{firstName || "there"}!</span>
+            {greeting.text} {firstName || "there"}! {greeting.emoji}
           </h1>
         </div>
       </div>
