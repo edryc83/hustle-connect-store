@@ -1,0 +1,1 @@
+ALTER TABLE public.profiles ADD COLUMN welcome_message text DEFAULT NULL;

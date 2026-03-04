@@ -173,6 +173,7 @@ export type Database = {
           store_name: string | null
           store_slug: string | null
           view_count: number
+          welcome_message: string | null
           whatsapp_number: string | null
         }
         Insert: {
@@ -192,6 +193,7 @@ export type Database = {
           store_name?: string | null
           store_slug?: string | null
           view_count?: number
+          welcome_message?: string | null
           whatsapp_number?: string | null
         }
         Update: {
@@ -211,6 +213,7 @@ export type Database = {
           store_name?: string | null
           store_slug?: string | null
           view_count?: number
+          welcome_message?: string | null
           whatsapp_number?: string | null
         }
         Relationships: []
