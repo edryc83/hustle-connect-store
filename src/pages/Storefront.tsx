@@ -12,6 +12,8 @@ import { useTheme } from "@/hooks/useTheme";
 import { useAuth } from "@/hooks/useAuth";
 import { CartProvider, useCart } from "@/hooks/useCart";
 import { WishlistProvider, useWishlist } from "@/hooks/useWishlist";
+import { BuyerAttributePicker, BuyerCakeMessageInput, BuyerPersonalisationInput } from "@/components/storefront/BuyerAttributePicker";
+import { getCategoryByValue, buildAttributeLines, parseTextToOptions } from "@/lib/productAttributes";
 import {
   DropdownMenu,
   DropdownMenuContent,
