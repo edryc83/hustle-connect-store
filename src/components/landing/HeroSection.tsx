@@ -22,44 +22,44 @@ const InstagramIcon = ({ className }: { className?: string }) => (
 );
 
 const HeroSection = () => (
-  <section className="relative overflow-hidden py-20 sm:py-28 lg:py-36">
+  <section className="relative overflow-hidden py-16 sm:py-28 lg:py-36">
     <EmojiGrid />
 
     <div className="pointer-events-none absolute -top-40 -left-20 h-[500px] w-[500px] rounded-full bg-primary/8 blur-[100px]" />
     <div className="pointer-events-none absolute -bottom-32 right-0 h-[400px] w-[400px] rounded-full bg-primary/6 blur-[80px]" />
 
     <div className="relative z-10 mx-auto max-w-6xl px-4 sm:px-6 text-center">
-      <div className="inline-flex items-center gap-1.5 rounded-full border border-border/50 bg-card/60 backdrop-blur-xl px-4 py-1.5 text-sm font-medium text-muted-foreground mb-8 shadow-sm">
-        <Sparkles className="h-3.5 w-3.5 text-primary" />
+      <div className="inline-flex items-center gap-1.5 rounded-full border border-border/50 bg-card/60 backdrop-blur-xl px-3 py-1 text-xs sm:text-sm font-medium text-muted-foreground mb-6 sm:mb-8 shadow-sm">
+        <Sparkles className="h-3 w-3 sm:h-3.5 sm:w-3.5 text-primary" />
         Free to start — no fees, no fuss
       </div>
 
-      <h1 className="text-4xl font-light tracking-tight sm:text-5xl lg:text-6xl text-foreground leading-[1.1]">
+      <h1 className="text-3xl sm:text-5xl lg:text-6xl font-light tracking-tight text-foreground leading-[1.1]">
         Your hustle deserves
         <br />
         <span className="text-primary font-light">a proper shop.</span>
       </h1>
 
-      <p className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground sm:text-xl leading-relaxed">
+      <p className="mx-auto mt-4 sm:mt-6 max-w-2xl text-base sm:text-xl text-muted-foreground leading-relaxed px-2">
         Build your store in minutes. Share it anywhere. Get orders on WhatsApp. Free to start.
       </p>
 
-      <div className="mt-10 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
+      <div className="mt-8 sm:mt-10 flex flex-row items-center justify-center gap-3">
         <Link to="/signup">
-          <Button size="lg" className="gap-2 text-base px-8 h-12 shadow-lg shadow-primary/20">
+          <Button size="lg" className="gap-2 text-sm sm:text-base px-5 sm:px-8 h-11 sm:h-12 shadow-lg shadow-primary/20">
             Create Your Store
             <ArrowRight className="h-4 w-4" />
           </Button>
         </Link>
         <Link to="/explore">
-          <Button variant="outline" size="lg" className="text-base px-8 h-12 border-border/50 bg-card/40 backdrop-blur-sm">
+          <Button variant="outline" size="lg" className="text-sm sm:text-base px-5 sm:px-8 h-11 sm:h-12 border-border/50 bg-card/40 backdrop-blur-sm">
             Explore Stores
           </Button>
         </Link>
       </div>
 
       {/* Social icons */}
-      <div className="mt-8 flex items-center justify-center gap-5">
+      <div className="mt-6 sm:mt-8 flex items-center justify-center gap-5">
         <TikTokIcon className="h-5 w-5 text-muted-foreground/60 hover:text-foreground transition-colors" />
         <WhatsAppIcon className="h-5 w-5 text-muted-foreground/60 hover:text-foreground transition-colors" />
         <InstagramIcon className="h-5 w-5 text-muted-foreground/60 hover:text-foreground transition-colors" />
