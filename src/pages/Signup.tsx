@@ -352,11 +352,23 @@ const Signup = () => {
                     value={storeSlug}
                     onChange={(e) => handleSlugChange(e.target.value)}
                     maxLength={40}
+                    className={slugAvailable === false ? "border-destructive" : slugAvailable === true ? "border-primary" : ""}
                   />
                 </div>
-                <p className="text-xs text-muted-foreground">
-                  ✏️ You can edit this — use your name or shop name
-                </p>
+                {checkingSlug && (
+                  <p className="text-xs text-muted-foreground">Checking availability...</p>
+                )}
+                {!checkingSlug && slugAvailable === false && (
+                  <p className="text-xs text-destructive font-medium">❌ Username unavailable — try another</p>
+                )}
+                {!checkingSlug && slugAvailable === true && (
+                  <p className="text-xs text-primary font-medium">✅ Available!</p>
+                )}
+                {slugAvailable === null && !checkingSlug && (
+                  <p className="text-xs text-muted-foreground">
+                    ✏️ You can edit this — use your name or shop name
+                  </p>
+                )}
               </div>
 
               <div className="space-y-1.5">
