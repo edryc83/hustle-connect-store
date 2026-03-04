@@ -156,7 +156,7 @@ const Explore = () => {
               {COUNTRIES.map((c) => (
                 <button
                   key={c}
-                  onClick={() => setSelectedCountry(c)}
+                  onClick={() => { setSelectedCountry(c); setSelectedLocation("All"); }}
                   className={`flex items-center gap-1 whitespace-nowrap rounded-full border px-3 py-1.5 text-sm font-medium transition-colors ${
                     selectedCountry === c
                       ? "border-primary bg-primary/10 text-primary"
@@ -167,6 +167,24 @@ const Explore = () => {
                 </button>
               ))}
             </div>
+            {/* City / District */}
+            {locationOptions.length > 1 && (
+              <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+                {locationOptions.map((loc) => (
+                  <button
+                    key={loc}
+                    onClick={() => setSelectedLocation(loc)}
+                    className={`flex items-center gap-1 whitespace-nowrap rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
+                      selectedLocation === loc
+                        ? "border-primary bg-primary/10 text-primary"
+                        : "border-border text-muted-foreground hover:border-primary/30"
+                    }`}
+                  >
+                    {loc !== "All" && <MapPin className="h-2.5 w-2.5" />} {loc}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         </section>
 
