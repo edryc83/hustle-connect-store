@@ -75,6 +75,9 @@ const DashboardSettings = () => {
         }
         setLoading(false);
       });
+    supabase.from("products").select("*", { count: "exact", head: true }).eq("user_id", user.id).then(({ count }) => {
+      setProductCount(count ?? 0);
+    });
   }, [user]);
 
   const handleProfilePicChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
