@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Loader2, Check, Palette, ArrowRight } from "lucide-react";
-import { PolotnoEditor } from "@/components/dashboard/PolotnoEditor";
+import { FabricEditor } from "@/components/dashboard/FabricEditor";
 
 /* ───────── Types ───────── */
 
@@ -100,7 +100,7 @@ const DashboardShareCard = () => {
   /* ───────── STEP 2: Polotno Editor ───────── */
   if (step === "edit" && selectedTemplate) {
     return (
-      <PolotnoEditor
+      <FabricEditor
         template={selectedTemplate}
         storeName={storeName}
         storeSlug={storeSlug}
