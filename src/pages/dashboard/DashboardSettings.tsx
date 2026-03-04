@@ -176,8 +176,8 @@ const DashboardSettings = () => {
           </div>
 
           <div className="space-y-1.5">
-            <Label>First Name</Label>
-            <Input value={firstName} onChange={(e) => setFirstName(e.target.value)} placeholder="e.g. John" />
+            <Label>Username</Label>
+            <Input value={firstName} onChange={(e) => setFirstName(e.target.value)} placeholder="e.g. johndoe" />
           </div>
         </CardContent>
       </Card>
