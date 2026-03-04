@@ -15,7 +15,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Plus, Pencil, Trash2, ImageIcon, Package, Sparkles, Loader2, Wrench, X, Star, ChevronRight } from "lucide-react";
+import { Plus, Pencil, Trash2, ImageIcon, Package, Sparkles, Loader2, Wrench, X, Star, ChevronRight, Copy } from "lucide-react";
 import { toast } from "sonner";
 import { formatPrice } from "@/lib/currency";
 import { Badge } from "@/components/ui/badge";
@@ -100,6 +100,19 @@ const DashboardProducts = () => {
   };
 
   const openAdd = () => { resetForm(); setDialogOpen(true); };
+
+  const openDuplicate = (product: Product) => {
+    resetForm();
+    setName(product.name + " (copy)");
+    setPrice(formatCommaInput(String(product.price)));
+    setDescription(product.description ?? "");
+    setVariantsText(product.variants_text ?? "");
+    setExistingImages(productImages[product.id] ?? (product.image_url ? [product.image_url] : []));
+    setListingType((product as any).listing_type ?? "product");
+    setCondition((product as any).condition ?? "");
+    setEditingProduct(null); // null = create new
+    setDialogOpen(true);
+  };
 
   const openEdit = (product: Product) => {
     setEditingProduct(product);
@@ -349,7 +362,7 @@ const DashboardProducts = () => {
               <div className="space-y-2">
                 {featured.map((product) => (
                   <ListingRow key={product.id} product={product} productImages={productImages} currency={currency} formatDate={formatDate}
-                    onEdit={openEdit} onDelete={handleDelete} onToggleFeatured={toggleFeatured} />
+                    onEdit={openEdit} onDelete={handleDelete} onToggleFeatured={toggleFeatured} onDuplicate={openDuplicate} />
                 ))}
               </div>
             </section>
@@ -363,7 +376,7 @@ const DashboardProducts = () => {
             <div className="space-y-2">
               {(featured.length > 0 ? regular : products).map((product) => (
                 <ListingRow key={product.id} product={product} productImages={productImages} currency={currency} formatDate={formatDate}
-                  onEdit={openEdit} onDelete={handleDelete} onToggleFeatured={toggleFeatured} />
+                  onEdit={openEdit} onDelete={handleDelete} onToggleFeatured={toggleFeatured} onDuplicate={openDuplicate} />
               ))}
             </div>
           </section>
@@ -375,7 +388,7 @@ const DashboardProducts = () => {
 
 /** List-style row for a single listing — inspired by the reference UI */
 function ListingRow({
-  product, productImages, currency, formatDate, onEdit, onDelete, onToggleFeatured,
+  product, productImages, currency, formatDate, onEdit, onDelete, onToggleFeatured, onDuplicate,
 }: {
   product: Product;
   productImages: Record<string, string[]>;
@@ -384,6 +397,7 @@ function ListingRow({
   onEdit: (p: Product) => void;
   onDelete: (id: string) => void;
   onToggleFeatured: (p: Product) => void;
+  onDuplicate: (p: Product) => void;
 }) {
   const imgs = productImages[product.id] ?? (product.image_url ? [product.image_url] : []);
   const { month, day } = formatDate(product.created_at);
@@ -434,6 +448,9 @@ function ListingRow({
       <div className="flex items-center gap-1 shrink-0">
         <Button size="icon" variant={isFeatured ? "default" : "ghost"} className="h-7 w-7" onClick={() => onToggleFeatured(product)} title="Toggle featured">
           <Star className={`h-3.5 w-3.5 ${isFeatured ? "fill-current" : ""}`} />
+        </Button>
+        <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => onDuplicate(product)} title="Duplicate">
+          <Copy className="h-3.5 w-3.5" />
         </Button>
         <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => onEdit(product)} title="Edit">
           <Pencil className="h-3.5 w-3.5" />
