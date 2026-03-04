@@ -63,13 +63,15 @@ const DashboardSettings = () => {
   const [deliveryAreas, setDeliveryAreas] = useState("");
   const [currency, setCurrency] = useState("UGX");
   const [welcomeMessage, setWelcomeMessage] = useState("");
+  const [instagramUrl, setInstagramUrl] = useState("");
+  const [tiktokUrl, setTiktokUrl] = useState("");
   const [productCount, setProductCount] = useState(0);
 
   useEffect(() => {
     if (!user) return;
     supabase
       .from("profiles")
-      .select("first_name, profile_picture_url, store_name, store_slug, whatsapp_number, city, store_bio, category, delivery_areas, currency, welcome_message, cover_photo_url, country, district, street, shop_number, building, is_online_only")
+      .select("first_name, profile_picture_url, store_name, store_slug, whatsapp_number, city, store_bio, category, delivery_areas, currency, welcome_message, cover_photo_url, country, district, street, shop_number, building, is_online_only, instagram_url, tiktok_url")
       .eq("id", user.id)
       .single()
       .then(({ data }) => {
@@ -87,7 +89,8 @@ const DashboardSettings = () => {
           setShopNumber(d.shop_number ?? "");
           setBuilding(d.building ?? "");
           setIsOnlineOnly(d.is_online_only ?? false);
-          // storeBio merged into welcomeMessage
+          setInstagramUrl(d.instagram_url ?? "");
+          setTiktokUrl(d.tiktok_url ?? "");
           setCategories(deserializeCategories(d.category));
           setDeliveryAreas(d.delivery_areas ?? "");
           setCurrency(d.currency ?? "UGX");
@@ -226,6 +229,8 @@ const DashboardSettings = () => {
         delivery_areas: deliveryAreas.trim() || null,
         currency: currency,
         welcome_message: welcomeMessage.trim() || null,
+        instagram_url: instagramUrl.trim() || null,
+        tiktok_url: tiktokUrl.trim() || null,
       } as any)
       .eq("id", user.id);
     if (error) toast.error("Failed to save");
@@ -497,6 +502,24 @@ const DashboardSettings = () => {
               maxLength={500}
             />
             <p className="text-xs text-muted-foreground">Comma-separated locations you deliver to</p>
+          </div>
+
+          {/* Social Links */}
+          <div className="space-y-1.5">
+            <Label>Instagram</Label>
+            <Input
+              value={instagramUrl}
+              onChange={(e) => setInstagramUrl(e.target.value)}
+              placeholder="e.g. https://instagram.com/yourstore"
+            />
+          </div>
+          <div className="space-y-1.5">
+            <Label>TikTok</Label>
+            <Input
+              value={tiktokUrl}
+              onChange={(e) => setTiktokUrl(e.target.value)}
+              placeholder="e.g. https://tiktok.com/@yourstore"
+            />
           </div>
 
           <div className="space-y-1.5">

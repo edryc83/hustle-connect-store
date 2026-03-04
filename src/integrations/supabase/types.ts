@@ -191,6 +191,7 @@ export type Database = {
           email: string | null
           first_name: string | null
           id: string
+          instagram_url: string | null
           is_online_only: boolean
           last_active_at: string
           phone: string | null
@@ -200,6 +201,7 @@ export type Database = {
           store_name: string | null
           store_slug: string | null
           street: string | null
+          tiktok_url: string | null
           view_count: number
           welcome_message: string | null
           whatsapp_number: string | null
@@ -218,6 +220,7 @@ export type Database = {
           email?: string | null
           first_name?: string | null
           id: string
+          instagram_url?: string | null
           is_online_only?: boolean
           last_active_at?: string
           phone?: string | null
@@ -227,6 +230,7 @@ export type Database = {
           store_name?: string | null
           store_slug?: string | null
           street?: string | null
+          tiktok_url?: string | null
           view_count?: number
           welcome_message?: string | null
           whatsapp_number?: string | null
@@ -245,6 +249,7 @@ export type Database = {
           email?: string | null
           first_name?: string | null
           id?: string
+          instagram_url?: string | null
           is_online_only?: boolean
           last_active_at?: string
           phone?: string | null
@@ -254,6 +259,7 @@ export type Database = {
           store_name?: string | null
           store_slug?: string | null
           street?: string | null
+          tiktok_url?: string | null
           view_count?: number
           welcome_message?: string | null
           whatsapp_number?: string | null
