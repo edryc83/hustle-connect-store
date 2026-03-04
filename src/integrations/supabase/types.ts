@@ -119,6 +119,7 @@ export type Database = {
       }
       products: {
         Row: {
+          attributes: Json | null
           condition: string | null
           created_at: string
           description: string | null
@@ -135,6 +136,7 @@ export type Database = {
           whatsapp_taps: number
         }
         Insert: {
+          attributes?: Json | null
           condition?: string | null
           created_at?: string
           description?: string | null
@@ -151,6 +153,7 @@ export type Database = {
           whatsapp_taps?: number
         }
         Update: {
+          attributes?: Json | null
           condition?: string | null
           created_at?: string
           description?: string | null
