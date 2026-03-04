@@ -57,11 +57,14 @@ export function StorefrontHeader({ profile, visitorName }: StorefrontHeaderProps
 
         {/* Category & Location Tags */}
         <div className="flex flex-wrap items-center justify-center gap-2 text-sm">
-          {profile.city && (
-            <span className="flex items-center gap-1 text-muted-foreground">
-              <MapPin className="h-3.5 w-3.5" /> {profile.city}
-            </span>
-          )}
+          {(() => {
+            const parts = [profile.city, (profile as any).district, (profile as any).country].filter(Boolean);
+            return parts.length > 0 ? (
+              <span className="flex items-center gap-1 text-muted-foreground">
+                <MapPin className="h-3.5 w-3.5" /> {parts.join(", ")}
+              </span>
+            ) : null;
+          })()}
           {categoriesToDisplay(profile.category).map((tag) => (
             <span
               key={tag}
