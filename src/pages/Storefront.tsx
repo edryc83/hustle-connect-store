@@ -97,7 +97,7 @@ function ProductCard({
   return (
     <div className="group cursor-pointer" onClick={onClick}>
       {/* Image */}
-      <div className="relative aspect-[4/5] rounded-2xl overflow-hidden bg-muted/50 mb-3">
+      <div className="relative aspect-[4/5] rounded-2xl overflow-hidden bg-muted/50 mb-3 shadow-sm ring-1 ring-border/30">
         <ProductImageCarousel
           images={images}
           alt={product.name}
