@@ -73,7 +73,7 @@ const Signup = () => {
   const [checkingSlug, setCheckingSlug] = useState(false);
   const slugCheckTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const [city, setCity] = useState("");
-  const [category, setCategory] = useState("");
+  const [categorySelection, setCategorySelection] = useState<CategorySelection>({});
   const [businessType, setBusinessType] = useState<"product" | "service" | "both">("product");
   const [profilePicture, setProfilePicture] = useState<File | null>(null);
   const [profilePicturePreview, setProfilePicturePreview] = useState("");
