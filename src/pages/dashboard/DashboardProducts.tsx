@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useBusinessTerms } from "@/hooks/useBusinessTerms";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -43,6 +44,7 @@ function formatCommaInput(raw: string): string {
 
 const DashboardProducts = () => {
   const { user } = useAuth();
+  const terms = useBusinessTerms();
   const [searchParams, setSearchParams] = useSearchParams();
   const [products, setProducts] = useState<Product[]>([]);
   const [productImages, setProductImages] = useState<Record<string, string[]>>({});
@@ -136,7 +138,7 @@ const DashboardProducts = () => {
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files ?? []);
     const totalImages = existingImages.length + imagePreviews.length + files.length;
-    if (totalImages > 5) { toast.error("Maximum 5 images per listing"); return; }
+    if (totalImages > 5) { toast.error(`Maximum 5 images per ${terms.singular.toLowerCase()}`); return; }
     for (const file of files) {
       if (file.size > 5 * 1024 * 1024) { toast.error(`${file.name} is over 5MB`); return; }
     }
@@ -206,7 +208,7 @@ const DashboardProducts = () => {
         await supabase.from("product_images").insert(allImages.map((url, i) => ({ product_id: productId, image_url: url, position: i })));
       }
 
-      toast.success(editingProduct ? "Listing updated!" : "Listing added! 🎉");
+      toast.success(editingProduct ? `${terms.singular} updated!` : `${terms.singular} added! 🎉`);
       setDialogOpen(false); resetForm();
       searchParams.delete("add"); setSearchParams(searchParams);
       fetchProducts();
@@ -217,20 +219,20 @@ const DashboardProducts = () => {
   const handleDelete = async (id: string) => {
     const { error } = await supabase.from("products").delete().eq("id", id);
     if (error) toast.error("Failed to delete");
-    else { toast.success("Listing deleted"); fetchProducts(); }
+    else { toast.success(`${terms.singular} deleted`); fetchProducts(); }
   };
 
   const toggleFeatured = async (product: Product) => {
     const isFeatured = (product as any).is_featured;
     if (!isFeatured && products.filter((p) => (p as any).is_featured).length >= 6) {
-      toast.error("Maximum 6 featured listings"); return;
+      toast.error(`Maximum 6 featured ${terms.plural.toLowerCase()}`); return;
     }
     const { error } = await supabase.from("products").update({ is_featured: !isFeatured } as any).eq("id", product.id);
     if (error) toast.error("Failed to update");
     else { toast.success(isFeatured ? "Removed from featured" : "Added to featured ⭐"); fetchProducts(); }
   };
 
-  if (loading) return <div className="animate-pulse text-muted-foreground py-12 text-center">Loading listings…</div>;
+  if (loading) return <div className="animate-pulse text-muted-foreground py-12 text-center">Loading {terms.plural.toLowerCase()}…</div>;
 
   const allFormImages = [...existingImages, ...imagePreviews];
   const featured = products.filter((p) => (p as any).is_featured);
@@ -246,8 +248,8 @@ const DashboardProducts = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold">Listings</h1>
-          <p className="text-sm text-muted-foreground">{products.length} listing{products.length !== 1 ? "s" : ""}</p>
+          <h1 className="text-2xl font-bold">{terms.plural}</h1>
+          <p className="text-sm text-muted-foreground">{products.length} {products.length !== 1 ? terms.plural.toLowerCase() : terms.singular.toLowerCase()}</p>
         </div>
         <Dialog open={dialogOpen} onOpenChange={(open) => {
           setDialogOpen(open);
@@ -258,7 +260,7 @@ const DashboardProducts = () => {
           </DialogTrigger>
           <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>{editingProduct ? "Edit Listing" : "Add Listing"}</DialogTitle>
+              <DialogTitle>{editingProduct ? `Edit ${terms.singular}` : `Add ${terms.singular}`}</DialogTitle>
             </DialogHeader>
             <div className="space-y-4 pt-2">
               {/* Type */}
@@ -346,9 +348,8 @@ const DashboardProducts = () => {
                 <Label htmlFor="productVariants">Variants / Options</Label>
                 <Input id="productVariants" placeholder="e.g. Small, Medium, Large" value={variantsText} onChange={(e) => setVariantsText(e.target.value)} />
               </div>
-              {/* Images section removed — now at top of form */}
               <Button className="w-full" onClick={handleSave} disabled={saving}>
-                {saving ? "Saving…" : editingProduct ? "Update Listing" : "Add Listing"}
+                {saving ? "Saving…" : editingProduct ? `Update ${terms.singular}` : `Add ${terms.singular}`}
               </Button>
             </div>
           </DialogContent>
@@ -360,9 +361,9 @@ const DashboardProducts = () => {
         <div className="rounded-2xl border border-border/50 bg-card/60 backdrop-blur-xl py-16">
           <CardContent className="flex flex-col items-center gap-3 text-center">
             <Package className="h-12 w-12 text-muted-foreground/50" />
-            <p className="text-lg font-medium">No listings yet</p>
-            <p className="text-sm text-muted-foreground">Add your first product or service to start selling!</p>
-            <Button className="mt-2 gap-2" onClick={openAdd}><Plus className="h-4 w-4" /> Add Listing</Button>
+            <p className="text-lg font-medium">No {terms.plural.toLowerCase()} yet</p>
+            <p className="text-sm text-muted-foreground">Add your first {terms.singular.toLowerCase()} to start selling!</p>
+            <Button className="mt-2 gap-2" onClick={openAdd}><Plus className="h-4 w-4" /> Add {terms.singular}</Button>
           </CardContent>
         </div>
       ) : (
@@ -370,7 +371,7 @@ const DashboardProducts = () => {
           {/* Tip */}
           <div className="rounded-xl bg-card/60 backdrop-blur-xl border border-border/50 px-4 py-2.5 text-xs text-muted-foreground flex items-center gap-2">
             <Star className="h-3.5 w-3.5 text-primary shrink-0" />
-            <span>Tap <strong>★</strong> to feature a listing (up to 6). Featured items appear first on your storefront.</span>
+            <span>Tap <strong>★</strong> to feature a {terms.singular.toLowerCase()} (up to 6). Featured items appear first on your storefront.</span>
           </div>
 
           {/* Featured section */}
@@ -389,10 +390,10 @@ const DashboardProducts = () => {
             </section>
           )}
 
-          {/* All listings */}
+          {/* All items */}
           <section className="space-y-2">
             {featured.length > 0 && (
-              <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">All Listings</h2>
+              <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">All {terms.plural}</h2>
             )}
             <div className="space-y-2">
               {(featured.length > 0 ? regular : products).map((product) => (
@@ -407,7 +408,7 @@ const DashboardProducts = () => {
   );
 };
 
-/** List-style row for a single listing — inspired by the reference UI */
+/** List-style row for a single item */
 function ListingRow({
   product, productImages, currency, formatDate, onEdit, onDelete, onToggleFeatured, onDuplicate,
 }: {
@@ -474,7 +475,7 @@ function ListingRow({
         )}
       </div>
 
-      {/* Actions — always visible */}
+      {/* Actions */}
       <div className="flex items-center gap-1 shrink-0">
         <Button size="icon" variant={isFeatured ? "default" : "ghost"} className="h-7 w-7" onClick={() => onToggleFeatured(product)} title="Toggle featured">
           <Star className={`h-3.5 w-3.5 ${isFeatured ? "fill-current" : ""}`} />

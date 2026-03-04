@@ -1,15 +1,18 @@
 import { LayoutDashboard, Package, Settings, ClipboardList, BarChart3 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
-
-const navItems = [
-  { title: "Home", url: "/dashboard", icon: LayoutDashboard },
-  { title: "Products", url: "/dashboard/products", icon: Package },
-  { title: "Orders", url: "/dashboard/orders", icon: ClipboardList },
-  { title: "Analytics", url: "/dashboard/analytics", icon: BarChart3 },
-  { title: "Settings", url: "/dashboard/settings", icon: Settings },
-];
+import { useBusinessTerms } from "@/hooks/useBusinessTerms";
 
 export function MobileBottomNav() {
+  const terms = useBusinessTerms();
+
+  const navItems = [
+    { title: "Home", url: "/dashboard", icon: LayoutDashboard },
+    { title: terms.plural, url: "/dashboard/products", icon: Package },
+    { title: "Orders", url: "/dashboard/orders", icon: ClipboardList },
+    { title: "Analytics", url: "/dashboard/analytics", icon: BarChart3 },
+    { title: "Settings", url: "/dashboard/settings", icon: Settings },
+  ];
+
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-50 border-t bg-background/80 backdrop-blur-xl md:hidden">
       <div className="flex items-center justify-around py-2">

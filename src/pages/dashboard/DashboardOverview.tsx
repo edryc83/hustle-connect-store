@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
+import { useBusinessTerms } from "@/hooks/useBusinessTerms";
 import { Button } from "@/components/ui/button";
 import {
   Package, Copy, Share2, X, Plus, Download, Eye, ShoppingCart, TrendingUp,
@@ -21,6 +22,7 @@ function getGreeting(): { text: string; emoji: string } {
 
 const DashboardOverview = () => {
   const { user } = useAuth();
+  const terms = useBusinessTerms();
   const { canInstall, isInstalled, promptInstall } = useInstallPrompt();
   const [productCount, setProductCount] = useState(0);
   const [viewCount, setViewCount] = useState(0);
@@ -114,19 +116,19 @@ const DashboardOverview = () => {
 
       {/* Stat Cards — glassmorphism grid */}
       <div className="grid grid-cols-2 gap-3">
-        {/* Products */}
+        {/* Products / Packages */}
         <Link
           to="/dashboard/products"
           className="rounded-2xl border border-border/40 bg-card/40 backdrop-blur-xl p-4 shadow-sm hover:bg-card/60 transition-all group"
         >
           <div className="flex items-center justify-between mb-3">
             <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center">
-              <span className="text-lg">📦</span>
+              <span className="text-lg">{terms.emoji}</span>
             </div>
             <TrendingUp className="h-3.5 w-3.5 text-muted-foreground/50 group-hover:text-primary transition-colors" />
           </div>
           <p className="text-2xl font-bold">{productCount}</p>
-          <p className="text-xs text-muted-foreground mt-0.5">Products</p>
+          <p className="text-xs text-muted-foreground mt-0.5">{terms.plural}</p>
         </Link>
 
         {/* Store Views */}
@@ -166,12 +168,12 @@ const DashboardOverview = () => {
       <div className="flex gap-2.5">
         <Button asChild className="flex-1 rounded-xl h-11 gap-2">
           <Link to="/dashboard/products?add=true">
-            <Plus className="h-4 w-4" /> Add Listing
+            <Plus className="h-4 w-4" /> Add {terms.singular}
           </Link>
         </Button>
         <Button asChild variant="outline" className="flex-1 rounded-xl h-11 gap-2 border-border/40 bg-card/40 backdrop-blur-xl">
           <Link to="/dashboard/products">
-            <Package className="h-4 w-4" /> My Products
+            <Package className="h-4 w-4" /> My {terms.plural}
           </Link>
         </Button>
       </div>
@@ -212,11 +214,11 @@ const DashboardOverview = () => {
             <div>
               <h3 className="font-semibold text-sm">Ready to sell?</h3>
               <p className="text-xs text-muted-foreground mt-1">
-                Add your first product & share on WhatsApp status.
+                Add your first {terms.singular.toLowerCase()} & share on WhatsApp status.
               </p>
               <Button asChild className="mt-2.5 rounded-xl gap-2" size="sm">
                 <Link to="/dashboard/products?add=true">
-                  <Plus className="h-3.5 w-3.5" /> Add Product
+                  <Plus className="h-3.5 w-3.5" /> Add {terms.singular}
                 </Link>
               </Button>
             </div>
