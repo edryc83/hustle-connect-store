@@ -156,6 +156,20 @@ const DashboardOverview = () => {
         </div>
       </div>
 
+      {/* Daily selling tip */}
+      <DailySellingTip />
+
+      {/* Quick stats pills */}
+      <div className="flex flex-wrap gap-2">
+        {stats.map((s) => (
+          <div key={s.label} className="flex items-center gap-1.5 rounded-full border border-border/50 bg-card/60 backdrop-blur-xl px-3 py-1.5 shadow-sm">
+            <s.icon className="h-3.5 w-3.5 text-primary" />
+            <span className="text-xs font-medium text-muted-foreground">{s.label}</span>
+            <span className="text-xs font-bold">{s.value}</span>
+          </div>
+        ))}
+      </div>
+
       {/* Onboarding banner */}
       {productCount === 0 && !bannerDismissed && (
         <div className="relative rounded-2xl border border-border/50 bg-card/60 backdrop-blur-xl p-5 shadow-sm border-l-4 border-l-primary">
@@ -179,20 +193,6 @@ const DashboardOverview = () => {
         </div>
       )}
 
-      {/* 2x2 stat cards */}
-      <div className="grid gap-4 grid-cols-2">
-        {stats.map((s) => (
-          <div key={s.label} className="rounded-2xl border border-border/50 bg-card/60 backdrop-blur-xl p-5 shadow-sm">
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-sm font-medium text-muted-foreground">{s.label}</span>
-              <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-primary/10">
-                <s.icon className="h-4 w-4 text-primary" />
-              </div>
-            </div>
-            <div className="text-3xl font-bold">{s.value}</div>
-          </div>
-        ))}
-      </div>
 
       {/* Share section */}
       {storeSlug && (
@@ -240,8 +240,6 @@ const DashboardOverview = () => {
         <p className="text-xs text-muted-foreground">{completenessMessage}</p>
       </div>
 
-      {/* Daily selling tip */}
-      <DailySellingTip />
 
       {/* WhatsApp test */}
       <WhatsAppTestCard whatsappNumber={whatsappNumber} storeName={storeName} />
