@@ -190,6 +190,7 @@ function ProductDetailView({
   onNavigate: (id: string) => void;
 }) {
   const { addItem } = useCart();
+  const { toggle, isWished } = useWishlist();
   const [selectedImg, setSelectedImg] = useState(0);
   const [qty, setQty] = useState(1);
 
