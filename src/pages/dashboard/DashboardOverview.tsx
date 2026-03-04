@@ -56,7 +56,7 @@ const DashboardOverview = () => {
       setStoreSlug(p?.store_slug ?? "");
       setStoreName(p?.store_name ?? "");
       setProfilePicUrl(p?.profile_picture_url ?? "");
-      
+      setCategory(p?.category ?? "");
     };
 
     fetchData();
