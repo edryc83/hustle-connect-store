@@ -250,6 +250,7 @@ const Storefront = () => {
         product={selectedProduct}
         whatsappNumber={profile.whatsapp_number ?? ""}
         storeName={profile.store_name ?? ""}
+        currency={(profile as any)?.currency ?? "UGX"}
         open={orderOpen}
         onOpenChange={setOrderOpen}
       />
