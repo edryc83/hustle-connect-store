@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Store, MapPin, ImageIcon, ShoppingBag, Share2, Copy, Check } from "lucide-react";
+import AfristallLogo from "@/components/AfristallLogo";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -146,7 +147,7 @@ const Storefront = () => {
               />
             ) : (
               <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
-                <Store className="h-7 w-7 text-primary" />
+                <AfristallLogo className="h-8 w-8" />
               </div>
             )}
             <div>
@@ -226,7 +227,7 @@ const Storefront = () => {
       {/* Footer */}
       <footer className="border-t bg-background py-4 text-center">
         <Link to="/" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground">
-          <Store className="h-4 w-4 text-primary" />
+          <AfristallLogo className="h-4 w-4" />
           Powered by <span className="font-semibold">Afri<span className="text-primary">stall</span></span>
         </Link>
       </footer>

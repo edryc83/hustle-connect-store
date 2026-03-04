@@ -6,6 +6,7 @@ import Footer from "@/components/layout/Footer";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
 import { Search, Store, MapPin, X } from "lucide-react";
+import AfristallLogo from "@/components/AfristallLogo";
 import type { Tables } from "@/integrations/supabase/types";
 
 type Profile = Tables<"profiles">;
@@ -169,7 +170,7 @@ const Explore = () => {
                           />
                         ) : (
                           <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
-                            <Store className="h-6 w-6 text-primary" />
+                            <AfristallLogo className="h-7 w-7" />
                           </div>
                         )}
                         <div>

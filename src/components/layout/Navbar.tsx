@@ -1,7 +1,8 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Store, Menu, X } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { useState } from "react";
+import AfristallLogo from "@/components/AfristallLogo";
 
 const Navbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -10,7 +11,7 @@ const Navbar = () => {
     <nav className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4 sm:px-6">
         <Link to="/" className="flex items-center gap-2">
-          <Store className="h-7 w-7 text-primary" />
+          <AfristallLogo />
           <span className="text-xl font-extrabold tracking-tight text-foreground">
             Afri<span className="text-primary">stall</span>
           </span>

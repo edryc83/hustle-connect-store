@@ -4,7 +4,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Package, Plus, Store, Eye } from "lucide-react";
+import { Package, Plus, Eye } from "lucide-react";
+import AfristallLogo from "@/components/AfristallLogo";
 
 const DashboardOverview = () => {
   const { user } = useAuth();
@@ -51,8 +52,8 @@ const DashboardOverview = () => {
         {storeSlug && (
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">Your Store</CardTitle>
-              <Store className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium text-muted-foreground">Your Store</CardTitle>
+              <AfristallLogo className="h-4 w-4" />
             </CardHeader>
             <CardContent>
               <Link

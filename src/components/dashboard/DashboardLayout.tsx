@@ -4,7 +4,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { DashboardSidebar } from "./DashboardSidebar";
 import { MobileBottomNav } from "./MobileBottomNav";
-import { Store } from "lucide-react";
+import AfristallLogo from "@/components/AfristallLogo";
 
 export function DashboardLayout({ children }: { children: ReactNode }) {
   const { user, loading } = useAuth();
@@ -30,7 +30,7 @@ export function DashboardLayout({ children }: { children: ReactNode }) {
           <header className="sticky top-0 z-40 flex h-14 items-center gap-3 border-b bg-background/95 px-4 backdrop-blur supports-[backdrop-filter]:bg-background/60">
             <SidebarTrigger className="hidden md:flex" />
             <div className="flex items-center gap-2 md:hidden">
-              <Store className="h-5 w-5 text-primary" />
+              <AfristallLogo className="h-5 w-5" />
               <span className="text-sm font-bold">
                 Afri<span className="text-primary">stall</span>
               </span>
