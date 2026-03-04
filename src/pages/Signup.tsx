@@ -9,6 +9,7 @@ import EmojiGrid from "@/components/landing/EmojiGrid";
 import AfristallLogo from "@/components/AfristallLogo";
 import { toast } from "sonner";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { CategoryPicker, type CategorySelection, serializeCategories } from "@/components/CategoryPicker";
 
 const CITIES = ["Kampala", "Nairobi", "Lagos", "Accra", "Dar es Salaam", "Kigali", "Other"];
 
