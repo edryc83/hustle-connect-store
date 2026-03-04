@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
 import { ThemeProvider } from "@/hooks/useTheme";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
+import { AdminLayout } from "@/components/admin/AdminLayout";
 import Index from "./pages/Index";
 import Signup from "./pages/Signup";
 import Login from "./pages/Login";
@@ -14,7 +15,10 @@ import DashboardProducts from "./pages/dashboard/DashboardProducts";
 import DashboardSettings from "./pages/dashboard/DashboardSettings";
 import DashboardOrders from "./pages/dashboard/DashboardOrders";
 import DashboardAnalytics from "./pages/dashboard/DashboardAnalytics";
-
+import AdminOverview from "./pages/admin/AdminOverview";
+import AdminSellers from "./pages/admin/AdminSellers";
+import AdminOrders from "./pages/admin/AdminOrders";
+import AdminAnalyticsPage from "./pages/admin/AdminAnalytics";
 import Storefront from "./pages/Storefront";
 import Explore from "./pages/Explore";
 import NotFound from "./pages/NotFound";
@@ -38,7 +42,12 @@ const App = () => (
               <Route path="/dashboard/settings" element={<DashboardLayout><DashboardSettings /></DashboardLayout>} />
               <Route path="/dashboard/orders" element={<DashboardLayout><DashboardOrders /></DashboardLayout>} />
               <Route path="/dashboard/analytics" element={<DashboardLayout><DashboardAnalytics /></DashboardLayout>} />
-              
+
+              <Route path="/admin" element={<AdminLayout><AdminOverview /></AdminLayout>} />
+              <Route path="/admin/sellers" element={<AdminLayout><AdminSellers /></AdminLayout>} />
+              <Route path="/admin/orders" element={<AdminLayout><AdminOrders /></AdminLayout>} />
+              <Route path="/admin/analytics" element={<AdminLayout><AdminAnalyticsPage /></AdminLayout>} />
+
               <Route path="/explore" element={<Explore />} />
               <Route path="/:storeSlug" element={<Storefront />} />
               <Route path="/:storeSlug/:productId" element={<Storefront />} />
