@@ -195,6 +195,71 @@ function ProductDetailView({
   const { toggle, isWished } = useWishlist();
   const [selectedImg, setSelectedImg] = useState(0);
   const [qty, setQty] = useState(1);
+  const [attrSelections, setAttrSelections] = useState<Record<string, string | string[]>>({});
+  const [attrTextInputs, setAttrTextInputs] = useState<Record<string, string>>({});
+  const [cakeMessage, setCakeMessage] = useState("");
+  const [personalisation, setPersonalisation] = useState("");
+
+  const attrs = (product as any).attributes as Record<string, any> | null;
+  const hasAttributes = attrs && attrs.product_type;
+
+  const handleAttrSelect = (key: string, value: string | string[]) => {
+    setAttrSelections((prev) => ({ ...prev, [key]: value }));
+  };
+  const handleAttrText = (key: string, value: string) => {
+    setAttrTextInputs((prev) => ({ ...prev, [key]: value }));
+  };
+
+  // Check if required selectable attributes are filled
+  const getSelectableFields = () => {
+    if (!hasAttributes || !attrs) return [];
+    const category = getCategoryByValue(attrs.product_type);
+    if (!category) return [];
+    return category.fields.filter((f) => {
+      const val = attrs[f.key];
+      if (!val) return false;
+      if (f.type === "toggle" || f.type === "number") return false; // info-only
+      if (Array.isArray(val) && val.length === 0) return false;
+      if (typeof val === "string" && !val.trim()) return false;
+      // For text fields, check if they parse to multiple options
+      if (f.type === "text") {
+        const opts = parseTextToOptions(val);
+        return opts.length > 0;
+      }
+      return true;
+    });
+  };
+
+  const buildWhatsAppMessage = () => {
+    const dp = Number(displayPrice);
+    const lines: string[] = [
+      `🛍️ New Order from Afristall`,
+      ``,
+      `Store: ${profile.store_name || storeSlug}`,
+      `Product: ${product.name}${qty > 1 ? ` x${qty}` : ""}`,
+      `Price: ${formatPrice(dp * qty, currency)}`,
+    ];
+
+    if (hasAttributes && attrs) {
+      const allTextInputs = { ...attrTextInputs };
+      if (cakeMessage) allTextInputs["cake_message_text"] = cakeMessage;
+      if (personalisation) allTextInputs["personalisation_text"] = personalisation;
+
+      const attrLines = buildAttributeLines(attrs, attrSelections, allTextInputs);
+      if (attrLines.length > 0) {
+        lines.push(``, `📋 Order Details:`);
+        lines.push(...attrLines);
+        if (cakeMessage) lines.push(`- Message on cake: "${cakeMessage}"`);
+        if (personalisation) lines.push(`- Personalisation: ${personalisation}`);
+      }
+    }
+
+    if (visitorName) lines.push(``, `👤 Customer: ${visitorName}`);
+    if (product.image_url) lines.push(``, `📷 ${product.image_url}`);
+    lines.push(``, `🔗 ${window.location.origin}/${storeSlug}`);
+
+    return lines.join("\n");
+  };
 
   const displayPrice = product.discount_price ?? product.price;
   const hasDiscount = !!product.discount_price;
