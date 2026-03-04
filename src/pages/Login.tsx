@@ -8,26 +8,20 @@ import { Eye, EyeOff } from "lucide-react";
 import AfristallLogo from "@/components/AfristallLogo";
 import EmojiGrid from "@/components/landing/EmojiGrid";
 import { toast } from "sonner";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+
 
 
 const Login = () => {
   const navigate = useNavigate();
-  const [authMode, setAuthMode] = useState<"email" | "phone">("email");
   const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
-  const [phoneCountryCode, setPhoneCountryCode] = useState("+256");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleLogin = async () => {
-    if (authMode === "email" && !email.trim()) {
+    if (!email.trim()) {
       toast.error("Email is required");
-      return;
-    }
-    if (authMode === "phone" && !phone.trim()) {
-      toast.error("Phone number is required");
       return;
     }
     if (!password) {
@@ -37,20 +31,10 @@ const Login = () => {
 
     setLoading(true);
     try {
-      let error;
-      if (authMode === "email") {
-        const result = await supabase.auth.signInWithPassword({
-          email: email.trim(),
-          password,
-        });
-        error = result.error;
-      } else {
-        const result = await supabase.auth.signInWithPassword({
-          phone: phoneCountryCode + phone.replace(/^0+/, ""),
-          password,
-        });
-        error = result.error;
-      }
+      const { error } = await supabase.auth.signInWithPassword({
+        email: email.trim(),
+        password,
+      });
       if (error) throw error;
 
       toast.success("Welcome back! 👋");
@@ -82,70 +66,17 @@ const Login = () => {
           <p className="text-sm text-muted-foreground mt-1">Sign in to manage your store</p>
         </div>
         <div className="space-y-4">
-          <div className="flex gap-1 rounded-lg bg-muted p-1">
-            <button
-              type="button"
-              onClick={() => setAuthMode("email")}
-              className={`flex flex-1 items-center justify-center gap-1.5 rounded-md py-2 text-sm font-medium transition-colors ${
-                authMode === "email"
-                  ? "bg-background text-foreground shadow-sm"
-                  : "text-muted-foreground"
-              }`}
-            >
-              <Mail className="h-4 w-4" /> Email
-            </button>
-            <button
-              type="button"
-              onClick={() => setAuthMode("phone")}
-              className={`flex flex-1 items-center justify-center gap-1.5 rounded-md py-2 text-sm font-medium transition-colors ${
-                authMode === "phone"
-                  ? "bg-background text-foreground shadow-sm"
-                  : "text-muted-foreground"
-              }`}
-            >
-              <Phone className="h-4 w-4" /> Phone
-            </button>
+          <div className="space-y-1.5">
+            <Label htmlFor="email">Email address</Label>
+            <Input
+              id="email"
+              type="email"
+              placeholder="you@example.com"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              autoComplete="email"
+            />
           </div>
-
-          {authMode === "email" ? (
-            <div className="space-y-1.5">
-              <Label htmlFor="email">Email address</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="you@example.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                autoComplete="email"
-              />
-            </div>
-          ) : (
-            <div className="space-y-1.5">
-              <Label htmlFor="phone">Phone number</Label>
-              <div className="flex gap-2">
-                <Select value={phoneCountryCode} onValueChange={setPhoneCountryCode}>
-                  <SelectTrigger className="w-[130px]">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {COUNTRY_CODES.map((c) => (
-                      <SelectItem key={c.code} value={c.code}>
-                        {c.country} {c.code}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                <Input
-                  id="phone"
-                  type="tel"
-                  placeholder="7XX XXX XXX"
-                  value={phone}
-                  onChange={(e) => setPhone(e.target.value)}
-                  className="flex-1"
-                />
-              </div>
-            </div>
-          )}
 
           <div className="space-y-1.5">
             <Label htmlFor="password">Password</Label>

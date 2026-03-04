@@ -78,9 +78,9 @@ const DashboardProducts = () => {
     setCurrency((profile as any)?.currency ?? "UGX");
 
     const imgMap: Record<string, string[]> = {};
-    const productIds = new Set((data ?? []).map((p) => p.id));
+    const productIdSet = new Set(productIds);
     (images ?? []).forEach((img: any) => {
-      if (productIds.has(img.product_id)) {
+      if (productIdSet.has(img.product_id)) {
         if (!imgMap[img.product_id]) imgMap[img.product_id] = [];
         imgMap[img.product_id].push(img.image_url);
       }
