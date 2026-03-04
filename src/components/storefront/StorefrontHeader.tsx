@@ -1,5 +1,4 @@
 import { MapPin, MessageCircle, Share2 } from "lucide-react";
-import { categoriesToDisplay } from "@/components/CategoryPicker";
 import AfristallLogo from "@/components/AfristallLogo";
 import { Button } from "@/components/ui/button";
 import type { Tables } from "@/integrations/supabase/types";
@@ -11,6 +10,15 @@ function getTimeGreeting() {
   if (h < 12) return "Good morning";
   if (h < 17) return "Good afternoon";
   return "Good evening";
+}
+
+/** Extract only the top-level / main category (before any ">" or sub-items) */
+function mainCategory(raw: string | null | undefined): string | null {
+  if (!raw) return null;
+  // categories stored as comma-separated, possibly with "Parent > Child"
+  const first = raw.split(",")[0]?.trim();
+  if (!first) return null;
+  return first.split(">")[0]?.trim() || first;
 }
 
 const defaultWelcome = "Take a look around — you might just find something you love. Happy shopping! 🧡";
@@ -26,6 +34,15 @@ export function StorefrontHeader({ profile, visitorName }: StorefrontHeaderProps
   const coverUrl = (profile as any).cover_photo_url;
   const ig = (profile as any).instagram_url;
   const tt = (profile as any).tiktok_url;
+  const mainCat = mainCategory(profile.category);
+
+  // Physical address parts
+  const addressParts = [
+    (profile as any).shop_number,
+    (profile as any).building,
+    (profile as any).street,
+  ].filter(Boolean);
+  const hasPhysicalAddress = !(profile as any).is_online_only && addressParts.length > 0;
 
   return (
     <header className="bg-background relative">
@@ -52,7 +69,7 @@ export function StorefrontHeader({ profile, visitorName }: StorefrontHeaderProps
         ) : null}
       </div>
 
-      <div className="mx-auto max-w-5xl px-4 -mt-12 pb-6 flex flex-col items-center text-center gap-4">
+      <div className="mx-auto max-w-5xl px-4 -mt-12 pb-5 flex flex-col items-center text-center gap-3">
         {/* Profile Picture */}
         {profile.profile_picture_url ? (
           <img
@@ -66,7 +83,7 @@ export function StorefrontHeader({ profile, visitorName }: StorefrontHeaderProps
           </div>
         )}
 
-        {/* Store Name */}
+        {/* Store Name + slug */}
         <div>
           <h1 className="text-2xl font-extrabold tracking-tight">{profile.store_name}</h1>
           {profile.store_slug && (
@@ -74,39 +91,26 @@ export function StorefrontHeader({ profile, visitorName }: StorefrontHeaderProps
           )}
         </div>
 
-        {/* Category & Location Tags */}
+        {/* Main category + City — compact row */}
         <div className="flex flex-wrap items-center justify-center gap-2 text-sm">
-          {(() => {
-            const parts = [profile.city, (profile as any).district, (profile as any).country].filter(Boolean);
-            return parts.length > 0 ? (
-              <span className="flex items-center gap-1 text-muted-foreground">
-                <MapPin className="h-3.5 w-3.5" /> {parts.join(", ")}
-              </span>
-            ) : null;
-          })()}
-          {categoriesToDisplay(profile.category).map((tag) => (
-            <span
-              key={tag}
-              className="rounded-full bg-primary/10 px-3 py-0.5 text-xs font-medium text-primary"
-            >
-              {tag}
+          {mainCat && (
+            <span className="rounded-full bg-primary/10 px-3 py-0.5 text-xs font-medium text-primary">
+              {mainCat}
             </span>
-          ))}
+          )}
+          {profile.city && (
+            <span className="flex items-center gap-1 text-muted-foreground text-xs">
+              <MapPin className="h-3 w-3" /> {profile.city}
+            </span>
+          )}
         </div>
 
-        {/* Physical Address */}
-        {!(profile as any).is_online_only && (() => {
-          const addressParts = [
-            (profile as any).shop_number,
-            (profile as any).building,
-            (profile as any).street,
-          ].filter(Boolean);
-          return addressParts.length > 0 ? (
-            <p className="text-xs text-muted-foreground">
-              📍 {addressParts.join(", ")}
-            </p>
-          ) : null;
-        })()}
+        {/* Physical shop location */}
+        {hasPhysicalAddress && (
+          <p className="text-xs text-muted-foreground">
+            📍 {addressParts.join(", ")}
+          </p>
+        )}
 
         {(profile as any).is_online_only && (
           <p className="text-xs text-muted-foreground">🌐 Online Store</p>
