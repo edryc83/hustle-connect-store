@@ -245,7 +245,16 @@ const DashboardSettings = () => {
                 />
               </label>
             </div>
-            <p className="text-xs text-muted-foreground">Recommended: 1200×400px. Shown on your store & explore cards.</p>
+            <div className="flex items-center justify-between">
+              <p className="text-xs text-muted-foreground">Recommended: 1200×400px. Shown on your store & explore cards.</p>
+              <WallpaperPicker onSelect={async (url) => {
+                if (!user) return;
+                const { error } = await supabase.from("profiles").update({ cover_photo_url: url } as any).eq("id", user.id);
+                if (error) { toast.error("Failed to set wallpaper"); return; }
+                setCoverPhotoUrl(url);
+                toast.success("Cover wallpaper set!");
+              }} />
+            </div>
           </div>
 
           {/* Profile Picture */}
