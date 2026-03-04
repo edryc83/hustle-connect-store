@@ -20,6 +20,7 @@ import {
   serializeCategories,
   deserializeCategories,
 } from "@/components/CategoryPicker";
+import { DISTRICTS, getTowns } from "@/lib/locations";
 
 const COUNTRIES = [
   "Uganda", "Kenya", "Nigeria", "Ghana", "Tanzania", "Rwanda",
@@ -413,21 +414,35 @@ const DashboardSettings = () => {
           </div>
 
           <div className="space-y-1.5">
-            <Label>District / State</Label>
-            <Input
-              value={district}
-              onChange={(e) => setDistrict(e.target.value)}
-              placeholder="e.g. Wakiso, Lagos Island, Westlands"
-            />
+            <Label>District</Label>
+            <Select value={district} onValueChange={(val) => { setDistrict(val); setCity(""); }}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select district" />
+              </SelectTrigger>
+              <SelectContent>
+                {DISTRICTS.map((d) => (
+                  <SelectItem key={d} value={d}>{d}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="space-y-1.5">
-            <Label>City / Town</Label>
-            <Input value={city} onChange={(e) => setCity(e.target.value)} placeholder="e.g. Kampala, Nairobi, Lagos" />
+            <Label>City / Town {district && <span className="text-muted-foreground font-normal">(optional)</span>}</Label>
+            <Select value={city} onValueChange={setCity} disabled={!district}>
+              <SelectTrigger>
+                <SelectValue placeholder={district ? "Select town" : "Select a district first"} />
+              </SelectTrigger>
+              <SelectContent>
+                {getTowns(district).map((t) => (
+                  <SelectItem key={t} value={t}>{t}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
 
           <div className="space-y-1.5">
-            <Label>Street</Label>
+            <Label>Street <span className="text-muted-foreground font-normal">(optional)</span></Label>
             <Input value={street} onChange={(e) => setStreet(e.target.value)} placeholder="e.g. Kira Road, Allen Avenue" />
           </div>
 
