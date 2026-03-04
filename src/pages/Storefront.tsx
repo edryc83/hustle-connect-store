@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Store, ShoppingBag, Share2, Copy, Check, Star, ShoppingCart, Sun, Moon, LogIn, LayoutDashboard } from "lucide-react";
+import { Store, ShoppingBag, Share2, Copy, Check, Star, ShoppingCart, Sun, Moon, LogIn, LayoutDashboard, Minus, Plus, Heart } from "lucide-react";
 import { formatPrice } from "@/lib/currency";
 import AfristallLogo from "@/components/AfristallLogo";
 import { ProductImageCarousel } from "@/components/storefront/ProductImageCarousel";
@@ -304,157 +304,23 @@ const StorefrontInner = () => {
     const imgs = productImagesMap[viewProduct.id] ?? (viewProduct.image_url ? [viewProduct.image_url] : []);
     const variants = viewProduct.variants_text?.split(",").map((v) => v.trim()).filter(Boolean) ?? [];
 
+    // Suggestions: other products from same store
+    const suggestions = products.filter((p) => p.id !== viewProduct.id).slice(0, 6);
+
     return (
-      <div className="min-h-screen bg-background">
-        <header className="border-b">
-          <div className="mx-auto max-w-5xl px-4 py-3 flex items-center justify-between">
-            <button onClick={() => navigate(`/${storeSlug}`)} className="text-sm font-medium text-muted-foreground hover:text-foreground flex items-center gap-1">
-              ← Back
-            </button>
-            <h1 className="text-sm font-semibold truncate max-w-[200px]">{viewProduct.name}</h1>
-            <ShareButton storeName={profile.store_name ?? "Store"} storeSlug={storeSlug ?? ""} />
-          </div>
-        </header>
-
-        <main className="mx-auto max-w-2xl px-4 py-6 space-y-6">
-          <div className="aspect-square rounded-2xl overflow-hidden bg-muted">
-            <ProductImageCarousel images={imgs} alt={viewProduct.name} listingType={viewProduct.listing_type} />
-          </div>
-
-          {imgs.length > 1 && (
-            <div className="flex gap-2 overflow-x-auto pb-1">
-              {imgs.map((url, i) => (
-                <img key={i} src={url} alt="" className="h-16 w-16 rounded-lg object-cover border-2 border-border shrink-0" />
-              ))}
-            </div>
-          )}
-
-          <div>
-            <div className="flex items-start justify-between gap-4">
-              <h2 className="text-2xl font-bold">{viewProduct.name}</h2>
-              <div className="text-right shrink-0">
-                {(viewProduct as any).discount_price ? (
-                  <>
-                    <p className="text-2xl font-bold text-primary">{formatPrice(Number((viewProduct as any).discount_price), currency)}</p>
-                    <p className="text-sm text-muted-foreground line-through">{formatPrice(Number(viewProduct.price), currency)}</p>
-                  </>
-                ) : (
-                  <p className="text-2xl font-bold text-primary">{formatPrice(Number(viewProduct.price), currency)}</p>
-                )}
-              </div>
-            </div>
-            <div className="flex gap-2 mt-2">
-              {viewProduct.listing_type === "service" && <Badge variant="secondary">Service</Badge>}
-              {viewProduct.condition && (
-                <Badge variant="outline">
-                  {viewProduct.condition === "new" ? "New" : viewProduct.condition === "used" ? "Used" : "Refurbished"}
-                </Badge>
-              )}
-              {(viewProduct as any).discount_price && (
-                <Badge className="bg-green-500/10 text-green-700 border-green-300 text-xs">
-                  {Math.round((1 - Number((viewProduct as any).discount_price) / Number(viewProduct.price)) * 100)}% OFF
-                </Badge>
-              )}
-            </div>
-          </div>
-
-          {variants.length > 0 && (
-            <div>
-              <p className="text-sm font-medium mb-2">Options</p>
-              <div className="flex flex-wrap gap-2">
-                {variants.map((v) => (
-                  <span key={v} className="rounded-full border px-3 py-1 text-sm text-muted-foreground">{v}</span>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {viewProduct.description && (
-            <div>
-              <p className="text-sm font-medium mb-1">Description</p>
-              <p className="text-sm text-muted-foreground leading-relaxed">{viewProduct.description}</p>
-            </div>
-          )}
-
-          <div className="flex gap-3">
-            <Button
-              size="lg"
-              className="flex-1 gap-2 text-base"
-              onClick={() => {
-                const imageUrl = imgs[0] || viewProduct.image_url || undefined;
-                addItem(viewProduct, imageUrl);
-              }}
-            >
-              <ShoppingCart className="h-5 w-5" />
-              Add to Cart
-            </Button>
-            <Button
-              size="lg"
-              variant="outline"
-              className="gap-2 text-base"
-              onClick={() => {
-                const cleanNumber = (profile.whatsapp_number ?? "").replace(/[^0-9+]/g, "");
-                const displayPrice = (viewProduct as any).discount_price ? Number((viewProduct as any).discount_price) : Number(viewProduct.price);
-                const message = [
-                  `🛒 Hi! I'd like to order *${viewProduct.name}* (${formatPrice(displayPrice, currency)}) from your Afristall store.`,
-                  viewProduct.image_url ? `\n📷 ${viewProduct.image_url}` : null,
-                ].filter(Boolean).join("\n");
-                supabase.from("orders").insert({
-                  seller_id: profile.id,
-                  product_id: viewProduct.id,
-                  product_name: viewProduct.name,
-                  quantity: 1,
-                  total: Number(viewProduct.price),
-                  customer_name: visitorName || "Store visitor",
-                  customer_phone: visitorName || "WhatsApp order",
-                } as any).then(() => {});
-                supabase.rpc("increment_whatsapp_taps", { p_id: viewProduct.id }).then(() => {});
-                window.open(`https://wa.me/${cleanNumber.replace("+", "")}?text=${encodeURIComponent(message)}`, "_blank");
-              }}
-            >
-              <span className="text-lg">💬</span>
-              WhatsApp
-            </Button>
-          </div>
-
-          <div className="border-t pt-4">
-            <Link to={`/${storeSlug}`} className="flex items-center gap-3">
-              {profile.profile_picture_url ? (
-                <img src={profile.profile_picture_url} alt="" className="h-10 w-10 rounded-full object-cover border" />
-              ) : (
-                <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
-                  <AfristallLogo className="h-5 w-5" />
-                </div>
-              )}
-              <div>
-                <p className="text-sm font-semibold">{profile.store_name}</p>
-                <p className="text-xs text-muted-foreground">View all listings →</p>
-              </div>
-            </Link>
-          </div>
-        </main>
-
-        <footer className="border-t bg-background py-4 text-center space-y-1">
-          <Link to="/" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground">
-            <AfristallLogo className="h-4 w-4" />
-            Powered by <span className="font-semibold">Afri<span className="text-primary">stall</span></span>
-          </Link>
-          <div>
-            <Link to="/dashboard" className="text-xs text-muted-foreground/60 hover:text-foreground transition-colors">
-              Are you the seller? Go to Dashboard →
-            </Link>
-          </div>
-        </footer>
-
-        {/* Cart Drawer */}
-        <CartDrawer
-          currency={currency}
-          whatsappNumber={profile.whatsapp_number ?? ""}
-          storeName={profile.store_name ?? "Store"}
-          sellerId={profile.id}
-          visitorName={visitorName}
-        />
-      </div>
+      <ProductDetailView
+        product={viewProduct}
+        images={imgs}
+        variants={variants}
+        suggestions={suggestions}
+        productImagesMap={productImagesMap}
+        currency={currency}
+        profile={profile}
+        storeSlug={storeSlug ?? ""}
+        visitorName={visitorName}
+        onBack={() => navigate(`/${storeSlug}`)}
+        onNavigate={(id) => navigate(`/${storeSlug}/${id}`)}
+      />
     );
   }
 
