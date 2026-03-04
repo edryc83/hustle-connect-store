@@ -11,6 +11,7 @@ import { CartDrawer } from "@/components/storefront/CartDrawer";
 import { useTheme } from "@/hooks/useTheme";
 import { useAuth } from "@/hooks/useAuth";
 import { CartProvider, useCart } from "@/hooks/useCart";
+import { WishlistProvider, useWishlist } from "@/hooks/useWishlist";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -82,6 +83,7 @@ function ProductCard({
   onClick: () => void;
 }) {
   const { addItem } = useCart();
+  const { toggle, isWished } = useWishlist();
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -128,6 +130,14 @@ function ProductCard({
             </Badge>
           )}
         </div>
+        {/* Wishlist heart top-right */}
+        <button
+          onClick={(e) => { e.stopPropagation(); toggle(product.id); }}
+          className="absolute top-2 right-2 h-7 w-7 rounded-full bg-background/80 backdrop-blur flex items-center justify-center shadow-sm border border-border/40 hover:bg-background transition-colors"
+          aria-label="Toggle wishlist"
+        >
+          <Heart className={`h-3.5 w-3.5 transition-colors ${isWished(product.id) ? "fill-destructive text-destructive" : "text-muted-foreground"}`} />
+        </button>
       </div>
 
       {/* Info */}
@@ -705,10 +715,15 @@ const StorefrontInner = () => {
   );
 };
 
-const Storefront = () => (
-  <CartProvider>
-    <StorefrontInner />
-  </CartProvider>
-);
+const Storefront = () => {
+  const { storeSlug } = useParams<{ storeSlug: string }>();
+  return (
+    <CartProvider>
+      <WishlistProvider storeSlug={storeSlug ?? ""}>
+        <StorefrontInner />
+      </WishlistProvider>
+    </CartProvider>
+  );
+};
 
 export default Storefront;
