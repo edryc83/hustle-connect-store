@@ -68,6 +68,7 @@ export type Database = {
           last_active_at: string
           phone: string | null
           profile_picture_url: string | null
+          store_bio: string | null
           store_name: string | null
           store_slug: string | null
           whatsapp_number: string | null
@@ -81,6 +82,7 @@ export type Database = {
           last_active_at?: string
           phone?: string | null
           profile_picture_url?: string | null
+          store_bio?: string | null
           store_name?: string | null
           store_slug?: string | null
           whatsapp_number?: string | null
@@ -94,6 +96,7 @@ export type Database = {
           last_active_at?: string
           phone?: string | null
           profile_picture_url?: string | null
+          store_bio?: string | null
           store_name?: string | null
           store_slug?: string | null
           whatsapp_number?: string | null
