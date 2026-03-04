@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Mail, Phone, Eye, EyeOff, ArrowRight, ArrowLeft, Upload, Check, MapPin, MessageCircle, Package, Wrench } from "lucide-react";
+import { Eye, EyeOff, ArrowRight, ArrowLeft, Upload, Check, MapPin, MessageCircle, Package, Wrench } from "lucide-react";
 import EmojiGrid from "@/components/landing/EmojiGrid";
 import AfristallLogo from "@/components/AfristallLogo";
 import { toast } from "sonner";
@@ -46,11 +46,8 @@ const Signup = () => {
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
 
-  // Step 1
-  const [authMode, setAuthMode] = useState<"email" | "phone">("email");
+  // Step 1 — Email only
   const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
-  const [phoneCountryCode, setPhoneCountryCode] = useState("+256");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -86,93 +83,37 @@ const Signup = () => {
   };
 
   const validateStep1 = () => {
-    if (authMode === "email" && !email.trim()) {
-      toast.error("Email is required");
-      return false;
-    }
-    if (authMode === "email" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      toast.error("Enter a valid email");
-      return false;
-    }
-    if (authMode === "phone" && !phone.trim()) {
-      toast.error("Phone number is required");
-      return false;
-    }
-    if (password.length < 6) {
-      toast.error("Password must be at least 6 characters");
-      return false;
-    }
-    if (password !== confirmPassword) {
-      toast.error("Passwords don't match");
-      return false;
-    }
+    if (!email.trim()) { toast.error("Email is required"); return false; }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { toast.error("Enter a valid email"); return false; }
+    if (password.length < 6) { toast.error("Password must be at least 6 characters"); return false; }
+    if (password !== confirmPassword) { toast.error("Passwords don't match"); return false; }
     return true;
   };
 
   const validateStep2 = () => {
-    if (!storeName.trim()) {
-      toast.error("Store name is required");
-      return false;
-    }
-    if (!storeSlug.trim()) {
-      toast.error("Store slug is required");
-      return false;
-    }
-    if (!/^[a-z0-9-]+$/.test(storeSlug)) {
-      toast.error("Slug can only contain lowercase letters, numbers, and hyphens");
-      return false;
-    }
-    if (!city) {
-      toast.error("Please select a city");
-      return false;
-    }
-    if (!category) {
-      toast.error("Please select a category");
-      return false;
-    }
-    return true;
-  };
-
-  const validateStep3 = () => {
-    if (!whatsappNumber.trim()) {
-      toast.error("WhatsApp number is required");
-      return false;
-    }
+    if (!storeName.trim()) { toast.error("Store name is required"); return false; }
+    if (!storeSlug.trim()) { toast.error("Store slug is required"); return false; }
+    if (!/^[a-z0-9-]+$/.test(storeSlug)) { toast.error("Slug can only contain lowercase letters, numbers, and hyphens"); return false; }
+    if (!category) { toast.error("Please select a category"); return false; }
     return true;
   };
 
   const handleSubmit = async () => {
-    if (!validateStep3()) return;
     setLoading(true);
-
     try {
-      const fullWhatsapp = whatsappCountryCode + whatsappNumber.replace(/^0+/, "");
+      const fullWhatsapp = whatsappNumber.trim()
+        ? whatsappCountryCode + whatsappNumber.replace(/^0+/, "")
+        : null;
 
-      // Sign up with Supabase Auth
-      let authData;
-      let authError;
-
-      if (authMode === "email") {
-        const result = await supabase.auth.signUp({
-          email: email.trim(),
-          password,
-          options: { emailRedirectTo: window.location.origin },
-        });
-        authData = result.data;
-        authError = result.error;
-      } else {
-        const result = await supabase.auth.signUp({
-          phone: phoneCountryCode + phone.replace(/^0+/, ""),
-          password,
-        });
-        authData = result.data;
-        authError = result.error;
-      }
+      const { data: authData, error: authError } = await supabase.auth.signUp({
+        email: email.trim(),
+        password,
+        options: { emailRedirectTo: window.location.origin },
+      });
 
       if (authError) throw authError;
       if (!authData.user) throw new Error("Signup failed");
 
-      // Upload profile picture if provided
       let profilePictureUrl = null;
       if (profilePicture) {
         const fileExt = profilePicture.name.split(".").pop();
@@ -181,20 +122,17 @@ const Signup = () => {
           .from("store-images")
           .upload(filePath, profilePicture, { upsert: true });
         if (!uploadError) {
-          const { data: urlData } = supabase.storage
-            .from("store-images")
-            .getPublicUrl(filePath);
+          const { data: urlData } = supabase.storage.from("store-images").getPublicUrl(filePath);
           profilePictureUrl = urlData.publicUrl;
         }
       }
 
-      // Update profile with store details
       const { error: profileError } = await supabase
         .from("profiles")
         .update({
           store_name: storeName.trim(),
           store_slug: storeSlug.trim(),
-          city,
+          city: city || null,
           category,
           business_type: businessType,
           whatsapp_number: fullWhatsapp,
@@ -215,7 +153,6 @@ const Signup = () => {
 
   return (
     <div className="relative flex min-h-screen flex-col items-center justify-center px-4 py-8 overflow-hidden">
-      {/* Background effects */}
       <EmojiGrid />
       <div className="pointer-events-none absolute -top-32 -left-20 h-[400px] w-[400px] rounded-full bg-primary/8 blur-[100px]" />
       <div className="pointer-events-none absolute -bottom-32 right-0 h-[350px] w-[350px] rounded-full bg-primary/6 blur-[80px]" />
@@ -231,96 +168,36 @@ const Signup = () => {
       <div className="relative z-10 mb-6 flex items-center gap-2">
         {[1, 2, 3].map((s) => (
           <div key={s} className="flex items-center gap-2">
-            <div
-              className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold transition-colors ${
-                step >= s
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-muted/60 backdrop-blur-sm text-muted-foreground"
-              }`}
-            >
+            <div className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold transition-colors ${
+              step >= s ? "bg-primary text-primary-foreground" : "bg-muted/60 backdrop-blur-sm text-muted-foreground"
+            }`}>
               {step > s ? <Check className="h-4 w-4" /> : s}
             </div>
-            {s < 3 && (
-              <div className={`h-0.5 w-8 sm:w-12 ${step > s ? "bg-primary" : "bg-muted/60"}`} />
-            )}
+            {s < 3 && <div className={`h-0.5 w-8 sm:w-12 ${step > s ? "bg-primary" : "bg-muted/60"}`} />}
           </div>
         ))}
       </div>
 
       <div className="relative z-10 w-full max-w-md rounded-2xl border border-border/50 bg-card/60 backdrop-blur-xl p-6 shadow-sm">
-        {/* STEP 1 — Account */}
+        {/* STEP 1 — Email */}
         {step === 1 && (
           <>
             <div className="text-center mb-6">
               <h2 className="text-xl font-bold text-foreground">Create your account</h2>
-              <p className="text-sm text-muted-foreground mt-1">Sign up with your email or phone number</p>
+              <p className="text-sm text-muted-foreground mt-1">Sign up with your email</p>
             </div>
             <div className="space-y-4">
-              {/* Toggle email/phone */}
-              <div className="flex gap-1 rounded-lg bg-muted p-1">
-                <button
-                  type="button"
-                  onClick={() => setAuthMode("email")}
-                  className={`flex flex-1 items-center justify-center gap-1.5 rounded-md py-2 text-sm font-medium transition-colors ${
-                    authMode === "email"
-                      ? "bg-background text-foreground shadow-sm"
-                      : "text-muted-foreground"
-                  }`}
-                >
-                  <Mail className="h-4 w-4" /> Email
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setAuthMode("phone")}
-                  className={`flex flex-1 items-center justify-center gap-1.5 rounded-md py-2 text-sm font-medium transition-colors ${
-                    authMode === "phone"
-                      ? "bg-background text-foreground shadow-sm"
-                      : "text-muted-foreground"
-                  }`}
-                >
-                  <Phone className="h-4 w-4" /> Phone
-                </button>
+              <div className="space-y-1.5">
+                <Label htmlFor="email">Email address</Label>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="you@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  autoComplete="email"
+                />
               </div>
-
-              {authMode === "email" ? (
-                <div className="space-y-1.5">
-                  <Label htmlFor="email">Email address</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="you@example.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    autoComplete="email"
-                  />
-                </div>
-              ) : (
-                <div className="space-y-1.5">
-                  <Label htmlFor="phone">Phone number</Label>
-                  <div className="flex gap-2">
-                    <Select value={phoneCountryCode} onValueChange={setPhoneCountryCode}>
-                      <SelectTrigger className="w-[130px]">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {COUNTRY_CODES.map((c) => (
-                          <SelectItem key={c.code} value={c.code}>
-                            {c.country} {c.code}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <Input
-                      id="phone"
-                      type="tel"
-                      placeholder="7XX XXX XXX"
-                      value={phone}
-                      onChange={(e) => setPhone(e.target.value)}
-                      className="flex-1"
-                    />
-                  </div>
-                </div>
-              )}
 
               <div className="space-y-1.5">
                 <Label htmlFor="password">Password</Label>
@@ -355,18 +232,13 @@ const Signup = () => {
                 />
               </div>
 
-              <Button
-                className="w-full gap-2"
-                onClick={() => validateStep1() && setStep(2)}
-              >
+              <Button className="w-full gap-2" onClick={() => validateStep1() && setStep(2)}>
                 Next <ArrowRight className="h-4 w-4" />
               </Button>
 
               <p className="text-center text-sm text-muted-foreground">
                 Already have an account?{" "}
-                <Link to="/login" className="font-medium text-primary hover:underline">
-                  Sign in
-                </Link>
+                <Link to="/login" className="font-medium text-primary hover:underline">Sign in</Link>
               </p>
             </div>
           </>
@@ -406,7 +278,7 @@ const Signup = () => {
               </div>
 
               <div className="space-y-1.5">
-                <Label>City</Label>
+                <Label>City <span className="text-muted-foreground font-normal">(optional)</span></Label>
                 <Select value={city} onValueChange={setCity}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select your city" />
@@ -427,11 +299,7 @@ const Signup = () => {
                 <Label>Profile picture</Label>
                 <div className="flex items-center gap-3">
                   {profilePicturePreview ? (
-                    <img
-                      src={profilePicturePreview}
-                      alt="Store profile"
-                      className="h-14 w-14 rounded-full object-cover border"
-                    />
+                    <img src={profilePicturePreview} alt="Store profile" className="h-14 w-14 rounded-full object-cover border" />
                   ) : (
                     <div className="flex h-14 w-14 items-center justify-center rounded-full bg-muted">
                       <Upload className="h-5 w-5 text-muted-foreground" />
@@ -441,12 +309,7 @@ const Signup = () => {
                     <span className="text-sm font-medium text-primary hover:underline">
                       {profilePicture ? "Change photo" : "Upload photo"}
                     </span>
-                    <input
-                      type="file"
-                      accept="image/*"
-                      className="hidden"
-                      onChange={handleProfilePicture}
-                    />
+                    <input type="file" accept="image/*" className="hidden" onChange={handleProfilePicture} />
                   </label>
                 </div>
               </div>
@@ -455,9 +318,9 @@ const Signup = () => {
                 <Label>What type of business?</Label>
                 <div className="grid grid-cols-3 gap-2">
                   {([
-                    { value: "product" as const, label: "Products", icon: Package, emoji: "📦" },
-                    { value: "service" as const, label: "Services", icon: Wrench, emoji: "🔧" },
-                    { value: "both" as const, label: "Both", icon: Package, emoji: "📦🔧" },
+                    { value: "product" as const, label: "Products", emoji: "📦" },
+                    { value: "service" as const, label: "Services", emoji: "🔧" },
+                    { value: "both" as const, label: "Both", emoji: "📦🔧" },
                   ]).map((t) => (
                     <button
                       key={t.value}
@@ -501,10 +364,7 @@ const Signup = () => {
                 <Button variant="outline" onClick={() => setStep(1)} className="gap-1">
                   <ArrowLeft className="h-4 w-4" /> Back
                 </Button>
-                <Button
-                  className="flex-1 gap-2"
-                  onClick={() => validateStep2() && setStep(3)}
-                >
+                <Button className="flex-1 gap-2" onClick={() => validateStep2() && setStep(3)}>
                   Next <ArrowRight className="h-4 w-4" />
                 </Button>
               </div>
@@ -521,16 +381,16 @@ const Signup = () => {
                 Connect WhatsApp
               </h2>
               <p className="text-sm text-muted-foreground mt-1">
-                This is where your orders will be sent. Make sure this number is correct.
+                This is where your orders will be sent
               </p>
             </div>
             <div className="space-y-4">
               <div className="rounded-lg bg-primary/5 border border-primary/10 p-3 text-sm text-muted-foreground">
-                💡 This can be different from your login. For example, you might sign in with email but receive orders on your Ugandan WhatsApp number.
+                💡 You can also skip this and add it later in settings.
               </div>
 
               <div className="space-y-1.5">
-                <Label htmlFor="whatsapp">WhatsApp number</Label>
+                <Label htmlFor="whatsapp">WhatsApp number <span className="text-muted-foreground font-normal">(optional)</span></Label>
                 <div className="flex gap-2">
                   <Select value={whatsappCountryCode} onValueChange={setWhatsappCountryCode}>
                     <SelectTrigger className="w-[130px]">
@@ -559,11 +419,7 @@ const Signup = () => {
                 <Button variant="outline" onClick={() => setStep(2)} className="gap-1">
                   <ArrowLeft className="h-4 w-4" /> Back
                 </Button>
-                <Button
-                  className="flex-1 gap-2"
-                  onClick={handleSubmit}
-                  disabled={loading}
-                >
+                <Button className="flex-1 gap-2" onClick={handleSubmit} disabled={loading}>
                   {loading ? "Creating your store..." : "Create My Store 🎉"}
                 </Button>
               </div>
