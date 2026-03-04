@@ -45,6 +45,7 @@ const Explore = () => {
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [selectedCountry, setSelectedCountry] = useState("All");
+  const [selectedLocation, setSelectedLocation] = useState("All");
 
   useEffect(() => {
     const fetchStores = async () => {
@@ -60,6 +61,17 @@ const Explore = () => {
     fetchStores();
   }, []);
 
+  // Build dynamic location options from stores matching the selected country
+  const locationOptions = useMemo(() => {
+    const locs = new Set<string>();
+    stores.forEach((s) => {
+      if (selectedCountry !== "All" && s.country !== selectedCountry) return;
+      if (s.city) locs.add(s.city);
+      if (s.district) locs.add(s.district);
+    });
+    return ["All", ...Array.from(locs).sort()];
+  }, [stores, selectedCountry]);
+
   const filtered = useMemo(() => {
     return stores.filter((s) => {
       const q = search.trim().toLowerCase().replace(/^@/, "");
@@ -69,17 +81,22 @@ const Explore = () => {
         s.store_slug?.toLowerCase().includes(q) ||
         s.category?.toLowerCase().includes(q) ||
         s.country?.toLowerCase().includes(q) ||
-        s.city?.toLowerCase().includes(q);
+        s.city?.toLowerCase().includes(q) ||
+        s.district?.toLowerCase().includes(q);
       const matchesCategory =
         selectedCategory === "All" ||
         (s.category && s.category.toLowerCase().includes(selectedCategory.toLowerCase()));
       const matchesCountry =
         selectedCountry === "All" || s.country === selectedCountry;
-      return matchesSearch && matchesCategory && matchesCountry;
+      const matchesLocation =
+        selectedLocation === "All" ||
+        s.city === selectedLocation ||
+        s.district === selectedLocation;
+      return matchesSearch && matchesCategory && matchesCountry && matchesLocation;
     });
-  }, [stores, search, selectedCategory, selectedCountry]);
+  }, [stores, search, selectedCategory, selectedCountry, selectedLocation]);
 
-  const hasFilters = selectedCategory !== "All" || selectedCountry !== "All" || search.trim();
+  const hasFilters = selectedCategory !== "All" || selectedCountry !== "All" || selectedLocation !== "All" || search.trim();
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -139,7 +156,7 @@ const Explore = () => {
               {COUNTRIES.map((c) => (
                 <button
                   key={c}
-                  onClick={() => setSelectedCountry(c)}
+                  onClick={() => { setSelectedCountry(c); setSelectedLocation("All"); }}
                   className={`flex items-center gap-1 whitespace-nowrap rounded-full border px-3 py-1.5 text-sm font-medium transition-colors ${
                     selectedCountry === c
                       ? "border-primary bg-primary/10 text-primary"
@@ -150,6 +167,24 @@ const Explore = () => {
                 </button>
               ))}
             </div>
+            {/* City / District */}
+            {locationOptions.length > 1 && (
+              <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+                {locationOptions.map((loc) => (
+                  <button
+                    key={loc}
+                    onClick={() => setSelectedLocation(loc)}
+                    className={`flex items-center gap-1 whitespace-nowrap rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
+                      selectedLocation === loc
+                        ? "border-primary bg-primary/10 text-primary"
+                        : "border-border text-muted-foreground hover:border-primary/30"
+                    }`}
+                  >
+                    {loc !== "All" && <MapPin className="h-2.5 w-2.5" />} {loc}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         </section>
 
@@ -166,7 +201,7 @@ const Explore = () => {
               </p>
               {hasFilters && (
                 <button
-                  onClick={() => { setSearch(""); setSelectedCategory("All"); setSelectedCountry("All"); }}
+                  onClick={() => { setSearch(""); setSelectedCategory("All"); setSelectedCountry("All"); setSelectedLocation("All"); }}
                   className="text-sm text-primary font-medium hover:underline"
                 >
                   Clear all filters
