@@ -15,7 +15,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Plus, Pencil, Trash2, ImageIcon, Package, Sparkles, Loader2, Wrench, X } from "lucide-react";
+import { Plus, Pencil, Trash2, ImageIcon, Package, Sparkles, Loader2, Wrench, X, Star } from "lucide-react";
 import { toast } from "sonner";
 import { formatPrice } from "@/lib/currency";
 import { Badge } from "@/components/ui/badge";
@@ -258,6 +258,27 @@ const DashboardProducts = () => {
     }
   };
 
+  const toggleFeatured = async (product: Product) => {
+    const isFeatured = (product as any).is_featured;
+    if (!isFeatured) {
+      const featuredCount = products.filter((p) => (p as any).is_featured).length;
+      if (featuredCount >= 6) {
+        toast.error("Maximum 6 featured listings");
+        return;
+      }
+    }
+    const { error } = await supabase
+      .from("products")
+      .update({ is_featured: !isFeatured } as any)
+      .eq("id", product.id);
+    if (error) {
+      toast.error("Failed to update");
+    } else {
+      toast.success(isFeatured ? "Removed from featured" : "Added to featured ⭐");
+      fetchProducts();
+    }
+  };
+
   if (loading) {
     return <div className="animate-pulse text-muted-foreground py-12 text-center">Loading listings…</div>;
   }
@@ -426,6 +447,15 @@ const DashboardProducts = () => {
                 <div className="relative aspect-square bg-muted">
                   <ProductImageCarousel images={imgs} alt={product.name} listingType={(product as any).listing_type} />
                   <div className="absolute inset-0 flex items-start justify-end gap-1 p-2 opacity-0 transition-opacity group-hover:opacity-100">
+                    <Button
+                      size="icon"
+                      variant={(product as any).is_featured ? "default" : "secondary"}
+                      className="h-8 w-8"
+                      onClick={() => toggleFeatured(product)}
+                      title={`${(product as any).is_featured ? "Remove from" : "Add to"} featured`}
+                    >
+                      <Star className={`h-3.5 w-3.5 ${(product as any).is_featured ? "fill-current" : ""}`} />
+                    </Button>
                     <Button size="icon" variant="secondary" className="h-8 w-8" onClick={() => openEdit(product)}>
                       <Pencil className="h-3.5 w-3.5" />
                     </Button>
@@ -435,6 +465,11 @@ const DashboardProducts = () => {
                   </div>
                   {/* Badges */}
                   <div className="absolute top-1.5 left-1.5 flex flex-col gap-1">
+                    {(product as any).is_featured && (
+                      <Badge className="text-[10px] px-1.5 py-0 bg-primary text-primary-foreground">
+                        <Star className="h-2.5 w-2.5 mr-0.5 fill-current" /> Featured
+                      </Badge>
+                    )}
                     {(product as any).listing_type === "service" && (
                       <Badge variant="secondary" className="text-[10px] px-1.5 py-0">Service</Badge>
                     )}
