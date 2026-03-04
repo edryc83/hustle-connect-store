@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Loader2, Check, Palette, ArrowRight } from "lucide-react";
-import { PolotnoEditor } from "@/components/dashboard/PolotnoEditor";
+import { FabricEditor } from "@/components/dashboard/FabricEditor";
 
 /* ───────── Types ───────── */
 
