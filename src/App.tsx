@@ -21,6 +21,7 @@ import AdminOrders from "./pages/admin/AdminOrders";
 import AdminAnalyticsPage from "./pages/admin/AdminAnalytics";
 import Storefront from "./pages/Storefront";
 import Explore from "./pages/Explore";
+import ResetPassword from "./pages/ResetPassword";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -37,6 +38,7 @@ const App = () => (
               <Route path="/" element={<Index />} />
               <Route path="/signup" element={<Signup />} />
               <Route path="/login" element={<Login />} />
+              <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/dashboard" element={<DashboardLayout><DashboardOverview /></DashboardLayout>} />
               <Route path="/dashboard/products" element={<DashboardLayout><DashboardProducts /></DashboardLayout>} />
               <Route path="/dashboard/settings" element={<DashboardLayout><DashboardSettings /></DashboardLayout>} />
