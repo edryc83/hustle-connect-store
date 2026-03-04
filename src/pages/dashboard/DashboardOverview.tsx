@@ -142,6 +142,23 @@ const DashboardOverview = () => {
       {/* Daily selling tip */}
       <DailySellingTip />
 
+      {/* Install app banner — hidden once installed */}
+      {!isInstalled && (
+        <Link
+          to="/dashboard/settings#install-app"
+          className="flex items-center gap-3 rounded-2xl border border-border/50 bg-card/60 backdrop-blur-xl p-4 shadow-sm hover:bg-muted/40 transition-colors"
+        >
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
+            <Download className="h-5 w-5 text-primary" />
+          </div>
+          <div className="flex-1">
+            <p className="text-sm font-semibold">Install Afristall App</p>
+            <p className="text-xs text-muted-foreground">Add to home screen for quick access</p>
+          </div>
+          <span className="text-xs text-primary font-medium">How →</span>
+        </Link>
+      )}
+
       {/* Onboarding banner */}
       {productCount === 0 && !bannerDismissed && (
         <div className="relative rounded-2xl border border-border/50 bg-card/60 backdrop-blur-xl p-5 shadow-sm border-l-4 border-l-primary">
