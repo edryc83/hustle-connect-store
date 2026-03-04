@@ -30,9 +30,10 @@ interface StorefrontFiltersProps {
   onChange: (f: FilterState) => void;
   totalCount: number;
   filteredCount: number;
+  products?: any[]; // pass store products to derive available categories
 }
 
-export function StorefrontFilters({ filters, onChange, totalCount, filteredCount }: StorefrontFiltersProps) {
+export function StorefrontFilters({ filters, onChange, totalCount, filteredCount, products = [] }: StorefrontFiltersProps) {
   const [showFilters, setShowFilters] = useState(false);
 
   const hasActiveFilters = filters.category || filters.condition || filters.priceRange;
@@ -42,8 +43,25 @@ export function StorefrontFilters({ filters, onChange, totalCount, filteredCount
 
   const clearAll = () => onChange({ search: "", category: "", condition: "", priceRange: null });
 
-  // Derive categories that actually exist in products (we show all for discoverability)
-  const categories = [{ value: "", label: "All", emoji: "" }, ...PRODUCT_CATEGORIES.map((c) => ({ value: c.value, label: c.label, emoji: c.emoji }))];
+  // Only show categories that exist in this store's products
+  const storeCategories = new Set(
+    products
+      .map((p) => (p.attributes as Record<string, any> | null)?.product_type)
+      .filter(Boolean)
+  );
+  const categories = [
+    { value: "", label: "All", emoji: "" },
+    ...PRODUCT_CATEGORIES.filter((c) => storeCategories.has(c.value)).map((c) => ({ value: c.value, label: c.label, emoji: c.emoji })),
+  ];
+
+  // Only show conditions that exist in this store's products
+  const storeConditions = new Set(
+    products
+      .map((p) => p.condition || (p.attributes as Record<string, any> | null)?.condition)
+      .filter(Boolean)
+      .map((c: string) => c.toLowerCase())
+  );
+  const availableConditions = CONDITIONS.filter((c) => !c.value || storeConditions.has(c.value));
 
   return (
     <div className="space-y-3">
@@ -88,13 +106,14 @@ export function StorefrontFilters({ filters, onChange, totalCount, filteredCount
       {showFilters && (
         <div className="rounded-2xl border border-border/60 bg-card p-4 space-y-4 animate-in fade-in slide-in-from-top-2 duration-200">
           {/* Category pills */}
+          {categories.length > 1 && (
           <div className="space-y-1.5">
             <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Category</p>
             <div className="flex flex-wrap gap-1.5">
               {categories.map((cat) => (
                 <button
                   key={cat.value}
-                  onClick={() => update({ category: cat.value })}
+                  onClick={() => update({ category: filters.category === cat.value ? "" : cat.value })}
                   className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
                     filters.category === cat.value
                       ? "border-primary bg-primary/10 text-primary"
@@ -106,6 +125,7 @@ export function StorefrontFilters({ filters, onChange, totalCount, filteredCount
               ))}
             </div>
           </div>
+          )}
 
           {/* Price range pills */}
           <div className="space-y-1.5">
@@ -117,7 +137,7 @@ export function StorefrontFilters({ filters, onChange, totalCount, filteredCount
                 return (
                   <button
                     key={i}
-                    onClick={() => update({ priceRange: pr.range })}
+                    onClick={() => update({ priceRange: isActive ? null : pr.range })}
                     className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
                       isActive
                         ? "border-primary bg-primary/10 text-primary"
@@ -131,14 +151,15 @@ export function StorefrontFilters({ filters, onChange, totalCount, filteredCount
             </div>
           </div>
 
-          {/* Condition pills */}
+          {/* Condition pills — only if store has multiple conditions */}
+          {availableConditions.length > 1 && (
           <div className="space-y-1.5">
             <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Condition</p>
             <div className="flex flex-wrap gap-1.5">
-              {CONDITIONS.map((c) => (
+              {availableConditions.map((c) => (
                 <button
                   key={c.value}
-                  onClick={() => update({ condition: c.value })}
+                  onClick={() => update({ condition: filters.condition === c.value ? "" : c.value })}
                   className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
                     filters.condition === c.value
                       ? "border-primary bg-primary/10 text-primary"
@@ -150,6 +171,7 @@ export function StorefrontFilters({ filters, onChange, totalCount, filteredCount
               ))}
             </div>
           </div>
+          )}
 
           {/* Clear + result count */}
           <div className="flex items-center justify-between pt-1">
