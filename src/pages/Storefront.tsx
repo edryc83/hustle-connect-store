@@ -1,7 +1,14 @@
 import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Store, MapPin, ImageIcon, ShoppingBag } from "lucide-react";
+import { Store, MapPin, ImageIcon, ShoppingBag, Share2, Copy, Check } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { toast } from "sonner";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { OrderModal } from "@/components/storefront/OrderModal";
@@ -9,6 +16,56 @@ import type { Tables } from "@/integrations/supabase/types";
 
 type Product = Tables<"products">;
 type Profile = Tables<"profiles">;
+
+function ShareButton({ storeName, storeSlug }: { storeName: string; storeSlug: string }) {
+  const [copied, setCopied] = useState(false);
+  const storeUrl = `${window.location.origin}/${storeSlug}`;
+  const shareText = `Check out ${storeName} on AfroDuka!`;
+
+  const copyLink = async () => {
+    await navigator.clipboard.writeText(storeUrl);
+    setCopied(true);
+    toast.success("Link copied!");
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const shareNative = () => {
+    if (navigator.share) {
+      navigator.share({ title: storeName, text: shareText, url: storeUrl });
+    } else {
+      copyLink();
+    }
+  };
+
+  const shareWhatsApp = () => window.open(`https://wa.me/?text=${encodeURIComponent(`${shareText}\n${storeUrl}`)}`, "_blank");
+  const shareFacebook = () => window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(storeUrl)}`, "_blank");
+  const shareTwitter = () => window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(storeUrl)}`, "_blank");
+
+  return (
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="outline" size="icon" className="shrink-0">
+          <Share2 className="h-4 w-4" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-48">
+        <DropdownMenuItem onClick={copyLink} className="gap-2">
+          {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+          Copy link
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={shareWhatsApp} className="gap-2">
+          <span className="text-base leading-none">💬</span> WhatsApp
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={shareFacebook} className="gap-2">
+          <span className="text-base leading-none">📘</span> Facebook
+        </DropdownMenuItem>
+        <DropdownMenuItem onClick={shareTwitter} className="gap-2">
+          <span className="text-base leading-none">𝕏</span> Twitter / X
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
+  );
+}
 
 const Storefront = () => {
   const { storeSlug } = useParams<{ storeSlug: string }>();
@@ -79,6 +136,7 @@ const Storefront = () => {
       {/* Header */}
       <header className="bg-background border-b">
         <div className="mx-auto max-w-5xl px-4 py-6 sm:py-8">
+        <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             {profile.profile_picture_url ? (
               <img
@@ -107,6 +165,9 @@ const Storefront = () => {
               </div>
             </div>
           </div>
+
+          <ShareButton storeName={profile.store_name ?? "Store"} storeSlug={storeSlug ?? ""} />
+        </div>
         </div>
       </header>
 
