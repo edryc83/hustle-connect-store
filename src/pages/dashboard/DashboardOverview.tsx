@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import AfristallLogo from "@/components/AfristallLogo";
 import { toast } from "sonner";
-import { ShareCardModal } from "@/components/dashboard/ShareCardModal";
+
 
 function getGreeting(): { text: string; emoji: string } {
   const hour = new Date().getHours();
@@ -252,16 +252,6 @@ const DashboardOverview = () => {
         </Button>
       </div>
 
-      {/* WhatsApp Status Card Modal */}
-      <ShareCardModal
-        open={shareModalOpen}
-        onOpenChange={setShareModalOpen}
-        storeName={storeName}
-        storeSlug={storeSlug}
-        profilePicUrl={profilePicUrl}
-        category={category}
-        products={products}
-      />
     </div>
   );
 };
