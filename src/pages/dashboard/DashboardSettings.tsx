@@ -264,6 +264,18 @@ const DashboardSettings = () => {
           </div>
 
           <div className="space-y-1.5">
+            <Label>Welcome Message</Label>
+            <Textarea
+              value={welcomeMessage}
+              onChange={(e) => setWelcomeMessage(e.target.value)}
+              placeholder="e.g. Thanks for stopping by! Browse around and hit me up on WhatsApp to order 🧡"
+              rows={2}
+              maxLength={200}
+            />
+            <p className="text-xs text-muted-foreground">{welcomeMessage.length}/200 — greeting visitors see when they open your store</p>
+          </div>
+
+          <div className="space-y-1.5">
             <Label>WhatsApp Number</Label>
             <Input value={whatsappNumber} onChange={(e) => setWhatsappNumber(e.target.value)} />
           </div>
