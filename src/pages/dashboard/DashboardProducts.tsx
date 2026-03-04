@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/dialog";
 import { Plus, Pencil, Trash2, ImageIcon, Package } from "lucide-react";
 import { toast } from "sonner";
+import { formatPrice } from "@/lib/currency";
 import type { Tables } from "@/integrations/supabase/types";
 
 type Product = Tables<"products">;
@@ -28,6 +29,7 @@ const DashboardProducts = () => {
   const [dialogOpen, setDialogOpen] = useState(searchParams.get("add") === "true");
   const [saving, setSaving] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [currency, setCurrency] = useState("UGX");
 
   // Form state
   const [name, setName] = useState("");
@@ -39,12 +41,12 @@ const DashboardProducts = () => {
 
   const fetchProducts = async () => {
     if (!user) return;
-    const { data } = await supabase
-      .from("products")
-      .select("*")
-      .eq("user_id", user.id)
-      .order("created_at", { ascending: false });
+    const [{ data }, { data: profile }] = await Promise.all([
+      supabase.from("products").select("*").eq("user_id", user.id).order("created_at", { ascending: false }),
+      supabase.from("profiles").select("currency").eq("id", user.id).single(),
+    ]);
     setProducts(data ?? []);
+    setCurrency((profile as any)?.currency ?? "UGX");
     setLoading(false);
   };
 
@@ -92,7 +94,8 @@ const DashboardProducts = () => {
   const handleSave = async () => {
     if (!user) return;
     if (!name.trim()) { toast.error("Product name is required"); return; }
-    if (!price || isNaN(Number(price)) || Number(price) <= 0) { toast.error("Enter a valid price"); return; }
+    const numericPrice = Number(price.replace(/,/g, ""));
+    if (!price || isNaN(numericPrice) || numericPrice <= 0) { toast.error("Enter a valid price"); return; }
 
     setSaving(true);
     try {
@@ -115,7 +118,7 @@ const DashboardProducts = () => {
           .from("products")
           .update({
             name: name.trim(),
-            price: Number(price),
+            price: numericPrice,
             description: description.trim() || null,
             variants_text: variantsText.trim() || null,
             image_url: imageUrl,
@@ -127,7 +130,7 @@ const DashboardProducts = () => {
         const { error } = await supabase.from("products").insert({
           user_id: user.id,
           name: name.trim(),
-          price: Number(price),
+          price: numericPrice,
           description: description.trim() || null,
           variants_text: variantsText.trim() || null,
           image_url: imageUrl,
@@ -188,8 +191,8 @@ const DashboardProducts = () => {
                 <Input id="productName" placeholder="e.g. Rolex wrap" value={name} onChange={(e) => setName(e.target.value)} maxLength={100} />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="productPrice">Price (UGX)</Label>
-                <Input id="productPrice" type="number" placeholder="5000" value={price} onChange={(e) => setPrice(e.target.value)} min="0" />
+                <Label htmlFor="productPrice">Price ({currency})</Label>
+                <Input id="productPrice" placeholder="5,000" value={price} onChange={(e) => setPrice(e.target.value)} />
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="productDesc">Description</Label>
@@ -259,7 +262,7 @@ const DashboardProducts = () => {
               </div>
               <CardContent className="p-3">
                 <p className="font-medium text-sm truncate">{product.name}</p>
-                <p className="text-primary font-bold text-sm">UGX {Number(product.price).toLocaleString()}</p>
+                <p className="text-primary font-bold text-sm">{formatPrice(Number(product.price), currency)}</p>
                 {product.variants_text && (
                   <p className="text-xs text-muted-foreground truncate mt-0.5">{product.variants_text}</p>
                 )}
