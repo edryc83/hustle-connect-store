@@ -145,6 +145,9 @@ const DashboardShareCard = () => {
     setSubtitle(selectedTemplate.defaultSubtitle);
     setBgColor("#000000");
     setTintFilter("normal");
+    // Use the template's preview image as the default so the canvas matches the thumbnail
+    setCustomUploadedImage(selectedTemplate.previewImage);
+    setSelectedProductImage(null);
     setStep("edit");
   };
 
