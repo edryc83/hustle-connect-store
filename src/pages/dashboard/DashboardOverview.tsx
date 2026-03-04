@@ -3,13 +3,11 @@ import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-
 import {
-  Package, CalendarDays, Copy, Share2, X, Plus, Download,
+  Package, Copy, Share2, X, Plus, Download, Eye, ShoppingCart, TrendingUp,
 } from "lucide-react";
 import AfristallLogo from "@/components/AfristallLogo";
 import { toast } from "sonner";
-import DailySellingTip from "@/components/dashboard/DailySellingTip";
 import CaptionGenerator from "@/components/dashboard/CaptionGenerator";
 import { useInstallPrompt } from "@/hooks/useInstallPrompt";
 
@@ -21,18 +19,12 @@ function getGreeting(): { text: string; emoji: string } {
   return { text: "Hey night owl,", emoji: "🌙" };
 }
 
-function getFormattedDate() {
-  const now = new Date();
-  const day = now.toLocaleDateString("en-US", { weekday: "long" });
-  const date = now.getDate();
-  const month = now.toLocaleDateString("en-US", { month: "long" });
-  return { day, date, month };
-}
-
 const DashboardOverview = () => {
   const { user } = useAuth();
   const { canInstall, isInstalled, promptInstall } = useInstallPrompt();
   const [productCount, setProductCount] = useState(0);
+  const [viewCount, setViewCount] = useState(0);
+  const [orderCount, setOrderCount] = useState(0);
   const [firstName, setFirstName] = useState("");
   const [storeSlug, setStoreSlug] = useState("");
   const [storeName, setStoreName] = useState("");
@@ -47,11 +39,13 @@ const DashboardOverview = () => {
     if (!user) return;
 
     const fetchData = async () => {
-      const [{ count }, { data: profile }] = await Promise.all([
+      const [{ count }, { data: profile }, { count: orders }] = await Promise.all([
         supabase.from("products").select("*", { count: "exact", head: true }).eq("user_id", user.id),
-        supabase.from("profiles").select("store_name, store_slug, first_name, profile_picture_url, category").eq("id", user.id).single(),
+        supabase.from("profiles").select("store_name, store_slug, first_name, profile_picture_url, category, view_count").eq("id", user.id).single(),
+        supabase.from("orders").select("*", { count: "exact", head: true }).eq("seller_id", user.id).eq("status", "confirmed"),
       ]);
       setProductCount(count ?? 0);
+      setOrderCount(orders ?? 0);
       const p = profile as any;
       const name = p?.first_name || p?.store_name || user.email?.split("@")[0]?.split(/[._]/)[0] || "";
       setFirstName(name.charAt(0).toUpperCase() + name.slice(1));
@@ -59,13 +53,13 @@ const DashboardOverview = () => {
       setStoreName(p?.store_name ?? "");
       setProfilePicUrl(p?.profile_picture_url ?? "");
       setCategory(p?.category ?? "");
+      setViewCount(p?.view_count ?? 0);
     };
 
     fetchData();
   }, [user]);
 
   const greeting = getGreeting();
-  const { day, date, month } = getFormattedDate();
 
   const storeUrl = `${window.location.origin}/${storeSlug}`;
   const ogProxyUrl = storeSlug
@@ -97,41 +91,92 @@ const DashboardOverview = () => {
     }
   };
 
-
   return (
-    <div className="space-y-6">
-      {/* Date header */}
-      <div className="flex items-center gap-2 text-muted-foreground">
-        <CalendarDays className="h-4 w-4" />
-        <span className="text-sm font-medium">
-          {day} {date} <span className="text-primary">•</span> {month}
-        </span>
-      </div>
-
-      {/* Greeting with profile pic */}
-      <div className="flex items-center gap-4">
-        <div className="relative shrink-0">
-          <div className="rounded-2xl p-[3px] bg-gradient-to-br from-primary/40 to-primary/10 backdrop-blur-xl shadow-lg shadow-primary/10">
+    <div className="space-y-5">
+      {/* Greeting */}
+      <div className="flex items-center gap-3.5">
+        <div className="shrink-0">
+          <div className="rounded-2xl p-[2px] bg-gradient-to-br from-primary/40 to-primary/10">
             {profilePicUrl ? (
-              <img src={profilePicUrl} alt="Profile" className="h-16 w-16 rounded-2xl object-cover border-2 border-background/50" />
+              <img src={profilePicUrl} alt="Profile" className="h-14 w-14 rounded-2xl object-cover border-2 border-background/50" />
             ) : (
-              <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-card/80 backdrop-blur-sm border-2 border-background/50">
-                <AfristallLogo className="h-8 w-8" />
+              <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-card/80 border-2 border-background/50">
+                <AfristallLogo className="h-7 w-7" />
               </div>
             )}
           </div>
         </div>
-        <div>
-          <h1 className="text-2xl font-bold leading-tight">
-            {greeting.text} {firstName || "there"}! {greeting.emoji}
-          </h1>
+        <div className="min-w-0">
+          <p className="text-sm text-muted-foreground">{greeting.text}</p>
+          <h1 className="text-xl font-bold truncate">{firstName || "there"} {greeting.emoji}</h1>
         </div>
       </div>
 
-      {/* Daily selling tip */}
-      <DailySellingTip />
+      {/* Stat Cards — glassmorphism grid */}
+      <div className="grid grid-cols-2 gap-3">
+        {/* Products */}
+        <Link
+          to="/dashboard/products"
+          className="rounded-2xl border border-border/40 bg-card/40 backdrop-blur-xl p-4 shadow-sm hover:bg-card/60 transition-all group"
+        >
+          <div className="flex items-center justify-between mb-3">
+            <div className="h-10 w-10 rounded-xl bg-primary/10 flex items-center justify-center">
+              <span className="text-lg">📦</span>
+            </div>
+            <TrendingUp className="h-3.5 w-3.5 text-muted-foreground/50 group-hover:text-primary transition-colors" />
+          </div>
+          <p className="text-2xl font-bold">{productCount}</p>
+          <p className="text-xs text-muted-foreground mt-0.5">Products</p>
+        </Link>
 
-      {/* Install app banner — hidden once installed */}
+        {/* Store Views */}
+        <Link
+          to="/dashboard/analytics"
+          className="rounded-2xl border border-border/40 bg-card/40 backdrop-blur-xl p-4 shadow-sm hover:bg-card/60 transition-all group"
+        >
+          <div className="flex items-center justify-between mb-3">
+            <div className="h-10 w-10 rounded-xl bg-blue-500/10 flex items-center justify-center">
+              <Eye className="h-5 w-5 text-blue-500" />
+            </div>
+            <TrendingUp className="h-3.5 w-3.5 text-muted-foreground/50 group-hover:text-blue-500 transition-colors" />
+          </div>
+          <p className="text-2xl font-bold">{viewCount}</p>
+          <p className="text-xs text-muted-foreground mt-0.5">Store Views</p>
+        </Link>
+
+        {/* Confirmed Sales */}
+        <Link
+          to="/dashboard/orders"
+          className="col-span-2 rounded-2xl border border-border/40 bg-card/40 backdrop-blur-xl p-4 shadow-sm hover:bg-card/60 transition-all group"
+        >
+          <div className="flex items-center gap-4">
+            <div className="h-12 w-12 rounded-xl bg-green-500/10 flex items-center justify-center">
+              <ShoppingCart className="h-6 w-6 text-green-500" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-2xl font-bold">{orderCount}</p>
+              <p className="text-xs text-muted-foreground">Confirmed Sales</p>
+            </div>
+            <TrendingUp className="h-4 w-4 text-muted-foreground/50 group-hover:text-green-500 transition-colors" />
+          </div>
+        </Link>
+      </div>
+
+      {/* Quick Actions */}
+      <div className="flex gap-2.5">
+        <Button asChild className="flex-1 rounded-xl h-11 gap-2">
+          <Link to="/dashboard/products?add=true">
+            <Plus className="h-4 w-4" /> Add Listing
+          </Link>
+        </Button>
+        <Button asChild variant="outline" className="flex-1 rounded-xl h-11 gap-2 border-border/40 bg-card/40 backdrop-blur-xl">
+          <Link to="/dashboard/products">
+            <Package className="h-4 w-4" /> My Products
+          </Link>
+        </Button>
+      </div>
+
+      {/* Install app banner */}
       {!isInstalled && (
         <button
           onClick={async () => {
@@ -141,15 +186,15 @@ const DashboardOverview = () => {
               window.location.href = "/dashboard/settings#install-app";
             }
           }}
-          className="flex w-full items-center gap-3 rounded-2xl border border-border/50 bg-card/60 backdrop-blur-xl p-4 shadow-sm hover:bg-muted/40 transition-colors text-left"
+          className="flex w-full items-center gap-3 rounded-2xl border border-border/40 bg-card/40 backdrop-blur-xl p-4 shadow-sm hover:bg-card/60 transition-colors text-left"
         >
           <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
             <Download className="h-5 w-5 text-primary" />
           </div>
           <div className="flex-1">
-            <p className="text-sm font-semibold">Install Afristall App</p>
+            <p className="text-sm font-semibold">Install App</p>
             <p className="text-xs text-muted-foreground">
-              {canInstall ? "Tap to install now" : "Add to home screen for quick access"}
+              {canInstall ? "Tap to install now" : "Add to home screen"}
             </p>
           </div>
           <span className="text-xs text-primary font-medium">{canInstall ? "Install" : "How →"}</span>
@@ -158,20 +203,20 @@ const DashboardOverview = () => {
 
       {/* Onboarding banner */}
       {productCount === 0 && !bannerDismissed && (
-        <div className="relative rounded-2xl border border-border/50 bg-card/60 backdrop-blur-xl p-5 shadow-sm border-l-4 border-l-primary">
+        <div className="relative rounded-2xl border border-border/40 bg-card/40 backdrop-blur-xl p-4 shadow-sm border-l-4 border-l-primary">
           <button onClick={dismissBanner} className="absolute top-3 right-3 text-muted-foreground hover:text-foreground">
             <X className="h-4 w-4" />
           </button>
           <div className="flex items-start gap-3">
             <span className="text-2xl">🚀</span>
             <div>
-              <h3 className="font-semibold">You're almost ready to sell</h3>
-              <p className="text-sm text-muted-foreground mt-1">
-                Add your first product then share your store link on WhatsApp status — that's all it takes to get your first order.
+              <h3 className="font-semibold text-sm">Ready to sell?</h3>
+              <p className="text-xs text-muted-foreground mt-1">
+                Add your first product & share on WhatsApp status.
               </p>
-              <Button asChild className="mt-3 rounded-xl gap-2" size="sm">
+              <Button asChild className="mt-2.5 rounded-xl gap-2" size="sm">
                 <Link to="/dashboard/products?add=true">
-                  <Plus className="h-4 w-4" /> Add Your First Product
+                  <Plus className="h-3.5 w-3.5" /> Add Product
                 </Link>
               </Button>
             </div>
@@ -179,14 +224,14 @@ const DashboardOverview = () => {
         </div>
       )}
 
-      {/* Share section — compact link with copy + share icons */}
+      {/* Share bar */}
       {storeSlug && (
-        <div className="flex items-center gap-2 rounded-full bg-muted/50 border border-border/50 px-4 py-2.5">
-          <span className="text-sm font-medium truncate flex-1">afristall.com/{storeSlug}</span>
-          <button onClick={copyLink} className="text-muted-foreground hover:text-foreground shrink-0 p-1" title="Copy link">
+        <div className="flex items-center gap-2 rounded-2xl bg-card/40 backdrop-blur-xl border border-border/40 px-4 py-3">
+          <span className="text-sm font-medium truncate flex-1 text-muted-foreground">afristall.com/{storeSlug}</span>
+          <button onClick={copyLink} className="text-muted-foreground hover:text-foreground shrink-0 p-1.5 rounded-lg hover:bg-muted/50 transition-colors" title="Copy link">
             <Copy className="h-4 w-4" />
           </button>
-          <button onClick={shareStore} className="text-muted-foreground hover:text-primary shrink-0 p-1" title="Share store">
+          <button onClick={shareStore} className="text-muted-foreground hover:text-primary shrink-0 p-1.5 rounded-lg hover:bg-muted/50 transition-colors" title="Share store">
             <Share2 className="h-4 w-4" />
           </button>
         </div>
@@ -199,20 +244,6 @@ const DashboardOverview = () => {
         category={category}
         productCount={productCount}
       />
-
-
-      <div className="flex gap-3">
-        <Button asChild className="rounded-xl">
-          <Link to="/dashboard/products" className="gap-2">
-            <Package className="h-4 w-4" /> View Listings
-          </Link>
-        </Button>
-        <Button asChild variant="outline" className="rounded-xl border-border/50 bg-card/60 backdrop-blur-sm">
-          <Link to="/dashboard/products?add=true" className="gap-2">
-            <Plus className="h-4 w-4" /> Add Listing
-          </Link>
-        </Button>
-      </div>
     </div>
   );
 };
