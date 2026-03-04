@@ -1,11 +1,11 @@
-import { LayoutDashboard, Package, Settings, ClipboardList, BarChart3 } from "lucide-react";
+import { LayoutDashboard, Package, Settings, ClipboardList, Palette } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 
 const navItems = [
   { title: "Overview", url: "/dashboard", icon: LayoutDashboard },
   { title: "Listings", url: "/dashboard/products", icon: Package },
   { title: "Orders", url: "/dashboard/orders", icon: ClipboardList },
-  { title: "Analytics", url: "/dashboard/analytics", icon: BarChart3 },
+  { title: "Design", url: "/dashboard/share", icon: Palette },
   { title: "Settings", url: "/dashboard/settings", icon: Settings },
 ];
 
