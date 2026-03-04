@@ -63,6 +63,23 @@ export default function AdminSellers() {
 
   useEffect(() => { fetchSellers(); }, []);
 
+  const handleDelete = async () => {
+    if (!deleteTarget || !user) return;
+    setDeleting(true);
+    const { error } = await (supabase.rpc as any)("admin_delete_seller", {
+      _admin_id: user.id,
+      _seller_id: deleteTarget.id,
+    });
+    setDeleting(false);
+    setDeleteTarget(null);
+    if (error) {
+      toast.error("Failed to delete seller");
+    } else {
+      toast.success("Seller deleted successfully");
+      fetchSellers();
+    }
+  };
+
   const filtered = sellers.filter((s) => {
     const q = search.toLowerCase();
     return !q ||
