@@ -160,9 +160,12 @@ export type Database = {
           business_type: string | null
           category: string | null
           city: string | null
+          country: string | null
+          cover_photo_url: string | null
           created_at: string
           currency: string | null
           delivery_areas: string | null
+          district: string | null
           email: string | null
           first_name: string | null
           id: string
@@ -180,9 +183,12 @@ export type Database = {
           business_type?: string | null
           category?: string | null
           city?: string | null
+          country?: string | null
+          cover_photo_url?: string | null
           created_at?: string
           currency?: string | null
           delivery_areas?: string | null
+          district?: string | null
           email?: string | null
           first_name?: string | null
           id: string
@@ -200,9 +206,12 @@ export type Database = {
           business_type?: string | null
           category?: string | null
           city?: string | null
+          country?: string | null
+          cover_photo_url?: string | null
           created_at?: string
           currency?: string | null
           delivery_areas?: string | null
+          district?: string | null
           email?: string | null
           first_name?: string | null
           id?: string
