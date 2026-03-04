@@ -116,7 +116,7 @@ const DashboardShareCard = () => {
   const categories = [...new Set(TEMPLATES.map(t => t.category))];
 
   return (
-    <div className="space-y-6 pb-24 md:pb-6">
+    <div className="space-y-6 pb-24 md:pb-6 max-w-4xl">
       <div>
         <h1 className="text-2xl font-bold flex items-center gap-2">
           <Palette className="h-6 w-6 text-primary" /> Design Studio
@@ -132,12 +132,12 @@ const DashboardShareCard = () => {
       {categories.map((cat) => (
         <div key={cat}>
           <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">{cat}</h2>
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
             {TEMPLATES.filter(t => t.category === cat).map((t) => (
               <button
                 key={t.id}
                 onClick={() => setSelectedTemplateId(t.id)}
-                className={`relative rounded-2xl border-2 overflow-hidden transition-all aspect-[9/14] group ${
+                className={`relative rounded-2xl border-2 overflow-hidden transition-all aspect-[9/14] max-h-64 group ${
                   selectedTemplateId === t.id
                     ? "border-primary ring-2 ring-primary/30 shadow-lg shadow-primary/10 scale-[1.02]"
                     : "border-border/50 hover:border-primary/40 hover:shadow-md"
