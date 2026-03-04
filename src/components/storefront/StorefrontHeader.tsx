@@ -75,6 +75,24 @@ export function StorefrontHeader({ profile, visitorName }: StorefrontHeaderProps
           ))}
         </div>
 
+        {/* Physical Address */}
+        {!(profile as any).is_online_only && (() => {
+          const addressParts = [
+            (profile as any).shop_number,
+            (profile as any).building,
+            (profile as any).street,
+          ].filter(Boolean);
+          return addressParts.length > 0 ? (
+            <p className="text-xs text-muted-foreground">
+              📍 {addressParts.join(", ")}
+            </p>
+          ) : null;
+        })()}
+
+        {(profile as any).is_online_only && (
+          <p className="text-xs text-muted-foreground">🌐 Online Store</p>
+        )}
+
         {/* Delivery Areas */}
         {(profile as any).delivery_areas && (
           <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
