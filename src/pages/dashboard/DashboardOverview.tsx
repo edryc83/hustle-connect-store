@@ -1,5 +1,6 @@
-import { useEffect, useState, useRef, useCallback } from "react";
+import { useEffect, useState, useRef, useCallback, useMemo } from "react";
 import { Link } from "react-router-dom";
+import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
@@ -48,16 +49,23 @@ const DashboardOverview = () => {
   const [shareModalOpen, setShareModalOpen] = useState(false);
   const [cardGenerated, setCardGenerated] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [weeklyOrders, setWeeklyOrders] = useState<{ day: string; orders: number }[]>([]);
 
   useEffect(() => {
     if (!user) return;
 
     const fetchData = async () => {
-      const [{ count }, { count: orders }, { data: profile }, { data: productsData }] = await Promise.all([
+      // 7 days ago ISO string
+      const sevenDaysAgo = new Date();
+      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6);
+      sevenDaysAgo.setHours(0, 0, 0, 0);
+
+      const [{ count }, { count: orders }, { data: profile }, { data: productsData }, { data: recentOrders }] = await Promise.all([
         supabase.from("products").select("*", { count: "exact", head: true }).eq("user_id", user.id),
         supabase.from("orders").select("*", { count: "exact", head: true }).eq("seller_id", user.id),
         supabase.from("profiles").select("store_name, store_slug, first_name, profile_picture_url, view_count, whatsapp_number").eq("id", user.id).single(),
         supabase.from("products").select("whatsapp_taps").eq("user_id", user.id),
+        supabase.from("orders").select("created_at").eq("seller_id", user.id).gte("created_at", sevenDaysAgo.toISOString()),
       ]);
       setProductCount(count ?? 0);
       setOrderCount(orders ?? 0);
@@ -71,6 +79,20 @@ const DashboardOverview = () => {
       setWhatsappNumber(p?.whatsapp_number ?? "");
       const totalTaps = (productsData ?? []).reduce((sum: number, pr: any) => sum + (pr.whatsapp_taps ?? 0), 0);
       setWhatsappTaps(totalTaps);
+
+      // Build weekly chart data
+      const dayCounts: Record<string, number> = {};
+      for (let i = 0; i < 7; i++) {
+        const d = new Date();
+        d.setDate(d.getDate() - (6 - i));
+        const key = d.toLocaleDateString("en-US", { weekday: "short" });
+        dayCounts[key] = 0;
+      }
+      (recentOrders ?? []).forEach((o: any) => {
+        const key = new Date(o.created_at).toLocaleDateString("en-US", { weekday: "short" });
+        if (key in dayCounts) dayCounts[key]++;
+      });
+      setWeeklyOrders(Object.entries(dayCounts).map(([day, orders]) => ({ day, orders })));
     };
 
     fetchData();
