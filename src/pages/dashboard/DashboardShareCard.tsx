@@ -302,17 +302,10 @@ const DashboardShareCard = () => {
         ctx.fillText(displayName, rightX - 60, y + 25);
       }
     } else {
-      const y = _H - 100;
-      if (logoImg) {
-        ctx.save(); ctx.beginPath(); ctx.roundRect(W / 2 - 130, y, 40, 40, 8); ctx.clip();
-        ctx.drawImage(logoImg, W / 2 - 130, y, 40, 40); ctx.restore();
-      }
-      ctx.fillStyle = color; ctx.font = "bold 28px system-ui, sans-serif";
+      const y = _H - 70;
+      ctx.fillStyle = color; ctx.font = "bold 30px system-ui, sans-serif";
       ctx.textAlign = "center"; ctx.textBaseline = "middle";
-      ctx.fillText(storeUrl, W / 2, y + 20);
-      ctx.fillStyle = light ? "rgba(255,255,255,0.5)" : "rgba(0,0,0,0.4)";
-      ctx.font = "20px system-ui, sans-serif";
-      ctx.fillText("Powered by Afristall", W / 2, y + 55);
+      ctx.fillText(storeUrl, W / 2, y);
     }
   };
 
@@ -338,8 +331,13 @@ const DashboardShareCard = () => {
     if (tid === "editorial-highlight") {
       if (activeImage) { try { const img = await loadImage(activeImage); drawFullBleed(ctx, img, W, H); } catch {} }
       applyTint(ctx, W, H, tintFilter);
+      // Top gradient for branding
+      const ovTop = ctx.createLinearGradient(0, 0, 0, H * 0.18);
+      ovTop.addColorStop(0, "rgba(0,0,0,0.5)"); ovTop.addColorStop(1, "rgba(0,0,0,0)");
+      ctx.fillStyle = ovTop; ctx.fillRect(0, 0, W, H * 0.18);
+      // Bottom gradient for text + URL
       const ov = ctx.createLinearGradient(0, H * 0.25, 0, H);
-      ov.addColorStop(0, "rgba(0,0,0,0)"); ov.addColorStop(0.5, "rgba(0,0,0,0.2)"); ov.addColorStop(1, "rgba(0,0,0,0.75)");
+      ov.addColorStop(0, "rgba(0,0,0,0)"); ov.addColorStop(0.5, "rgba(0,0,0,0.3)"); ov.addColorStop(1, "rgba(0,0,0,0.85)");
       ctx.fillStyle = ov; ctx.fillRect(0, 0, W, H);
       await drawBranding(ctx, W, H, profileImg, displayName, letter, "top", true);
       const lines = headline.split("\n");
@@ -362,11 +360,11 @@ const DashboardShareCard = () => {
     } else if (tid === "editorial-magazine") {
       if (activeImage) { try { const img = await loadImage(activeImage); drawFullBleed(ctx, img, W, H); } catch {} }
       applyTint(ctx, W, H, tintFilter);
-      const ov = ctx.createLinearGradient(0, 0, 0, H * 0.5);
-      ov.addColorStop(0, "rgba(0,0,0,0.65)"); ov.addColorStop(1, "rgba(0,0,0,0)");
+      const ov = ctx.createLinearGradient(0, 0, 0, H * 0.45);
+      ov.addColorStop(0, "rgba(0,0,0,0.7)"); ov.addColorStop(1, "rgba(0,0,0,0)");
       ctx.fillStyle = ov; ctx.fillRect(0, 0, W, H);
-      const ov2 = ctx.createLinearGradient(0, H * 0.7, 0, H);
-      ov2.addColorStop(0, "rgba(0,0,0,0)"); ov2.addColorStop(1, "rgba(0,0,0,0.6)");
+      const ov2 = ctx.createLinearGradient(0, H * 0.6, 0, H);
+      ov2.addColorStop(0, "rgba(0,0,0,0)"); ov2.addColorStop(1, "rgba(0,0,0,0.8)");
       ctx.fillStyle = ov2; ctx.fillRect(0, 0, W, H);
       await drawBranding(ctx, W, H, profileImg, displayName, letter, "top", true);
       ctx.fillStyle = "#ffffff"; ctx.font = "bold 120px Georgia, serif"; ctx.textBaseline = "top";
@@ -379,8 +377,13 @@ const DashboardShareCard = () => {
     } else if (tid === "editorial-minimal") {
       if (activeImage) { try { const img = await loadImage(activeImage); drawFullBleed(ctx, img, W, H); } catch {} }
       applyTint(ctx, W, H, tintFilter);
-      const ov = ctx.createLinearGradient(0, H * 0.5, 0, H);
-      ov.addColorStop(0, "rgba(0,0,0,0)"); ov.addColorStop(1, "rgba(0,0,0,0.65)");
+      // Top gradient for branding visibility
+      const ovTop = ctx.createLinearGradient(0, 0, 0, H * 0.2);
+      ovTop.addColorStop(0, "rgba(0,0,0,0.5)"); ovTop.addColorStop(1, "rgba(0,0,0,0)");
+      ctx.fillStyle = ovTop; ctx.fillRect(0, 0, W, H * 0.2);
+      // Bottom gradient for text visibility
+      const ov = ctx.createLinearGradient(0, H * 0.4, 0, H);
+      ov.addColorStop(0, "rgba(0,0,0,0)"); ov.addColorStop(1, "rgba(0,0,0,0.75)");
       ctx.fillStyle = ov; ctx.fillRect(0, 0, W, H);
       await drawBranding(ctx, W, H, profileImg, displayName, letter, "top", true);
       ctx.fillStyle = "#ffffff"; ctx.font = "bold 100px system-ui, sans-serif"; ctx.textBaseline = "middle";
