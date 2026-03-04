@@ -71,6 +71,10 @@ const DashboardSettings = () => {
           setCountry(d.country ?? "");
           setDistrict(d.district ?? "");
           setCity(d.city ?? "");
+          setStreet(d.street ?? "");
+          setShopNumber(d.shop_number ?? "");
+          setBuilding(d.building ?? "");
+          setIsOnlineOnly(d.is_online_only ?? false);
           // storeBio merged into welcomeMessage
           setCategories(deserializeCategories(d.category));
           setDeliveryAreas(d.delivery_areas ?? "");
