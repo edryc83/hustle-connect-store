@@ -61,6 +61,17 @@ const Explore = () => {
     fetchStores();
   }, []);
 
+  // Build dynamic location options from stores matching the selected country
+  const locationOptions = useMemo(() => {
+    const locs = new Set<string>();
+    stores.forEach((s) => {
+      if (selectedCountry !== "All" && s.country !== selectedCountry) return;
+      if (s.city) locs.add(s.city);
+      if (s.district) locs.add(s.district);
+    });
+    return ["All", ...Array.from(locs).sort()];
+  }, [stores, selectedCountry]);
+
   const filtered = useMemo(() => {
     return stores.filter((s) => {
       const q = search.trim().toLowerCase().replace(/^@/, "");
@@ -70,17 +81,22 @@ const Explore = () => {
         s.store_slug?.toLowerCase().includes(q) ||
         s.category?.toLowerCase().includes(q) ||
         s.country?.toLowerCase().includes(q) ||
-        s.city?.toLowerCase().includes(q);
+        s.city?.toLowerCase().includes(q) ||
+        s.district?.toLowerCase().includes(q);
       const matchesCategory =
         selectedCategory === "All" ||
         (s.category && s.category.toLowerCase().includes(selectedCategory.toLowerCase()));
       const matchesCountry =
         selectedCountry === "All" || s.country === selectedCountry;
-      return matchesSearch && matchesCategory && matchesCountry;
+      const matchesLocation =
+        selectedLocation === "All" ||
+        s.city === selectedLocation ||
+        s.district === selectedLocation;
+      return matchesSearch && matchesCategory && matchesCountry && matchesLocation;
     });
-  }, [stores, search, selectedCategory, selectedCountry]);
+  }, [stores, search, selectedCategory, selectedCountry, selectedLocation]);
 
-  const hasFilters = selectedCategory !== "All" || selectedCountry !== "All" || search.trim();
+  const hasFilters = selectedCategory !== "All" || selectedCountry !== "All" || selectedLocation !== "All" || search.trim();
 
   return (
     <div className="min-h-screen flex flex-col">
