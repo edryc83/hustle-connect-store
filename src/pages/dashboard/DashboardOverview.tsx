@@ -11,18 +11,7 @@ import AfristallLogo from "@/components/AfristallLogo";
 import { toast } from "sonner";
 import DailySellingTip from "@/components/dashboard/DailySellingTip";
 import CaptionGenerator from "@/components/dashboard/CaptionGenerator";
-
-function useIsInstalledPWA() {
-  const [installed, setInstalled] = useState(false);
-  useEffect(() => {
-    const mq = window.matchMedia("(display-mode: standalone)");
-    setInstalled(mq.matches || (navigator as any).standalone === true);
-    const handler = (e: MediaQueryListEvent) => setInstalled(e.matches);
-    mq.addEventListener("change", handler);
-    return () => mq.removeEventListener("change", handler);
-  }, []);
-  return installed;
-}
+import { useInstallPrompt } from "@/hooks/useInstallPrompt";
 
 function getGreeting(): { text: string; emoji: string } {
   const hour = new Date().getHours();
