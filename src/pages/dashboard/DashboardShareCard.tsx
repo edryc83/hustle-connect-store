@@ -15,9 +15,10 @@ interface DesignTemplate {
   category: string;
   defaultHeadline: string;
   defaultSubtitle: string;
-  previewBg: string;        // CSS bg for the thumbnail card
-  previewTextColor: string;  // text color for the thumbnail
-  previewAccent: string;     // accent element color
+  previewImage: string;      // real preview image path
+  previewBg: string;
+  previewTextColor: string;
+  previewAccent: string;
   previewLayout: "full-bleed" | "split" | "centered" | "grid";
 }
 
@@ -31,18 +32,18 @@ interface Product {
 
 const TEMPLATES: DesignTemplate[] = [
   // Editorial
-  { id: "editorial-highlight", name: "Highlight", category: "Editorial", defaultHeadline: "No limits.\nNo compromise.", defaultSubtitle: "Just everyday essentials, done properly.", previewBg: "linear-gradient(135deg, #1a1a1a 0%, #333 100%)", previewTextColor: "#fff", previewAccent: "#FF6B35", previewLayout: "full-bleed" },
-  { id: "editorial-magazine", name: "Magazine", category: "Editorial", defaultHeadline: "NEW\nCOLLECTION", defaultSubtitle: "Curated pieces you'll love.", previewBg: "linear-gradient(180deg, #0a0a0a 0%, #2a1a10 100%)", previewTextColor: "#fff", previewAccent: "#d4a574", previewLayout: "full-bleed" },
-  { id: "editorial-minimal", name: "Minimal", category: "Editorial", defaultHeadline: "SHOP\nNOW", defaultSubtitle: "Discover what's trending.", previewBg: "linear-gradient(180deg, #111 0%, #222 100%)", previewTextColor: "#fff", previewAccent: "#FF6B35", previewLayout: "full-bleed" },
+  { id: "editorial-highlight", name: "Highlight", category: "Editorial", defaultHeadline: "No limits.\nNo compromise.", defaultSubtitle: "Just everyday essentials, done properly.", previewImage: "/templates/editorial-1.jpeg", previewBg: "#1a1a1a", previewTextColor: "#fff", previewAccent: "#FF6B35", previewLayout: "full-bleed" },
+  { id: "editorial-magazine", name: "Magazine", category: "Editorial", defaultHeadline: "NEW\nCOLLECTION", defaultSubtitle: "Curated pieces you'll love.", previewImage: "/templates/editorial-3.jpg", previewBg: "#0a0a0a", previewTextColor: "#fff", previewAccent: "#d4a574", previewLayout: "full-bleed" },
+  { id: "editorial-minimal", name: "Minimal", category: "Editorial", defaultHeadline: "SHOP\nNOW", defaultSubtitle: "Discover what's trending.", previewImage: "/templates/spotlight-1.jpeg", previewBg: "#111", previewTextColor: "#fff", previewAccent: "#FF6B35", previewLayout: "full-bleed" },
   // Spotlight
-  { id: "spotlight-hero", name: "Hero Shot", category: "Spotlight", defaultHeadline: "FEATURED\nPRODUCT", defaultSubtitle: "The one everyone's talking about.", previewBg: "linear-gradient(180deg, #f5f3ef 0%, #ece8e0 100%)", previewTextColor: "#1a1a1a", previewAccent: "#FF6B35", previewLayout: "split" },
-  { id: "spotlight-split", name: "Split View", category: "Spotlight", defaultHeadline: "BEST\nSELLER", defaultSubtitle: "See why it's #1.", previewBg: "linear-gradient(180deg, #1a1a2e 50%, #fff 50%)", previewTextColor: "#fff", previewAccent: "#FF6B35", previewLayout: "split" },
+  { id: "spotlight-hero", name: "Hero Shot", category: "Spotlight", defaultHeadline: "FEATURED\nPRODUCT", defaultSubtitle: "The one everyone's talking about.", previewImage: "/templates/spotlight-2.jpeg", previewBg: "#f5f3ef", previewTextColor: "#1a1a1a", previewAccent: "#FF6B35", previewLayout: "split" },
+  { id: "spotlight-split", name: "Split View", category: "Spotlight", defaultHeadline: "BEST\nSELLER", defaultSubtitle: "See why it's #1.", previewImage: "/templates/brand-2.png", previewBg: "#1a1a2e", previewTextColor: "#fff", previewAccent: "#FF6B35", previewLayout: "split" },
   // Brand Card
-  { id: "brand-profile", name: "Profile Card", category: "Brand Card", defaultHeadline: "VISIT\nMY STORE", defaultSubtitle: "Quality products, great prices.", previewBg: "#ffffff", previewTextColor: "#111827", previewAccent: "#FF6B35", previewLayout: "centered" },
-  { id: "brand-elegant", name: "Elegant Dark", category: "Brand Card", defaultHeadline: "EXPLORE\nOUR RANGE", defaultSubtitle: "Something for everyone.", previewBg: "linear-gradient(180deg, #1a1a2e 0%, #0d0d1a 100%)", previewTextColor: "#fff", previewAccent: "#d4a574", previewLayout: "centered" },
+  { id: "brand-profile", name: "Profile Card", category: "Brand Card", defaultHeadline: "VISIT\nMY STORE", defaultSubtitle: "Quality products, great prices.", previewImage: "/templates/brand-1.jpeg", previewBg: "#ffffff", previewTextColor: "#111827", previewAccent: "#FF6B35", previewLayout: "centered" },
+  { id: "brand-elegant", name: "Elegant Dark", category: "Brand Card", defaultHeadline: "EXPLORE\nOUR RANGE", defaultSubtitle: "Something for everyone.", previewImage: "/templates/brand-3.png", previewBg: "#1a1a2e", previewTextColor: "#fff", previewAccent: "#d4a574", previewLayout: "centered" },
   // Collage
-  { id: "collage-grid", name: "Grid Layout", category: "Collage", defaultHeadline: "NEW ARRIVALS", defaultSubtitle: "Fresh stock just dropped!", previewBg: "#faf9f7", previewTextColor: "#111827", previewAccent: "#FF6B35", previewLayout: "grid" },
-  { id: "collage-mosaic", name: "Mosaic", category: "Collage", defaultHeadline: "TOP PICKS", defaultSubtitle: "Our best sellers, curated for you.", previewBg: "#faf9f7", previewTextColor: "#111827", previewAccent: "#FF8F5E", previewLayout: "grid" },
+  { id: "collage-grid", name: "Grid Layout", category: "Collage", defaultHeadline: "NEW ARRIVALS", defaultSubtitle: "Fresh stock just dropped!", previewImage: "/templates/collage-1.png", previewBg: "#faf9f7", previewTextColor: "#111827", previewAccent: "#FF6B35", previewLayout: "grid" },
+  { id: "collage-mosaic", name: "Mosaic", category: "Collage", defaultHeadline: "TOP PICKS", defaultSubtitle: "Our best sellers, curated for you.", previewImage: "/templates/collage-2.png", previewBg: "#faf9f7", previewTextColor: "#111827", previewAccent: "#FF8F5E", previewLayout: "grid" },
 ];
 
 const BG_COLORS = [
