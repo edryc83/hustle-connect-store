@@ -4,6 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Search, ExternalLink, MapPin } from "lucide-react";
+import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
 import AfristallLogo from "@/components/AfristallLogo";
 
 type SellerProfile = {
@@ -93,67 +94,79 @@ export default function AdminSellers() {
       {loading ? (
         <div className="animate-pulse text-muted-foreground">Loading sellers…</div>
       ) : (
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-          {filtered.map((s) => {
-            const location = getLocation(s);
-            return (
-              <div key={s.id} className="group rounded-2xl border border-border/50 bg-card/60 backdrop-blur-xl overflow-hidden transition-all hover:shadow-lg hover:border-primary/20">
-                {/* Cover Photo */}
-                <div className="h-20 bg-gradient-to-br from-primary/10 to-primary/5 overflow-hidden relative">
-                  {s.cover_photo_url ? (
-                    <img src={s.cover_photo_url} alt="" className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" loading="lazy" />
-                  ) : (
-                    <div className="w-full h-full bg-gradient-to-br from-primary/15 via-primary/5 to-accent/10" />
-                  )}
-                  <div className="absolute top-1.5 right-1.5">
-                    {isActive(s) ? (
-                      <Badge variant="default" className="text-[9px] px-1.5 py-0">Active</Badge>
-                    ) : (
-                      <Badge variant="secondary" className="text-[9px] px-1.5 py-0">Inactive</Badge>
-                    )}
-                  </div>
-                </div>
-
-                {/* Profile pic overlapping cover */}
-                <div className="flex flex-col items-center -mt-7 px-3 pb-3">
-                  {s.profile_picture_url ? (
-                    <img src={s.profile_picture_url} alt={s.store_name ?? "Seller"} className="h-12 w-12 rounded-full object-cover border-2 border-background shadow-md" loading="lazy" />
-                  ) : (
-                    <div className="flex h-12 w-12 items-center justify-center rounded-full bg-card border-2 border-background shadow-md">
-                      <AfristallLogo className="h-5 w-5" />
-                    </div>
-                  )}
-
-                  <p className="font-semibold text-sm mt-1.5 truncate max-w-full">{s.store_name || s.first_name || "Unnamed"}</p>
-                  {s.store_slug && <p className="text-[11px] text-muted-foreground">@{s.store_slug}</p>}
-                  <p className="text-[10px] text-muted-foreground truncate max-w-full">{s.email}</p>
-
-                  {location && (
-                    <p className="flex items-center gap-1 text-[10px] text-muted-foreground mt-1">
-                      <MapPin className="h-2.5 w-2.5 shrink-0" /> {location}
-                    </p>
-                  )}
-
-                  <div className="flex gap-2 text-[10px] text-muted-foreground mt-1.5">
-                    <span>{productCounts[s.id] || 0} products</span>
-                    <span>•</span>
-                    <span>{s.view_count} views</span>
-                  </div>
-
-                  {s.store_slug && (
-                    <Button variant="outline" size="sm" className="w-full mt-2 h-7 text-xs" asChild>
-                      <a href={`/${s.store_slug}`} target="_blank" rel="noopener noreferrer">
-                        <ExternalLink className="h-3 w-3 mr-1" /> View Store
-                      </a>
-                    </Button>
-                  )}
-                </div>
-              </div>
-            );
-          })}
-          {filtered.length === 0 && (
-            <p className="text-center text-muted-foreground py-8 col-span-full">No sellers found</p>
-          )}
+        <div className="rounded-xl border border-border/50 bg-card/60 backdrop-blur-xl overflow-hidden">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Seller</TableHead>
+                <TableHead className="hidden sm:table-cell">Email</TableHead>
+                <TableHead className="hidden md:table-cell">Location</TableHead>
+                <TableHead className="text-center">Products</TableHead>
+                <TableHead className="text-center">Views</TableHead>
+                <TableHead className="text-center">Status</TableHead>
+                <TableHead className="text-right">Store</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {filtered.map((s) => {
+                const location = getLocation(s);
+                return (
+                  <TableRow key={s.id}>
+                    <TableCell>
+                      <div className="flex items-center gap-3">
+                        {s.profile_picture_url ? (
+                          <img src={s.profile_picture_url} alt={s.store_name ?? ""} className="h-9 w-9 rounded-full object-cover border border-border" loading="lazy" />
+                        ) : (
+                          <div className="flex h-9 w-9 items-center justify-center rounded-full bg-muted border border-border">
+                            <AfristallLogo className="h-4 w-4" />
+                          </div>
+                        )}
+                        <div className="min-w-0">
+                          <p className="font-medium text-sm truncate">{s.store_name || s.first_name || "Unnamed"}</p>
+                          {s.store_slug && <p className="text-xs text-muted-foreground">@{s.store_slug}</p>}
+                        </div>
+                      </div>
+                    </TableCell>
+                    <TableCell className="hidden sm:table-cell text-xs text-muted-foreground truncate max-w-[180px]">{s.email}</TableCell>
+                    <TableCell className="hidden md:table-cell">
+                      {location ? (
+                        <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                          <MapPin className="h-3 w-3 shrink-0" /> {location}
+                        </span>
+                      ) : (
+                        <span className="text-xs text-muted-foreground">—</span>
+                      )}
+                    </TableCell>
+                    <TableCell className="text-center text-sm">{productCounts[s.id] || 0}</TableCell>
+                    <TableCell className="text-center text-sm">{s.view_count}</TableCell>
+                    <TableCell className="text-center">
+                      {isActive(s) ? (
+                        <Badge variant="default" className="text-[10px]">Active</Badge>
+                      ) : (
+                        <Badge variant="secondary" className="text-[10px]">Inactive</Badge>
+                      )}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      {s.store_slug ? (
+                        <Button variant="ghost" size="sm" className="h-7 text-xs" asChild>
+                          <a href={`/${s.store_slug}`} target="_blank" rel="noopener noreferrer">
+                            <ExternalLink className="h-3 w-3 mr-1" /> View
+                          </a>
+                        </Button>
+                      ) : (
+                        <span className="text-xs text-muted-foreground">—</span>
+                      )}
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+              {filtered.length === 0 && (
+                <TableRow>
+                  <TableCell colSpan={7} className="text-center text-muted-foreground py-8">No sellers found</TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
         </div>
       )}
     </div>
