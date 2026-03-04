@@ -30,6 +30,16 @@ const COUNTRIES = [
 
 const DashboardSettings = () => {
   const { user } = useAuth();
+  const location = useLocation();
+
+  // Scroll to #install-app if hash present
+  useEffect(() => {
+    if (location.hash === "#install-app") {
+      setTimeout(() => {
+        document.getElementById("install-app")?.scrollIntoView({ behavior: "smooth" });
+      }, 500);
+    }
+  }, [location.hash]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [generating, setGenerating] = useState(false);
