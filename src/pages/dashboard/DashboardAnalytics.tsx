@@ -21,7 +21,7 @@ const DashboardAnalytics = () => {
       sevenDaysAgo.setHours(0, 0, 0, 0);
 
       const [{ data: recentOrders }, { data: profile }, { data: productsData }, { count: orderCount }] = await Promise.all([
-        supabase.from("orders").select("created_at, total").eq("seller_id", user.id).gte("created_at", sevenDaysAgo.toISOString()),
+        supabase.from("orders").select("created_at, total").eq("seller_id", user.id).eq("status", "confirmed").gte("created_at", sevenDaysAgo.toISOString()),
         supabase.from("profiles").select("view_count").eq("id", user.id).single(),
         supabase.from("products").select("whatsapp_taps").eq("user_id", user.id),
         supabase.from("orders").select("*", { count: "exact", head: true }).eq("seller_id", user.id),

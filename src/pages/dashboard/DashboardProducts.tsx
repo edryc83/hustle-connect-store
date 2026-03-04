@@ -261,6 +261,32 @@ const DashboardProducts = () => {
               <DialogTitle>{editingProduct ? "Edit Listing" : "Add Listing"}</DialogTitle>
             </DialogHeader>
             <div className="space-y-4 pt-2">
+              {/* Multi-image upload — moved to top */}
+              <div className="space-y-1.5">
+                <Label>Images <span className="text-muted-foreground font-normal">(up to 5)</span></Label>
+                {allFormImages.length > 0 && (
+                  <div className="flex gap-2 flex-wrap">
+                    {existingImages.map((url, i) => (
+                      <div key={`existing-${i}`} className="relative h-16 w-16">
+                        <img src={url} alt="" className="h-16 w-16 rounded-lg object-cover border" />
+                        <button type="button" onClick={() => removeExistingImage(i)} className="absolute -top-1.5 -right-1.5 rounded-full bg-destructive text-destructive-foreground p-0.5"><X className="h-3 w-3" /></button>
+                      </div>
+                    ))}
+                    {imagePreviews.map((url, i) => (
+                      <div key={`new-${i}`} className="relative h-16 w-16">
+                        <img src={url} alt="" className="h-16 w-16 rounded-lg object-cover border" />
+                        <button type="button" onClick={() => removeNewImage(i)} className="absolute -top-1.5 -right-1.5 rounded-full bg-destructive text-destructive-foreground p-0.5"><X className="h-3 w-3" /></button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                {allFormImages.length < 5 && (
+                  <label className="cursor-pointer inline-block">
+                    <span className="text-sm font-medium text-primary hover:underline">{allFormImages.length > 0 ? "+ Add more" : "Upload images"}</span>
+                    <input type="file" accept="image/*" multiple className="hidden" onChange={handleImageChange} />
+                  </label>
+                )}
+              </div>
               {/* Type */}
               <div className="space-y-1.5">
                 <Label>Type</Label>
@@ -315,32 +341,7 @@ const DashboardProducts = () => {
                 <Label htmlFor="productVariants">Variants / Options</Label>
                 <Input id="productVariants" placeholder="e.g. Small, Medium, Large" value={variantsText} onChange={(e) => setVariantsText(e.target.value)} />
               </div>
-              {/* Multi-image upload */}
-              <div className="space-y-1.5">
-                <Label>Images <span className="text-muted-foreground font-normal">(up to 5)</span></Label>
-                {allFormImages.length > 0 && (
-                  <div className="flex gap-2 flex-wrap">
-                    {existingImages.map((url, i) => (
-                      <div key={`existing-${i}`} className="relative h-16 w-16">
-                        <img src={url} alt="" className="h-16 w-16 rounded-lg object-cover border" />
-                        <button type="button" onClick={() => removeExistingImage(i)} className="absolute -top-1.5 -right-1.5 rounded-full bg-destructive text-destructive-foreground p-0.5"><X className="h-3 w-3" /></button>
-                      </div>
-                    ))}
-                    {imagePreviews.map((url, i) => (
-                      <div key={`new-${i}`} className="relative h-16 w-16">
-                        <img src={url} alt="" className="h-16 w-16 rounded-lg object-cover border" />
-                        <button type="button" onClick={() => removeNewImage(i)} className="absolute -top-1.5 -right-1.5 rounded-full bg-destructive text-destructive-foreground p-0.5"><X className="h-3 w-3" /></button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-                {allFormImages.length < 5 && (
-                  <label className="cursor-pointer inline-block">
-                    <span className="text-sm font-medium text-primary hover:underline">{allFormImages.length > 0 ? "+ Add more" : "Upload images"}</span>
-                    <input type="file" accept="image/*" multiple className="hidden" onChange={handleImageChange} />
-                  </label>
-                )}
-              </div>
+              {/* Images section removed — now at top of form */}
               <Button className="w-full" onClick={handleSave} disabled={saving}>
                 {saving ? "Saving…" : editingProduct ? "Update Listing" : "Add Listing"}
               </Button>
