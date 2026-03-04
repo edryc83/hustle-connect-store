@@ -96,16 +96,19 @@ function ProductCard({
     : 0;
 
   return (
-    <div className="group cursor-pointer" onClick={onClick}>
-      {/* Image */}
-      <div className="relative aspect-[4/5] rounded-2xl overflow-hidden bg-muted/50 mb-3 shadow-sm ring-1 ring-border/30">
+    <div
+      className="group cursor-pointer rounded-2xl border border-border/60 bg-card p-2.5 shadow-sm hover:shadow-md transition-shadow"
+      onClick={onClick}
+    >
+      {/* Framed Image */}
+      <div className="relative aspect-[4/5] rounded-xl overflow-hidden bg-muted/30 border border-border/40">
         <ProductImageCarousel
           images={images}
           alt={product.name}
           listingType={product.listing_type}
         />
         {/* Badges top-left */}
-        <div className="absolute top-2.5 left-2.5 flex flex-col gap-1">
+        <div className="absolute top-2 left-2 flex flex-col gap-1">
           {product.is_featured && (
             <Badge className="text-[10px] px-2 py-0.5 bg-foreground text-background shadow-sm rounded-full font-medium">
               <Star className="h-2.5 w-2.5 mr-0.5 fill-current" /> Featured
@@ -128,21 +131,21 @@ function ProductCard({
       </div>
 
       {/* Info */}
-      <div className="space-y-1.5 px-0.5">
+      <div className="pt-2.5 px-0.5 space-y-1">
         <p className="font-semibold text-sm leading-tight truncate">{product.name}</p>
         {product.description && (
-          <p className="text-xs text-muted-foreground truncate">{product.description}</p>
+          <p className="text-[11px] text-muted-foreground line-clamp-1">{product.description}</p>
         )}
-        <div className="flex items-center justify-between gap-2">
-          <div className="flex items-baseline gap-1.5">
-            <p className="font-bold text-sm">{formatPrice(Number(displayPrice), currency)}</p>
+        <div className="flex items-center justify-between gap-1 pt-0.5">
+          <div className="flex items-baseline gap-1.5 min-w-0">
+            <p className="font-bold text-sm truncate">{formatPrice(Number(displayPrice), currency)}</p>
             {hasDiscount && (
-              <p className="text-[11px] text-muted-foreground line-through">{formatPrice(Number(product.price), currency)}</p>
+              <p className="text-[10px] text-muted-foreground line-through shrink-0">{formatPrice(Number(product.price), currency)}</p>
             )}
           </div>
           <button
             onClick={handleAddToCart}
-            className="flex items-center gap-1 rounded-full border border-border px-2.5 py-1 text-xs font-medium text-foreground hover:bg-accent hover:border-accent-foreground/20 transition-colors"
+            className="shrink-0 flex items-center gap-1 rounded-full border border-border bg-background px-3 py-1.5 text-xs font-semibold text-foreground hover:bg-accent transition-colors"
           >
             Add <ShoppingCart className="h-3 w-3" />
           </button>
@@ -515,7 +518,7 @@ const StorefrontInner = () => {
                   <Star className="h-5 w-5 text-primary fill-primary" />
                   <h2 className="text-lg font-bold">Featured</h2>
                 </div>
-                <div className="grid gap-x-4 gap-y-6 grid-cols-2 sm:grid-cols-3">
+                <div className="grid gap-3 sm:gap-4 grid-cols-2 sm:grid-cols-3">
                   {featured.map((product) => (
                     <ProductCard
                       key={product.id}
@@ -533,7 +536,7 @@ const StorefrontInner = () => {
               <h2 className="text-lg font-bold mb-4">
                 {featured.length > 0 ? "All Listings" : `${products.length} listing${products.length !== 1 ? "s" : ""}`}
               </h2>
-              <div className="grid gap-x-4 gap-y-6 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
+              <div className="grid gap-3 sm:gap-4 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
                 {(featured.length > 0 ? nonFeatured : products).map((product) => (
                   <ProductCard
                     key={product.id}
