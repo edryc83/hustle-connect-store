@@ -66,6 +66,7 @@ const DashboardProducts = () => {
   const [existingImages, setExistingImages] = useState<string[]>([]);
   const [listingType, setListingType] = useState("product");
   const [condition, setCondition] = useState("");
+  const [attributes, setAttributes] = useState<Record<string, any>>({});
 
   const fetchProducts = async () => {
     if (!user) return;
