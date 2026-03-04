@@ -1,19 +1,16 @@
-import { useEffect, useState, useRef, useCallback, useMemo } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from "recharts";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import {
   Package, Eye, MessageCircle, ClipboardList, CalendarDays,
-  Copy, Share2, X, Plus, Download, Smartphone,
+  Copy, Share2, X, Plus, Smartphone,
 } from "lucide-react";
 import AfristallLogo from "@/components/AfristallLogo";
 import { toast } from "sonner";
-import {
-  Dialog, DialogContent, DialogHeader, DialogTitle,
-} from "@/components/ui/dialog";
+import { ShareCardModal } from "@/components/dashboard/ShareCardModal";
 
 function getGreeting(): { text: string; emoji: string } {
   const hour = new Date().getHours();
@@ -47,25 +44,16 @@ const DashboardOverview = () => {
   );
   const [copied, setCopied] = useState(false);
   const [shareModalOpen, setShareModalOpen] = useState(false);
-  const [cardGenerated, setCardGenerated] = useState(false);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [weeklyOrders, setWeeklyOrders] = useState<{ day: string; orders: number }[]>([]);
 
   useEffect(() => {
     if (!user) return;
 
     const fetchData = async () => {
-      // 7 days ago ISO string
-      const sevenDaysAgo = new Date();
-      sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 6);
-      sevenDaysAgo.setHours(0, 0, 0, 0);
-
-      const [{ count }, { count: orders }, { data: profile }, { data: productsData }, { data: recentOrders }] = await Promise.all([
+      const [{ count }, { count: orders }, { data: profile }, { data: productsData }] = await Promise.all([
         supabase.from("products").select("*", { count: "exact", head: true }).eq("user_id", user.id),
         supabase.from("orders").select("*", { count: "exact", head: true }).eq("seller_id", user.id),
         supabase.from("profiles").select("store_name, store_slug, first_name, profile_picture_url, view_count, whatsapp_number").eq("id", user.id).single(),
         supabase.from("products").select("whatsapp_taps").eq("user_id", user.id),
-        supabase.from("orders").select("created_at").eq("seller_id", user.id).gte("created_at", sevenDaysAgo.toISOString()),
       ]);
       setProductCount(count ?? 0);
       setOrderCount(orders ?? 0);
@@ -79,20 +67,6 @@ const DashboardOverview = () => {
       setWhatsappNumber(p?.whatsapp_number ?? "");
       const totalTaps = (productsData ?? []).reduce((sum: number, pr: any) => sum + (pr.whatsapp_taps ?? 0), 0);
       setWhatsappTaps(totalTaps);
-
-      // Build weekly chart data
-      const dayCounts: Record<string, number> = {};
-      for (let i = 0; i < 7; i++) {
-        const d = new Date();
-        d.setDate(d.getDate() - (6 - i));
-        const key = d.toLocaleDateString("en-US", { weekday: "short" });
-        dayCounts[key] = 0;
-      }
-      (recentOrders ?? []).forEach((o: any) => {
-        const key = new Date(o.created_at).toLocaleDateString("en-US", { weekday: "short" });
-        if (key in dayCounts) dayCounts[key]++;
-      });
-      setWeeklyOrders(Object.entries(dayCounts).map(([day, orders]) => ({ day, orders })));
     };
 
     fetchData();
@@ -125,7 +99,6 @@ const DashboardOverview = () => {
     }
   };
 
-  // Completeness
   const completeness =
     (profilePicUrl ? 20 : 0) +
     (storeName ? 20 : 0) +
@@ -139,114 +112,6 @@ const DashboardOverview = () => {
       : completeness < 100
         ? "Almost there! Add more products to boost your store"
         : "🎉 Your store is ready to share!";
-
-  // Canvas card generator
-  const generateCard = useCallback(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
-    canvas.width = 720;
-    canvas.height = 1280;
-
-    // Gradient bg
-    const grad = ctx.createLinearGradient(0, 0, 0, canvas.height);
-    grad.addColorStop(0, "#FF6B35");
-    grad.addColorStop(1, "#1a1a2e");
-    ctx.fillStyle = grad;
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-    const drawText = () => {
-      // Store name
-      ctx.fillStyle = "#ffffff";
-      ctx.font = "bold 48px system-ui, sans-serif";
-      ctx.textAlign = "center";
-      ctx.fillText(storeName || "My Store", canvas.width / 2, 580);
-
-      // Shop now
-      ctx.font = "32px system-ui, sans-serif";
-      ctx.fillText("Shop now 👇", canvas.width / 2, 650);
-
-      // URL
-      ctx.font = "28px system-ui, sans-serif";
-      ctx.fillStyle = "#ffffffcc";
-      ctx.fillText(`afristall.com/${storeSlug}`, canvas.width / 2, 720);
-
-      // Afristall branding
-      ctx.font = "20px system-ui, sans-serif";
-      ctx.fillStyle = "#ffffff88";
-      ctx.fillText("Powered by Afristall", canvas.width / 2, canvas.height - 60);
-
-      setCardGenerated(true);
-    };
-
-    if (profilePicUrl) {
-      const img = new Image();
-      img.crossOrigin = "anonymous";
-      img.onload = () => {
-        // Circle clip
-        ctx.save();
-        ctx.beginPath();
-        ctx.arc(canvas.width / 2, 400, 100, 0, Math.PI * 2);
-        ctx.closePath();
-        ctx.clip();
-        ctx.drawImage(img, canvas.width / 2 - 100, 300, 200, 200);
-        ctx.restore();
-
-        // Circle border
-        ctx.beginPath();
-        ctx.arc(canvas.width / 2, 400, 102, 0, Math.PI * 2);
-        ctx.strokeStyle = "#ffffff44";
-        ctx.lineWidth = 4;
-        ctx.stroke();
-
-        drawText();
-      };
-      img.onerror = () => drawText();
-      img.src = profilePicUrl;
-    } else {
-      // Placeholder circle
-      ctx.beginPath();
-      ctx.arc(canvas.width / 2, 400, 100, 0, Math.PI * 2);
-      ctx.fillStyle = "#ffffff22";
-      ctx.fill();
-      ctx.strokeStyle = "#ffffff44";
-      ctx.lineWidth = 4;
-      ctx.stroke();
-
-      ctx.fillStyle = "#ffffff";
-      ctx.font = "bold 64px system-ui, sans-serif";
-      ctx.textAlign = "center";
-      ctx.fillText((storeName || "S")[0].toUpperCase(), canvas.width / 2, 420);
-
-      drawText();
-    }
-  }, [profilePicUrl, storeName, storeSlug]);
-
-  const shareOrDownloadCard = async () => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    canvas.toBlob(async (blob) => {
-      if (!blob) return;
-      const file = new File([blob], `${storeSlug}-store-card.png`, { type: "image/png" });
-
-      if (navigator.canShare?.({ files: [file] })) {
-        try {
-          await navigator.share({ files: [file], title: storeName, text: "Check out my store on Afristall!" });
-        } catch { /* cancelled */ }
-      } else {
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = `${storeSlug}-store-card.png`;
-        a.click();
-        URL.revokeObjectURL(url);
-        toast.success("Card downloaded!");
-      }
-    }, "image/png");
-  };
 
   const stats = [
     { label: "Listings", value: productCount, icon: Package },
@@ -325,25 +190,7 @@ const DashboardOverview = () => {
         ))}
       </div>
 
-      {/* Weekly orders chart */}
-      <div className="rounded-2xl border border-border/50 bg-card/60 backdrop-blur-xl p-5 shadow-sm space-y-3">
-        <span className="text-sm font-medium text-muted-foreground">Orders — Last 7 Days</span>
-        <div className="h-40">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={weeklyOrders} margin={{ top: 4, right: 4, bottom: 0, left: -20 }}>
-              <CartesianGrid strokeDasharray="3 3" className="stroke-border/40" vertical={false} />
-              <XAxis dataKey="day" tick={{ fontSize: 12 }} className="text-muted-foreground" tickLine={false} axisLine={false} />
-              <YAxis allowDecimals={false} tick={{ fontSize: 12 }} className="text-muted-foreground" tickLine={false} axisLine={false} />
-              <Tooltip
-                contentStyle={{ borderRadius: 12, border: "1px solid hsl(var(--border))", background: "hsl(var(--card))", fontSize: 13 }}
-                cursor={{ fill: "hsl(var(--primary) / 0.08)" }}
-              />
-              <Bar dataKey="orders" fill="hsl(var(--primary))" radius={[6, 6, 0, 0]} maxBarSize={32} />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
-      </div>
-
+      {/* Store completeness */}
       <div className="rounded-2xl border border-border/50 bg-card/60 backdrop-blur-xl p-5 shadow-sm space-y-3">
         <div className="flex items-center justify-between">
           <span className="text-sm font-medium text-muted-foreground">Store Completeness</span>
@@ -358,7 +205,6 @@ const DashboardOverview = () => {
         <div className="rounded-2xl border border-border/50 bg-card/60 backdrop-blur-xl p-5 shadow-sm space-y-4">
           <span className="text-sm font-medium text-muted-foreground">Share Your Store</span>
 
-          {/* URL pill */}
           <div className="flex items-center gap-2 rounded-full bg-muted/50 border border-border/50 px-4 py-2">
             <span className="text-sm font-medium truncate flex-1">afristall.com/{storeSlug}</span>
             <button onClick={copyLink} className="text-muted-foreground hover:text-foreground shrink-0">
@@ -366,7 +212,6 @@ const DashboardOverview = () => {
             </button>
           </div>
 
-          {/* Copy & Share buttons */}
           <div className="grid grid-cols-2 gap-3">
             <Button onClick={copyLink} variant="outline" className="rounded-xl border-primary/30 hover:bg-primary/10 gap-2">
               <Copy className="h-4 w-4" />
@@ -378,11 +223,10 @@ const DashboardOverview = () => {
             </Button>
           </div>
 
-          {/* WhatsApp Status card button */}
           <Button
             variant="outline"
             className="w-full rounded-xl border-primary/30 hover:bg-primary/10 gap-2"
-            onClick={() => { setShareModalOpen(true); setCardGenerated(false); }}
+            onClick={() => setShareModalOpen(true)}
           >
             <Smartphone className="h-4 w-4" />
             Share to WhatsApp Status
@@ -405,33 +249,13 @@ const DashboardOverview = () => {
       </div>
 
       {/* WhatsApp Status Card Modal */}
-      <Dialog open={shareModalOpen} onOpenChange={setShareModalOpen}>
-        <DialogContent className="max-w-sm">
-          <DialogHeader>
-            <DialogTitle>WhatsApp Status Card</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <canvas
-              ref={canvasRef}
-              className="w-full rounded-xl border border-border/50"
-              style={{ aspectRatio: "9/16" }}
-            />
-            {!cardGenerated ? (
-              <Button onClick={generateCard} className="w-full rounded-xl gap-2">
-                Generate Card
-              </Button>
-            ) : (
-              <Button onClick={shareOrDownloadCard} className="w-full rounded-xl gap-2">
-                {typeof navigator !== "undefined" && navigator.canShare ? (
-                  <><Share2 className="h-4 w-4" /> Share</>
-                ) : (
-                  <><Download className="h-4 w-4" /> Download</>
-                )}
-              </Button>
-            )}
-          </div>
-        </DialogContent>
-      </Dialog>
+      <ShareCardModal
+        open={shareModalOpen}
+        onOpenChange={setShareModalOpen}
+        storeName={storeName}
+        storeSlug={storeSlug}
+        profilePicUrl={profilePicUrl}
+      />
     </div>
   );
 };
