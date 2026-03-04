@@ -3,7 +3,7 @@ import { NavLink } from "@/components/NavLink";
 
 const navItems = [
   { title: "Home", url: "/dashboard", icon: LayoutDashboard },
-  { title: "Listings", url: "/dashboard/products", icon: Package },
+  { title: "Products", url: "/dashboard/products", icon: Package },
   { title: "Orders", url: "/dashboard/orders", icon: ClipboardList },
   { title: "Design", url: "/dashboard/share", icon: Palette },
   { title: "Settings", url: "/dashboard/settings", icon: Settings },
