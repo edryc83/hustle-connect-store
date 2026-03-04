@@ -486,6 +486,16 @@ const StorefrontInner = () => {
         <ShareButton storeName={profile.store_name ?? "Store"} storeSlug={storeSlug ?? ""} />
       </div>
 
+      {/* Owner banner */}
+      {user && profile && user.id === profile.id && (
+        <div className="bg-primary text-primary-foreground text-center text-sm py-2 px-4">
+          You're viewing your store as a buyer.{" "}
+          <Link to="/dashboard" className="underline font-semibold hover:opacity-80">
+            Manage Store →
+          </Link>
+        </div>
+      )}
+
       {/* Header with profile pic, name, greeting */}
       <StorefrontHeader profile={profile} visitorName={visitorName} />
 
