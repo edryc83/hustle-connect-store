@@ -8,8 +8,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Sparkles, Loader2 } from "lucide-react";
+import { Sparkles, Loader2, Camera } from "lucide-react";
 import { CURRENCY_OPTIONS } from "@/lib/currency";
+import AfristallLogo from "@/components/AfristallLogo";
 import {
   CategoryPicker,
   CategorySelection,
@@ -22,7 +23,9 @@ const DashboardSettings = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [generating, setGenerating] = useState(false);
+  const [uploadingPic, setUploadingPic] = useState(false);
   const [firstName, setFirstName] = useState("");
+  const [profilePicUrl, setProfilePicUrl] = useState("");
   const [storeName, setStoreName] = useState("");
   const [whatsappNumber, setWhatsappNumber] = useState("");
   const [city, setCity] = useState("");
@@ -35,12 +38,13 @@ const DashboardSettings = () => {
     if (!user) return;
     supabase
       .from("profiles")
-      .select("first_name, store_name, whatsapp_number, city, store_bio, category, delivery_areas, currency")
+      .select("first_name, profile_picture_url, store_name, whatsapp_number, city, store_bio, category, delivery_areas, currency")
       .eq("id", user.id)
       .single()
       .then(({ data }) => {
         if (data) {
           setFirstName((data as any).first_name ?? "");
+          setProfilePicUrl(data.profile_picture_url ?? "");
           setStoreName(data.store_name ?? "");
           setWhatsappNumber(data.whatsapp_number ?? "");
           setCity(data.city ?? "");
@@ -52,6 +56,37 @@ const DashboardSettings = () => {
         setLoading(false);
       });
   }, [user]);
+
+  const handleProfilePicChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file || !user) return;
+    if (file.size > 5 * 1024 * 1024) { toast.error("Image must be under 5MB"); return; }
+
+    setUploadingPic(true);
+    try {
+      const ext = file.name.split(".").pop();
+      const path = `${user.id}/profile.${ext}`;
+      const { error: uploadErr } = await supabase.storage
+        .from("store-images")
+        .upload(path, file, { upsert: true });
+      if (uploadErr) throw uploadErr;
+
+      const { data: urlData } = supabase.storage.from("store-images").getPublicUrl(path);
+      const newUrl = `${urlData.publicUrl}?t=${Date.now()}`;
+
+      const { error: updateErr } = await supabase
+        .from("profiles")
+        .update({ profile_picture_url: urlData.publicUrl } as any)
+        .eq("id", user.id);
+      if (updateErr) throw updateErr;
+
+      setProfilePicUrl(newUrl);
+      toast.success("Profile picture updated!");
+    } catch {
+      toast.error("Failed to upload picture");
+    }
+    setUploadingPic(false);
+  };
 
   const handleGenerateBio = async () => {
     setGenerating(true);
@@ -105,6 +140,41 @@ const DashboardSettings = () => {
           <CardTitle className="text-base">Your Profile</CardTitle>
         </CardHeader>
         <CardContent className="space-y-4">
+          {/* Profile Picture */}
+          <div className="flex items-center gap-4">
+            <div className="relative group">
+              {profilePicUrl ? (
+                <img
+                  src={profilePicUrl}
+                  alt="Profile"
+                  className="h-20 w-20 rounded-full object-cover border-2 border-primary/20"
+                />
+              ) : (
+                <div className="flex h-20 w-20 items-center justify-center rounded-full bg-primary/10">
+                  <AfristallLogo className="h-10 w-10" />
+                </div>
+              )}
+              <label className="absolute inset-0 flex items-center justify-center rounded-full bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
+                {uploadingPic ? (
+                  <Loader2 className="h-5 w-5 text-white animate-spin" />
+                ) : (
+                  <Camera className="h-5 w-5 text-white" />
+                )}
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleProfilePicChange}
+                  disabled={uploadingPic}
+                />
+              </label>
+            </div>
+            <div>
+              <p className="text-sm font-medium">Store Logo / Photo</p>
+              <p className="text-xs text-muted-foreground">Hover and click to change</p>
+            </div>
+          </div>
+
           <div className="space-y-1.5">
             <Label>First Name</Label>
             <Input value={firstName} onChange={(e) => setFirstName(e.target.value)} placeholder="e.g. John" />
