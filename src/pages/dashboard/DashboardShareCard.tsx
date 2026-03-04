@@ -1,11 +1,9 @@
-import { useEffect, useState, useRef, useCallback } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Download, Loader2, Sparkles, Copy, Share2, Check, Palette, Image as ImageIcon, Upload, X, Camera, ArrowLeft, ArrowRight } from "lucide-react";
-import { toast } from "sonner";
+import { Loader2, Check, Palette, ArrowRight } from "lucide-react";
+import { PolotnoEditor } from "@/components/dashboard/PolotnoEditor";
 
 /* ───────── Types ───────── */
 
@@ -15,7 +13,7 @@ interface DesignTemplate {
   category: string;
   defaultHeadline: string;
   defaultSubtitle: string;
-  previewImage: string;      // real preview image path
+  previewImage: string;
   previewBg: string;
   previewTextColor: string;
   previewAccent: string;
@@ -31,36 +29,15 @@ interface Product {
 /* ───────── All 9 Design Templates ───────── */
 
 const TEMPLATES: DesignTemplate[] = [
-  // Editorial
   { id: "editorial-highlight", name: "Highlight", category: "Editorial", defaultHeadline: "No limits.\nNo compromise.", defaultSubtitle: "Just everyday essentials, done properly.", previewImage: "/templates/editorial-1.jpeg", previewBg: "#1a1a1a", previewTextColor: "#fff", previewAccent: "#FF6B35", previewLayout: "full-bleed" },
   { id: "editorial-magazine", name: "Magazine", category: "Editorial", defaultHeadline: "NEW\nCOLLECTION", defaultSubtitle: "Curated pieces you'll love.", previewImage: "/templates/editorial-3.jpg", previewBg: "#0a0a0a", previewTextColor: "#fff", previewAccent: "#d4a574", previewLayout: "full-bleed" },
   { id: "editorial-minimal", name: "Minimal", category: "Editorial", defaultHeadline: "SHOP\nNOW", defaultSubtitle: "Discover what's trending.", previewImage: "/templates/spotlight-1.jpeg", previewBg: "#111", previewTextColor: "#fff", previewAccent: "#FF6B35", previewLayout: "full-bleed" },
-  // Spotlight
   { id: "spotlight-hero", name: "Hero Shot", category: "Spotlight", defaultHeadline: "FEATURED\nPRODUCT", defaultSubtitle: "The one everyone's talking about.", previewImage: "/templates/spotlight-2.jpeg", previewBg: "#f5f3ef", previewTextColor: "#1a1a1a", previewAccent: "#FF6B35", previewLayout: "split" },
   { id: "spotlight-split", name: "Split View", category: "Spotlight", defaultHeadline: "BEST\nSELLER", defaultSubtitle: "See why it's #1.", previewImage: "/templates/brand-2.png", previewBg: "#1a1a2e", previewTextColor: "#fff", previewAccent: "#FF6B35", previewLayout: "split" },
-  // Brand Card
   { id: "brand-profile", name: "Profile Card", category: "Brand Card", defaultHeadline: "VISIT\nMY STORE", defaultSubtitle: "Quality products, great prices.", previewImage: "/templates/brand-1.jpeg", previewBg: "#ffffff", previewTextColor: "#111827", previewAccent: "#FF6B35", previewLayout: "centered" },
   { id: "brand-elegant", name: "Elegant Dark", category: "Brand Card", defaultHeadline: "EXPLORE\nOUR RANGE", defaultSubtitle: "Something for everyone.", previewImage: "/templates/brand-3.png", previewBg: "#1a1a2e", previewTextColor: "#fff", previewAccent: "#d4a574", previewLayout: "centered" },
-  // Collage
   { id: "collage-grid", name: "Grid Layout", category: "Collage", defaultHeadline: "NEW ARRIVALS", defaultSubtitle: "Fresh stock just dropped!", previewImage: "/templates/collage-1.png", previewBg: "#faf9f7", previewTextColor: "#111827", previewAccent: "#FF6B35", previewLayout: "grid" },
   { id: "collage-mosaic", name: "Mosaic", category: "Collage", defaultHeadline: "TOP PICKS", defaultSubtitle: "Our best sellers, curated for you.", previewImage: "/templates/collage-2.png", previewBg: "#faf9f7", previewTextColor: "#111827", previewAccent: "#FF8F5E", previewLayout: "grid" },
-];
-
-const BG_COLORS = [
-  { label: "Black", value: "#000000" },
-  { label: "White", value: "#ffffff" },
-  { label: "Beige", value: "#f5f0e8" },
-  { label: "Navy", value: "#1a1a3e" },
-  { label: "Forest", value: "#1a3a2a" },
-  { label: "Warm", value: "#d4a574" },
-];
-
-const TINT_FILTERS = [
-  { label: "Normal", value: "normal" },
-  { label: "Warm", value: "warm" },
-  { label: "Cool", value: "cool" },
-  { label: "B&W", value: "bw" },
-  { label: "Sepia", value: "sepia" },
 ];
 
 /* ───────── Helpers ───────── */
@@ -78,8 +55,6 @@ const parseCategory = (raw: string | null | undefined): string => {
 
 const DashboardShareCard = () => {
   const { user } = useAuth();
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Data
   const [storeName, setStoreName] = useState("");
@@ -93,23 +68,6 @@ const DashboardShareCard = () => {
   const [step, setStep] = useState<"select" | "edit">("select");
   const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null);
 
-  // Design state
-  const [selectedProductImage, setSelectedProductImage] = useState<string | null>(null);
-  const [customUploadedImage, setCustomUploadedImage] = useState<string | null>(null);
-  const [headline, setHeadline] = useState("");
-  const [subtitle, setSubtitle] = useState("");
-  const [bgColor, setBgColor] = useState("#000000");
-  const [tintFilter, setTintFilter] = useState("normal");
-
-  // UI state
-  const [generatingMsg, setGeneratingMsg] = useState(false);
-  const [captionCopied, setCaptionCopied] = useState(false);
-  const [uploading, setUploading] = useState(false);
-
-  const storeUrl = `afristall.com/${storeSlug}`;
-  const caption = `🛍️ Visit my store → ${storeUrl}`;
-  const activeImage = customUploadedImage || selectedProductImage;
-  const productsWithImages = products.filter(p => p.image_url);
   const selectedTemplate = TEMPLATES.find(t => t.id === selectedTemplateId) ?? null;
 
   // ── Fetch data ──
@@ -125,487 +83,11 @@ const DashboardShareCard = () => {
       setStoreSlug(p?.store_slug ?? "");
       setProfilePicUrl(p?.profile_picture_url ?? "");
       setCategory(parseCategory(p?.category));
-      const prods = (productsData ?? []).map((pr: any) => ({ id: pr.id, name: pr.name, image_url: pr.image_url }));
-      setProducts(prods);
-      const firstWithImage = prods.find((pr: Product) => pr.image_url);
-      if (firstWithImage) setSelectedProductImage(firstWithImage.image_url);
+      setProducts((productsData ?? []).map((pr: any) => ({ id: pr.id, name: pr.name, image_url: pr.image_url })));
       setLoading(false);
     };
     fetchData();
   }, [user]);
-
-  // ── Select template and go to editor ──
-  const handleSelectTemplate = (t: DesignTemplate) => {
-    setSelectedTemplateId(t.id);
-  };
-
-  const goToEditor = () => {
-    if (!selectedTemplate) return;
-    setHeadline(selectedTemplate.defaultHeadline);
-    setSubtitle(selectedTemplate.defaultSubtitle);
-    setBgColor("#000000");
-    setTintFilter("normal");
-    // Use the template's preview image as the default so the canvas matches the thumbnail
-    setCustomUploadedImage(selectedTemplate.previewImage);
-    setSelectedProductImage(null);
-    setStep("edit");
-  };
-
-  const goBack = () => {
-    setStep("select");
-  };
-
-  // ── Image upload ──
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file || !user) return;
-    if (file.size > 5 * 1024 * 1024) { toast.error("Image must be under 5MB"); return; }
-    setUploading(true);
-    try {
-      const ext = file.name.split(".").pop();
-      const path = `${user.id}/design-${Date.now()}.${ext}`;
-      const { error: uploadError } = await supabase.storage.from("store-images").upload(path, file);
-      if (uploadError) throw uploadError;
-      const { data: { publicUrl } } = supabase.storage.from("store-images").getPublicUrl(path);
-      setCustomUploadedImage(publicUrl);
-      toast.success("Image uploaded!");
-    } catch { toast.error("Upload failed"); }
-    setUploading(false);
-    if (fileInputRef.current) fileInputRef.current.value = "";
-  };
-
-  const generateAIText = async () => {
-    setGeneratingMsg(true);
-    try {
-      const res = await supabase.functions.invoke("generate-card-message", { body: { storeName } });
-      if (res.error) throw res.error;
-      if (res.data?.message) setSubtitle(res.data.message);
-    } catch { toast.error("Failed to generate text"); }
-    setGeneratingMsg(false);
-  };
-
-  /* ───────── Canvas Drawing ───────── */
-
-  const loadImage = (src: string): Promise<HTMLImageElement> =>
-    new Promise((resolve, reject) => {
-      const img = new Image();
-      img.crossOrigin = "anonymous";
-      img.onload = () => resolve(img);
-      img.onerror = reject;
-      img.src = src;
-    });
-
-  const drawFullBleed = (ctx: CanvasRenderingContext2D, img: HTMLImageElement, W: number, H: number) => {
-    const scale = Math.max(W / img.width, H / img.height);
-    const sw = img.width * scale; const sh = img.height * scale;
-    ctx.drawImage(img, (W - sw) / 2, (H - sh) / 2, sw, sh);
-  };
-
-  const applyTint = (ctx: CanvasRenderingContext2D, W: number, H: number, filter: string) => {
-    if (filter === "normal") return;
-    ctx.save();
-    if (filter === "warm") { ctx.fillStyle = "rgba(255,140,50,0.18)"; ctx.fillRect(0, 0, W, H); }
-    else if (filter === "cool") { ctx.fillStyle = "rgba(50,100,255,0.15)"; ctx.fillRect(0, 0, W, H); }
-    else if (filter === "bw") {
-      ctx.globalCompositeOperation = "saturation";
-      ctx.fillStyle = "hsl(0,0%,50%)"; ctx.fillRect(0, 0, W, H);
-      ctx.globalCompositeOperation = "source-over";
-    } else if (filter === "sepia") {
-      ctx.globalCompositeOperation = "saturation";
-      ctx.fillStyle = "hsl(0,0%,50%)"; ctx.fillRect(0, 0, W, H);
-      ctx.globalCompositeOperation = "source-over";
-      ctx.fillStyle = "rgba(180,120,60,0.25)"; ctx.fillRect(0, 0, W, H);
-    }
-    ctx.restore();
-  };
-
-  const drawCircularImage = (
-    ctx: CanvasRenderingContext2D, img: HTMLImageElement,
-    cx: number, cy: number, radius: number, borderWidth = 0, borderColor = "#fff"
-  ) => {
-    if (borderWidth > 0) {
-      ctx.beginPath(); ctx.arc(cx, cy, radius + borderWidth, 0, Math.PI * 2);
-      ctx.fillStyle = borderColor; ctx.fill();
-    }
-    ctx.save();
-    ctx.beginPath(); ctx.arc(cx, cy, radius, 0, Math.PI * 2); ctx.clip();
-    const scale = Math.max((radius * 2) / img.width, (radius * 2) / img.height);
-    const sw = img.width * scale; const sh = img.height * scale;
-    ctx.drawImage(img, cx - sw / 2, cy - sh / 2, sw, sh);
-    ctx.restore();
-  };
-
-  const drawCircularPlaceholder = (
-    ctx: CanvasRenderingContext2D, cx: number, cy: number, radius: number,
-    letter: string, bg: string, fg: string, borderWidth = 0, borderColor = "#fff"
-  ) => {
-    if (borderWidth > 0) {
-      ctx.beginPath(); ctx.arc(cx, cy, radius + borderWidth, 0, Math.PI * 2);
-      ctx.fillStyle = borderColor; ctx.fill();
-    }
-    ctx.beginPath(); ctx.arc(cx, cy, radius, 0, Math.PI * 2);
-    ctx.fillStyle = bg; ctx.fill();
-    ctx.fillStyle = fg;
-    ctx.font = `bold ${radius}px system-ui, sans-serif`;
-    ctx.textAlign = "center"; ctx.textBaseline = "middle";
-    ctx.fillText(letter, cx, cy);
-  };
-
-  const drawMultiline = (
-    ctx: CanvasRenderingContext2D, text: string,
-    x: number, y: number, maxWidth: number, lineHeight: number, align: CanvasTextAlign = "left"
-  ) => {
-    ctx.textAlign = align;
-    const lines = text.split("\n");
-    let currentY = y;
-    for (const rawLine of lines) {
-      const words = rawLine.split(" ");
-      let line = "";
-      for (const word of words) {
-        const test = line + (line ? " " : "") + word;
-        if (ctx.measureText(test).width > maxWidth && line) {
-          ctx.fillText(line, x, currentY); line = word; currentY += lineHeight;
-        } else { line = test; }
-      }
-      if (line) ctx.fillText(line, x, currentY);
-      currentY += lineHeight;
-    }
-    return currentY;
-  };
-
-  const drawBranding = async (
-    ctx: CanvasRenderingContext2D, W: number, _H: number,
-    profileImg: HTMLImageElement | null, displayName: string, letter: string,
-    position: "top" | "bottom" = "top", light = true
-  ) => {
-    const color = light ? "#ffffff" : "#111827";
-
-    let logoImg: HTMLImageElement | null = null;
-    try { logoImg = await loadImage("/logo.jpeg"); } catch {}
-
-    if (position === "top") {
-      const y = 70;
-      if (logoImg) {
-        ctx.save(); ctx.beginPath(); ctx.roundRect(70, y, 50, 50, 10); ctx.clip();
-        ctx.drawImage(logoImg, 70, y, 50, 50); ctx.restore();
-        ctx.fillStyle = color; ctx.font = "bold 28px system-ui, sans-serif";
-        ctx.textAlign = "left"; ctx.textBaseline = "middle";
-        ctx.fillText("afristall", 132, y + 25);
-      }
-      const rightX = W - 70;
-      if (profileImg) {
-        drawCircularImage(ctx, profileImg, rightX - 25, y + 25, 25, 2, light ? "#ffffff" : "#e5e7eb");
-        ctx.fillStyle = color; ctx.font = "600 24px system-ui, sans-serif";
-        ctx.textAlign = "right"; ctx.textBaseline = "middle";
-        ctx.fillText(displayName, rightX - 60, y + 25);
-      } else {
-        drawCircularPlaceholder(ctx, rightX - 25, y + 25, 25, letter, light ? "rgba(255,255,255,0.2)" : "#e5e7eb", color, 2, light ? "#ffffff" : "#e5e7eb");
-        ctx.fillStyle = color; ctx.font = "600 24px system-ui, sans-serif";
-        ctx.textAlign = "right"; ctx.textBaseline = "middle";
-        ctx.fillText(displayName, rightX - 60, y + 25);
-      }
-    } else {
-      const y = _H - 70;
-      ctx.fillStyle = color; ctx.font = "bold 30px system-ui, sans-serif";
-      ctx.textAlign = "center"; ctx.textBaseline = "middle";
-      ctx.fillText(storeUrl, W / 2, y);
-    }
-  };
-
-  const renderCanvas = useCallback(async () => {
-    const canvas = canvasRef.current;
-    if (!canvas || loading || !selectedTemplate) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
-    const W = 1080; const H = 1920;
-    canvas.width = W; canvas.height = H;
-
-    let profileImg: HTMLImageElement | null = null;
-    if (profilePicUrl) { try { profileImg = await loadImage(profilePicUrl); } catch {} }
-    const displayName = storeName || "My Store";
-    const letter = displayName[0].toUpperCase();
-
-    ctx.fillStyle = bgColor; ctx.fillRect(0, 0, W, H);
-
-    const tid = selectedTemplate.id;
-
-    /* ──────── EDITORIAL TEMPLATES ──────── */
-    if (tid === "editorial-highlight") {
-      if (activeImage) { try { const img = await loadImage(activeImage); drawFullBleed(ctx, img, W, H); } catch {} }
-      applyTint(ctx, W, H, tintFilter);
-      // Top gradient for branding
-      const ovTop = ctx.createLinearGradient(0, 0, 0, H * 0.18);
-      ovTop.addColorStop(0, "rgba(0,0,0,0.5)"); ovTop.addColorStop(1, "rgba(0,0,0,0)");
-      ctx.fillStyle = ovTop; ctx.fillRect(0, 0, W, H * 0.18);
-      // Bottom gradient for text + URL
-      const ov = ctx.createLinearGradient(0, H * 0.25, 0, H);
-      ov.addColorStop(0, "rgba(0,0,0,0)"); ov.addColorStop(0.5, "rgba(0,0,0,0.3)"); ov.addColorStop(1, "rgba(0,0,0,0.85)");
-      ctx.fillStyle = ov; ctx.fillRect(0, 0, W, H);
-      await drawBranding(ctx, W, H, profileImg, displayName, letter, "top", true);
-      const lines = headline.split("\n");
-      let hlY = H * 0.52;
-      ctx.font = "bold 108px system-ui, sans-serif"; ctx.textBaseline = "top";
-      for (const line of lines) {
-        if (!line.trim()) { hlY += 120; continue; }
-        const m = ctx.measureText(line);
-        ctx.fillStyle = "rgba(255,255,255,0.92)";
-        ctx.beginPath(); ctx.roundRect(60, hlY - 10, m.width + 40, 130, 10); ctx.fill();
-        ctx.fillStyle = "#0a0a0a"; ctx.textAlign = "left"; ctx.fillText(line, 80, hlY);
-        hlY += 140;
-      }
-      ctx.fillStyle = "#ffffff"; ctx.font = "italic 40px Georgia, serif";
-      ctx.globalAlpha = 0.95;
-      drawMultiline(ctx, subtitle, 80, hlY + 30, W - 160, 54, "left");
-      ctx.globalAlpha = 1;
-      await drawBranding(ctx, W, H, profileImg, displayName, letter, "bottom", true);
-
-    } else if (tid === "editorial-magazine") {
-      if (activeImage) { try { const img = await loadImage(activeImage); drawFullBleed(ctx, img, W, H); } catch {} }
-      applyTint(ctx, W, H, tintFilter);
-      const ov = ctx.createLinearGradient(0, 0, 0, H * 0.45);
-      ov.addColorStop(0, "rgba(0,0,0,0.7)"); ov.addColorStop(1, "rgba(0,0,0,0)");
-      ctx.fillStyle = ov; ctx.fillRect(0, 0, W, H);
-      const ov2 = ctx.createLinearGradient(0, H * 0.6, 0, H);
-      ov2.addColorStop(0, "rgba(0,0,0,0)"); ov2.addColorStop(1, "rgba(0,0,0,0.8)");
-      ctx.fillStyle = ov2; ctx.fillRect(0, 0, W, H);
-      await drawBranding(ctx, W, H, profileImg, displayName, letter, "top", true);
-      ctx.fillStyle = "#ffffff"; ctx.font = "bold 120px Georgia, serif"; ctx.textBaseline = "top";
-      drawMultiline(ctx, headline, W / 2, 200, W - 120, 140, "center");
-      ctx.fillStyle = "#ffffff"; ctx.font = "36px system-ui, sans-serif"; ctx.globalAlpha = 0.85;
-      drawMultiline(ctx, subtitle, W / 2, H - 250, W - 160, 48, "center");
-      ctx.globalAlpha = 1;
-      await drawBranding(ctx, W, H, profileImg, displayName, letter, "bottom", true);
-
-    } else if (tid === "editorial-minimal") {
-      if (activeImage) { try { const img = await loadImage(activeImage); drawFullBleed(ctx, img, W, H); } catch {} }
-      applyTint(ctx, W, H, tintFilter);
-      // Top gradient for branding visibility
-      const ovTop = ctx.createLinearGradient(0, 0, 0, H * 0.2);
-      ovTop.addColorStop(0, "rgba(0,0,0,0.5)"); ovTop.addColorStop(1, "rgba(0,0,0,0)");
-      ctx.fillStyle = ovTop; ctx.fillRect(0, 0, W, H * 0.2);
-      // Bottom gradient for text visibility
-      const ov = ctx.createLinearGradient(0, H * 0.4, 0, H);
-      ov.addColorStop(0, "rgba(0,0,0,0)"); ov.addColorStop(1, "rgba(0,0,0,0.75)");
-      ctx.fillStyle = ov; ctx.fillRect(0, 0, W, H);
-      await drawBranding(ctx, W, H, profileImg, displayName, letter, "top", true);
-      ctx.fillStyle = "#ffffff"; ctx.font = "bold 100px system-ui, sans-serif"; ctx.textBaseline = "middle";
-      drawMultiline(ctx, headline, W / 2, H * 0.65, W - 160, 120, "center");
-      ctx.font = "34px system-ui, sans-serif"; ctx.globalAlpha = 0.85;
-      drawMultiline(ctx, subtitle, W / 2, H * 0.65 + 180, W - 160, 46, "center");
-      ctx.globalAlpha = 1;
-      await drawBranding(ctx, W, H, profileImg, displayName, letter, "bottom", true);
-
-    /* ──────── SPOTLIGHT TEMPLATES ──────── */
-    } else if (tid === "spotlight-hero") {
-      ctx.fillStyle = bgColor === "#000000" ? "#f5f3ef" : bgColor; ctx.fillRect(0, 0, W, H);
-      await drawBranding(ctx, W, H, profileImg, displayName, letter, "top", false);
-      const words = headline.replace(/\n/g, " ").split(" ");
-      const mid = Math.ceil(words.length / 2);
-      ctx.font = "bold 80px system-ui, sans-serif"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
-      ctx.fillStyle = "#FF6B35"; ctx.fillText(words.slice(0, mid).join(" ").toUpperCase(), W / 2, 220);
-      ctx.fillStyle = "#1a1a1a"; ctx.fillText(words.slice(mid).join(" ").toUpperCase(), W / 2, 310);
-      if (activeImage) {
-        try {
-          const img = await loadImage(activeImage);
-          const imgTop = 400; const imgH = H - imgTop - 340; const imgW = W - 120;
-          ctx.save(); ctx.beginPath(); ctx.roundRect(60, imgTop, imgW, imgH, 40); ctx.clip();
-          const scale = Math.max(imgW / img.width, imgH / img.height);
-          const sw = img.width * scale; const sh = img.height * scale;
-          ctx.drawImage(img, 60 + (imgW - sw) / 2, imgTop + (imgH - sh) / 2, sw, sh);
-          ctx.restore();
-          applyTint(ctx, W, H, tintFilter);
-        } catch {}
-      }
-      ctx.fillStyle = "#666666"; ctx.font = "32px system-ui, sans-serif"; ctx.textAlign = "center";
-      drawMultiline(ctx, subtitle, W / 2, H - 220, W - 160, 42, "center");
-      ctx.fillStyle = "#FF6B35"; ctx.font = "bold 32px system-ui, sans-serif"; ctx.textBaseline = "middle";
-      ctx.fillText(storeUrl, W / 2, H - 70);
-
-    } else if (tid === "spotlight-split") {
-      const splitY = H * 0.55;
-      if (activeImage) {
-        try {
-          const img = await loadImage(activeImage);
-          ctx.save(); ctx.beginPath(); ctx.rect(0, 0, W, splitY); ctx.clip();
-          drawFullBleed(ctx, img, W, splitY); ctx.restore();
-          applyTint(ctx, W, H, tintFilter);
-        } catch {}
-      }
-      ctx.fillStyle = bgColor === "#000000" ? "#ffffff" : bgColor;
-      ctx.fillRect(0, splitY, W, H - splitY);
-      await drawBranding(ctx, W, H, profileImg, displayName, letter, "top", true);
-      const textY = splitY + 60;
-      ctx.fillStyle = "#1a1a1a"; ctx.font = "bold 90px system-ui, sans-serif"; ctx.textBaseline = "top";
-      drawMultiline(ctx, headline, 70, textY, W - 140, 110, "left");
-      ctx.fillStyle = "#6b7280"; ctx.font = "32px system-ui, sans-serif";
-      drawMultiline(ctx, subtitle, 70, textY + 260, W - 140, 44, "left");
-      const barH = 100;
-      ctx.fillStyle = "#FF6B35"; ctx.fillRect(0, H - barH, W, barH);
-      ctx.fillStyle = "#ffffff"; ctx.font = "bold 32px system-ui, sans-serif";
-      ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText(storeUrl, W / 2, H - barH / 2);
-
-    /* ──────── BRAND CARD TEMPLATES ──────── */
-    } else if (tid === "brand-profile") {
-      ctx.fillStyle = bgColor === "#000000" ? "#ffffff" : bgColor; ctx.fillRect(0, 0, W, H);
-      const imgPad = 80; const imgTop = 160; const imgW = W - imgPad * 2; const imgH = H * 0.48;
-      if (activeImage || profileImg) {
-        const img = activeImage ? await loadImage(activeImage).catch(() => profileImg) : profileImg;
-        if (img) {
-          ctx.save(); ctx.beginPath(); ctx.roundRect(imgPad, imgTop, imgW, imgH, 32); ctx.clip();
-          const scale = Math.max(imgW / img.width, imgH / img.height);
-          const sw = img.width * scale; const sh = img.height * scale;
-          ctx.drawImage(img, imgPad + (imgW - sw) / 2, imgTop + (imgH - sh) / 2, sw, sh);
-          ctx.restore(); applyTint(ctx, W, H, tintFilter);
-        }
-      } else {
-        ctx.fillStyle = "#f3f4f6"; ctx.beginPath(); ctx.roundRect(imgPad, imgTop, imgW, imgH, 32); ctx.fill();
-        drawCircularPlaceholder(ctx, W / 2, imgTop + imgH / 2, 100, letter, "#e5e7eb", "#9ca3af");
-      }
-      let logoImg: HTMLImageElement | null = null;
-      try { logoImg = await loadImage("/logo.jpeg"); } catch {}
-      if (logoImg) {
-        ctx.save(); ctx.beginPath(); ctx.roundRect(imgPad, 70, 45, 45, 10); ctx.clip();
-        ctx.drawImage(logoImg, imgPad, 70, 45, 45); ctx.restore();
-        ctx.fillStyle = "#1a1a1a"; ctx.font = "bold 26px system-ui, sans-serif";
-        ctx.textAlign = "left"; ctx.textBaseline = "middle"; ctx.fillText("afristall", imgPad + 55, 92);
-      }
-      const textTop = imgTop + imgH + 50;
-      ctx.fillStyle = "#111827"; ctx.font = "bold 64px system-ui, sans-serif"; ctx.textBaseline = "top";
-      drawMultiline(ctx, headline, imgPad, textTop, imgW, 78, "left");
-      ctx.fillStyle = "#6b7280"; ctx.font = "32px system-ui, sans-serif";
-      drawMultiline(ctx, subtitle, imgPad, textTop + 180, imgW, 44, "left");
-      const bY = H - 180;
-      if (profileImg) {
-        drawCircularImage(ctx, profileImg, imgPad + 30, bY, 30, 3, "#e5e7eb");
-        ctx.fillStyle = "#111827"; ctx.font = "600 28px system-ui, sans-serif"; ctx.textAlign = "left"; ctx.textBaseline = "middle";
-        ctx.fillText(displayName, imgPad + 75, bY);
-      }
-      const barH2 = 110;
-      const grad = ctx.createLinearGradient(0, H - barH2, W, H);
-      grad.addColorStop(0, "#FF6B35"); grad.addColorStop(1, "#FF8F5E");
-      ctx.fillStyle = grad; ctx.fillRect(0, H - barH2, W, barH2);
-      ctx.fillStyle = "#ffffff"; ctx.font = "bold 34px system-ui, sans-serif";
-      ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText(storeUrl, W / 2, H - barH2 / 2);
-
-    } else if (tid === "brand-elegant") {
-      ctx.fillStyle = bgColor === "#000000" || bgColor === "#ffffff" ? "#1a1a2e" : bgColor;
-      ctx.fillRect(0, 0, W, H);
-      const imgPad = 80; const imgTop = 160; const imgW = W - imgPad * 2; const imgH = H * 0.45;
-      if (activeImage || profileImg) {
-        const img = activeImage ? await loadImage(activeImage).catch(() => profileImg) : profileImg;
-        if (img) {
-          ctx.save(); ctx.beginPath(); ctx.roundRect(imgPad, imgTop, imgW, imgH, 32); ctx.clip();
-          const scale = Math.max(imgW / img.width, imgH / img.height);
-          const sw = img.width * scale; const sh = img.height * scale;
-          ctx.drawImage(img, imgPad + (imgW - sw) / 2, imgTop + (imgH - sh) / 2, sw, sh);
-          ctx.restore(); applyTint(ctx, W, H, tintFilter);
-        }
-      }
-      await drawBranding(ctx, W, H, profileImg, displayName, letter, "top", true);
-      const textTop = imgTop + imgH + 50;
-      ctx.fillStyle = "#ffffff"; ctx.font = "bold 64px system-ui, sans-serif"; ctx.textBaseline = "top";
-      drawMultiline(ctx, headline, imgPad, textTop, imgW, 78, "left");
-      ctx.fillStyle = "rgba(255,255,255,0.7)"; ctx.font = "32px system-ui, sans-serif";
-      drawMultiline(ctx, subtitle, imgPad, textTop + 180, imgW, 44, "left");
-      await drawBranding(ctx, W, H, profileImg, displayName, letter, "bottom", true);
-
-    /* ──────── COLLAGE TEMPLATES ──────── */
-    } else if (tid === "collage-grid" || tid === "collage-mosaic") {
-      ctx.fillStyle = bgColor === "#000000" ? "#faf9f7" : bgColor; ctx.fillRect(0, 0, W, H);
-      const headerH = 200;
-      if (profileImg) {
-        drawCircularImage(ctx, profileImg, 100, headerH / 2, 40, 3, "#e5e7eb");
-        ctx.fillStyle = "#111827"; ctx.font = "bold 36px system-ui, sans-serif";
-        ctx.textAlign = "left"; ctx.textBaseline = "middle"; ctx.fillText(displayName, 155, headerH / 2);
-      } else {
-        drawCircularPlaceholder(ctx, 100, headerH / 2, 40, letter, "#f3f4f6", "#9ca3af", 3, "#e5e7eb");
-        ctx.fillStyle = "#111827"; ctx.font = "bold 36px system-ui, sans-serif";
-        ctx.textAlign = "left"; ctx.textBaseline = "middle"; ctx.fillText(displayName, 155, headerH / 2);
-      }
-      let logoImg2: HTMLImageElement | null = null;
-      try { logoImg2 = await loadImage("/logo.jpeg"); } catch {}
-      if (logoImg2) {
-        ctx.save(); ctx.beginPath(); ctx.roundRect(W - 120, headerH / 2 - 20, 40, 40, 8); ctx.clip();
-        ctx.drawImage(logoImg2, W - 120, headerH / 2 - 20, 40, 40); ctx.restore();
-      }
-      const gridTop = headerH + 10; const gridPad = 16; const gap = 12;
-      const gridW = W - gridPad * 2; const gridBottom = H - 320; const gridH = gridBottom - gridTop; const rad = 20;
-      const collageImages = productsWithImages.slice(0, 4);
-      const imgCount = collageImages.length;
-      const drawRounded = async (url: string, x: number, y: number, w: number, h: number) => {
-        try {
-          const img = await loadImage(url);
-          ctx.save(); ctx.beginPath(); ctx.roundRect(x, y, w, h, rad); ctx.clip();
-          const scale = Math.max(w / img.width, h / img.height);
-          const sw = img.width * scale; const sh = img.height * scale;
-          ctx.drawImage(img, x + (w - sw) / 2, y + (h - sh) / 2, sw, sh); ctx.restore();
-        } catch {
-          ctx.fillStyle = "#e5e7eb"; ctx.beginPath(); ctx.roundRect(x, y, w, h, rad); ctx.fill();
-        }
-      };
-      if (tid === "collage-grid") {
-        if (imgCount >= 4) {
-          const cW = (gridW - gap) / 2; const cH = (gridH - gap) / 2;
-          await drawRounded(collageImages[0].image_url!, gridPad, gridTop, cW, cH);
-          await drawRounded(collageImages[1].image_url!, gridPad + cW + gap, gridTop, cW, cH);
-          await drawRounded(collageImages[2].image_url!, gridPad, gridTop + cH + gap, cW, cH);
-          await drawRounded(collageImages[3].image_url!, gridPad + cW + gap, gridTop + cH + gap, cW, cH);
-        } else if (imgCount >= 1) {
-          await drawRounded(collageImages[0].image_url!, gridPad, gridTop, gridW, gridH);
-        }
-      } else {
-        if (imgCount >= 3) {
-          const leftW = Math.round(gridW * 0.55); const rightW = gridW - leftW - gap;
-          const rightH = (gridH - gap) / 2;
-          await drawRounded(collageImages[0].image_url!, gridPad, gridTop, leftW, gridH);
-          await drawRounded(collageImages[1].image_url!, gridPad + leftW + gap, gridTop, rightW, rightH);
-          await drawRounded(collageImages[2].image_url!, gridPad + leftW + gap, gridTop + rightH + gap, rightW, rightH);
-        } else if (imgCount >= 1) {
-          await drawRounded(collageImages[0].image_url!, gridPad, gridTop, gridW, gridH);
-        }
-      }
-      applyTint(ctx, W, H, tintFilter);
-      ctx.fillStyle = "#111827"; ctx.font = "bold 52px system-ui, sans-serif"; ctx.textBaseline = "top";
-      drawMultiline(ctx, headline.replace(/\n/g, " "), W / 2, gridBottom + 30, W - 120, 62, "center");
-      ctx.fillStyle = "#6b7280"; ctx.font = "30px system-ui, sans-serif";
-      drawMultiline(ctx, subtitle, W / 2, gridBottom + 110, W - 120, 42, "center");
-      const pillW = 500; const pillH = 80; const pillX = (W - pillW) / 2; const pillY = H - pillH - 40;
-      const pGrad = ctx.createLinearGradient(pillX, pillY, pillX + pillW, pillY);
-      pGrad.addColorStop(0, "#FF6B35"); pGrad.addColorStop(1, "#FF8F5E");
-      ctx.fillStyle = pGrad; ctx.beginPath(); ctx.roundRect(pillX, pillY, pillW, pillH, 40); ctx.fill();
-      ctx.fillStyle = "#ffffff"; ctx.font = "bold 30px system-ui, sans-serif";
-      ctx.textBaseline = "middle"; ctx.textAlign = "center"; ctx.fillText(storeUrl, W / 2, pillY + pillH / 2);
-    }
-  }, [profilePicUrl, storeName, storeSlug, headline, subtitle, selectedTemplate, activeImage, bgColor, tintFilter, loading, products, productsWithImages, storeUrl]);
-
-  useEffect(() => {
-    if (step === "edit" && selectedTemplate) renderCanvas();
-  }, [renderCanvas, step, selectedTemplate]);
-
-  const downloadOrShare = async () => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    canvas.toBlob(async (blob) => {
-      if (!blob) return;
-      const file = new File([blob], `${storeSlug}-card.png`, { type: "image/png" });
-      if (navigator.canShare?.({ files: [file] })) {
-        try { await navigator.share({ files: [file], title: storeName, text: caption }); } catch {}
-      } else {
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a"); a.href = url; a.download = `${storeSlug}-card.png`; a.click();
-        URL.revokeObjectURL(url);
-        toast.success("Card downloaded!");
-      }
-    }, "image/png", 1.0);
-  };
-
-  const copyCaption = async () => {
-    await navigator.clipboard.writeText(caption);
-    setCaptionCopied(true);
-    toast.success("Caption copied!");
-    setTimeout(() => setCaptionCopied(false), 2000);
-  };
 
   if (loading) {
     return (
@@ -615,213 +97,75 @@ const DashboardShareCard = () => {
     );
   }
 
-  /* ───────── STEP 1: Template Selection ───────── */
-  if (step === "select") {
-    const categories = [...new Set(TEMPLATES.map(t => t.category))];
+  /* ───────── STEP 2: Polotno Editor ───────── */
+  if (step === "edit" && selectedTemplate) {
     return (
-      <div className="space-y-6 pb-24 md:pb-6">
-        <div>
-          <h1 className="text-2xl font-bold flex items-center gap-2">
-            <Palette className="h-6 w-6 text-primary" /> Design Studio
-          </h1>
-          <p className="text-sm text-muted-foreground mt-1">Create branded cards for WhatsApp Status & Instagram Stories</p>
-        </div>
-
-        {/* Guide text */}
-        <div className="rounded-2xl border border-primary/20 bg-primary/5 p-4">
-          <p className="text-sm font-medium text-foreground">👋 Select your preferred design to get started</p>
-          <p className="text-xs text-muted-foreground mt-1">Pick a template that matches your brand's vibe, then customize it with your own images and text.</p>
-        </div>
-
-        {categories.map((cat) => (
-          <div key={cat}>
-            <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">{cat}</h2>
-            <div className="grid grid-cols-2 gap-3">
-              {TEMPLATES.filter(t => t.category === cat).map((t) => (
-                <button
-                  key={t.id}
-                  onClick={() => handleSelectTemplate(t)}
-                  className={`relative rounded-2xl border-2 overflow-hidden transition-all aspect-[9/14] group ${
-                    selectedTemplateId === t.id
-                      ? "border-primary ring-2 ring-primary/30 shadow-lg shadow-primary/10 scale-[1.02]"
-                      : "border-border/50 hover:border-primary/40 hover:shadow-md"
-                  }`}
-                >
-                  {/* Real design preview image */}
-                  <img
-                    src={t.previewImage}
-                    alt={t.name}
-                    className="absolute inset-0 w-full h-full object-cover"
-                  />
-
-                  {/* Name overlay */}
-                  <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-3 pt-8">
-                    <p className="text-white text-xs font-bold">{t.name}</p>
-                    <p className="text-white/60 text-[10px]">{t.category}</p>
-                  </div>
-
-                  {/* Selected check */}
-                  {selectedTemplateId === t.id && (
-                    <div className="absolute top-2 right-2 h-6 w-6 rounded-full bg-primary flex items-center justify-center">
-                      <Check className="h-3.5 w-3.5 text-primary-foreground" />
-                    </div>
-                  )}
-                </button>
-              ))}
-            </div>
-          </div>
-        ))}
-
-        {/* Next button */}
-        {selectedTemplateId && (
-          <div className="sticky bottom-20 md:bottom-4 z-40">
-            <Button onClick={goToEditor} className="w-full rounded-2xl h-12 text-base gap-2 shadow-lg shadow-primary/20">
-              Next – Customize Design <ArrowRight className="h-5 w-5" />
-            </Button>
-          </div>
-        )}
-      </div>
+      <PolotnoEditor
+        template={selectedTemplate}
+        storeName={storeName}
+        storeSlug={storeSlug}
+        profilePicUrl={profilePicUrl}
+        category={category}
+        products={products}
+        onBack={() => setStep("select")}
+      />
     );
   }
 
-  /* ───────── STEP 2: Editor ───────── */
+  /* ───────── STEP 1: Template Selection ───────── */
+  const categories = [...new Set(TEMPLATES.map(t => t.category))];
+
   return (
-    <div className="space-y-5 pb-24 md:pb-6">
-      {/* Back button + title */}
-      <div className="flex items-center gap-3">
-        <Button variant="ghost" size="icon" onClick={goBack} className="shrink-0 rounded-xl">
-          <ArrowLeft className="h-5 w-5" />
-        </Button>
-        <div>
-          <h1 className="text-lg font-bold">{selectedTemplate?.name} Design</h1>
-          <p className="text-xs text-muted-foreground">Customize your card</p>
-        </div>
-      </div>
-
-      {/* Canvas preview — click to change image */}
-      <div className="flex justify-center">
-        <div className="relative group w-full max-w-xs cursor-pointer" onClick={() => fileInputRef.current?.click()}>
-          <canvas
-            ref={canvasRef}
-            className="w-full rounded-2xl border border-border/50 shadow-lg"
-            style={{ aspectRatio: "9/16" }}
-          />
-          <div className="absolute inset-0 rounded-2xl bg-black/0 group-hover:bg-black/30 transition-all flex items-center justify-center opacity-0 group-hover:opacity-100">
-            <div className="bg-white/90 rounded-full px-4 py-2 flex items-center gap-2 text-sm font-medium text-foreground shadow-lg">
-              <Camera className="h-4 w-4" /> Tap to change image
-            </div>
-          </div>
-        </div>
-      </div>
-      <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
-
-      {/* Image picker row */}
+    <div className="space-y-6 pb-24 md:pb-6">
       <div>
-        <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider flex items-center gap-1.5">
-          <ImageIcon className="h-3.5 w-3.5" /> Images
-        </Label>
-        <div className="grid grid-cols-5 gap-2 mt-2">
-          <button
-            onClick={() => fileInputRef.current?.click()}
-            className="rounded-xl border-2 border-dashed border-border/50 hover:border-primary/40 aspect-square flex flex-col items-center justify-center gap-1 text-muted-foreground hover:text-primary transition-colors"
-            disabled={uploading}
-          >
-            {uploading ? <Loader2 className="h-4 w-4 animate-spin" /> : <><Upload className="h-4 w-4" /><span className="text-[9px] font-medium">Upload</span></>}
-          </button>
-          {customUploadedImage && (
-            <div className="relative">
-              <button onClick={() => setCustomUploadedImage(null)} className="absolute -top-1 -right-1 z-10 h-4 w-4 rounded-full bg-destructive text-destructive-foreground flex items-center justify-center"><X className="h-2.5 w-2.5" /></button>
+        <h1 className="text-2xl font-bold flex items-center gap-2">
+          <Palette className="h-6 w-6 text-primary" /> Design Studio
+        </h1>
+        <p className="text-sm text-muted-foreground mt-1">Create branded cards for WhatsApp Status & Instagram Stories</p>
+      </div>
+
+      <div className="rounded-2xl border border-primary/20 bg-primary/5 p-4">
+        <p className="text-sm font-medium text-foreground">👋 Select your preferred design to get started</p>
+        <p className="text-xs text-muted-foreground mt-1">Pick a template that matches your brand's vibe, then customize it with the full design editor.</p>
+      </div>
+
+      {categories.map((cat) => (
+        <div key={cat}>
+          <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">{cat}</h2>
+          <div className="grid grid-cols-2 gap-3">
+            {TEMPLATES.filter(t => t.category === cat).map((t) => (
               <button
-                onClick={() => { setCustomUploadedImage(customUploadedImage); setSelectedProductImage(null); }}
-                className={`rounded-xl border-2 overflow-hidden aspect-square w-full ${activeImage === customUploadedImage ? "border-primary ring-2 ring-primary/20" : "border-border/50"}`}
+                key={t.id}
+                onClick={() => setSelectedTemplateId(t.id)}
+                className={`relative rounded-2xl border-2 overflow-hidden transition-all aspect-[9/14] group ${
+                  selectedTemplateId === t.id
+                    ? "border-primary ring-2 ring-primary/30 shadow-lg shadow-primary/10 scale-[1.02]"
+                    : "border-border/50 hover:border-primary/40 hover:shadow-md"
+                }`}
               >
-                <img src={customUploadedImage} alt="Uploaded" className="w-full h-full object-cover" />
+                <img src={t.previewImage} alt={t.name} className="absolute inset-0 w-full h-full object-cover" />
+                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-3 pt-8">
+                  <p className="text-white text-xs font-bold">{t.name}</p>
+                  <p className="text-white/60 text-[10px]">{t.category}</p>
+                </div>
+                {selectedTemplateId === t.id && (
+                  <div className="absolute top-2 right-2 h-6 w-6 rounded-full bg-primary flex items-center justify-center">
+                    <Check className="h-3.5 w-3.5 text-primary-foreground" />
+                  </div>
+                )}
               </button>
-            </div>
-          )}
-          {productsWithImages.slice(0, customUploadedImage ? 3 : 4).map((p) => (
-            <button
-              key={p.id}
-              onClick={() => { setSelectedProductImage(p.image_url); setCustomUploadedImage(null); }}
-              className={`rounded-xl border-2 overflow-hidden aspect-square ${activeImage === p.image_url && !customUploadedImage ? "border-primary ring-2 ring-primary/20" : "border-border/50 hover:border-primary/30"}`}
-            >
-              <img src={p.image_url!} alt={p.name} className="w-full h-full object-cover" />
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Background color */}
-      <div>
-        <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Background</Label>
-        <div className="flex gap-2 mt-2">
-          {BG_COLORS.map((c) => (
-            <button
-              key={c.value}
-              onClick={() => setBgColor(c.value)}
-              className={`h-8 w-8 rounded-full border-2 transition-all ${bgColor === c.value ? "border-primary ring-2 ring-primary/20 scale-110" : "border-border/50"}`}
-              style={{ backgroundColor: c.value }}
-              title={c.label}
-            />
-          ))}
-        </div>
-      </div>
-
-      {/* Tint filter */}
-      <div>
-        <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">Image Tint</Label>
-        <div className="flex gap-2 mt-2">
-          {TINT_FILTERS.map((t) => (
-            <button
-              key={t.value}
-              onClick={() => setTintFilter(t.value)}
-              className={`rounded-full px-3 py-1.5 text-xs font-medium transition-all ${tintFilter === t.value ? "bg-primary text-primary-foreground" : "bg-muted text-muted-foreground hover:bg-muted/80"}`}
-            >
-              {t.label}
-            </button>
-          ))}
-        </div>
-      </div>
-
-      {/* Text editing */}
-      <div className="rounded-2xl border border-border/50 bg-card/60 backdrop-blur-xl p-5 space-y-4">
-        <h3 className="text-sm font-semibold">Customize Text</h3>
-        <div>
-          <Label className="text-xs">Headline</Label>
-          <textarea
-            value={headline}
-            onChange={(e) => setHeadline(e.target.value)}
-            placeholder="e.g. SHOP NOW"
-            maxLength={120}
-            rows={3}
-            className="mt-1 flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 resize-none"
-          />
-        </div>
-        <div>
-          <div className="flex items-center justify-between mb-1">
-            <Label className="text-xs">Subtitle</Label>
-            <Button variant="ghost" size="sm" className="h-7 gap-1.5 text-xs text-primary" onClick={generateAIText} disabled={generatingMsg}>
-              {generatingMsg ? <Loader2 className="h-3 w-3 animate-spin" /> : <Sparkles className="h-3 w-3" />} AI Generate
-            </Button>
+            ))}
           </div>
-          <Input value={subtitle} onChange={(e) => setSubtitle(e.target.value)} placeholder="e.g. Quality products, great prices." maxLength={120} />
         </div>
-      </div>
+      ))}
 
-      {/* Actions */}
-      <div className="space-y-3">
-        <Button onClick={downloadOrShare} className="w-full rounded-2xl gap-2 h-12 text-base">
-          {typeof navigator !== "undefined" && navigator.canShare ? <><Share2 className="h-5 w-5" /> Share Card</> : <><Download className="h-5 w-5" /> Download Card</>}
-        </Button>
-        <div className="rounded-2xl border border-border/50 bg-card/60 backdrop-blur-xl p-4 space-y-3">
-          <Label className="text-xs text-muted-foreground uppercase tracking-wider">Caption</Label>
-          <p className="text-sm leading-relaxed">{caption}</p>
-          <Button variant="outline" size="sm" className="w-full rounded-xl gap-1.5" onClick={copyCaption}>
-            {captionCopied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
-            {captionCopied ? "Copied!" : "Copy Caption"}
+      {selectedTemplateId && (
+        <div className="sticky bottom-20 md:bottom-4 z-40">
+          <Button onClick={() => setStep("edit")} className="w-full rounded-2xl h-12 text-base gap-2 shadow-lg shadow-primary/20">
+            Next – Customize Design <ArrowRight className="h-5 w-5" />
           </Button>
         </div>
-      </div>
+      )}
     </div>
   );
 };
