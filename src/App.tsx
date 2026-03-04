@@ -11,6 +11,7 @@ import Login from "./pages/Login";
 import DashboardOverview from "./pages/dashboard/DashboardOverview";
 import DashboardProducts from "./pages/dashboard/DashboardProducts";
 import DashboardSettings from "./pages/dashboard/DashboardSettings";
+import Storefront from "./pages/Storefront";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -29,6 +30,7 @@ const App = () => (
             <Route path="/dashboard" element={<DashboardLayout><DashboardOverview /></DashboardLayout>} />
             <Route path="/dashboard/products" element={<DashboardLayout><DashboardProducts /></DashboardLayout>} />
             <Route path="/dashboard/settings" element={<DashboardLayout><DashboardSettings /></DashboardLayout>} />
+            <Route path="/:storeSlug" element={<Storefront />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
