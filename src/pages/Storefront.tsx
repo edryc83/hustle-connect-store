@@ -159,11 +159,11 @@ const Storefront = () => {
                     <MapPin className="h-3.5 w-3.5" /> {profile.city}
                   </span>
                 )}
-                {profile.category && (
-                  <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary">
-                    {profile.category}
+                {categoriesToDisplay(profile.category).map((tag) => (
+                  <span key={tag} className="rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary">
+                    {tag}
                   </span>
-                )}
+                ))}
               </div>
             </div>
           </div>
