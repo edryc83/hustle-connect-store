@@ -7,7 +7,6 @@ import { Label } from "@/components/ui/label";
 import { Mail, Phone, Eye, EyeOff } from "lucide-react";
 import AfristallLogo from "@/components/AfristallLogo";
 import EmojiGrid from "@/components/landing/EmojiGrid";
-import AfristallLogo from "@/components/AfristallLogo";
 import { toast } from "sonner";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
