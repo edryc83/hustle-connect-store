@@ -442,7 +442,7 @@ const DashboardSettings = () => {
           </div>
 
           <div className="space-y-1.5">
-            <Label>Street</Label>
+            <Label>Street <span className="text-muted-foreground font-normal">(optional)</span></Label>
             <Input value={street} onChange={(e) => setStreet(e.target.value)} placeholder="e.g. Kira Road, Allen Avenue" />
           </div>
 
