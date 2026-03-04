@@ -440,6 +440,7 @@ function ProductDetailView({
 
 const StorefrontInner = () => {
   const { addItem } = useCart();
+  const { items: wishlistItems } = useWishlist();
   const { theme, toggleTheme } = useTheme();
   const { user } = useAuth();
   const { storeSlug, productId } = useParams<{ storeSlug: string; productId?: string }>();
@@ -653,6 +654,32 @@ const StorefrontInner = () => {
 
       {/* Products */}
       <main className="mx-auto max-w-5xl px-4 py-6 space-y-8">
+        {/* Wishlist Section */}
+        {(() => {
+          const wishedProducts = products.filter((p) => wishlistItems.includes(p.id));
+          if (wishedProducts.length === 0) return null;
+          return (
+            <section>
+              <div className="flex items-center gap-2 mb-4">
+                <Heart className="h-5 w-5 text-destructive fill-destructive" />
+                <h2 className="text-lg font-bold">Your Wishlist</h2>
+                <span className="text-xs text-muted-foreground">({wishedProducts.length})</span>
+              </div>
+              <div className="grid gap-3 sm:gap-4 grid-cols-2 sm:grid-cols-3">
+                {wishedProducts.map((product) => (
+                  <ProductCard
+                    key={product.id}
+                    product={product}
+                    images={productImagesMap[product.id] ?? (product.image_url ? [product.image_url] : [])}
+                    currency={currency}
+                    onClick={() => navigate(`/${storeSlug}/${product.id}`)}
+                  />
+                ))}
+              </div>
+            </section>
+          );
+        })()}
+
         {products.length === 0 ? (
           <div className="flex flex-col items-center gap-3 py-16 text-center">
             <ShoppingBag className="h-12 w-12 text-muted-foreground/40" />
