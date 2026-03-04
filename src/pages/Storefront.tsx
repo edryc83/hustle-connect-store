@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Store, ShoppingBag, Share2, Copy, Check, Star, ShoppingCart } from "lucide-react";
+import { Store, ShoppingBag, Share2, Copy, Check, Star, ShoppingCart, Sun, Moon } from "lucide-react";
 import { formatPrice } from "@/lib/currency";
 import AfristallLogo from "@/components/AfristallLogo";
 import { ProductImageCarousel } from "@/components/storefront/ProductImageCarousel";
 import { StorefrontHeader } from "@/components/storefront/StorefrontHeader";
 import { VisitorNameModal } from "@/components/storefront/VisitorNameModal";
 import { CartDrawer } from "@/components/storefront/CartDrawer";
+import { useTheme } from "@/hooks/useTheme";
 import { CartProvider, useCart } from "@/hooks/useCart";
 import {
   DropdownMenu,
@@ -27,7 +28,7 @@ type Profile = Tables<"profiles">;
 function ShareButton({ storeName, storeSlug }: { storeName: string; storeSlug: string }) {
   const [copied, setCopied] = useState(false);
   const storeUrl = `${window.location.origin}/${storeSlug}`;
-  const shareText = `Check out ${storeName} on Afristall!`;
+  const shareText = `🛍️ Check out ${storeName} on Afristall — order directly on WhatsApp!`;
 
   const copyLink = async () => {
     await navigator.clipboard.writeText(storeUrl);
@@ -150,6 +151,7 @@ function ProductCard({
 
 const StorefrontInner = () => {
   const { addItem } = useCart();
+  const { theme, toggleTheme } = useTheme();
   const { storeSlug, productId } = useParams<{ storeSlug: string; productId?: string }>();
   const navigate = useNavigate();
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -218,6 +220,44 @@ const StorefrontInner = () => {
 
     fetchStore();
   }, [storeSlug]);
+
+  // Set dynamic OG meta tags for social sharing
+  useEffect(() => {
+    if (!profile) return;
+    const title = `${profile.store_name || storeSlug} — Shop on Afristall`;
+    const description = profile.store_bio ||
+      `Check out ${profile.store_name || storeSlug}${profile.category ? ` for ${profile.category}` : ""}${profile.city ? ` in ${profile.city}` : ""}. Order directly on WhatsApp! 🛒`;
+    const image = profile.profile_picture_url || "/logo-glow.png";
+
+    document.title = title;
+    const setMeta = (property: string, content: string) => {
+      let el = document.querySelector(`meta[property="${property}"]`) || document.querySelector(`meta[name="${property}"]`);
+      if (!el) {
+        el = document.createElement("meta");
+        el.setAttribute(property.startsWith("og:") ? "property" : "name", property);
+        document.head.appendChild(el);
+      }
+      el.setAttribute("content", content);
+    };
+    setMeta("og:title", title);
+    setMeta("og:description", description);
+    setMeta("og:image", image);
+    setMeta("og:url", `${window.location.origin}/${storeSlug}`);
+    setMeta("twitter:title", title);
+    setMeta("twitter:description", description);
+    setMeta("twitter:image", image);
+
+    return () => { document.title = "Afristall — Your Shop, Your WhatsApp, Your Hustle"; };
+  }, [profile, storeSlug]);
+
+  // Default to light mode on storefront
+  useEffect(() => {
+    const root = document.documentElement;
+    if (!localStorage.getItem(`storefront_theme_${storeSlug}`)) {
+      root.classList.remove("dark");
+      root.classList.add("light");
+    }
+  }, []);
 
   const handleVisitorName = (name: string) => {
     localStorage.setItem(`visitor_name_${storeSlug}`, name);
@@ -416,8 +456,11 @@ const StorefrontInner = () => {
         onSubmit={handleVisitorName}
       />
 
-      {/* Share button floating top-right */}
-      <div className="fixed top-4 right-4 z-30">
+      {/* Theme toggle + Share button floating top-right */}
+      <div className="fixed top-4 right-4 z-30 flex items-center gap-2">
+        <Button variant="outline" size="icon" className="shrink-0 rounded-full" onClick={toggleTheme}>
+          {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+        </Button>
         <ShareButton storeName={profile.store_name ?? "Store"} storeSlug={storeSlug ?? ""} />
       </div>
 
