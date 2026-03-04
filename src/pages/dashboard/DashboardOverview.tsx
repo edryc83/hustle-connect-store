@@ -5,14 +5,11 @@ import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Progress } from "@/components/ui/progress";
 import {
-  Package, Eye, MessageCircle, ClipboardList, CalendarDays,
-  Copy, Share2, X, Plus,
+  Package, CalendarDays, Copy, Share2, X, Plus,
 } from "lucide-react";
 import AfristallLogo from "@/components/AfristallLogo";
 import { toast } from "sonner";
 import DailySellingTip from "@/components/dashboard/DailySellingTip";
-import WhatsAppTestCard from "@/components/dashboard/WhatsAppTestCard";
-
 
 function getGreeting(): { text: string; emoji: string } {
   const hour = new Date().getHours();
@@ -33,46 +30,32 @@ function getFormattedDate() {
 const DashboardOverview = () => {
   const { user } = useAuth();
   const [productCount, setProductCount] = useState(0);
-  const [orderCount, setOrderCount] = useState(0);
-  const [viewCount, setViewCount] = useState(0);
-  const [whatsappTaps, setWhatsappTaps] = useState(0);
   const [firstName, setFirstName] = useState("");
   const [storeSlug, setStoreSlug] = useState("");
   const [storeName, setStoreName] = useState("");
   const [profilePicUrl, setProfilePicUrl] = useState("");
   const [whatsappNumber, setWhatsappNumber] = useState("");
-  const [category, setCategory] = useState("");
-  const [products, setProducts] = useState<{ id: string; name: string; image_url: string | null }[]>([]);
   const [bannerDismissed, setBannerDismissed] = useState(
     () => localStorage.getItem("afristall_banner_dismissed") === "true"
   );
   const [copied, setCopied] = useState(false);
-  
 
   useEffect(() => {
     if (!user) return;
 
     const fetchData = async () => {
-      const [{ count }, { count: orders }, { data: profile }, { data: productsData }] = await Promise.all([
+      const [{ count }, { data: profile }] = await Promise.all([
         supabase.from("products").select("*", { count: "exact", head: true }).eq("user_id", user.id),
-        supabase.from("orders").select("*", { count: "exact", head: true }).eq("seller_id", user.id),
-        supabase.from("profiles").select("store_name, store_slug, first_name, profile_picture_url, view_count, whatsapp_number, category").eq("id", user.id).single(),
-        supabase.from("products").select("id, name, image_url, whatsapp_taps").eq("user_id", user.id),
+        supabase.from("profiles").select("store_name, store_slug, first_name, profile_picture_url, whatsapp_number").eq("id", user.id).single(),
       ]);
       setProductCount(count ?? 0);
-      setOrderCount(orders ?? 0);
       const p = profile as any;
       const name = p?.first_name || p?.store_name || user.email?.split("@")[0]?.split(/[._]/)[0] || "";
       setFirstName(name.charAt(0).toUpperCase() + name.slice(1));
       setStoreSlug(p?.store_slug ?? "");
       setStoreName(p?.store_name ?? "");
       setProfilePicUrl(p?.profile_picture_url ?? "");
-      setViewCount(p?.view_count ?? 0);
       setWhatsappNumber(p?.whatsapp_number ?? "");
-      setCategory(p?.category ?? "");
-      setProducts((productsData ?? []).map((pr: any) => ({ id: pr.id, name: pr.name, image_url: pr.image_url })));
-      const totalTaps = (productsData ?? []).reduce((sum: number, pr: any) => sum + (pr.whatsapp_taps ?? 0), 0);
-      setWhatsappTaps(totalTaps);
     };
 
     fetchData();
@@ -119,20 +102,38 @@ const DashboardOverview = () => {
         ? "Almost there! Add more products to boost your store"
         : "🎉 Your store is ready to share!";
 
+  return (
+    <div className="space-y-6">
+      {/* Date header */}
+      <div className="flex items-center gap-2 text-muted-foreground">
+        <CalendarDays className="h-4 w-4" />
+        <span className="text-sm font-medium">
+          {day} {date} <span className="text-primary">•</span> {month}
+        </span>
+      </div>
+
+      {/* Greeting with profile pic */}
+      <div className="flex items-center gap-4">
+        <div className="relative shrink-0">
+          <div className="rounded-2xl p-[3px] bg-gradient-to-br from-primary/40 to-primary/10 backdrop-blur-xl shadow-lg shadow-primary/10">
+            {profilePicUrl ? (
+              <img src={profilePicUrl} alt="Profile" className="h-16 w-16 rounded-2xl object-cover border-2 border-background/50" />
+            ) : (
+              <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-card/80 backdrop-blur-sm border-2 border-background/50">
+                <AfristallLogo className="h-8 w-8" />
+              </div>
+            )}
+          </div>
+        </div>
+        <div>
+          <h1 className="text-2xl font-bold leading-tight">
+            {greeting.text} {firstName || "there"}! {greeting.emoji}
+          </h1>
+        </div>
+      </div>
 
       {/* Daily selling tip */}
       <DailySellingTip />
-
-      {/* Quick stats pills */}
-      <div className="flex flex-wrap gap-2">
-        {stats.map((s) => (
-          <div key={s.label} className="flex items-center gap-1.5 rounded-full border border-border/50 bg-card/60 backdrop-blur-xl px-3 py-1.5 shadow-sm">
-            <s.icon className="h-3.5 w-3.5 text-primary" />
-            <span className="text-xs font-medium text-muted-foreground">{s.label}</span>
-            <span className="text-xs font-bold">{s.value}</span>
-          </div>
-        ))}
-      </div>
 
       {/* Onboarding banner */}
       {productCount === 0 && !bannerDismissed && (
@@ -157,40 +158,16 @@ const DashboardOverview = () => {
         </div>
       )}
 
-
-      {/* Share section */}
+      {/* Share section — compact link with copy + share icons */}
       {storeSlug && (
-        <div className="rounded-2xl border border-border/50 bg-card/60 backdrop-blur-xl p-5 shadow-sm space-y-4">
-          <span className="text-sm font-medium text-muted-foreground">Share Your Store</span>
-
-          <div className="flex items-center gap-2 rounded-full bg-muted/50 border border-border/50 px-4 py-2">
-            <span className="text-sm font-medium truncate flex-1">afristall.com/{storeSlug}</span>
-            <button onClick={copyLink} className="text-muted-foreground hover:text-foreground shrink-0">
-              <Copy className="h-4 w-4" />
-            </button>
-          </div>
-
-          <div className="grid grid-cols-2 gap-3">
-            <Button onClick={copyLink} variant="outline" className="rounded-xl border-primary/30 hover:bg-primary/10 gap-2">
-              <Copy className="h-4 w-4" />
-              {copied ? "Copied!" : "Copy Link"}
-            </Button>
-            <Button onClick={shareStore} className="rounded-xl gap-2">
-              <Share2 className="h-4 w-4" />
-              Share Store
-            </Button>
-          </div>
-
-          <Button
-            variant="outline"
-            className="w-full rounded-xl border-primary/30 hover:bg-primary/10 gap-2"
-            asChild
-          >
-            <Link to="/dashboard/share" className="gap-2">
-              <Smartphone className="h-4 w-4" />
-              Share to WhatsApp Status
-            </Link>
-          </Button>
+        <div className="flex items-center gap-2 rounded-full bg-muted/50 border border-border/50 px-4 py-2.5">
+          <span className="text-sm font-medium truncate flex-1">afristall.com/{storeSlug}</span>
+          <button onClick={copyLink} className="text-muted-foreground hover:text-foreground shrink-0 p-1" title="Copy link">
+            <Copy className="h-4 w-4" />
+          </button>
+          <button onClick={shareStore} className="text-muted-foreground hover:text-primary shrink-0 p-1" title="Share store">
+            <Share2 className="h-4 w-4" />
+          </button>
         </div>
       )}
 
@@ -203,10 +180,6 @@ const DashboardOverview = () => {
         <Progress value={completeness} className="h-2.5 bg-muted" />
         <p className="text-xs text-muted-foreground">{completenessMessage}</p>
       </div>
-
-
-      {/* WhatsApp test */}
-      <WhatsAppTestCard whatsappNumber={whatsappNumber} storeName={storeName} />
 
       {/* Quick actions */}
       <div className="flex gap-3">
@@ -221,7 +194,6 @@ const DashboardOverview = () => {
           </Link>
         </Button>
       </div>
-
     </div>
   );
 };
