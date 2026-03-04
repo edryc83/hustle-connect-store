@@ -372,6 +372,30 @@ function ProductDetailView({
           </div>
         )}
 
+        {/* Dynamic Attribute Selectors */}
+        {hasAttributes && attrs && (
+          <div className="rounded-2xl border border-border/60 bg-card p-4 space-y-4">
+            <p className="text-sm font-semibold">Customize your order</p>
+            <BuyerAttributePicker
+              attributes={attrs}
+              selections={attrSelections}
+              textInputs={attrTextInputs}
+              onSelectionChange={handleAttrSelect}
+              onTextInputChange={handleAttrText}
+            />
+            <BuyerCakeMessageInput
+              attributes={attrs}
+              value={cakeMessage}
+              onChange={setCakeMessage}
+            />
+            <BuyerPersonalisationInput
+              attributes={attrs}
+              value={personalisation}
+              onChange={setPersonalisation}
+            />
+          </div>
+        )}
+
         {/* Quantity Controls + Add to Cart */}
         <div className="rounded-2xl border border-border/60 bg-card p-4 space-y-4">
           <div className="flex items-center justify-between">
@@ -412,18 +436,31 @@ function ProductDetailView({
               variant="outline"
               className="gap-2 text-base"
               onClick={() => {
+                // Validate required attribute selections
+                if (hasAttributes && attrs) {
+                  const selectableFields = getSelectableFields();
+                  for (const field of selectableFields) {
+                    const sel = attrSelections[field.key];
+                    const txt = attrTextInputs[field.key];
+                    if (!sel && !txt) {
+                      toast.error(`Please select a ${field.label.toLowerCase()} before ordering`);
+                      return;
+                    }
+                    if (typeof sel === "string" && !sel.trim()) {
+                      toast.error(`Please select a ${field.label.toLowerCase()} before ordering`);
+                      return;
+                    }
+                  }
+                }
+
                 const cleanNumber = (profile.whatsapp_number ?? "").replace(/[^0-9+]/g, "");
-                const dp = Number(displayPrice);
-                const message = [
-                  `🛒 Hi! I'd like to order *${product.name}*${qty > 1 ? ` x${qty}` : ""} (${formatPrice(dp * qty, currency)}) from your Afristall store.`,
-                  product.image_url ? `\n📷 ${product.image_url}` : null,
-                ].filter(Boolean).join("\n");
+                const message = buildWhatsAppMessage();
                 supabase.from("orders").insert({
                   seller_id: profile.id,
                   product_id: product.id,
                   product_name: product.name,
                   quantity: qty,
-                  total: dp * qty,
+                  total: Number(displayPrice) * qty,
                   customer_name: visitorName || "Store visitor",
                   customer_phone: visitorName || "WhatsApp order",
                 } as any).then(() => {});
