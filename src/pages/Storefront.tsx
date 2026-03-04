@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Store, ShoppingBag, Share2, Copy, Check, Star, ShoppingCart, Sun, Moon } from "lucide-react";
+import { Store, ShoppingBag, Share2, Copy, Check, Star, ShoppingCart, Sun, Moon, LogIn, LayoutDashboard } from "lucide-react";
 import { formatPrice } from "@/lib/currency";
 import AfristallLogo from "@/components/AfristallLogo";
 import { ProductImageCarousel } from "@/components/storefront/ProductImageCarousel";
@@ -9,6 +9,7 @@ import { StorefrontHeader } from "@/components/storefront/StorefrontHeader";
 import { VisitorNameModal } from "@/components/storefront/VisitorNameModal";
 import { CartDrawer } from "@/components/storefront/CartDrawer";
 import { useTheme } from "@/hooks/useTheme";
+import { useAuth } from "@/hooks/useAuth";
 import { CartProvider, useCart } from "@/hooks/useCart";
 import {
   DropdownMenu,
@@ -154,6 +155,7 @@ function ProductCard({
 const StorefrontInner = () => {
   const { addItem } = useCart();
   const { theme, toggleTheme } = useTheme();
+  const { user } = useAuth();
   const { storeSlug, productId } = useParams<{ storeSlug: string; productId?: string }>();
   const navigate = useNavigate();
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -429,11 +431,16 @@ const StorefrontInner = () => {
           </div>
         </main>
 
-        <footer className="border-t bg-background py-4 text-center">
+        <footer className="border-t bg-background py-4 text-center space-y-1">
           <Link to="/" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground">
             <AfristallLogo className="h-4 w-4" />
             Powered by <span className="font-semibold">Afri<span className="text-primary">stall</span></span>
           </Link>
+          <div>
+            <Link to="/dashboard" className="text-xs text-muted-foreground/60 hover:text-foreground transition-colors">
+              Are you the seller? Go to Dashboard →
+            </Link>
+          </div>
         </footer>
 
         {/* Cart Drawer */}
@@ -457,6 +464,19 @@ const StorefrontInner = () => {
         storeName={profile.store_name ?? "this store"}
         onSubmit={handleVisitorName}
       />
+
+      {/* Floating top-left: Dashboard / Sign In */}
+      <div className="fixed top-4 left-4 z-30">
+        {user && profile && user.id === profile.id ? (
+          <Button variant="outline" size="icon" className="shrink-0 rounded-full" asChild>
+            <Link to="/dashboard"><LayoutDashboard className="h-4 w-4" /></Link>
+          </Button>
+        ) : !user ? (
+          <Button variant="ghost" size="icon" className="shrink-0 rounded-full text-muted-foreground" asChild>
+            <Link to="/login"><LogIn className="h-4 w-4" /></Link>
+          </Button>
+        ) : null}
+      </div>
 
       {/* Theme toggle + Share button floating top-right */}
       <div className="fixed top-4 right-4 z-30 flex items-center gap-2">
@@ -519,11 +539,16 @@ const StorefrontInner = () => {
         )}
       </main>
 
-      <footer className="border-t bg-background py-4 text-center">
+      <footer className="border-t bg-background py-4 text-center space-y-1">
         <Link to="/" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground">
           <AfristallLogo className="h-4 w-4" />
           Powered by <span className="font-semibold">Afri<span className="text-primary">stall</span></span>
         </Link>
+        <div>
+          <Link to="/dashboard" className="text-xs text-muted-foreground/60 hover:text-foreground transition-colors">
+            Are you the seller? Go to Dashboard →
+          </Link>
+        </div>
       </footer>
 
       {/* Cart Drawer */}
