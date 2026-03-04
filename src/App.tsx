@@ -14,6 +14,7 @@ import DashboardProducts from "./pages/dashboard/DashboardProducts";
 import DashboardSettings from "./pages/dashboard/DashboardSettings";
 import DashboardOrders from "./pages/dashboard/DashboardOrders";
 import DashboardAnalytics from "./pages/dashboard/DashboardAnalytics";
+import DashboardShareCard from "./pages/dashboard/DashboardShareCard";
 import Storefront from "./pages/Storefront";
 import Explore from "./pages/Explore";
 import NotFound from "./pages/NotFound";
@@ -37,6 +38,7 @@ const App = () => (
               <Route path="/dashboard/settings" element={<DashboardLayout><DashboardSettings /></DashboardLayout>} />
               <Route path="/dashboard/orders" element={<DashboardLayout><DashboardOrders /></DashboardLayout>} />
               <Route path="/dashboard/analytics" element={<DashboardLayout><DashboardAnalytics /></DashboardLayout>} />
+              <Route path="/dashboard/share" element={<DashboardLayout><DashboardShareCard /></DashboardLayout>} />
               <Route path="/explore" element={<Explore />} />
               <Route path="/:storeSlug" element={<Storefront />} />
               <Route path="/:storeSlug/:productId" element={<Storefront />} />

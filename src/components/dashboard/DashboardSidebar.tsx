@@ -1,4 +1,4 @@
-import { Package, LayoutDashboard, Settings, LogOut, ClipboardList, BarChart3, Moon, Sun } from "lucide-react";
+import { Package, LayoutDashboard, Settings, LogOut, ClipboardList, BarChart3, Moon, Sun, Palette } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useAuth } from "@/hooks/useAuth";
 import { useTheme } from "@/hooks/useTheme";
@@ -23,6 +23,7 @@ const navItems = [
   { title: "Listings", url: "/dashboard/products", icon: Package },
   { title: "Orders", url: "/dashboard/orders", icon: ClipboardList },
   { title: "Analytics", url: "/dashboard/analytics", icon: BarChart3 },
+  { title: "Design Studio", url: "/dashboard/share", icon: Palette },
   { title: "Settings", url: "/dashboard/settings", icon: Settings },
 ];
 
