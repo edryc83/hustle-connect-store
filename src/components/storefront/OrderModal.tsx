@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { MessageCircle } from "lucide-react";
 import { toast } from "sonner";
+import { formatPrice } from "@/lib/currency";
 import type { Tables } from "@/integrations/supabase/types";
 
 type Product = Tables<"products">;
@@ -14,11 +15,12 @@ interface OrderModalProps {
   product: Product | null;
   whatsappNumber: string;
   storeName: string;
+  currency?: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-export function OrderModal({ product, whatsappNumber, storeName, open, onOpenChange }: OrderModalProps) {
+export function OrderModal({ product, whatsappNumber, storeName, currency = "UGX", open, onOpenChange }: OrderModalProps) {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [quantity, setQuantity] = useState("1");
@@ -42,7 +44,7 @@ export function OrderModal({ product, whatsappNumber, storeName, open, onOpenCha
       `*Product:* ${product.name}`,
       variant ? `*Variant:* ${variant}` : null,
       `*Quantity:* ${qty}`,
-      `*Total:* UGX ${total.toLocaleString()}`,
+      `*Total:* ${formatPrice(total, currency)}`,
       ``,
       `*Customer:* ${name.trim()}`,
       `*Phone:* ${phone.trim()}`,
@@ -74,7 +76,7 @@ export function OrderModal({ product, whatsappNumber, storeName, open, onOpenCha
           )}
 
           <div className="flex items-baseline justify-between">
-            <p className="text-xl font-bold text-primary">UGX {Number(product.price).toLocaleString()}</p>
+            <p className="text-xl font-bold text-primary">{formatPrice(Number(product.price), currency)}</p>
             {product.description && (
               <p className="text-sm text-muted-foreground max-w-[60%] text-right">{product.description}</p>
             )}
