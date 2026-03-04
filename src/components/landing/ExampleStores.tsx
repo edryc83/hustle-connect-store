@@ -33,7 +33,7 @@ const ExampleStores = () => (
   <section className="py-16 sm:py-24">
     <div className="mx-auto max-w-6xl px-4 sm:px-6">
       <h2 className="text-center text-2xl font-bold sm:text-3xl text-foreground">
-        Stores already on AfroDuka
+        Stores already on Afristall
       </h2>
       <p className="mx-auto mt-3 max-w-lg text-center text-muted-foreground">
         Join hundreds of sellers across Africa who are reaching more customers.

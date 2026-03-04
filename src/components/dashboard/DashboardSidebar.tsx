@@ -40,7 +40,7 @@ export function DashboardSidebar() {
           <SidebarGroupLabel>
             <div className="flex items-center gap-2">
               <Store className="h-4 w-4 text-primary" />
-              {!collapsed && <span className="font-bold">AfroDuka</span>}
+              {!collapsed && <span className="font-bold">Afristall</span>}
             </div>
           </SidebarGroupLabel>
           <SidebarGroupContent>

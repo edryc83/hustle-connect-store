@@ -20,7 +20,7 @@ type Profile = Tables<"profiles">;
 function ShareButton({ storeName, storeSlug }: { storeName: string; storeSlug: string }) {
   const [copied, setCopied] = useState(false);
   const storeUrl = `${window.location.origin}/${storeSlug}`;
-  const shareText = `Check out ${storeName} on AfroDuka!`;
+  const shareText = `Check out ${storeName} on Afristall!`;
 
   const copyLink = async () => {
     await navigator.clipboard.writeText(storeUrl);
@@ -125,7 +125,7 @@ const Storefront = () => {
         <h1 className="text-2xl font-bold">Store not found</h1>
         <p className="text-muted-foreground">The store you're looking for doesn't exist.</p>
         <Button asChild variant="outline">
-          <Link to="/">Go to AfroDuka</Link>
+          <Link to="/">Go to Afristall</Link>
         </Button>
       </div>
     );
@@ -227,7 +227,7 @@ const Storefront = () => {
       <footer className="border-t bg-background py-4 text-center">
         <Link to="/" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground">
           <Store className="h-4 w-4 text-primary" />
-          Powered by <span className="font-semibold">Afro<span className="text-primary">Duka</span></span>
+          Powered by <span className="font-semibold">Afri<span className="text-primary">stall</span></span>
         </Link>
       </footer>
 

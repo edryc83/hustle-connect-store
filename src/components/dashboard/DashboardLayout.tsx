@@ -32,7 +32,7 @@ export function DashboardLayout({ children }: { children: ReactNode }) {
             <div className="flex items-center gap-2 md:hidden">
               <Store className="h-5 w-5 text-primary" />
               <span className="text-sm font-bold">
-                Afro<span className="text-primary">Duka</span>
+                Afri<span className="text-primary">stall</span>
               </span>
             </div>
           </header>

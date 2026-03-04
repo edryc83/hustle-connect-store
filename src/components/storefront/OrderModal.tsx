@@ -37,7 +37,7 @@ export function OrderModal({ product, whatsappNumber, storeName, open, onOpenCha
     const total = qty * Number(product.price);
 
     const message = [
-      `🛒 *New Order from AfroDuka*`,
+      `🛒 *New Order from Afristall*`,
       ``,
       `*Product:* ${product.name}`,
       variant ? `*Variant:* ${variant}` : null,
