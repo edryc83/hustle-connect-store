@@ -307,7 +307,8 @@ const Storefront = () => {
             className="w-full gap-2 text-base"
             onClick={() => {
               const cleanNumber = (profile.whatsapp_number ?? "").replace(/[^0-9+]/g, "");
-              const message = `🛒 Hi! I'd like to order *${viewProduct.name}* (${formatPrice(Number(viewProduct.price), currency)}) from your Afristall store.`;
+              const displayPrice = (viewProduct as any).discount_price ? Number((viewProduct as any).discount_price) : Number(viewProduct.price);
+              const message = `🛒 Hi! I'd like to order *${viewProduct.name}* (${formatPrice(displayPrice, currency)}) from your Afristall store.`;
               supabase.from("orders").insert({
                 seller_id: profile.id,
                 product_id: viewProduct.id,

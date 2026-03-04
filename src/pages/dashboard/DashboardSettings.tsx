@@ -42,7 +42,7 @@ const DashboardSettings = () => {
   const [country, setCountry] = useState("");
   const [district, setDistrict] = useState("");
   const [city, setCity] = useState("");
-  const [storeBio, setStoreBio] = useState("");
+  
   const [categories, setCategories] = useState<CategorySelection>({});
   const [deliveryAreas, setDeliveryAreas] = useState("");
   const [currency, setCurrency] = useState("UGX");
