@@ -137,7 +137,7 @@ export function StorefrontFilters({ filters, onChange, totalCount, filteredCount
                 return (
                   <button
                     key={i}
-                    onClick={() => update({ priceRange: pr.range })}
+                    onClick={() => update({ priceRange: isActive ? null : pr.range })}
                     className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
                       isActive
                         ? "border-primary bg-primary/10 text-primary"
@@ -151,14 +151,15 @@ export function StorefrontFilters({ filters, onChange, totalCount, filteredCount
             </div>
           </div>
 
-          {/* Condition pills */}
+          {/* Condition pills — only if store has multiple conditions */}
+          {availableConditions.length > 1 && (
           <div className="space-y-1.5">
             <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Condition</p>
             <div className="flex flex-wrap gap-1.5">
-              {CONDITIONS.map((c) => (
+              {availableConditions.map((c) => (
                 <button
                   key={c.value}
-                  onClick={() => update({ condition: c.value })}
+                  onClick={() => update({ condition: filters.condition === c.value ? "" : c.value })}
                   className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
                     filters.condition === c.value
                       ? "border-primary bg-primary/10 text-primary"
@@ -170,6 +171,7 @@ export function StorefrontFilters({ filters, onChange, totalCount, filteredCount
               ))}
             </div>
           </div>
+          )}
 
           {/* Clear + result count */}
           <div className="flex items-center justify-between pt-1">
