@@ -106,45 +106,42 @@ export default function AdminSellers() {
       {loading ? (
         <div className="animate-pulse text-muted-foreground">Loading sellers…</div>
       ) : (
-        <div className="space-y-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {filtered.map((s) => (
-            <Card key={s.id}>
-              <CardContent className="py-4">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                  <div className="space-y-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <p className="font-semibold truncate">{s.store_name || s.first_name || "Unnamed Seller"}</p>
-                      {isActive(s) ? (
-                        <Badge variant="default" className="text-[10px] px-1.5 py-0">Active</Badge>
-                      ) : (
-                        <Badge variant="secondary" className="text-[10px] px-1.5 py-0">Inactive</Badge>
-                      )}
-                    </div>
-                    <p className="text-xs text-muted-foreground">{s.email}</p>
-                    <div className="flex flex-wrap gap-2 text-xs text-muted-foreground">
-                      {s.store_slug && <span>/{s.store_slug}</span>}
-                      {s.city && <span>• {s.city}</span>}
-                      {s.country && <span>, {s.country}</span>}
-                      <span>• {productCounts[s.id] || 0} products</span>
-                      <span>• {s.view_count} views</span>
-                      <span>• Joined {new Date(s.created_at).toLocaleDateString()}</span>
-                    </div>
-                  </div>
-                  <div className="flex items-center gap-2 shrink-0">
-                    {s.store_slug && (
-                      <Button variant="outline" size="sm" asChild>
-                        <a href={`/${s.store_slug}`} target="_blank" rel="noopener noreferrer">
-                          <ExternalLink className="h-3.5 w-3.5 mr-1" /> View Store
-                        </a>
-                      </Button>
-                    )}
-                  </div>
+            <Card key={s.id} className="flex flex-col justify-between">
+              <CardHeader className="pb-3">
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-base truncate">{s.store_name || s.first_name || "Unnamed Seller"}</CardTitle>
+                  {isActive(s) ? (
+                    <Badge variant="default" className="text-[10px] px-1.5 py-0 shrink-0">Active</Badge>
+                  ) : (
+                    <Badge variant="secondary" className="text-[10px] px-1.5 py-0 shrink-0">Inactive</Badge>
+                  )}
                 </div>
+                <p className="text-xs text-muted-foreground truncate">{s.email}</p>
+              </CardHeader>
+              <CardContent className="pb-3 space-y-2 text-xs text-muted-foreground">
+                {s.store_slug && <p>/{s.store_slug}</p>}
+                <div className="flex flex-wrap gap-x-3 gap-y-1">
+                  {s.city && <span>{s.city}{s.country ? `, ${s.country}` : ""}</span>}
+                  <span>{productCounts[s.id] || 0} products</span>
+                  <span>{s.view_count} views</span>
+                </div>
+                <p>Joined {new Date(s.created_at).toLocaleDateString()}</p>
               </CardContent>
+              {s.store_slug && (
+                <div className="px-6 pb-4">
+                  <Button variant="outline" size="sm" className="w-full" asChild>
+                    <a href={`/${s.store_slug}`} target="_blank" rel="noopener noreferrer">
+                      <ExternalLink className="h-3.5 w-3.5 mr-1" /> View Store
+                    </a>
+                  </Button>
+                </div>
+              )}
             </Card>
           ))}
           {filtered.length === 0 && (
-            <p className="text-center text-muted-foreground py-8">No sellers found</p>
+            <p className="text-center text-muted-foreground py-8 col-span-full">No sellers found</p>
           )}
         </div>
       )}
