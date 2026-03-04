@@ -2,17 +2,24 @@ import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Package, Plus, Eye, ShoppingBag, ClipboardList } from "lucide-react";
+import { Package, Plus, Eye, ClipboardList, CalendarDays } from "lucide-react";
 import AfristallLogo from "@/components/AfristallLogo";
 
 function getGreeting(): { text: string; emoji: string } {
   const hour = new Date().getHours();
-  if (hour >= 5 && hour < 12) return { text: "Good morning", emoji: "☀️" };
-  if (hour >= 12 && hour < 17) return { text: "Good afternoon", emoji: "🌤️" };
-  if (hour >= 17 && hour < 21) return { text: "Good evening", emoji: "🌇" };
-  return { text: "Hey night owl", emoji: "🌙" };
+  if (hour >= 5 && hour < 12) return { text: "Good morning,", emoji: "☀️" };
+  if (hour >= 12 && hour < 17) return { text: "Good afternoon,", emoji: "🌤️" };
+  if (hour >= 17 && hour < 21) return { text: "Good evening,", emoji: "🌇" };
+  return { text: "Hey night owl,", emoji: "🌙" };
+}
+
+function getFormattedDate() {
+  const now = new Date();
+  const day = now.toLocaleDateString("en-US", { weekday: "long" });
+  const date = now.getDate();
+  const month = now.toLocaleDateString("en-US", { month: "long" });
+  return { day, date, month };
 }
 
 const DashboardOverview = () => {
@@ -44,81 +51,95 @@ const DashboardOverview = () => {
   }, [user]);
 
   const greeting = getGreeting();
+  const { day, date, month } = getFormattedDate();
 
   return (
     <div className="space-y-6">
+      {/* Date header */}
+      <div className="flex items-center gap-2 text-muted-foreground">
+        <CalendarDays className="h-4 w-4" />
+        <span className="text-sm font-medium">
+          {day} {date} <span className="text-primary">•</span> {month}
+        </span>
+      </div>
+
       {/* Greeting with profile pic */}
       <div className="flex items-center gap-4">
         <div className="relative shrink-0">
           {profilePicUrl ? (
-            <div className="rounded-full p-[3px] bg-gradient-to-br from-primary/30 to-primary/10 backdrop-blur-sm">
+            <div className="rounded-2xl p-[3px] bg-gradient-to-br from-primary/40 to-primary/10 backdrop-blur-xl shadow-lg shadow-primary/10">
               <img
                 src={profilePicUrl}
                 alt="Profile"
-                className="h-14 w-14 rounded-full object-cover border-2 border-background"
+                className="h-16 w-16 rounded-2xl object-cover border-2 border-background/50"
               />
             </div>
           ) : (
-            <div className="rounded-full p-[3px] bg-gradient-to-br from-primary/30 to-primary/10 backdrop-blur-sm">
-              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-background border-2 border-background">
-                <AfristallLogo className="h-7 w-7" />
+            <div className="rounded-2xl p-[3px] bg-gradient-to-br from-primary/40 to-primary/10 backdrop-blur-xl shadow-lg shadow-primary/10">
+              <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-card/80 backdrop-blur-sm border-2 border-background/50">
+                <AfristallLogo className="h-8 w-8" />
               </div>
             </div>
           )}
         </div>
         <div>
-          <p className="text-sm text-muted-foreground">{greeting.text} {greeting.emoji}</p>
-          <h1 className="text-xl font-bold">{firstName || "there"}</h1>
+          <h1 className="text-2xl font-bold leading-tight">
+            {greeting.text} {greeting.emoji}
+            <br />
+            <span className="text-foreground">{firstName || "there"}!</span>
+          </h1>
         </div>
       </div>
 
+      {/* Glass stat cards */}
       <div className="grid gap-4 grid-cols-2 lg:grid-cols-3">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Listings</CardTitle>
-            <Package className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold">{productCount}</div>
-          </CardContent>
-        </Card>
+        <div className="rounded-2xl border border-border/50 bg-card/60 backdrop-blur-xl p-5 shadow-sm">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-sm font-medium text-muted-foreground">Listings</span>
+            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-primary/10">
+              <Package className="h-4 w-4 text-primary" />
+            </div>
+          </div>
+          <div className="text-3xl font-bold">{productCount}</div>
+        </div>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Orders</CardTitle>
-            <ClipboardList className="h-4 w-4 text-muted-foreground" />
-          </CardHeader>
-          <CardContent>
-            <div className="text-3xl font-bold">{orderCount}</div>
-          </CardContent>
-        </Card>
+        <div className="rounded-2xl border border-border/50 bg-card/60 backdrop-blur-xl p-5 shadow-sm">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-sm font-medium text-muted-foreground">Orders</span>
+            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-primary/10">
+              <ClipboardList className="h-4 w-4 text-primary" />
+            </div>
+          </div>
+          <div className="text-3xl font-bold">{orderCount}</div>
+        </div>
 
         {storeSlug && (
-          <Card className="col-span-2 lg:col-span-1">
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Your Store</CardTitle>
-              <AfristallLogo className="h-4 w-4" />
-            </CardHeader>
-            <CardContent>
-              <Link
-                to={`/${storeSlug}`}
-                className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
-              >
-                <Eye className="h-3.5 w-3.5" />
-                afristall.com/{storeSlug}
-              </Link>
-            </CardContent>
-          </Card>
+          <div className="col-span-2 lg:col-span-1 rounded-2xl border border-border/50 bg-card/60 backdrop-blur-xl p-5 shadow-sm">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-sm font-medium text-muted-foreground">Your Store</span>
+              <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-primary/10">
+                <AfristallLogo className="h-4 w-4" />
+              </div>
+            </div>
+            <Link
+              to={`/${storeSlug}`}
+              className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
+            >
+              <Eye className="h-3.5 w-3.5" />
+              afristall.com/{storeSlug}
+            </Link>
+          </div>
         )}
       </div>
 
+      {/* Quick actions — glass style */}
       <div className="flex gap-3">
-        <Button asChild>
+        <Button asChild className="rounded-xl">
           <Link to="/dashboard/products" className="gap-2">
             <Package className="h-4 w-4" /> View Listings
           </Link>
         </Button>
-        <Button asChild variant="outline">
+        <Button asChild variant="outline" className="rounded-xl border-border/50 bg-card/60 backdrop-blur-sm">
           <Link to="/dashboard/products?add=true" className="gap-2">
             <Plus className="h-4 w-4" /> Add Listing
           </Link>
