@@ -9,15 +9,25 @@ let deferredPrompt: BeforeInstallPromptEvent | null = null;
 
 export function useInstallPrompt() {
   const [canInstall, setCanInstall] = useState(false);
-  const [isInstalled, setIsInstalled] = useState(false);
+  const [isInstalled, setIsInstalled] = useState(() => {
+    // Check immediately on init — standalone mode or previously recorded install
+    if (typeof window !== "undefined") {
+      const mq = window.matchMedia("(display-mode: standalone)");
+      if (mq.matches || (navigator as any).standalone === true) return true;
+      if (localStorage.getItem("afristall_pwa_installed") === "true") return true;
+    }
+    return false;
+  });
 
   useEffect(() => {
-    // Check if already installed
     const mq = window.matchMedia("(display-mode: standalone)");
     const checkInstalled = () => {
       const installed = mq.matches || (navigator as any).standalone === true;
-      setIsInstalled(installed);
-      if (installed) setCanInstall(false);
+      if (installed) {
+        setIsInstalled(true);
+        setCanInstall(false);
+        localStorage.setItem("afristall_pwa_installed", "true");
+      }
     };
     checkInstalled();
     mq.addEventListener("change", checkInstalled);
@@ -35,6 +45,7 @@ export function useInstallPrompt() {
       setIsInstalled(true);
       setCanInstall(false);
       deferredPrompt = null;
+      localStorage.setItem("afristall_pwa_installed", "true");
     };
     window.addEventListener("appinstalled", installedHandler);
 
