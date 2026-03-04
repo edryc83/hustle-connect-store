@@ -10,7 +10,6 @@ import EmojiGrid from "@/components/landing/EmojiGrid";
 import { toast } from "sonner";
 
 
-
 const Login = () => {
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
