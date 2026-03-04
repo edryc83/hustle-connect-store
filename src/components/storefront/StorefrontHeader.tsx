@@ -103,16 +103,40 @@ export function StorefrontHeader({ profile, visitorName }: StorefrontHeaderProps
         )}
       </div>
 
-      {/* Greeting & Welcome */}
+      {/* Greeting & Welcome + Message Button */}
       <div className="border-t border-b bg-secondary/40">
-        <div className="mx-auto max-w-5xl px-4 py-5 text-center space-y-1.5">
-          <p className="text-lg font-semibold">
-            {greeting}
-            {visitorName ? `, ${visitorName}` : ""}! 👋
-          </p>
-          <p className="text-sm text-muted-foreground leading-relaxed max-w-md mx-auto">
-            {welcomeMessage}
-          </p>
+        <div className="mx-auto max-w-5xl px-4 py-5 text-center space-y-4">
+          <div className="space-y-1.5">
+            <p className="text-lg font-semibold">
+              {greeting}
+              {visitorName ? `, ${visitorName}` : ""}! 👋
+            </p>
+            <p className="text-sm text-muted-foreground leading-relaxed max-w-md mx-auto">
+              {welcomeMessage}
+            </p>
+          </div>
+
+          {/* Big WhatsApp Message Button */}
+          {profile.whatsapp_number && (
+            <Button
+              size="lg"
+              className="w-full max-w-sm mx-auto gap-3 text-base rounded-2xl h-14 bg-green-600 hover:bg-green-700 text-white shadow-lg shadow-green-600/20"
+              onClick={() => {
+                const cleanNumber = (profile.whatsapp_number ?? "").replace(/[^0-9+]/g, "").replace(/^\+/, "");
+                const waGreeting = [
+                  `Hey${visitorName ? ` ${visitorName}` : ""}! 👋 Welcome to ${profile.store_name || "my shop"}!`,
+                  welcomeMessage !== defaultWelcome ? welcomeMessage : null,
+                ].filter(Boolean).join("\n\n");
+                window.open(
+                  `https://wa.me/${cleanNumber}?text=${encodeURIComponent(waGreeting)}`,
+                  "_blank"
+                );
+              }}
+            >
+              <MessageCircle className="h-5 w-5" />
+              Message {profile.store_name || "Seller"}
+            </Button>
+          )}
         </div>
       </div>
     </header>
