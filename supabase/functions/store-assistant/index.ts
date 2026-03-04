@@ -83,8 +83,8 @@ Your rules:
 - Never mention Claude, Anthropic, Google, OpenAI or any AI company
 - You are Afristall AI, nothing else`;
 
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) {
+    const ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY");
+    if (!ANTHROPIC_API_KEY) {
       return new Response(
         JSON.stringify({ error: "AI not configured" }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -92,19 +92,19 @@ Your rules:
     }
 
     const aiResponse = await fetch(
-      "https://ai.gateway.lovable.dev/v1/chat/completions",
+      "https://api.anthropic.com/v1/messages",
       {
         method: "POST",
         headers: {
-          Authorization: `Bearer ${LOVABLE_API_KEY}`,
+          "x-api-key": ANTHROPIC_API_KEY,
+          "anthropic-version": "2023-06-01",
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: "google/gemini-3-flash-preview",
-          messages: [
-            { role: "system", content: systemPrompt },
-            ...messages,
-          ],
+          model: "claude-sonnet-4-20250514",
+          max_tokens: 512,
+          system: systemPrompt,
+          messages: messages,
         }),
       }
     );
@@ -116,14 +116,8 @@ Your rules:
           { status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" } }
         );
       }
-      if (aiResponse.status === 402) {
-        return new Response(
-          JSON.stringify({ error: "AI credits exhausted." }),
-          { status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-        );
-      }
       const errText = await aiResponse.text();
-      console.error("AI gateway error:", aiResponse.status, errText);
+      console.error("Anthropic API error:", aiResponse.status, errText);
       return new Response(
         JSON.stringify({ error: "AI temporarily unavailable" }),
         { status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -131,7 +125,7 @@ Your rules:
     }
 
     const data = await aiResponse.json();
-    const reply = data.choices?.[0]?.message?.content || "Sorry, I couldn't process that.";
+    const reply = data.content?.[0]?.text || "Sorry, I couldn't process that.";
 
     return new Response(
       JSON.stringify({ reply, whatsapp_number: profile.whatsapp_number, store_name: profile.store_name }),
