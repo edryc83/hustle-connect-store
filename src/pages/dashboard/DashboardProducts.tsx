@@ -323,18 +323,18 @@ const DashboardProducts = () => {
 
       {/* Empty state */}
       {products.length === 0 ? (
-        <Card className="py-16">
+        <div className="rounded-2xl border border-border/50 bg-card/60 backdrop-blur-xl py-16">
           <CardContent className="flex flex-col items-center gap-3 text-center">
             <Package className="h-12 w-12 text-muted-foreground/50" />
             <p className="text-lg font-medium">No listings yet</p>
             <p className="text-sm text-muted-foreground">Add your first product or service to start selling!</p>
             <Button className="mt-2 gap-2" onClick={openAdd}><Plus className="h-4 w-4" /> Add Listing</Button>
           </CardContent>
-        </Card>
+        </div>
       ) : (
         <div className="space-y-6">
           {/* Tip */}
-          <div className="rounded-lg bg-muted/60 border border-border/40 px-4 py-2.5 text-xs text-muted-foreground flex items-center gap-2">
+          <div className="rounded-xl bg-card/60 backdrop-blur-xl border border-border/50 px-4 py-2.5 text-xs text-muted-foreground flex items-center gap-2">
             <Star className="h-3.5 w-3.5 text-primary shrink-0" />
             <span>Tap <strong>★</strong> to feature a listing (up to 6). Featured items appear first on your storefront.</span>
           </div>
@@ -391,7 +391,7 @@ function ListingRow({
   const isService = (product as any).listing_type === "service";
 
   return (
-    <div className="group flex items-center gap-3 rounded-xl bg-background border border-border/60 p-3 transition-shadow hover:shadow-md">
+    <div className="group flex items-center gap-3 rounded-2xl bg-card/60 backdrop-blur-xl border border-border/50 p-3 transition-shadow hover:shadow-md">
       {/* Date column */}
       <div className="hidden sm:flex flex-col items-center text-center w-10 shrink-0">
         <span className="text-[10px] font-medium text-muted-foreground uppercase">{month}</span>
