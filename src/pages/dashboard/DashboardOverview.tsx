@@ -119,42 +119,6 @@ const DashboardOverview = () => {
         ? "Almost there! Add more products to boost your store"
         : "🎉 Your store is ready to share!";
 
-  const stats = [
-    { label: "Listings", value: productCount, icon: Package },
-    { label: "Store Views", value: viewCount, icon: Eye },
-    { label: "WhatsApp Taps", value: whatsappTaps, icon: MessageCircle },
-    { label: "Orders", value: orderCount, icon: ClipboardList },
-  ];
-
-  return (
-    <div className="space-y-6">
-      {/* Date header */}
-      <div className="flex items-center gap-2 text-muted-foreground">
-        <CalendarDays className="h-4 w-4" />
-        <span className="text-sm font-medium">
-          {day} {date} <span className="text-primary">•</span> {month}
-        </span>
-      </div>
-
-      {/* Greeting with profile pic */}
-      <div className="flex items-center gap-4">
-        <div className="relative shrink-0">
-          <div className="rounded-2xl p-[3px] bg-gradient-to-br from-primary/40 to-primary/10 backdrop-blur-xl shadow-lg shadow-primary/10">
-            {profilePicUrl ? (
-              <img src={profilePicUrl} alt="Profile" className="h-16 w-16 rounded-2xl object-cover border-2 border-background/50" />
-            ) : (
-              <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-card/80 backdrop-blur-sm border-2 border-background/50">
-                <AfristallLogo className="h-8 w-8" />
-              </div>
-            )}
-          </div>
-        </div>
-        <div>
-          <h1 className="text-2xl font-bold leading-tight">
-            {greeting.text} {firstName || "there"}! {greeting.emoji}
-          </h1>
-        </div>
-      </div>
 
       {/* Daily selling tip */}
       <DailySellingTip />
