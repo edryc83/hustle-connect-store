@@ -30,6 +30,7 @@ interface StorefrontFiltersProps {
   onChange: (f: FilterState) => void;
   totalCount: number;
   filteredCount: number;
+  products?: any[]; // pass store products to derive available categories
 }
 
 export function StorefrontFilters({ filters, onChange, totalCount, filteredCount }: StorefrontFiltersProps) {
