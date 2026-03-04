@@ -22,6 +22,22 @@ const TEMPLATE_LABELS: Record<TemplateId, { name: string; desc: string; emoji: s
   4: { name: "Collage", desc: "Show multiple items", emoji: "🎨" },
 };
 
+// Parse category — handles plain strings or JSON objects
+const parseCategory = (raw: string | null | undefined): string => {
+  if (!raw) return "";
+  try {
+    const parsed = JSON.parse(raw);
+    if (typeof parsed === "object" && parsed !== null) {
+      // Take the first key as the category name
+      const keys = Object.keys(parsed);
+      return keys[0] || "";
+    }
+    return String(parsed);
+  } catch {
+    return raw;
+  }
+};
+
 const DashboardShareCard = () => {
   const { user } = useAuth();
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -60,10 +76,10 @@ const DashboardShareCard = () => {
       setStoreName(p?.store_name ?? "");
       setStoreSlug(p?.store_slug ?? "");
       setProfilePicUrl(p?.profile_picture_url ?? "");
-      setCategory(p?.category ?? "");
+      setCategory(parseCategory(p?.category));
       const prods = (productsData ?? []).map((pr: any) => ({ id: pr.id, name: pr.name, image_url: pr.image_url }));
       setProducts(prods);
-      setSubtitle(`Just everyday ${p?.category || "essentials"}, done properly.`);
+      setSubtitle(`Just everyday ${parseCategory(p?.category) || "essentials"}, done properly.`);
       setHeadline(`No limits.\nNo compromise.\nNo holding back.`);
       const firstWithImage = prods.find((pr: Product) => pr.image_url);
       if (firstWithImage) setSelectedProductImage(firstWithImage.image_url);
