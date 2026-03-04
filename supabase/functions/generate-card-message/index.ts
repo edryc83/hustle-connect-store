@@ -10,22 +10,21 @@ serve(async (req) => {
 
   try {
     const { storeName } = await req.json();
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
+    const ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY");
+    if (!ANTHROPIC_API_KEY) throw new Error("ANTHROPIC_API_KEY is not configured");
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+        "x-api-key": ANTHROPIC_API_KEY,
+        "anthropic-version": "2023-06-01",
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-3-flash-preview",
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 256,
+        system: "You write very short, catchy social media captions for African small businesses to share on WhatsApp status or Instagram stories. Max 1 sentence, under 80 characters. Include 1 emoji. The message should invite people to visit the store and check out products. Only return the message text, nothing else.",
         messages: [
-          {
-            role: "system",
-            content: "You write very short, catchy social media captions for African small businesses to share on WhatsApp status or Instagram stories. Max 1 sentence, under 80 characters. Include 1 emoji. The message should invite people to visit the store and check out products. Only return the message text, nothing else.",
-          },
           {
             role: "user",
             content: `Write a short status caption for a store called "${storeName || "My Store"}".`,
@@ -40,16 +39,13 @@ serve(async (req) => {
           status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
-      if (response.status === 402) {
-        return new Response(JSON.stringify({ error: "AI credits exhausted." }), {
-          status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
-      throw new Error("AI gateway error");
+      const errText = await response.text();
+      console.error("Anthropic error:", response.status, errText);
+      throw new Error("AI error");
     }
 
     const data = await response.json();
-    const message = data.choices?.[0]?.message?.content?.trim() ?? "";
+    const message = data.content?.[0]?.text?.trim() ?? "";
 
     return new Response(JSON.stringify({ message }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },

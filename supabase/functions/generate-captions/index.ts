@@ -9,8 +9,8 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
-    if (!LOVABLE_API_KEY) throw new Error('LOVABLE_API_KEY is not configured');
+    const ANTHROPIC_API_KEY = Deno.env.get('ANTHROPIC_API_KEY');
+    if (!ANTHROPIC_API_KEY) throw new Error('ANTHROPIC_API_KEY is not configured');
 
     const { storeName, storeSlug, category, productCount } = await req.json().catch(() => ({}));
 
@@ -25,9 +25,7 @@ Deno.serve(async (req) => {
       hour < 21 ? "evening" : "late night";
 
     const dayName = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"][day];
-
     const monthVibe = date >= 25 ? "month end / payday energy" : date <= 5 ? "new month fresh start" : "";
-
     const link = storeSlug ? `afristall.com/${storeSlug}` : "afristall.com/yourname";
 
     const systemPrompt = `You write very short WhatsApp status captions for African small business sellers. Max 2-3 lines each. Punchy, real, relatable. End every caption with the store link. No hashtags. No emojis overload. Sound human not corporate.`;
@@ -47,16 +45,18 @@ Make them 1-3 lines max. Short enough to read in 2 seconds.
 Return JSON only:
 {"captions":[{"vibe":"🆕 Fresh","text":"..."},{"vibe":"🔥 Hustle","text":"..."},{"vibe":"💛 Real","text":"..."}]}`;
 
-    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+        'x-api-key': ANTHROPIC_API_KEY,
+        'anthropic-version': '2023-06-01',
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'google/gemini-3-flash-preview',
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 512,
+        system: systemPrompt,
         messages: [
-          { role: 'system', content: systemPrompt },
           { role: 'user', content: userPrompt },
         ],
       }),
@@ -68,16 +68,13 @@ Return JSON only:
           status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
       }
-      if (response.status === 402) {
-        return new Response(JSON.stringify({ error: 'AI credits exhausted' }), {
-          status: 402, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        });
-      }
-      throw new Error('AI gateway error');
+      const errText = await response.text();
+      console.error('Anthropic error:', response.status, errText);
+      throw new Error('AI error');
     }
 
     const data = await response.json();
-    let content = data.choices?.[0]?.message?.content || '';
+    let content = data.content?.[0]?.text || '';
     content = content.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim();
     const parsed = JSON.parse(content);
 
