@@ -25,7 +25,7 @@ type Product = Tables<"products">;
 
 const LISTING_TYPES = [
   { value: "product", label: "Product" },
-  { value: "service", label: "Service" },
+  { value: "service", label: "Package" },
 ];
 
 const CONDITIONS = [
@@ -56,6 +56,7 @@ const DashboardProducts = () => {
   // Form state
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
+  const [discountPrice, setDiscountPrice] = useState("");
   const [description, setDescription] = useState("");
   const [variantsText, setVariantsText] = useState("");
   const [imageFiles, setImageFiles] = useState<File[]>([]);
@@ -97,7 +98,7 @@ const DashboardProducts = () => {
   useEffect(() => { fetchProducts(); }, [user]);
 
   const resetForm = () => {
-    setName(""); setPrice(""); setDescription(""); setVariantsText("");
+    setName(""); setPrice(""); setDiscountPrice(""); setDescription(""); setVariantsText("");
     setImageFiles([]); setImagePreviews([]); setExistingImages([]);
     setEditingProduct(null); setListingType("product"); setCondition("");
   };
@@ -108,12 +109,13 @@ const DashboardProducts = () => {
     resetForm();
     setName(product.name + " (copy)");
     setPrice(formatCommaInput(String(product.price)));
+    setDiscountPrice((product as any).discount_price ? formatCommaInput(String((product as any).discount_price)) : "");
     setDescription(product.description ?? "");
     setVariantsText(product.variants_text ?? "");
     setExistingImages(productImages[product.id] ?? (product.image_url ? [product.image_url] : []));
     setListingType((product as any).listing_type ?? "product");
     setCondition((product as any).condition ?? "");
-    setEditingProduct(null); // null = create new
+    setEditingProduct(null);
     setDialogOpen(true);
   };
 
@@ -121,6 +123,7 @@ const DashboardProducts = () => {
     setEditingProduct(product);
     setName(product.name);
     setPrice(formatCommaInput(String(product.price)));
+    setDiscountPrice((product as any).discount_price ? formatCommaInput(String((product as any).discount_price)) : "");
     setDescription(product.description ?? "");
     setVariantsText(product.variants_text ?? "");
     setExistingImages(productImages[product.id] ?? (product.image_url ? [product.image_url] : []));
@@ -178,8 +181,10 @@ const DashboardProducts = () => {
       }
 
       const allImages = [...existingImages, ...newImageUrls];
+      const numericDiscount = discountPrice ? Number(discountPrice.replace(/,/g, "")) : null;
       const payload = {
         name: name.trim(), price: numericPrice,
+        discount_price: numericDiscount && numericDiscount > 0 && numericDiscount < numericPrice ? numericDiscount : null,
         description: description.trim() || null, variants_text: variantsText.trim() || null,
         image_url: allImages[0] ?? null, listing_type: listingType,
         condition: listingType === "product" ? (condition || null) : null,
@@ -274,11 +279,18 @@ const DashboardProducts = () => {
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="productName">Name</Label>
-                <Input id="productName" placeholder={listingType === "service" ? "e.g. Hair braiding" : "e.g. Rolex wrap"} value={name} onChange={(e) => setName(e.target.value)} maxLength={100} />
+                <Input id="productName" placeholder={listingType === "service" ? "e.g. Birthday Party Package" : "e.g. Rolex wrap"} value={name} onChange={(e) => setName(e.target.value)} maxLength={100} />
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="productPrice">Price ({currency})</Label>
                 <Input id="productPrice" placeholder="5,000" value={price} onChange={(e) => setPrice(formatCommaInput(e.target.value))} inputMode="numeric" />
+              </div>
+              <div className="space-y-1.5">
+                <Label htmlFor="discountPrice">Discount Price ({currency}) <span className="text-muted-foreground font-normal">(optional)</span></Label>
+                <Input id="discountPrice" placeholder="e.g. 3,500" value={discountPrice} onChange={(e) => setDiscountPrice(formatCommaInput(e.target.value))} inputMode="numeric" />
+                {discountPrice && Number(discountPrice.replace(/,/g, "")) >= Number(price.replace(/,/g, "")) && (
+                  <p className="text-xs text-destructive">Discount must be less than the price</p>
+                )}
               </div>
               {listingType === "product" && (
                 <div className="space-y-1.5">
@@ -297,7 +309,7 @@ const DashboardProducts = () => {
                     {generatingDesc ? "Generating…" : "AI Generate"}
                   </Button>
                 </div>
-                <Textarea id="productDesc" placeholder={listingType === "service" ? "What does this service include?" : "What makes this product special?"} value={description} onChange={(e) => setDescription(e.target.value)} rows={3} />
+                <Textarea id="productDesc" placeholder={listingType === "service" ? "What does this package include?" : "What makes this product special?"} value={description} onChange={(e) => setDescription(e.target.value)} rows={3} />
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="productVariants">Variants / Options</Label>
@@ -343,7 +355,7 @@ const DashboardProducts = () => {
           <CardContent className="flex flex-col items-center gap-3 text-center">
             <Package className="h-12 w-12 text-muted-foreground/50" />
             <p className="text-lg font-medium">No listings yet</p>
-            <p className="text-sm text-muted-foreground">Add your first product or service to start selling!</p>
+            <p className="text-sm text-muted-foreground">Add your first product or package to start selling!</p>
             <Button className="mt-2 gap-2" onClick={openAdd}><Plus className="h-4 w-4" /> Add Listing</Button>
           </CardContent>
         </div>
@@ -429,7 +441,16 @@ function ListingRow({
       {/* Info */}
       <div className="flex-1 min-w-0">
         <p className="font-semibold text-sm truncate">{product.name}</p>
-        <p className="text-xs text-primary font-bold">{formatPrice(Number(product.price), currency)}</p>
+        <div className="flex items-center gap-1.5">
+          {(product as any).discount_price ? (
+            <>
+              <p className="text-xs text-primary font-bold">{formatPrice(Number((product as any).discount_price), currency)}</p>
+              <p className="text-[10px] text-muted-foreground line-through">{formatPrice(Number(product.price), currency)}</p>
+            </>
+          ) : (
+            <p className="text-xs text-primary font-bold">{formatPrice(Number(product.price), currency)}</p>
+          )}
+        </div>
       </div>
 
       {/* Badges */}
@@ -439,7 +460,7 @@ function ListingRow({
             <Star className="h-2.5 w-2.5 mr-0.5 fill-current" /> Featured
           </Badge>
         )}
-        {isService && <Badge variant="secondary" className="text-[10px] px-1.5 py-0">Service</Badge>}
+        {isService && <Badge variant="secondary" className="text-[10px] px-1.5 py-0">Package</Badge>}
         {(product as any).condition && (
           <Badge variant="outline" className="text-[10px] px-1.5 py-0">
             {(product as any).condition === "new" ? "New" : (product as any).condition === "used" ? "Used" : "Refurbished"}
