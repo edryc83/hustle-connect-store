@@ -220,10 +220,12 @@ const DashboardOverview = () => {
           <Button
             variant="outline"
             className="w-full rounded-xl border-primary/30 hover:bg-primary/10 gap-2"
-            onClick={() => setShareModalOpen(true)}
+            asChild
           >
-            <Smartphone className="h-4 w-4" />
-            Share to WhatsApp Status
+            <Link to="/dashboard/share" className="gap-2">
+              <Smartphone className="h-4 w-4" />
+              Share to WhatsApp Status
+            </Link>
           </Button>
         </div>
       )}
