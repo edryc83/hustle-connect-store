@@ -4,8 +4,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Mail, Phone, Eye, EyeOff, ArrowRight, ArrowLeft, Upload, Check, MapPin, MessageCircle, Package, Wrench } from "lucide-react";
+import EmojiGrid from "@/components/landing/EmojiGrid";
 import AfristallLogo from "@/components/AfristallLogo";
 import { toast } from "sonner";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -214,8 +214,13 @@ const Signup = () => {
   };
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-secondary/30 px-4 py-8">
-      <Link to="/" className="mb-8 flex items-center gap-2">
+    <div className="relative flex min-h-screen flex-col items-center justify-center px-4 py-8 overflow-hidden">
+      {/* Background effects */}
+      <EmojiGrid />
+      <div className="pointer-events-none absolute -top-32 -left-20 h-[400px] w-[400px] rounded-full bg-primary/8 blur-[100px]" />
+      <div className="pointer-events-none absolute -bottom-32 right-0 h-[350px] w-[350px] rounded-full bg-primary/6 blur-[80px]" />
+
+      <Link to="/" className="relative z-10 mb-8 flex items-center gap-2">
         <AfristallLogo />
         <span className="text-xl font-extrabold tracking-tight">
           Afri<span className="text-primary">stall</span>
@@ -223,34 +228,34 @@ const Signup = () => {
       </Link>
 
       {/* Progress indicator */}
-      <div className="mb-6 flex items-center gap-2">
+      <div className="relative z-10 mb-6 flex items-center gap-2">
         {[1, 2, 3].map((s) => (
           <div key={s} className="flex items-center gap-2">
             <div
               className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold transition-colors ${
                 step >= s
                   ? "bg-primary text-primary-foreground"
-                  : "bg-muted text-muted-foreground"
+                  : "bg-muted/60 backdrop-blur-sm text-muted-foreground"
               }`}
             >
               {step > s ? <Check className="h-4 w-4" /> : s}
             </div>
             {s < 3 && (
-              <div className={`h-0.5 w-8 sm:w-12 ${step > s ? "bg-primary" : "bg-muted"}`} />
+              <div className={`h-0.5 w-8 sm:w-12 ${step > s ? "bg-primary" : "bg-muted/60"}`} />
             )}
           </div>
         ))}
       </div>
 
-      <Card className="w-full max-w-md">
+      <div className="relative z-10 w-full max-w-md rounded-2xl border border-border/50 bg-card/60 backdrop-blur-xl p-6 shadow-sm">
         {/* STEP 1 — Account */}
         {step === 1 && (
           <>
-            <CardHeader className="text-center">
-              <CardTitle className="text-xl">Create your account</CardTitle>
-              <CardDescription>Sign up with your email or phone number</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
+            <div className="text-center mb-6">
+              <h2 className="text-xl font-bold text-foreground">Create your account</h2>
+              <p className="text-sm text-muted-foreground mt-1">Sign up with your email or phone number</p>
+            </div>
+            <div className="space-y-4">
               {/* Toggle email/phone */}
               <div className="flex gap-1 rounded-lg bg-muted p-1">
                 <button
@@ -363,18 +368,17 @@ const Signup = () => {
                   Sign in
                 </Link>
               </p>
-            </CardContent>
+            </div>
           </>
-        )}
 
         {/* STEP 2 — Store Setup */}
         {step === 2 && (
           <>
-            <CardHeader className="text-center">
-              <CardTitle className="text-xl">Set up your store</CardTitle>
-              <CardDescription>Tell us about what you sell</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
+            <div className="text-center mb-6">
+              <h2 className="text-xl font-bold text-foreground">Set up your store</h2>
+              <p className="text-sm text-muted-foreground mt-1">Tell us about what you sell</p>
+            </div>
+            <div className="space-y-4">
               <div className="space-y-1.5">
                 <Label htmlFor="storeName">Store name</Label>
                 <Input
@@ -503,23 +507,22 @@ const Signup = () => {
                   Next <ArrowRight className="h-4 w-4" />
                 </Button>
               </div>
-            </CardContent>
+            </div>
           </>
-        )}
 
         {/* STEP 3 — WhatsApp */}
         {step === 3 && (
           <>
-            <CardHeader className="text-center">
-              <CardTitle className="text-xl flex items-center justify-center gap-2">
+            <div className="text-center mb-6">
+              <h2 className="text-xl font-bold text-foreground flex items-center justify-center gap-2">
                 <MessageCircle className="h-5 w-5 text-primary" />
                 Connect WhatsApp
-              </CardTitle>
-              <CardDescription>
+              </h2>
+              <p className="text-sm text-muted-foreground mt-1">
                 This is where your orders will be sent. Make sure this number is correct.
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
+              </p>
+            </div>
+            <div className="space-y-4">
               <div className="rounded-lg bg-primary/5 border border-primary/10 p-3 text-sm text-muted-foreground">
                 💡 This can be different from your login. For example, you might sign in with email but receive orders on your Ugandan WhatsApp number.
               </div>
@@ -562,10 +565,10 @@ const Signup = () => {
                   {loading ? "Creating your store..." : "Create My Store 🎉"}
                 </Button>
               </div>
-            </CardContent>
+            </div>
           </>
         )}
-      </Card>
+      </div>
     </div>
   );
 };

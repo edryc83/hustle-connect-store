@@ -4,8 +4,9 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Mail, Phone, Eye, EyeOff } from "lucide-react";
+import AfristallLogo from "@/components/AfristallLogo";
+import EmojiGrid from "@/components/landing/EmojiGrid";
 import AfristallLogo from "@/components/AfristallLogo";
 import { toast } from "sonner";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -74,20 +75,25 @@ const Login = () => {
   };
 
   return (
-    <div className="flex min-h-screen flex-col items-center justify-center bg-secondary/30 px-4">
-      <Link to="/" className="mb-8 flex items-center gap-2">
+    <div className="relative flex min-h-screen flex-col items-center justify-center px-4 overflow-hidden">
+      {/* Background effects */}
+      <EmojiGrid />
+      <div className="pointer-events-none absolute -top-32 -left-20 h-[400px] w-[400px] rounded-full bg-primary/8 blur-[100px]" />
+      <div className="pointer-events-none absolute -bottom-32 right-0 h-[350px] w-[350px] rounded-full bg-primary/6 blur-[80px]" />
+
+      <Link to="/" className="relative z-10 mb-8 flex items-center gap-2">
         <AfristallLogo />
         <span className="text-xl font-extrabold tracking-tight">
           Afri<span className="text-primary">stall</span>
         </span>
       </Link>
 
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <CardTitle className="text-xl">Welcome back</CardTitle>
-          <CardDescription>Sign in to manage your store</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
+      <div className="relative z-10 w-full max-w-md rounded-2xl border border-border/50 bg-card/60 backdrop-blur-xl p-6 shadow-sm">
+        <div className="text-center mb-6">
+          <h1 className="text-xl font-bold text-foreground">Welcome back</h1>
+          <p className="text-sm text-muted-foreground mt-1">Sign in to manage your store</p>
+        </div>
+        <div className="space-y-4">
           <div className="flex gap-1 rounded-lg bg-muted p-1">
             <button
               type="button"
@@ -175,7 +181,7 @@ const Login = () => {
             </div>
           </div>
 
-          <Button className="w-full" onClick={handleLogin} disabled={loading}>
+          <Button className="w-full shadow-sm shadow-primary/20" onClick={handleLogin} disabled={loading}>
             {loading ? "Signing in..." : "Sign In"}
           </Button>
 
@@ -185,8 +191,8 @@ const Login = () => {
               Create your store
             </Link>
           </p>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </div>
   );
 };
