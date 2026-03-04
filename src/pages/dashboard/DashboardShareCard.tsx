@@ -2,45 +2,8 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
-import { Loader2, Check, Palette, ArrowRight } from "lucide-react";
-import { FabricEditor } from "@/components/dashboard/FabricEditor";
-
-/* ───────── Types ───────── */
-
-interface DesignTemplate {
-  id: string;
-  name: string;
-  category: string;
-  defaultHeadline: string;
-  defaultSubtitle: string;
-  previewImage: string;
-  previewBg: string;
-  previewTextColor: string;
-  previewAccent: string;
-  previewLayout: "full-bleed" | "split" | "centered" | "grid";
-}
-
-interface Product {
-  id: string;
-  name: string;
-  image_url: string | null;
-}
-
-/* ───────── All 9 Design Templates ───────── */
-
-const TEMPLATES: DesignTemplate[] = [
-  { id: "editorial-highlight", name: "Highlight", category: "Editorial", defaultHeadline: "No limits.\nNo compromise.", defaultSubtitle: "Just everyday essentials, done properly.", previewImage: "/templates/editorial-1.jpeg", previewBg: "#1a1a1a", previewTextColor: "#fff", previewAccent: "#FF6B35", previewLayout: "full-bleed" },
-  { id: "editorial-magazine", name: "Magazine", category: "Editorial", defaultHeadline: "NEW\nCOLLECTION", defaultSubtitle: "Curated pieces you'll love.", previewImage: "/templates/editorial-3.jpg", previewBg: "#0a0a0a", previewTextColor: "#fff", previewAccent: "#d4a574", previewLayout: "full-bleed" },
-  { id: "editorial-minimal", name: "Minimal", category: "Editorial", defaultHeadline: "SHOP\nNOW", defaultSubtitle: "Discover what's trending.", previewImage: "/templates/spotlight-1.jpeg", previewBg: "#111", previewTextColor: "#fff", previewAccent: "#FF6B35", previewLayout: "full-bleed" },
-  { id: "spotlight-hero", name: "Hero Shot", category: "Spotlight", defaultHeadline: "FEATURED\nPRODUCT", defaultSubtitle: "The one everyone's talking about.", previewImage: "/templates/spotlight-2.jpeg", previewBg: "#f5f3ef", previewTextColor: "#1a1a1a", previewAccent: "#FF6B35", previewLayout: "split" },
-  { id: "spotlight-split", name: "Split View", category: "Spotlight", defaultHeadline: "BEST\nSELLER", defaultSubtitle: "See why it's #1.", previewImage: "/templates/brand-2.png", previewBg: "#1a1a2e", previewTextColor: "#fff", previewAccent: "#FF6B35", previewLayout: "split" },
-  { id: "brand-profile", name: "Profile Card", category: "Brand Card", defaultHeadline: "VISIT\nMY STORE", defaultSubtitle: "Quality products, great prices.", previewImage: "/templates/brand-1.jpeg", previewBg: "#ffffff", previewTextColor: "#111827", previewAccent: "#FF6B35", previewLayout: "centered" },
-  { id: "brand-elegant", name: "Elegant Dark", category: "Brand Card", defaultHeadline: "EXPLORE\nOUR RANGE", defaultSubtitle: "Something for everyone.", previewImage: "/templates/brand-3.png", previewBg: "#1a1a2e", previewTextColor: "#fff", previewAccent: "#d4a574", previewLayout: "centered" },
-  { id: "collage-grid", name: "Grid Layout", category: "Collage", defaultHeadline: "NEW ARRIVALS", defaultSubtitle: "Fresh stock just dropped!", previewImage: "/templates/collage-1.png", previewBg: "#faf9f7", previewTextColor: "#111827", previewAccent: "#FF6B35", previewLayout: "grid" },
-  { id: "collage-mosaic", name: "Mosaic", category: "Collage", defaultHeadline: "TOP PICKS", defaultSubtitle: "Our best sellers, curated for you.", previewImage: "/templates/collage-2.png", previewBg: "#faf9f7", previewTextColor: "#111827", previewAccent: "#FF8F5E", previewLayout: "grid" },
-];
-
-/* ───────── Helpers ───────── */
+import { Loader2, Palette, ArrowRight, Check } from "lucide-react";
+import { ShareCardEditor } from "@/components/dashboard/ShareCardEditor";
 
 const parseCategory = (raw: string | null | undefined): string => {
   if (!raw) return "";
@@ -51,42 +14,55 @@ const parseCategory = (raw: string | null | undefined): string => {
   } catch { return raw; }
 };
 
-/* ───────── Component ───────── */
+const TEMPLATES = [
+  {
+    id: 1,
+    name: "Editorial",
+    desc: "White background, large image top, bold text bottom",
+    preview: "/templates/editorial-1.jpeg",
+    previewBg: "#ffffff",
+  },
+  {
+    id: 2,
+    name: "Bold Orange",
+    desc: "Full orange background, store name centre, white text",
+    preview: "/templates/brand-1.jpeg",
+    previewBg: "#FF6B35",
+  },
+  {
+    id: 3,
+    name: "Dark Gradient",
+    desc: "Dark background, product image, orange gradient overlay",
+    preview: "/templates/spotlight-2.jpeg",
+    previewBg: "#1a1a2e",
+  },
+];
 
 const DashboardShareCard = () => {
   const { user } = useAuth();
-
-  // Data
   const [storeName, setStoreName] = useState("");
   const [storeSlug, setStoreSlug] = useState("");
   const [profilePicUrl, setProfilePicUrl] = useState("");
   const [category, setCategory] = useState("");
-  const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
-
-  // Flow state
   const [step, setStep] = useState<"select" | "edit">("select");
-  const [selectedTemplateId, setSelectedTemplateId] = useState<string | null>(null);
+  const [selectedId, setSelectedId] = useState<number | null>(null);
 
-  const selectedTemplate = TEMPLATES.find(t => t.id === selectedTemplateId) ?? null;
-
-  // ── Fetch data ──
   useEffect(() => {
     if (!user) return;
-    const fetchData = async () => {
-      const [{ data: profile }, { data: productsData }] = await Promise.all([
-        supabase.from("profiles").select("store_name, store_slug, profile_picture_url, category").eq("id", user.id).single(),
-        supabase.from("products").select("id, name, image_url").eq("user_id", user.id),
-      ]);
+    (async () => {
+      const { data: profile } = await supabase
+        .from("profiles")
+        .select("store_name, store_slug, profile_picture_url, category")
+        .eq("id", user.id)
+        .single();
       const p = profile as any;
       setStoreName(p?.store_name ?? "");
       setStoreSlug(p?.store_slug ?? "");
       setProfilePicUrl(p?.profile_picture_url ?? "");
       setCategory(parseCategory(p?.category));
-      setProducts((productsData ?? []).map((pr: any) => ({ id: pr.id, name: pr.name, image_url: pr.image_url })));
       setLoading(false);
-    };
-    fetchData();
+    })();
   }, [user]);
 
   if (loading) {
@@ -97,23 +73,18 @@ const DashboardShareCard = () => {
     );
   }
 
-  /* ───────── STEP 2: Polotno Editor ───────── */
-  if (step === "edit" && selectedTemplate) {
+  if (step === "edit" && selectedId) {
     return (
-      <FabricEditor
-        template={selectedTemplate}
+      <ShareCardEditor
+        templateId={selectedId}
         storeName={storeName}
         storeSlug={storeSlug}
         profilePicUrl={profilePicUrl}
         category={category}
-        products={products}
         onBack={() => setStep("select")}
       />
     );
   }
-
-  /* ───────── STEP 1: Template Selection ───────── */
-  const categories = [...new Set(TEMPLATES.map(t => t.category))];
 
   return (
     <div className="space-y-6 pb-24 md:pb-6 max-w-4xl">
@@ -125,41 +96,36 @@ const DashboardShareCard = () => {
       </div>
 
       <div className="rounded-2xl border border-primary/20 bg-primary/5 p-4">
-        <p className="text-sm font-medium text-foreground">👋 Select your preferred design to get started</p>
-        <p className="text-xs text-muted-foreground mt-1">Pick a template that matches your brand's vibe, then customize it with the full design editor.</p>
+        <p className="text-sm font-medium text-foreground">👋 Pick a template to get started</p>
+        <p className="text-xs text-muted-foreground mt-1">Click to edit text, change images, then share as PNG.</p>
       </div>
 
-      {categories.map((cat) => (
-        <div key={cat}>
-          <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">{cat}</h2>
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
-            {TEMPLATES.filter(t => t.category === cat).map((t) => (
-              <button
-                key={t.id}
-                onClick={() => setSelectedTemplateId(t.id)}
-                className={`relative rounded-2xl border-2 overflow-hidden transition-all aspect-[9/14] max-h-64 group ${
-                  selectedTemplateId === t.id
-                    ? "border-primary ring-2 ring-primary/30 shadow-lg shadow-primary/10 scale-[1.02]"
-                    : "border-border/50 hover:border-primary/40 hover:shadow-md"
-                }`}
-              >
-                <img src={t.previewImage} alt={t.name} className="absolute inset-0 w-full h-full object-cover" />
-                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-3 pt-8">
-                  <p className="text-white text-xs font-bold">{t.name}</p>
-                  <p className="text-white/60 text-[10px]">{t.category}</p>
-                </div>
-                {selectedTemplateId === t.id && (
-                  <div className="absolute top-2 right-2 h-6 w-6 rounded-full bg-primary flex items-center justify-center">
-                    <Check className="h-3.5 w-3.5 text-primary-foreground" />
-                  </div>
-                )}
-              </button>
-            ))}
-          </div>
-        </div>
-      ))}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        {TEMPLATES.map((t) => (
+          <button
+            key={t.id}
+            onClick={() => setSelectedId(t.id)}
+            className={`relative rounded-2xl border-2 overflow-hidden transition-all aspect-[9/16] group ${
+              selectedId === t.id
+                ? "border-primary ring-2 ring-primary/30 shadow-lg shadow-primary/10 scale-[1.02]"
+                : "border-border/50 hover:border-primary/40 hover:shadow-md"
+            }`}
+          >
+            <img src={t.preview} alt={t.name} className="absolute inset-0 w-full h-full object-cover" />
+            <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-4 pt-10">
+              <p className="text-white text-sm font-bold">{t.name}</p>
+              <p className="text-white/60 text-xs">{t.desc}</p>
+            </div>
+            {selectedId === t.id && (
+              <div className="absolute top-3 right-3 h-7 w-7 rounded-full bg-primary flex items-center justify-center">
+                <Check className="h-4 w-4 text-primary-foreground" />
+              </div>
+            )}
+          </button>
+        ))}
+      </div>
 
-      {selectedTemplateId && (
+      {selectedId && (
         <div className="sticky bottom-20 md:bottom-4 z-40">
           <Button onClick={() => setStep("edit")} className="w-full rounded-2xl h-12 text-base gap-2 shadow-lg shadow-primary/20">
             Next – Customize Design <ArrowRight className="h-5 w-5" />
