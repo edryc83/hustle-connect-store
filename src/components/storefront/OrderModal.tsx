@@ -68,6 +68,7 @@ export function OrderModal({ product, whatsappNumber, storeName, sellerId, curre
       `*Customer:* ${name.trim()}`,
       `*Phone:* ${phone.trim()}`,
       notes.trim() ? `*Notes:* ${notes.trim()}` : null,
+      product.image_url ? `\n📷 *Product Image:*\n${product.image_url}` : null,
     ]
       .filter(Boolean)
       .join("\n");
