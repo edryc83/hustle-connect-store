@@ -370,6 +370,7 @@ const Signup = () => {
               </p>
             </div>
           </>
+        )}
 
         {/* STEP 2 — Store Setup */}
         {step === 2 && (
@@ -509,6 +510,7 @@ const Signup = () => {
               </div>
             </div>
           </>
+        )}
 
         {/* STEP 3 — WhatsApp */}
         {step === 3 && (
