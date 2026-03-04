@@ -5,12 +5,24 @@ import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 
 import {
-  Package, CalendarDays, Copy, Share2, X, Plus,
+  Package, CalendarDays, Copy, Share2, X, Plus, Download,
 } from "lucide-react";
 import AfristallLogo from "@/components/AfristallLogo";
 import { toast } from "sonner";
 import DailySellingTip from "@/components/dashboard/DailySellingTip";
 import CaptionGenerator from "@/components/dashboard/CaptionGenerator";
+
+function useIsInstalledPWA() {
+  const [installed, setInstalled] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(display-mode: standalone)");
+    setInstalled(mq.matches || (navigator as any).standalone === true);
+    const handler = (e: MediaQueryListEvent) => setInstalled(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
+  return installed;
+}
 
 function getGreeting(): { text: string; emoji: string } {
   const hour = new Date().getHours();

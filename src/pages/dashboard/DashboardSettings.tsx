@@ -510,6 +510,50 @@ const DashboardSettings = () => {
 
       {/* WhatsApp Test */}
       <WhatsAppTestCard whatsappNumber={whatsappNumber} storeName={storeName} storeSlug={firstName} />
+
+      {/* Add to Home Screen Tutorial */}
+      <Card id="install-app" className="border-border/50 bg-card/60 backdrop-blur-xl">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-lg">
+            📲 Install Afristall as an App
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <p className="text-sm text-muted-foreground">
+            Add Afristall to your home screen for quick access — it works just like a real app, no download needed!
+          </p>
+
+          <div className="grid gap-4 sm:grid-cols-2">
+            {/* iPhone */}
+            <a
+              href="https://www.youtube.com/watch?v=QpFbExFHXe0&pp=ygUYYWRkIHdlYmFwcCB0byBob21lc2NyZWVu"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-3 rounded-xl border border-border/50 bg-muted/30 p-4 hover:bg-muted/60 transition-colors"
+            >
+              <span className="text-2xl">🍎</span>
+              <div>
+                <p className="font-semibold text-sm">iPhone / iPad</p>
+                <p className="text-xs text-muted-foreground">Tap Share → Add to Home Screen</p>
+              </div>
+            </a>
+
+            {/* Android */}
+            <a
+              href="https://www.youtube.com/watch?v=fUqVVSgCNtw&pp=ygUgYWRkIHdlYmFwcCB0byBob21lc2NyZWVuIGFuZHJvaWQ%3D"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-3 rounded-xl border border-border/50 bg-muted/30 p-4 hover:bg-muted/60 transition-colors"
+            >
+              <span className="text-2xl">🤖</span>
+              <div>
+                <p className="font-semibold text-sm">Android</p>
+                <p className="text-xs text-muted-foreground">Tap Menu → Add to Home Screen</p>
+              </div>
+            </a>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };
