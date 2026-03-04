@@ -261,8 +261,24 @@ const DashboardProducts = () => {
               <DialogTitle>{editingProduct ? "Edit Listing" : "Add Listing"}</DialogTitle>
             </DialogHeader>
             <div className="space-y-4 pt-2">
-              {/* Multi-image upload — moved to top */}
+              {/* Type */}
               <div className="space-y-1.5">
+                <Label>Type</Label>
+                <div className="flex gap-2">
+                  {LISTING_TYPES.map((t) => (
+                    <button key={t.value} type="button"
+                      onClick={() => { setListingType(t.value); if (t.value === "service") setCondition(""); }}
+                      className={`flex-1 rounded-lg border px-3 py-2 text-sm font-medium transition-colors ${
+                        listingType === t.value ? "border-primary bg-primary/10 text-primary" : "border-border text-muted-foreground hover:border-primary/40"
+                      }`}>
+                      {t.value === "service" ? <Wrench className="h-3.5 w-3.5 inline mr-1.5" /> : <Package className="h-3.5 w-3.5 inline mr-1.5" />}
+                      {t.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              {/* Multi-image upload */}
+              <div className="space-y-2">
                 <Label>Images <span className="text-muted-foreground font-normal">(up to 5)</span></Label>
                 {allFormImages.length > 0 && (
                   <div className="flex gap-2 flex-wrap">
@@ -281,27 +297,16 @@ const DashboardProducts = () => {
                   </div>
                 )}
                 {allFormImages.length < 5 && (
-                  <label className="cursor-pointer inline-block">
-                    <span className="text-sm font-medium text-primary hover:underline">{allFormImages.length > 0 ? "+ Add more" : "Upload images"}</span>
+                  <label className="cursor-pointer block">
+                    <div className="flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-border/60 bg-muted/30 py-6 hover:border-primary/40 hover:bg-muted/50 transition-colors">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
+                        <ImageIcon className="h-5 w-5 text-primary" />
+                      </div>
+                      <span className="text-sm font-medium text-muted-foreground">{allFormImages.length > 0 ? "Add more photos" : "Tap to add photos"}</span>
+                    </div>
                     <input type="file" accept="image/*" multiple className="hidden" onChange={handleImageChange} />
                   </label>
                 )}
-              </div>
-              {/* Type */}
-              <div className="space-y-1.5">
-                <Label>Type</Label>
-                <div className="flex gap-2">
-                  {LISTING_TYPES.map((t) => (
-                    <button key={t.value} type="button"
-                      onClick={() => { setListingType(t.value); if (t.value === "service") setCondition(""); }}
-                      className={`flex-1 rounded-lg border px-3 py-2 text-sm font-medium transition-colors ${
-                        listingType === t.value ? "border-primary bg-primary/10 text-primary" : "border-border text-muted-foreground hover:border-primary/40"
-                      }`}>
-                      {t.value === "service" ? <Wrench className="h-3.5 w-3.5 inline mr-1.5" /> : <Package className="h-3.5 w-3.5 inline mr-1.5" />}
-                      {t.label}
-                    </button>
-                  ))}
-                </div>
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="productName">Name</Label>
