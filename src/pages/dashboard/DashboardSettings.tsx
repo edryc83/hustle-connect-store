@@ -6,8 +6,10 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { Sparkles, Loader2 } from "lucide-react";
+import { CURRENCY_OPTIONS } from "@/lib/currency";
 import {
   CategoryPicker,
   CategorySelection,
@@ -26,12 +28,13 @@ const DashboardSettings = () => {
   const [storeBio, setStoreBio] = useState("");
   const [categories, setCategories] = useState<CategorySelection>({});
   const [deliveryAreas, setDeliveryAreas] = useState("");
+  const [currency, setCurrency] = useState("UGX");
 
   useEffect(() => {
     if (!user) return;
     supabase
       .from("profiles")
-      .select("store_name, whatsapp_number, city, store_bio, category, delivery_areas")
+      .select("store_name, whatsapp_number, city, store_bio, category, delivery_areas, currency")
       .eq("id", user.id)
       .single()
       .then(({ data }) => {
@@ -42,6 +45,7 @@ const DashboardSettings = () => {
           setStoreBio((data as any).store_bio ?? "");
           setCategories(deserializeCategories(data.category));
           setDeliveryAreas((data as any).delivery_areas ?? "");
+          setCurrency((data as any).currency ?? "UGX");
         }
         setLoading(false);
       });
