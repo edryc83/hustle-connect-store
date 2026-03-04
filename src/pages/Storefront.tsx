@@ -465,8 +465,23 @@ const StorefrontInner = () => {
           Powered by <span className="font-semibold">Afri<span className="text-primary">stall</span></span>
         </Link>
       </footer>
+
+      {/* Cart Drawer */}
+      <CartDrawer
+        currency={currency}
+        whatsappNumber={profile.whatsapp_number ?? ""}
+        storeName={profile.store_name ?? "Store"}
+        sellerId={profile.id}
+        visitorName={visitorName}
+      />
     </div>
   );
 };
+
+const Storefront = () => (
+  <CartProvider>
+    <StorefrontInner />
+  </CartProvider>
+);
 
 export default Storefront;
