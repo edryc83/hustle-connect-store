@@ -11,6 +11,7 @@ import Login from "./pages/Login";
 import DashboardOverview from "./pages/dashboard/DashboardOverview";
 import DashboardProducts from "./pages/dashboard/DashboardProducts";
 import DashboardSettings from "./pages/dashboard/DashboardSettings";
+import Storefront from "./pages/Storefront";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
