@@ -113,6 +113,7 @@ export type Database = {
           updated_at: string
           user_id: string
           variants_text: string | null
+          whatsapp_taps: number
         }
         Insert: {
           condition?: string | null
@@ -127,6 +128,7 @@ export type Database = {
           updated_at?: string
           user_id: string
           variants_text?: string | null
+          whatsapp_taps?: number
         }
         Update: {
           condition?: string | null
@@ -141,6 +143,7 @@ export type Database = {
           updated_at?: string
           user_id?: string
           variants_text?: string | null
+          whatsapp_taps?: number
         }
         Relationships: [
           {
@@ -169,6 +172,7 @@ export type Database = {
           store_bio: string | null
           store_name: string | null
           store_slug: string | null
+          view_count: number
           whatsapp_number: string | null
         }
         Insert: {
@@ -187,6 +191,7 @@ export type Database = {
           store_bio?: string | null
           store_name?: string | null
           store_slug?: string | null
+          view_count?: number
           whatsapp_number?: string | null
         }
         Update: {
@@ -205,6 +210,7 @@ export type Database = {
           store_bio?: string | null
           store_name?: string | null
           store_slug?: string | null
+          view_count?: number
           whatsapp_number?: string | null
         }
         Relationships: []
@@ -214,7 +220,8 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      increment_store_views: { Args: { slug: string }; Returns: undefined }
+      increment_whatsapp_taps: { Args: { p_id: string }; Returns: undefined }
     }
     Enums: {
       [_ in never]: never
