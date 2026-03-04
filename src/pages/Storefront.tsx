@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Store, MapPin, ImageIcon, ShoppingBag, Share2, Copy, Check } from "lucide-react";
+import { categoriesToDisplay } from "@/components/CategoryPicker";
 import AfristallLogo from "@/components/AfristallLogo";
 import {
   DropdownMenu,
@@ -158,11 +159,11 @@ const Storefront = () => {
                     <MapPin className="h-3.5 w-3.5" /> {profile.city}
                   </span>
                 )}
-                {profile.category && (
-                  <span className="rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary">
-                    {profile.category}
+                {categoriesToDisplay(profile.category).map((tag) => (
+                  <span key={tag} className="rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary">
+                    {tag}
                   </span>
-                )}
+                ))}
               </div>
             </div>
           </div>

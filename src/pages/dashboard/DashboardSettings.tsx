@@ -6,28 +6,14 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 import { Sparkles, Loader2 } from "lucide-react";
-
-const CATEGORIES = [
-  "Fashion & Clothing",
-  "Electronics & Gadgets",
-  "Food & Beverages",
-  "Beauty & Cosmetics",
-  "Home & Living",
-  "Health & Wellness",
-  "Books & Stationery",
-  "Art & Crafts",
-  "Sports & Fitness",
-  "Agriculture & Farm Produce",
-  "Auto & Motor Parts",
-  "Baby & Kids",
-  "Phones & Accessories",
-  "Jewelry & Accessories",
-  "Services",
-  "Other",
-];
+import {
+  CategoryPicker,
+  CategorySelection,
+  serializeCategories,
+  deserializeCategories,
+} from "@/components/CategoryPicker";
 
 const DashboardSettings = () => {
   const { user } = useAuth();
@@ -38,7 +24,7 @@ const DashboardSettings = () => {
   const [whatsappNumber, setWhatsappNumber] = useState("");
   const [city, setCity] = useState("");
   const [storeBio, setStoreBio] = useState("");
-  const [category, setCategory] = useState("");
+  const [categories, setCategories] = useState<CategorySelection>({});
   const [deliveryAreas, setDeliveryAreas] = useState("");
 
   useEffect(() => {
@@ -54,7 +40,7 @@ const DashboardSettings = () => {
           setWhatsappNumber(data.whatsapp_number ?? "");
           setCity(data.city ?? "");
           setStoreBio((data as any).store_bio ?? "");
-          setCategory(data.category ?? "");
+          setCategories(deserializeCategories(data.category));
           setDeliveryAreas((data as any).delivery_areas ?? "");
         }
         setLoading(false);
@@ -64,8 +50,9 @@ const DashboardSettings = () => {
   const handleGenerateBio = async () => {
     setGenerating(true);
     try {
+      const catNames = Object.keys(categories).join(", ") || "General";
       const res = await supabase.functions.invoke("generate-bio", {
-        body: { storeName, category, city },
+        body: { storeName, category: catNames, city },
       });
       if (res.error) throw res.error;
       const bio = res.data?.bio;
@@ -89,7 +76,7 @@ const DashboardSettings = () => {
         whatsapp_number: whatsappNumber.trim(),
         city: city.trim(),
         store_bio: storeBio.trim() || null,
-        category: category || null,
+        category: serializeCategories(categories) || null,
         delivery_areas: deliveryAreas.trim() || null,
       } as any)
       .eq("id", user.id);
@@ -98,7 +85,8 @@ const DashboardSettings = () => {
     setSaving(false);
   };
 
-  if (loading) return <div className="animate-pulse text-muted-foreground py-12 text-center">Loading…</div>;
+  if (loading)
+    return <div className="animate-pulse text-muted-foreground py-12 text-center">Loading…</div>;
 
   return (
     <div className="max-w-lg space-y-6">
@@ -114,17 +102,9 @@ const DashboardSettings = () => {
           </div>
 
           <div className="space-y-1.5">
-            <Label>Category</Label>
-            <Select value={category} onValueChange={setCategory}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select what you sell" />
-              </SelectTrigger>
-              <SelectContent>
-                {CATEGORIES.map((cat) => (
-                  <SelectItem key={cat} value={cat}>{cat}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Label>Categories & Subcategories</Label>
+            <p className="text-xs text-muted-foreground mb-1">Select all that apply to your store</p>
+            <CategoryPicker value={categories} onChange={setCategories} />
           </div>
 
           <div className="space-y-1.5">
