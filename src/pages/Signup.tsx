@@ -186,8 +186,24 @@ const Signup = () => {
         options: { emailRedirectTo: window.location.origin },
       });
 
-      if (authError) throw authError;
+      if (authError) {
+        const msg = authError.message?.toLowerCase() || "";
+        if (msg.includes("already registered") || msg.includes("already been registered") || msg.includes("duplicate")) {
+          toast.error("This email already has a store. Try signing in instead.");
+          setStep(1);
+        } else {
+          toast.error(authError.message);
+        }
+        return;
+      }
       if (!authData.user) throw new Error("Signup failed");
+
+      // Check for fake signup (email exists but identities empty = already registered)
+      if (authData.user.identities && authData.user.identities.length === 0) {
+        toast.error("This email already has a store. Try signing in instead.");
+        setStep(1);
+        return;
+      }
 
       let profilePictureUrl = null;
       if (profilePicture) {
