@@ -14,6 +14,7 @@ import { CartProvider, useCart } from "@/hooks/useCart";
 import { WishlistProvider, useWishlist } from "@/hooks/useWishlist";
 import { BuyerAttributePicker, BuyerCakeMessageInput, BuyerPersonalisationInput } from "@/components/storefront/BuyerAttributePicker";
 import { getCategoryByValue, buildAttributeLines, parseTextToOptions } from "@/lib/productAttributes";
+import { StorefrontFilters, applyFilters, type FilterState } from "@/components/storefront/StorefrontFilters";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -597,6 +598,7 @@ const StorefrontInner = () => {
   const [productImagesMap, setProductImagesMap] = useState<Record<string, string[]>>({});
   const [visitorName, setVisitorName] = useState<string | null>(null);
   const [showNameModal, setShowNameModal] = useState(false);
+  const [filters, setFilters] = useState<FilterState>({ search: "", category: "", condition: "", priceRange: null });
 
   // Load visitor name from localStorage
   useEffect(() => {
@@ -723,8 +725,10 @@ const StorefrontInner = () => {
   }
 
   const currency = profile.currency ?? "UGX";
-  const featured = products.filter((p) => p.is_featured);
-  const nonFeatured = products.filter((p) => !p.is_featured);
+  const hasActiveSearch = filters.search || filters.category || filters.condition || filters.priceRange;
+  const filteredProducts = hasActiveSearch ? applyFilters(products, filters) : products;
+  const featured = filteredProducts.filter((p) => p.is_featured);
+  const nonFeatured = filteredProducts.filter((p) => !p.is_featured);
 
   // Product detail view
   const viewProduct = productId ? products.find((p) => p.id === productId) : null;
@@ -799,9 +803,19 @@ const StorefrontInner = () => {
 
       {/* Products */}
       <main className="mx-auto max-w-5xl px-4 py-6 space-y-8">
+        {/* Search & Filters */}
+        {products.length > 0 && (
+          <StorefrontFilters
+            filters={filters}
+            onChange={setFilters}
+            totalCount={products.length}
+            filteredCount={filteredProducts.length}
+          />
+        )}
+
         {/* Wishlist Section */}
         {(() => {
-          const wishedProducts = products.filter((p) => wishlistItems.includes(p.id));
+          const wishedProducts = filteredProducts.filter((p) => wishlistItems.includes(p.id));
           if (wishedProducts.length === 0) return null;
           return (
             <section>
@@ -825,11 +839,23 @@ const StorefrontInner = () => {
           );
         })()}
 
-        {products.length === 0 ? (
+        {filteredProducts.length === 0 ? (
           <div className="flex flex-col items-center gap-3 py-16 text-center">
             <ShoppingBag className="h-12 w-12 text-muted-foreground/40" />
-            <p className="text-lg font-medium">No products yet</p>
-            <p className="text-sm text-muted-foreground">This store hasn't added any products.</p>
+            {hasActiveSearch ? (
+              <>
+                <p className="text-lg font-medium">No products match your filters</p>
+                <p className="text-sm text-muted-foreground">Try adjusting your search or filters.</p>
+                <button onClick={() => setFilters({ search: "", category: "", condition: "", priceRange: null })} className="text-sm text-primary font-medium hover:underline">
+                  Clear all filters
+                </button>
+              </>
+            ) : (
+              <>
+                <p className="text-lg font-medium">No products yet</p>
+                <p className="text-sm text-muted-foreground">This store hasn't added any products.</p>
+              </>
+            )}
           </div>
         ) : (
           <>
@@ -855,7 +881,7 @@ const StorefrontInner = () => {
 
             <section>
               <h2 className="text-lg font-bold mb-4">
-                {featured.length > 0 ? "All Listings" : `${products.length} listing${products.length !== 1 ? "s" : ""}`}
+                {featured.length > 0 ? "All Products" : `${filteredProducts.length} product${filteredProducts.length !== 1 ? "s" : ""}`}
               </h2>
               <div className="grid gap-3 sm:gap-4 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
                 {(featured.length > 0 ? nonFeatured : products).map((product) => (
