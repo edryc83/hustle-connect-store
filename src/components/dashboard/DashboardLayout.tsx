@@ -5,6 +5,8 @@ import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { DashboardSidebar } from "./DashboardSidebar";
 import { MobileBottomNav } from "./MobileBottomNav";
 import AfristallLogo from "@/components/AfristallLogo";
+import { useTheme } from "@/hooks/useTheme";
+import { Moon, Sun } from "lucide-react";
 
 export function DashboardLayout({ children }: { children: ReactNode }) {
   const { user, loading } = useAuth();
