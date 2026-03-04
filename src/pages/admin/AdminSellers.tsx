@@ -127,7 +127,7 @@ export default function AdminSellers() {
                 <TableHead className="text-center">Products</TableHead>
                 <TableHead className="text-center">Views</TableHead>
                 <TableHead className="text-center">Status</TableHead>
-                <TableHead className="text-right">Store</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
