@@ -193,20 +193,6 @@ const DashboardOverview = () => {
         </div>
       )}
 
-      {/* 2x2 stat cards */}
-      <div className="grid gap-4 grid-cols-2">
-        {stats.map((s) => (
-          <div key={s.label} className="rounded-2xl border border-border/50 bg-card/60 backdrop-blur-xl p-5 shadow-sm">
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-sm font-medium text-muted-foreground">{s.label}</span>
-              <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-primary/10">
-                <s.icon className="h-4 w-4 text-primary" />
-              </div>
-            </div>
-            <div className="text-3xl font-bold">{s.value}</div>
-          </div>
-        ))}
-      </div>
 
       {/* Share section */}
       {storeSlug && (
@@ -254,8 +240,6 @@ const DashboardOverview = () => {
         <p className="text-xs text-muted-foreground">{completenessMessage}</p>
       </div>
 
-      {/* Daily selling tip */}
-      <DailySellingTip />
 
       {/* WhatsApp test */}
       <WhatsAppTestCard whatsappNumber={whatsappNumber} storeName={storeName} />
