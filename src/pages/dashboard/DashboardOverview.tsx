@@ -34,7 +34,7 @@ const DashboardOverview = () => {
   const [storeSlug, setStoreSlug] = useState("");
   const [storeName, setStoreName] = useState("");
   const [profilePicUrl, setProfilePicUrl] = useState("");
-  const [whatsappNumber, setWhatsappNumber] = useState("");
+  
   const [bannerDismissed, setBannerDismissed] = useState(
     () => localStorage.getItem("afristall_banner_dismissed") === "true"
   );
@@ -46,7 +46,7 @@ const DashboardOverview = () => {
     const fetchData = async () => {
       const [{ count }, { data: profile }] = await Promise.all([
         supabase.from("products").select("*", { count: "exact", head: true }).eq("user_id", user.id),
-        supabase.from("profiles").select("store_name, store_slug, first_name, profile_picture_url, whatsapp_number").eq("id", user.id).single(),
+        supabase.from("profiles").select("store_name, store_slug, first_name, profile_picture_url").eq("id", user.id).single(),
       ]);
       setProductCount(count ?? 0);
       const p = profile as any;
@@ -55,7 +55,7 @@ const DashboardOverview = () => {
       setStoreSlug(p?.store_slug ?? "");
       setStoreName(p?.store_name ?? "");
       setProfilePicUrl(p?.profile_picture_url ?? "");
-      setWhatsappNumber(p?.whatsapp_number ?? "");
+      
     };
 
     fetchData();
@@ -88,19 +88,6 @@ const DashboardOverview = () => {
     }
   };
 
-  const completeness =
-    (profilePicUrl ? 20 : 0) +
-    (storeName ? 20 : 0) +
-    (whatsappNumber ? 20 : 0) +
-    (productCount >= 1 ? 20 : 0) +
-    (productCount >= 3 ? 20 : 0);
-
-  const completenessMessage =
-    completeness <= 40
-      ? "Your store isn't ready yet — buyers need products to order"
-      : completeness < 100
-        ? "Almost there! Add more products to boost your store"
-        : "🎉 Your store is ready to share!";
 
   return (
     <div className="space-y-6">
