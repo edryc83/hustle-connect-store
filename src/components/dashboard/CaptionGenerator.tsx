@@ -51,7 +51,7 @@ const CaptionGenerator = ({ storeName, storeSlug, category, productCount }: Prop
       <div className="flex items-center justify-between">
         <div>
           <span className="text-sm font-medium">For your status 🔥</span>
-          <p className="text-[11px] text-muted-foreground">Tap copy → paste on WhatsApp status → get orders</p>
+          <p className="text-[11px] text-muted-foreground">Tap copy → paste on WhatsApp status → stays up for 24hrs</p>
         </div>
         <button
           onClick={fetchCaptions}
