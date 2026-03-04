@@ -83,7 +83,6 @@ function ProductCard({
     e.stopPropagation();
     const imageUrl = images[0] || product.image_url || undefined;
     addItem(product, imageUrl);
-    toast.success(`${product.name} added to cart`);
   };
 
   const displayPrice = (product as any).discount_price ?? product.price;
@@ -337,7 +336,6 @@ const StorefrontInner = () => {
               onClick={() => {
                 const imageUrl = imgs[0] || viewProduct.image_url || undefined;
                 addItem(viewProduct, imageUrl);
-                toast.success(`${viewProduct.name} added to cart`);
               }}
             >
               <ShoppingCart className="h-5 w-5" />
