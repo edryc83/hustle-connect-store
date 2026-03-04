@@ -35,9 +35,6 @@ export function CartDrawer({ currency, whatsappNumber, storeName, sellerId, visi
       const subtotal = Number(price) * item.quantity;
       lines.push(`${i + 1}. *${item.product.name}*${item.variant ? ` (${item.variant})` : ""}`);
       lines.push(`   Qty: ${item.quantity} × ${formatPrice(Number(price), currency)} = ${formatPrice(subtotal, currency)}`);
-      if (item.imageUrl) {
-        lines.push(`   📷 ${item.imageUrl}`);
-      }
     });
 
     lines.push(``);
