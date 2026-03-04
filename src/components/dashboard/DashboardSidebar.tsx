@@ -2,6 +2,7 @@ import { Package, LayoutDashboard, Settings, LogOut, ClipboardList, BarChart3, M
 import { NavLink } from "@/components/NavLink";
 import { useAuth } from "@/hooks/useAuth";
 import { useTheme } from "@/hooks/useTheme";
+import { useBusinessTerms } from "@/hooks/useBusinessTerms";
 import { useNavigate } from "react-router-dom";
 import AfristallLogo from "@/components/AfristallLogo";
 import {
@@ -18,20 +19,21 @@ import {
 } from "@/components/ui/sidebar";
 import { Button } from "@/components/ui/button";
 
-const navItems = [
-  { title: "Home", url: "/dashboard", icon: LayoutDashboard },
-  { title: "Products", url: "/dashboard/products", icon: Package },
-  { title: "Orders", url: "/dashboard/orders", icon: ClipboardList },
-  { title: "Analytics", url: "/dashboard/analytics", icon: BarChart3 },
-  { title: "Settings", url: "/dashboard/settings", icon: Settings },
-];
-
 export function DashboardSidebar() {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
   const { signOut } = useAuth();
   const { theme, toggleTheme } = useTheme();
+  const terms = useBusinessTerms();
   const navigate = useNavigate();
+
+  const navItems = [
+    { title: "Home", url: "/dashboard", icon: LayoutDashboard },
+    { title: terms.plural, url: "/dashboard/products", icon: Package },
+    { title: "Orders", url: "/dashboard/orders", icon: ClipboardList },
+    { title: "Analytics", url: "/dashboard/analytics", icon: BarChart3 },
+    { title: "Settings", url: "/dashboard/settings", icon: Settings },
+  ];
 
   const handleSignOut = async () => {
     await signOut();
