@@ -16,10 +16,12 @@ export type Database = {
     Tables: {
       products: {
         Row: {
+          condition: string | null
           created_at: string
           description: string | null
           id: string
           image_url: string | null
+          listing_type: string | null
           name: string
           price: number
           updated_at: string
@@ -27,10 +29,12 @@ export type Database = {
           variants_text: string | null
         }
         Insert: {
+          condition?: string | null
           created_at?: string
           description?: string | null
           id?: string
           image_url?: string | null
+          listing_type?: string | null
           name: string
           price: number
           updated_at?: string
@@ -38,10 +42,12 @@ export type Database = {
           variants_text?: string | null
         }
         Update: {
+          condition?: string | null
           created_at?: string
           description?: string | null
           id?: string
           image_url?: string | null
+          listing_type?: string | null
           name?: string
           price?: number
           updated_at?: string
@@ -66,6 +72,7 @@ export type Database = {
           currency: string | null
           delivery_areas: string | null
           email: string | null
+          first_name: string | null
           id: string
           last_active_at: string
           phone: string | null
@@ -82,6 +89,7 @@ export type Database = {
           currency?: string | null
           delivery_areas?: string | null
           email?: string | null
+          first_name?: string | null
           id: string
           last_active_at?: string
           phone?: string | null
@@ -98,6 +106,7 @@ export type Database = {
           currency?: string | null
           delivery_areas?: string | null
           email?: string | null
+          first_name?: string | null
           id?: string
           last_active_at?: string
           phone?: string | null
