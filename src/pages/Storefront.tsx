@@ -86,6 +86,7 @@ const Storefront = () => {
       {/* Header */}
       <header className="bg-background border-b">
         <div className="mx-auto max-w-5xl px-4 py-6 sm:py-8">
+        <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             {profile.profile_picture_url ? (
               <img
@@ -114,6 +115,9 @@ const Storefront = () => {
               </div>
             </div>
           </div>
+
+          <ShareButton storeName={profile.store_name ?? "Store"} storeSlug={storeSlug ?? ""} />
+        </div>
         </div>
       </header>
 
