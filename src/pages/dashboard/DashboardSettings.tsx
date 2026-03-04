@@ -10,6 +10,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { toast } from "sonner";
 import { Sparkles, Loader2, Camera, ImagePlus } from "lucide-react";
 import WallpaperPicker from "@/components/dashboard/WallpaperPicker";
+import WhatsAppTestCard from "@/components/dashboard/WhatsAppTestCard";
 import { CURRENCY_OPTIONS } from "@/lib/currency";
 import AfristallLogo from "@/components/AfristallLogo";
 import {
