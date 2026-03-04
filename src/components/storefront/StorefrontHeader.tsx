@@ -44,21 +44,6 @@ export function StorefrontHeader({ profile, visitorName }: StorefrontHeaderProps
 
   return (
     <header className="bg-background relative">
-      {/* Share Button — top right */}
-      <button
-        onClick={() => {
-          const url = window.location.href;
-          if (navigator.share) {
-            navigator.share({ title: profile.store_name || "Store", url });
-          } else {
-            navigator.clipboard.writeText(url);
-          }
-        }}
-        className="absolute top-3 right-3 z-10 rounded-full bg-background/80 backdrop-blur p-2 shadow-md border border-border/50 hover:bg-muted transition-colors"
-        aria-label="Share store"
-      >
-        <Share2 className="h-4 w-4" />
-      </button>
 
       {/* Cover Photo */}
       <div className="h-36 sm:h-48 bg-gradient-to-br from-primary/15 via-primary/5 to-accent/10 overflow-hidden">
