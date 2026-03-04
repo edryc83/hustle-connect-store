@@ -70,8 +70,10 @@ export function CategoryPicker({ value, onChange, filter = "all" }: CategoryPick
     const next = { ...value };
     if (isCatSelected(cat)) {
       delete next[cat];
+      setExpanded((prev) => ({ ...prev, [cat]: false }));
     } else {
       next[cat] = [];
+      setExpanded((prev) => ({ ...prev, [cat]: true }));
     }
     onChange(next);
   };

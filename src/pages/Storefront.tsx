@@ -93,7 +93,7 @@ function ProductCard({
             </Badge>
           )}
           {product.listing_type === "service" && (
-            <Badge variant="secondary" className="text-[10px] px-1.5 py-0 shadow-sm">Package</Badge>
+            <Badge variant="secondary" className="text-[10px] px-1.5 py-0 shadow-sm">Service</Badge>
           )}
           {product.condition && (
             <Badge variant="outline" className="text-[10px] px-1.5 py-0 bg-background/90 shadow-sm">
@@ -270,7 +270,7 @@ const Storefront = () => {
               </div>
             </div>
             <div className="flex gap-2 mt-2">
-              {viewProduct.listing_type === "service" && <Badge variant="secondary">Package</Badge>}
+              {viewProduct.listing_type === "service" && <Badge variant="secondary">Service</Badge>}
               {viewProduct.condition && (
                 <Badge variant="outline">
                   {viewProduct.condition === "new" ? "New" : viewProduct.condition === "used" ? "Used" : "Refurbished"}
