@@ -141,6 +141,9 @@ const Storefront = () => {
 
       setProfile(prof);
 
+      // Track store view
+      supabase.rpc("increment_store_views", { slug: storeSlug } as any).then(() => {});
+
       const [{ data: prods }, { data: imgs }] = await Promise.all([
         supabase.from("products").select("*").eq("user_id", prof.id).order("created_at", { ascending: false }),
         supabase.from("product_images").select("*").order("position", { ascending: true }),
@@ -283,6 +286,8 @@ const Storefront = () => {
                 customer_name: "Store visitor",
                 customer_phone: "",
               } as any).then(() => {});
+              // Track WhatsApp tap
+              supabase.rpc("increment_whatsapp_taps", { p_id: viewProduct.id } as any).then(() => {});
               window.open(`https://wa.me/${cleanNumber.replace("+", "")}?text=${encodeURIComponent(message)}`, "_blank");
             }}
           >
