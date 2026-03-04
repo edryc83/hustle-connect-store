@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Download, Loader2, Sparkles, Copy, Share2, Check, Palette, Image as ImageIcon } from "lucide-react";
 import { toast } from "sonner";
 
-type TemplateId = 1 | 2 | 3;
+type TemplateId = 1 | 2 | 3 | 4;
 
 interface Product {
   id: string;
@@ -19,6 +19,7 @@ const TEMPLATE_LABELS: Record<TemplateId, { name: string; desc: string; emoji: s
   1: { name: "Clean", desc: "White & minimal", emoji: "🤍" },
   2: { name: "Bold", desc: "Orange energy", emoji: "🔥" },
   3: { name: "Product", desc: "Feature an item", emoji: "📸" },
+  4: { name: "Collage", desc: "Show multiple items", emoji: "🎨" },
 };
 
 const DashboardShareCard = () => {
@@ -253,7 +254,7 @@ const DashboardShareCard = () => {
       ctx.fillText("Powered by Afristall", W / 2, H - 60);
       ctx.globalAlpha = 1;
 
-    } else {
+    } else if (selectedTemplate === 3) {
       ctx.fillStyle = "#1a1a2e";
       ctx.fillRect(0, 0, W, H);
       const productH = Math.round(H * 0.6);
@@ -313,8 +314,132 @@ const DashboardShareCard = () => {
       ctx.font = "bold 32px system-ui, sans-serif";
       ctx.textBaseline = "middle";
       ctx.fillText(storeUrl, W / 2, H - 50);
+
+    } else {
+      // ---- TEMPLATE 4: Collage ----
+      ctx.fillStyle = "#faf9f7";
+      ctx.fillRect(0, 0, W, H);
+
+      // Header area with profile + store name
+      const headerH = 280;
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, W, headerH);
+      // Bottom border
+      ctx.fillStyle = "#f3f4f6";
+      ctx.fillRect(0, headerH - 2, W, 2);
+
+      const hPicRadius = 50;
+      const hPicX = 80 + hPicRadius;
+      const hPicY = headerH / 2;
+      if (profileImg) drawCircularImage(ctx, profileImg, hPicX, hPicY, hPicRadius, 4, "#f3f4f6");
+      else drawCircularPlaceholder(ctx, hPicX, hPicY, hPicRadius, letter, "#f3f4f6", "#9ca3af", 4, "#e5e7eb");
+
+      ctx.fillStyle = "#111827";
+      ctx.font = "bold 44px system-ui, sans-serif";
+      ctx.textAlign = "left";
+      ctx.textBaseline = "middle";
+      ctx.fillText(displayName, hPicX + hPicRadius + 28, hPicY - 14);
+      if (category) {
+        ctx.fillStyle = "#FF6B35";
+        ctx.font = "26px system-ui, sans-serif";
+        ctx.fillText(category, hPicX + hPicRadius + 28, hPicY + 26);
+      }
+
+      // Collage grid area
+      const gridTop = headerH + 20;
+      const gridPad = 20;
+      const gap = 16;
+      const gridW = W - gridPad * 2;
+      const collageImages = productsWithImages.slice(0, 4);
+      const imgCount = collageImages.length;
+
+      const drawRoundedImage = async (imgUrl: string, x: number, y: number, w: number, h: number, r: number) => {
+        try {
+          const img = await loadImage(imgUrl);
+          ctx.save();
+          ctx.beginPath();
+          ctx.roundRect(x, y, w, h, r);
+          ctx.clip();
+          const scale = Math.max(w / img.width, h / img.height);
+          const sw = img.width * scale;
+          const sh = img.height * scale;
+          ctx.drawImage(img, x + (w - sw) / 2, y + (h - sh) / 2, sw, sh);
+          ctx.restore();
+        } catch {
+          ctx.save();
+          ctx.beginPath();
+          ctx.roundRect(x, y, w, h, r);
+          ctx.clip();
+          ctx.fillStyle = "#e5e7eb";
+          ctx.fillRect(x, y, w, h);
+          ctx.restore();
+        }
+      };
+
+      const gridBottom = H - 380;
+      const gridH = gridBottom - gridTop;
+      const rad = 24;
+
+      if (imgCount >= 4) {
+        const cellW = (gridW - gap) / 2;
+        const cellH = (gridH - gap) / 2;
+        await drawRoundedImage(collageImages[0].image_url!, gridPad, gridTop, cellW, cellH, rad);
+        await drawRoundedImage(collageImages[1].image_url!, gridPad + cellW + gap, gridTop, cellW, cellH, rad);
+        await drawRoundedImage(collageImages[2].image_url!, gridPad, gridTop + cellH + gap, cellW, cellH, rad);
+        await drawRoundedImage(collageImages[3].image_url!, gridPad + cellW + gap, gridTop + cellH + gap, cellW, cellH, rad);
+      } else if (imgCount === 3) {
+        const leftW = Math.round(gridW * 0.55);
+        const rightW = gridW - leftW - gap;
+        const rightCellH = (gridH - gap) / 2;
+        await drawRoundedImage(collageImages[0].image_url!, gridPad, gridTop, leftW, gridH, rad);
+        await drawRoundedImage(collageImages[1].image_url!, gridPad + leftW + gap, gridTop, rightW, rightCellH, rad);
+        await drawRoundedImage(collageImages[2].image_url!, gridPad + leftW + gap, gridTop + rightCellH + gap, rightW, rightCellH, rad);
+      } else if (imgCount === 2) {
+        const cellW = (gridW - gap) / 2;
+        await drawRoundedImage(collageImages[0].image_url!, gridPad, gridTop, cellW, gridH, rad);
+        await drawRoundedImage(collageImages[1].image_url!, gridPad + cellW + gap, gridTop, cellW, gridH, rad);
+      } else if (imgCount === 1) {
+        await drawRoundedImage(collageImages[0].image_url!, gridPad, gridTop, gridW, gridH, rad);
+      } else {
+        ctx.fillStyle = "#e5e7eb";
+        ctx.beginPath();
+        ctx.roundRect(gridPad, gridTop, gridW, gridH, rad);
+        ctx.fill();
+        ctx.fillStyle = "#9ca3af";
+        ctx.font = "bold 36px system-ui, sans-serif";
+        ctx.textAlign = "center";
+        ctx.textBaseline = "middle";
+        ctx.fillText("Add products to see your collage", W / 2, gridTop + gridH / 2);
+      }
+
+      // Bottom text area
+      const textTop = gridBottom + 30;
+      ctx.fillStyle = "#111827";
+      ctx.font = "bold 48px system-ui, sans-serif";
+      ctx.textAlign = "center";
+      ctx.textBaseline = "top";
+      wrapText(ctx, headline, W / 2, textTop, W - 120, 58);
+
+      ctx.fillStyle = "#6b7280";
+      ctx.font = "30px system-ui, sans-serif";
+      wrapText(ctx, subtitle, W / 2, textTop + 80, W - 120, 42);
+
+      // Orange bottom bar
+      const barH = 120;
+      const barGrad = ctx.createLinearGradient(0, H - barH, W, H);
+      barGrad.addColorStop(0, "#FF6B35");
+      barGrad.addColorStop(1, "#FF8F5E");
+      ctx.fillStyle = barGrad;
+      ctx.beginPath();
+      ctx.roundRect(gridPad, H - barH - 20, gridW, barH, 20);
+      ctx.fill();
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "bold 34px system-ui, sans-serif";
+      ctx.textBaseline = "middle";
+      ctx.textAlign = "center";
+      ctx.fillText(storeUrl, W / 2, H - barH / 2 - 20);
     }
-  }, [profilePicUrl, storeName, storeSlug, category, headline, subtitle, selectedTemplate, selectedProductImage, loading]);
+  }, [profilePicUrl, storeName, storeSlug, category, headline, subtitle, selectedTemplate, selectedProductImage, loading, products]);
 
   useEffect(() => {
     if (selectedTemplate) renderCanvas();
@@ -410,8 +535,8 @@ const DashboardShareCard = () => {
         <Label className="text-xs font-medium text-muted-foreground uppercase tracking-wider">
           {selectedTemplate ? "Template" : "👇 Choose a template to start"}
         </Label>
-        <div className="grid grid-cols-3 gap-3 mt-2">
-          {([1, 2, 3] as TemplateId[]).map((id) => (
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mt-2">
+          {([1, 2, 3, 4] as TemplateId[]).map((id) => (
             <button
               key={id}
               onClick={() => setSelectedTemplate(id)}
