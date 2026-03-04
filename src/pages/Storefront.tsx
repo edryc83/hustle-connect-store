@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Store, MapPin, ShoppingBag, Share2, Copy, Check, Wrench, Star } from "lucide-react";
-import { categoriesToDisplay } from "@/components/CategoryPicker";
+import { Store, ShoppingBag, Share2, Copy, Check, Star } from "lucide-react";
 import { formatPrice } from "@/lib/currency";
 import AfristallLogo from "@/components/AfristallLogo";
 import { ProductImageCarousel } from "@/components/storefront/ProductImageCarousel";
+import { StorefrontHeader } from "@/components/storefront/StorefrontHeader";
+import { VisitorNameModal } from "@/components/storefront/VisitorNameModal";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -40,7 +41,7 @@ function ShareButton({ storeName, storeSlug }: { storeName: string; storeSlug: s
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" size="icon" className="shrink-0">
+        <Button variant="outline" size="icon" className="shrink-0 rounded-full">
           <Share2 className="h-4 w-4" />
         </Button>
       </DropdownMenuTrigger>
@@ -76,38 +77,38 @@ function ProductCard({
 }) {
   return (
     <Card
-      className="group cursor-pointer overflow-hidden transition-shadow hover:shadow-md"
+      className="group cursor-pointer overflow-hidden border-0 shadow-sm transition-all hover:shadow-lg hover:-translate-y-0.5"
       onClick={onClick}
     >
-      <div className="relative aspect-square bg-muted">
+      <div className="relative aspect-square bg-muted rounded-t-xl overflow-hidden">
         <ProductImageCarousel
           images={images}
           alt={product.name}
-          listingType={(product as any).listing_type}
+          listingType={product.listing_type}
         />
-        <div className="absolute top-1.5 left-1.5 flex flex-col gap-1">
-          {(product as any).is_featured && (
-            <Badge className="text-[10px] px-1.5 py-0 bg-primary text-primary-foreground">
+        <div className="absolute top-2 left-2 flex flex-col gap-1">
+          {product.is_featured && (
+            <Badge className="text-[10px] px-1.5 py-0 bg-primary text-primary-foreground shadow-sm">
               <Star className="h-2.5 w-2.5 mr-0.5 fill-current" /> Featured
             </Badge>
           )}
-          {(product as any).listing_type === "service" && (
-            <Badge variant="secondary" className="text-[10px] px-1.5 py-0">Service</Badge>
+          {product.listing_type === "service" && (
+            <Badge variant="secondary" className="text-[10px] px-1.5 py-0 shadow-sm">Service</Badge>
           )}
-          {(product as any).condition && (
-            <Badge variant="outline" className="text-[10px] px-1.5 py-0 bg-background/80">
-              {(product as any).condition === "new" ? "New" : (product as any).condition === "used" ? "Used" : "Refurbished"}
+          {product.condition && (
+            <Badge variant="outline" className="text-[10px] px-1.5 py-0 bg-background/90 shadow-sm">
+              {product.condition === "new" ? "New" : product.condition === "used" ? "Used" : "Refurbished"}
             </Badge>
           )}
         </div>
       </div>
-      <CardContent className="p-3">
-        <p className="font-medium text-sm truncate">{product.name}</p>
+      <CardContent className="p-3 space-y-0.5">
+        <p className="font-semibold text-sm truncate">{product.name}</p>
         <p className="text-primary font-bold text-sm">
           {formatPrice(Number(product.price), currency)}
         </p>
         {product.variants_text && (
-          <p className="text-xs text-muted-foreground truncate mt-0.5">
+          <p className="text-xs text-muted-foreground truncate">
             {product.variants_text}
           </p>
         )}
@@ -124,6 +125,20 @@ const Storefront = () => {
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [productImagesMap, setProductImagesMap] = useState<Record<string, string[]>>({});
+  const [visitorName, setVisitorName] = useState<string | null>(null);
+  const [showNameModal, setShowNameModal] = useState(false);
+
+  // Load visitor name from localStorage
+  useEffect(() => {
+    const stored = localStorage.getItem(`visitor_name_${storeSlug}`);
+    if (stored) {
+      setVisitorName(stored);
+    } else {
+      // Show modal after a short delay so page loads first
+      const timer = setTimeout(() => setShowNameModal(true), 800);
+      return () => clearTimeout(timer);
+    }
+  }, [storeSlug]);
 
   useEffect(() => {
     const fetchStore = async () => {
@@ -141,8 +156,7 @@ const Storefront = () => {
 
       setProfile(prof);
 
-      // Track store view
-      supabase.rpc("increment_store_views", { slug: storeSlug } as any).then(() => {});
+      supabase.rpc("increment_store_views", { slug: storeSlug! }).then(() => {});
 
       const [{ data: prods }, { data: imgs }] = await Promise.all([
         supabase.from("products").select("*").eq("user_id", prof.id).order("created_at", { ascending: false }),
@@ -152,14 +166,14 @@ const Storefront = () => {
       setProducts(prods ?? []);
 
       const imgMap: Record<string, string[]> = {};
-      const productIds = new Set((prods ?? []).map((p: any) => p.id));
-      (imgs ?? []).forEach((img: any) => {
+      const productIds = new Set((prods ?? []).map((p) => p.id));
+      (imgs ?? []).forEach((img) => {
         if (productIds.has(img.product_id)) {
           if (!imgMap[img.product_id]) imgMap[img.product_id] = [];
           imgMap[img.product_id].push(img.image_url);
         }
       });
-      (prods ?? []).forEach((p: any) => {
+      (prods ?? []).forEach((p) => {
         if (p.image_url && (!imgMap[p.id] || imgMap[p.id].length === 0)) {
           imgMap[p.id] = [p.image_url];
         }
@@ -170,6 +184,12 @@ const Storefront = () => {
 
     fetchStore();
   }, [storeSlug]);
+
+  const handleVisitorName = (name: string) => {
+    localStorage.setItem(`visitor_name_${storeSlug}`, name);
+    setVisitorName(name);
+    setShowNameModal(false);
+  };
 
   if (loading) {
     return (
@@ -192,11 +212,11 @@ const Storefront = () => {
     );
   }
 
-  const currency = (profile as any)?.currency ?? "UGX";
-  const featured = products.filter((p) => (p as any).is_featured);
-  const nonFeatured = products.filter((p) => !(p as any).is_featured);
+  const currency = profile.currency ?? "UGX";
+  const featured = products.filter((p) => p.is_featured);
+  const nonFeatured = products.filter((p) => !p.is_featured);
 
-  // If viewing a specific product
+  // Product detail view
   const viewProduct = productId ? products.find((p) => p.id === productId) : null;
 
   if (viewProduct) {
@@ -205,7 +225,6 @@ const Storefront = () => {
 
     return (
       <div className="min-h-screen bg-background">
-        {/* Back nav */}
         <header className="border-b">
           <div className="mx-auto max-w-5xl px-4 py-3 flex items-center justify-between">
             <button onClick={() => navigate(`/${storeSlug}`)} className="text-sm font-medium text-muted-foreground hover:text-foreground flex items-center gap-1">
@@ -217,12 +236,10 @@ const Storefront = () => {
         </header>
 
         <main className="mx-auto max-w-2xl px-4 py-6 space-y-6">
-          {/* Images */}
           <div className="aspect-square rounded-2xl overflow-hidden bg-muted">
-            <ProductImageCarousel images={imgs} alt={viewProduct.name} listingType={(viewProduct as any).listing_type} />
+            <ProductImageCarousel images={imgs} alt={viewProduct.name} listingType={viewProduct.listing_type} />
           </div>
 
-          {/* Image thumbnails */}
           {imgs.length > 1 && (
             <div className="flex gap-2 overflow-x-auto pb-1">
               {imgs.map((url, i) => (
@@ -231,25 +248,21 @@ const Storefront = () => {
             </div>
           )}
 
-          {/* Info */}
           <div>
             <div className="flex items-start justify-between gap-4">
               <h2 className="text-2xl font-bold">{viewProduct.name}</h2>
               <p className="text-2xl font-bold text-primary whitespace-nowrap">{formatPrice(Number(viewProduct.price), currency)}</p>
             </div>
             <div className="flex gap-2 mt-2">
-              {(viewProduct as any).listing_type === "service" && (
-                <Badge variant="secondary">Service</Badge>
-              )}
-              {(viewProduct as any).condition && (
+              {viewProduct.listing_type === "service" && <Badge variant="secondary">Service</Badge>}
+              {viewProduct.condition && (
                 <Badge variant="outline">
-                  {(viewProduct as any).condition === "new" ? "New" : (viewProduct as any).condition === "used" ? "Used" : "Refurbished"}
+                  {viewProduct.condition === "new" ? "New" : viewProduct.condition === "used" ? "Used" : "Refurbished"}
                 </Badge>
               )}
             </div>
           </div>
 
-          {/* Variants */}
           {variants.length > 0 && (
             <div>
               <p className="text-sm font-medium mb-2">Options</p>
@@ -261,7 +274,6 @@ const Storefront = () => {
             </div>
           )}
 
-          {/* Description */}
           {viewProduct.description && (
             <div>
               <p className="text-sm font-medium mb-1">Description</p>
@@ -269,25 +281,22 @@ const Storefront = () => {
             </div>
           )}
 
-          {/* Order CTA */}
           <Button
             size="lg"
             className="w-full gap-2 text-base"
             onClick={() => {
               const cleanNumber = (profile.whatsapp_number ?? "").replace(/[^0-9+]/g, "");
               const message = `🛒 Hi! I'd like to order *${viewProduct.name}* (${formatPrice(Number(viewProduct.price), currency)}) from your Afristall store.`;
-              // Auto-log order
               supabase.from("orders").insert({
                 seller_id: profile.id,
                 product_id: viewProduct.id,
                 product_name: viewProduct.name,
                 quantity: 1,
                 total: Number(viewProduct.price),
-                customer_name: "Store visitor",
+                customer_name: visitorName || "Store visitor",
                 customer_phone: "",
               } as any).then(() => {});
-              // Track WhatsApp tap
-              supabase.rpc("increment_whatsapp_taps", { p_id: viewProduct.id } as any).then(() => {});
+              supabase.rpc("increment_whatsapp_taps", { p_id: viewProduct.id }).then(() => {});
               window.open(`https://wa.me/${cleanNumber.replace("+", "")}?text=${encodeURIComponent(message)}`, "_blank");
             }}
           >
@@ -295,7 +304,6 @@ const Storefront = () => {
             Order via WhatsApp
           </Button>
 
-          {/* Store info */}
           <div className="border-t pt-4">
             <Link to={`/${storeSlug}`} className="flex items-center gap-3">
               {profile.profile_picture_url ? (
@@ -325,58 +333,21 @@ const Storefront = () => {
 
   // Shop view
   return (
-    <div className="min-h-screen bg-secondary/30">
-      {/* Header */}
-      <header className="bg-background border-b">
-        <div className="mx-auto max-w-5xl px-4 py-6 sm:py-8">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              {profile.profile_picture_url ? (
-                <img
-                  src={profile.profile_picture_url}
-                  alt={profile.store_name ?? "Store"}
-                  className="h-16 w-16 rounded-full object-cover border-2 border-primary/20"
-                />
-              ) : (
-                <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/10">
-                  <AfristallLogo className="h-8 w-8" />
-                </div>
-              )}
-              <div>
-                <h1 className="text-2xl font-bold">{profile.store_name}</h1>
-                {profile.store_slug && (
-                  <p className="text-sm text-muted-foreground">@{profile.store_slug}</p>
-                )}
-                <div className="flex items-center gap-3 text-sm text-muted-foreground mt-1">
-                  {profile.city && (
-                    <span className="flex items-center gap-1">
-                      <MapPin className="h-3.5 w-3.5" /> {profile.city}
-                    </span>
-                  )}
-                  {categoriesToDisplay(profile.category).map((tag) => (
-                    <span key={tag} className="rounded-full bg-primary/10 px-2.5 py-0.5 text-xs font-medium text-primary">
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            </div>
+    <div className="min-h-screen bg-background">
+      {/* Visitor Name Modal */}
+      <VisitorNameModal
+        open={showNameModal}
+        storeName={profile.store_name ?? "this store"}
+        onSubmit={handleVisitorName}
+      />
 
-            <ShareButton storeName={profile.store_name ?? "Store"} storeSlug={storeSlug ?? ""} />
-          </div>
-          {profile.store_bio && (
-            <p className="mt-4 text-sm text-muted-foreground leading-relaxed">
-              {profile.store_bio}
-            </p>
-          )}
-          {(profile as any).delivery_areas && (
-            <div className="mt-3 flex items-center gap-1.5 text-xs text-muted-foreground">
-              <MapPin className="h-3 w-3" />
-              <span>Delivers to: {(profile as any).delivery_areas}</span>
-            </div>
-          )}
-        </div>
-      </header>
+      {/* Share button floating top-right */}
+      <div className="fixed top-4 right-4 z-30">
+        <ShareButton storeName={profile.store_name ?? "Store"} storeSlug={storeSlug ?? ""} />
+      </div>
+
+      {/* Header with profile pic, name, greeting */}
+      <StorefrontHeader profile={profile} visitorName={visitorName} />
 
       {/* Products */}
       <main className="mx-auto max-w-5xl px-4 py-6 space-y-8">
@@ -388,7 +359,6 @@ const Storefront = () => {
           </div>
         ) : (
           <>
-            {/* Featured section */}
             {featured.length > 0 && (
               <section>
                 <div className="flex items-center gap-2 mb-4">
@@ -409,7 +379,6 @@ const Storefront = () => {
               </section>
             )}
 
-            {/* All listings */}
             <section>
               <h2 className="text-lg font-bold mb-4">
                 {featured.length > 0 ? "All Listings" : `${products.length} listing${products.length !== 1 ? "s" : ""}`}
@@ -430,7 +399,6 @@ const Storefront = () => {
         )}
       </main>
 
-      {/* Footer */}
       <footer className="border-t bg-background py-4 text-center">
         <Link to="/" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground">
           <AfristallLogo className="h-4 w-4" />
