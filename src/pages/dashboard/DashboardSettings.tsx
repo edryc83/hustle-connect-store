@@ -67,7 +67,7 @@ const DashboardSettings = () => {
           setCountry(d.country ?? "");
           setDistrict(d.district ?? "");
           setCity(d.city ?? "");
-          setStoreBio(d.store_bio ?? "");
+          // storeBio merged into welcomeMessage
           setCategories(deserializeCategories(d.category));
           setDeliveryAreas(d.delivery_areas ?? "");
           setCurrency(d.currency ?? "UGX");
@@ -152,8 +152,8 @@ const DashboardSettings = () => {
       if (res.error) throw res.error;
       const bio = res.data?.bio;
       if (bio) {
-        setStoreBio(bio);
-        toast.success("Bio generated!");
+        setWelcomeMessage(bio);
+        toast.success("Welcome message generated!");
       }
     } catch {
       toast.error("Failed to generate bio");
