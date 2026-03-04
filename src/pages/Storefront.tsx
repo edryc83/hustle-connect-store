@@ -221,6 +221,44 @@ const StorefrontInner = () => {
     fetchStore();
   }, [storeSlug]);
 
+  // Set dynamic OG meta tags for social sharing
+  useEffect(() => {
+    if (!profile) return;
+    const title = `${profile.store_name || storeSlug} — Shop on Afristall`;
+    const description = profile.store_bio ||
+      `Check out ${profile.store_name || storeSlug}${profile.category ? ` for ${profile.category}` : ""}${profile.city ? ` in ${profile.city}` : ""}. Order directly on WhatsApp! 🛒`;
+    const image = profile.profile_picture_url || "/logo-glow.png";
+
+    document.title = title;
+    const setMeta = (property: string, content: string) => {
+      let el = document.querySelector(`meta[property="${property}"]`) || document.querySelector(`meta[name="${property}"]`);
+      if (!el) {
+        el = document.createElement("meta");
+        el.setAttribute(property.startsWith("og:") ? "property" : "name", property);
+        document.head.appendChild(el);
+      }
+      el.setAttribute("content", content);
+    };
+    setMeta("og:title", title);
+    setMeta("og:description", description);
+    setMeta("og:image", image);
+    setMeta("og:url", `${window.location.origin}/${storeSlug}`);
+    setMeta("twitter:title", title);
+    setMeta("twitter:description", description);
+    setMeta("twitter:image", image);
+
+    return () => { document.title = "Afristall — Your Shop, Your WhatsApp, Your Hustle"; };
+  }, [profile, storeSlug]);
+
+  // Default to light mode on storefront
+  useEffect(() => {
+    const root = document.documentElement;
+    if (!localStorage.getItem(`storefront_theme_${storeSlug}`)) {
+      root.classList.remove("dark");
+      root.classList.add("light");
+    }
+  }, []);
+
   const handleVisitorName = (name: string) => {
     localStorage.setItem(`visitor_name_${storeSlug}`, name);
     setVisitorName(name);
