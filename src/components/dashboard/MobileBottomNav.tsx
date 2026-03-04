@@ -2,7 +2,7 @@ import { LayoutDashboard, Package, Settings, ClipboardList, Palette } from "luci
 import { NavLink } from "@/components/NavLink";
 
 const navItems = [
-  { title: "Overview", url: "/dashboard", icon: LayoutDashboard },
+  { title: "Home", url: "/dashboard", icon: LayoutDashboard },
   { title: "Listings", url: "/dashboard/products", icon: Package },
   { title: "Orders", url: "/dashboard/orders", icon: ClipboardList },
   { title: "Design", url: "/dashboard/share", icon: Palette },
