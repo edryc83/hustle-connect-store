@@ -1,6 +1,7 @@
-import { Package, LayoutDashboard, Settings, LogOut, ClipboardList } from "lucide-react";
+import { Package, LayoutDashboard, Settings, LogOut, ClipboardList, Moon, Sun } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useAuth } from "@/hooks/useAuth";
+import { useTheme } from "@/hooks/useTheme";
 import { useNavigate } from "react-router-dom";
 import AfristallLogo from "@/components/AfristallLogo";
 import {
@@ -28,6 +29,7 @@ export function DashboardSidebar() {
   const { state } = useSidebar();
   const collapsed = state === "collapsed";
   const { signOut } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
 
   const handleSignOut = async () => {
@@ -66,7 +68,16 @@ export function DashboardSidebar() {
           </SidebarGroupContent>
         </SidebarGroup>
       </SidebarContent>
-      <SidebarFooter>
+      <SidebarFooter className="space-y-1">
+        <Button
+          variant="ghost"
+          size={collapsed ? "icon" : "default"}
+          className="w-full justify-start gap-2 text-muted-foreground"
+          onClick={toggleTheme}
+        >
+          {theme === "dark" ? <Sun className="h-4 w-4 shrink-0" /> : <Moon className="h-4 w-4 shrink-0" />}
+          {!collapsed && <span>{theme === "dark" ? "Light mode" : "Dark mode"}</span>}
+        </Button>
         <Button
           variant="ghost"
           size={collapsed ? "icon" : "default"}
