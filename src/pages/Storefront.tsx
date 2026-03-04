@@ -768,17 +768,24 @@ const StorefrontInner = () => {
         onSubmit={handleVisitorName}
       />
 
-      {/* Floating top-left: Dashboard / Sign In */}
-      <div className="fixed top-4 left-4 z-30">
+      {/* Floating top-left: Dashboard / Sign In + Create Store for non-owners */}
+      <div className="fixed top-4 left-4 z-30 flex items-center gap-2">
         {user && profile && user.id === profile.id ? (
           <Button variant="outline" size="icon" className="shrink-0 rounded-full" asChild>
             <Link to="/dashboard"><LayoutDashboard className="h-4 w-4" /></Link>
           </Button>
-        ) : !user ? (
-          <Button variant="ghost" size="icon" className="shrink-0 rounded-full text-muted-foreground" asChild>
-            <Link to="/login"><LogIn className="h-4 w-4" /></Link>
-          </Button>
-        ) : null}
+        ) : (
+          <>
+            {!user && (
+              <Button variant="ghost" size="icon" className="shrink-0 rounded-full text-muted-foreground" asChild>
+                <Link to="/login"><LogIn className="h-4 w-4" /></Link>
+              </Button>
+            )}
+            <Button variant="outline" size="sm" className="rounded-full text-xs gap-1.5 bg-background/80 backdrop-blur-sm" asChild>
+              <Link to="/"><Store className="h-3.5 w-3.5" /> Create Store</Link>
+            </Button>
+          </>
+        )}
       </div>
 
       {/* Theme toggle + Share button floating top-right */}
