@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Mail, Phone, Eye, EyeOff, ArrowRight, ArrowLeft, Upload, Check, MapPin, MessageCircle } from "lucide-react";
+import { Mail, Phone, Eye, EyeOff, ArrowRight, ArrowLeft, Upload, Check, MapPin, MessageCircle, Package, Wrench } from "lucide-react";
 import AfristallLogo from "@/components/AfristallLogo";
 import { toast } from "sonner";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -60,6 +60,7 @@ const Signup = () => {
   const [storeSlug, setStoreSlug] = useState("");
   const [city, setCity] = useState("");
   const [category, setCategory] = useState("");
+  const [businessType, setBusinessType] = useState<"product" | "service" | "both">("product");
   const [profilePicture, setProfilePicture] = useState<File | null>(null);
   const [profilePicturePreview, setProfilePicturePreview] = useState("");
 
@@ -195,9 +196,10 @@ const Signup = () => {
           store_slug: storeSlug.trim(),
           city,
           category,
+          business_type: businessType,
           whatsapp_number: fullWhatsapp,
           profile_picture_url: profilePictureUrl,
-        })
+        } as any)
         .eq("id", authData.user.id);
 
       if (profileError) throw profileError;
@@ -441,6 +443,31 @@ const Signup = () => {
                       onChange={handleProfilePicture}
                     />
                   </label>
+                </div>
+              </div>
+
+              <div className="space-y-1.5">
+                <Label>What type of business?</Label>
+                <div className="grid grid-cols-3 gap-2">
+                  {([
+                    { value: "product" as const, label: "Products", icon: Package, emoji: "📦" },
+                    { value: "service" as const, label: "Services", icon: Wrench, emoji: "🔧" },
+                    { value: "both" as const, label: "Both", icon: Package, emoji: "📦🔧" },
+                  ]).map((t) => (
+                    <button
+                      key={t.value}
+                      type="button"
+                      onClick={() => setBusinessType(t.value)}
+                      className={`flex flex-col items-center gap-1 rounded-lg border-2 p-3 text-center transition-colors ${
+                        businessType === t.value
+                          ? "border-primary bg-primary/5"
+                          : "border-border hover:border-primary/30"
+                      }`}
+                    >
+                      <span className="text-xl">{t.emoji}</span>
+                      <span className="text-xs font-medium">{t.label}</span>
+                    </button>
+                  ))}
                 </div>
               </div>
 
