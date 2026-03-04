@@ -23,6 +23,12 @@ export default defineConfig(({ mode }) => ({
         navigateFallbackDenylist: [/^\/~oauth/],
         runtimeCaching: [
           {
+            // Auth endpoints must NEVER be cached — prevents stale tokens causing logouts
+            urlPattern: /^https:\/\/.*supabase\.co\/auth\/.*/i,
+            handler: "NetworkOnly",
+          },
+          {
+            // Other Supabase API calls (storage, rest, etc.) can use NetworkFirst
             urlPattern: /^https:\/\/.*supabase\.co\/.*/i,
             handler: "NetworkFirst",
             options: { cacheName: "supabase-api", expiration: { maxEntries: 50, maxAgeSeconds: 300 } },
