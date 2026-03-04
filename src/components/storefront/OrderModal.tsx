@@ -6,6 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { MessageCircle } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 import { formatPrice } from "@/lib/currency";
 import type { Tables } from "@/integrations/supabase/types";
 
@@ -15,12 +16,13 @@ interface OrderModalProps {
   product: Product | null;
   whatsappNumber: string;
   storeName: string;
+  sellerId: string;
   currency?: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-export function OrderModal({ product, whatsappNumber, storeName, currency = "UGX", open, onOpenChange }: OrderModalProps) {
+export function OrderModal({ product, whatsappNumber, storeName, sellerId, currency = "UGX", open, onOpenChange }: OrderModalProps) {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [quantity, setQuantity] = useState("1");
@@ -31,12 +33,29 @@ export function OrderModal({ product, whatsappNumber, storeName, currency = "UGX
 
   const variants = product.variants_text?.split(",").map((v) => v.trim()).filter(Boolean) ?? [];
 
-  const handleOrder = () => {
+  const handleOrder = async () => {
     if (!name.trim()) { toast.error("Please enter your name"); return; }
     if (!phone.trim()) { toast.error("Please enter your phone number"); return; }
 
     const qty = parseInt(quantity) || 1;
     const total = qty * Number(product.price);
+
+    // Auto-log order to database
+    try {
+      await supabase.from("orders").insert({
+        seller_id: sellerId,
+        product_id: product.id,
+        product_name: product.name,
+        quantity: qty,
+        total,
+        customer_name: name.trim(),
+        customer_phone: phone.trim(),
+        variant: variant || null,
+        notes: notes.trim() || null,
+      } as any);
+    } catch {
+      // Don't block the WhatsApp redirect if logging fails
+    }
 
     const message = [
       `🛒 *New Order from Afristall*`,
