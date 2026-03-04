@@ -13,28 +13,6 @@ import { CategoryPicker, type CategorySelection, serializeCategories } from "@/c
 
 const CITIES = ["Kampala", "Nairobi", "Lagos", "Accra", "Dar es Salaam", "Kigali", "Other"];
 
-const PRODUCT_CATEGORIES = [
-  { label: "Food & Drinks", icon: "🍲" },
-  { label: "Fashion & Clothes", icon: "👗" },
-  { label: "Beauty & Skincare", icon: "✨" },
-  { label: "Phones & Electronics", icon: "📱" },
-  { label: "Home & Decor", icon: "🏠" },
-  { label: "Plants & Garden", icon: "🌿" },
-  { label: "Other", icon: "📦" },
-];
-
-const SERVICE_CATEGORIES = [
-  { label: "Delivery", icon: "🚚" },
-  { label: "Repairs", icon: "🔧" },
-  { label: "Tutoring", icon: "📚" },
-  { label: "Cleaning", icon: "🧹" },
-  { label: "Photography", icon: "📸" },
-  { label: "Catering", icon: "🍽️" },
-  { label: "Beauty Services", icon: "💅" },
-  { label: "Design", icon: "🎨" },
-  { label: "Other", icon: "🔧" },
-];
-
 const COUNTRY_CODES = [
   { code: "+256", country: "🇺🇬 Uganda" },
   { code: "+254", country: "🇰🇪 Kenya" },
