@@ -194,16 +194,6 @@ const DashboardOverview = () => {
         ))}
       </div>
 
-      {/* Store completeness */}
-      <div className="rounded-2xl border border-border/50 bg-card/60 backdrop-blur-xl p-5 shadow-sm space-y-3">
-        <div className="flex items-center justify-between">
-          <span className="text-sm font-medium text-muted-foreground">Store Completeness</span>
-          <span className="text-sm font-bold text-primary">{completeness}%</span>
-        </div>
-        <Progress value={completeness} className="h-2.5 bg-muted" />
-        <p className="text-xs text-muted-foreground">{completenessMessage}</p>
-      </div>
-
       {/* Share section */}
       {storeSlug && (
         <div className="rounded-2xl border border-border/50 bg-card/60 backdrop-blur-xl p-5 shadow-sm space-y-4">
@@ -237,6 +227,16 @@ const DashboardOverview = () => {
           </Button>
         </div>
       )}
+
+      {/* Store completeness */}
+      <div className="rounded-2xl border border-border/50 bg-card/60 backdrop-blur-xl p-5 shadow-sm space-y-3">
+        <div className="flex items-center justify-between">
+          <span className="text-sm font-medium text-muted-foreground">Store Completeness</span>
+          <span className="text-sm font-bold text-primary">{completeness}%</span>
+        </div>
+        <Progress value={completeness} className="h-2.5 bg-muted" />
+        <p className="text-xs text-muted-foreground">{completenessMessage}</p>
+      </div>
 
       {/* Quick actions */}
       <div className="flex gap-3">
