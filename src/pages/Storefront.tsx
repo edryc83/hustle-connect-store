@@ -456,8 +456,11 @@ const StorefrontInner = () => {
         onSubmit={handleVisitorName}
       />
 
-      {/* Share button floating top-right */}
-      <div className="fixed top-4 right-4 z-30">
+      {/* Theme toggle + Share button floating top-right */}
+      <div className="fixed top-4 right-4 z-30 flex items-center gap-2">
+        <Button variant="outline" size="icon" className="shrink-0 rounded-full" onClick={toggleTheme}>
+          {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+        </Button>
         <ShareButton storeName={profile.store_name ?? "Store"} storeSlug={storeSlug ?? ""} />
       </div>
 
