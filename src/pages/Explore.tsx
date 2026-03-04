@@ -45,6 +45,7 @@ const Explore = () => {
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [selectedCountry, setSelectedCountry] = useState("All");
+  const [selectedLocation, setSelectedLocation] = useState("All");
 
   useEffect(() => {
     const fetchStores = async () => {
