@@ -172,7 +172,6 @@ const DashboardSettings = () => {
               </SelectContent>
             </Select>
           </div>
-          </div>
 
           <Button onClick={handleSave} disabled={saving}>
             {saving ? "Saving…" : "Save Changes"}
