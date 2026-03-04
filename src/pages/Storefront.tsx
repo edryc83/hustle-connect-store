@@ -3,6 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Store, MapPin, ImageIcon, ShoppingBag, Share2, Copy, Check } from "lucide-react";
 import { categoriesToDisplay } from "@/components/CategoryPicker";
+import { formatPrice } from "@/lib/currency";
 import AfristallLogo from "@/components/AfristallLogo";
 import {
   DropdownMenu,
@@ -221,7 +222,7 @@ const Storefront = () => {
                   <CardContent className="p-3">
                     <p className="font-medium text-sm truncate">{product.name}</p>
                     <p className="text-primary font-bold text-sm">
-                      UGX {Number(product.price).toLocaleString()}
+                      {formatPrice(Number(product.price), (profile as any)?.currency ?? "UGX")}
                     </p>
                     {product.variants_text && (
                       <p className="text-xs text-muted-foreground truncate mt-0.5">
