@@ -159,6 +159,21 @@ const DashboardSettings = () => {
             <p className="text-xs text-muted-foreground">Comma-separated locations you deliver to</p>
           </div>
 
+          <div className="space-y-1.5">
+            <Label>Currency</Label>
+            <Select value={currency} onValueChange={setCurrency}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select currency" />
+              </SelectTrigger>
+              <SelectContent>
+                {CURRENCY_OPTIONS.map((c) => (
+                  <SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          </div>
+
           <Button onClick={handleSave} disabled={saving}>
             {saving ? "Saving…" : "Save Changes"}
           </Button>
