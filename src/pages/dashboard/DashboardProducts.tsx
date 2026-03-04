@@ -103,7 +103,7 @@ const DashboardProducts = () => {
   const resetForm = () => {
     setName(""); setPrice(""); setDiscountPrice(""); setDescription(""); setVariantsText("");
     setImageFiles([]); setImagePreviews([]); setExistingImages([]);
-    setEditingProduct(null); setListingType("product"); setCondition("");
+    setEditingProduct(null); setListingType("product"); setCondition(""); setAttributes({});
   };
 
   const openAdd = () => { resetForm(); setDialogOpen(true); };
@@ -118,6 +118,7 @@ const DashboardProducts = () => {
     setExistingImages(productImages[product.id] ?? (product.image_url ? [product.image_url] : []));
     setListingType((product as any).listing_type ?? "product");
     setCondition((product as any).condition ?? "");
+    setAttributes((product as any).attributes ?? {});
     setEditingProduct(null);
     setDialogOpen(true);
   };
@@ -133,6 +134,7 @@ const DashboardProducts = () => {
     setImageFiles([]); setImagePreviews([]);
     setListingType((product as any).listing_type ?? "product");
     setCondition((product as any).condition ?? "");
+    setAttributes((product as any).attributes ?? {});
     setDialogOpen(true);
   };
 
@@ -191,6 +193,7 @@ const DashboardProducts = () => {
         description: description.trim() || null, variants_text: variantsText.trim() || null,
         image_url: allImages[0] ?? null, listing_type: listingType,
         condition: listingType === "product" ? (condition || null) : null,
+        attributes: Object.keys(attributes).length > 0 ? attributes : null,
       } as any;
 
       let productId: string;
