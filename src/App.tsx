@@ -35,6 +35,7 @@ const App = () => (
             <Route path="/dashboard/orders" element={<DashboardLayout><DashboardOrders /></DashboardLayout>} />
             <Route path="/explore" element={<Explore />} />
             <Route path="/:storeSlug" element={<Storefront />} />
+            <Route path="/:storeSlug/:productId" element={<Storefront />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
