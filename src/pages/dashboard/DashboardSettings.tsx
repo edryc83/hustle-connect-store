@@ -47,6 +47,7 @@ const DashboardSettings = () => {
   const [deliveryAreas, setDeliveryAreas] = useState("");
   const [currency, setCurrency] = useState("UGX");
   const [welcomeMessage, setWelcomeMessage] = useState("");
+  const [productCount, setProductCount] = useState(0);
 
   useEffect(() => {
     if (!user) return;
