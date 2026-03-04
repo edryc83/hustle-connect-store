@@ -213,7 +213,16 @@ function ProductDetailView({
             ← Back
           </button>
           <h1 className="text-sm font-semibold truncate max-w-[200px]">{product.name}</h1>
-          <ShareButton storeName={profile.store_name ?? "Store"} storeSlug={storeSlug} />
+          <div className="flex items-center gap-2">
+              <button
+                onClick={() => toggle(product.id)}
+                className="h-9 w-9 rounded-full border border-border flex items-center justify-center hover:bg-muted transition-colors"
+                aria-label="Toggle wishlist"
+              >
+                <Heart className={`h-4 w-4 transition-colors ${isWished(product.id) ? "fill-destructive text-destructive" : "text-muted-foreground"}`} />
+              </button>
+              <ShareButton storeName={profile.store_name ?? "Store"} storeSlug={storeSlug} />
+            </div>
         </div>
       </header>
 
