@@ -527,7 +527,7 @@ function ProductDetailView({
             )}
             <div>
               <p className="text-sm font-semibold">{profile.store_name}</p>
-              <p className="text-xs text-muted-foreground">View all listings →</p>
+              <p className="text-xs text-muted-foreground">View all products →</p>
             </div>
           </button>
         </div>
