@@ -106,13 +106,14 @@ export function StorefrontFilters({ filters, onChange, totalCount, filteredCount
       {showFilters && (
         <div className="rounded-2xl border border-border/60 bg-card p-4 space-y-4 animate-in fade-in slide-in-from-top-2 duration-200">
           {/* Category pills */}
+          {categories.length > 1 && (
           <div className="space-y-1.5">
             <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Category</p>
             <div className="flex flex-wrap gap-1.5">
               {categories.map((cat) => (
                 <button
                   key={cat.value}
-                  onClick={() => update({ category: cat.value })}
+                  onClick={() => update({ category: filters.category === cat.value ? "" : cat.value })}
                   className={`rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
                     filters.category === cat.value
                       ? "border-primary bg-primary/10 text-primary"
@@ -124,6 +125,7 @@ export function StorefrontFilters({ filters, onChange, totalCount, filteredCount
               ))}
             </div>
           </div>
+          )}
 
           {/* Price range pills */}
           <div className="space-y-1.5">
