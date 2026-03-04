@@ -325,7 +325,25 @@ const DashboardOverview = () => {
         ))}
       </div>
 
-      {/* Store completeness */}
+      {/* Weekly orders chart */}
+      <div className="rounded-2xl border border-border/50 bg-card/60 backdrop-blur-xl p-5 shadow-sm space-y-3">
+        <span className="text-sm font-medium text-muted-foreground">Orders — Last 7 Days</span>
+        <div className="h-40">
+          <ResponsiveContainer width="100%" height="100%">
+            <BarChart data={weeklyOrders} margin={{ top: 4, right: 4, bottom: 0, left: -20 }}>
+              <CartesianGrid strokeDasharray="3 3" className="stroke-border/40" vertical={false} />
+              <XAxis dataKey="day" tick={{ fontSize: 12 }} className="text-muted-foreground" tickLine={false} axisLine={false} />
+              <YAxis allowDecimals={false} tick={{ fontSize: 12 }} className="text-muted-foreground" tickLine={false} axisLine={false} />
+              <Tooltip
+                contentStyle={{ borderRadius: 12, border: "1px solid hsl(var(--border))", background: "hsl(var(--card))", fontSize: 13 }}
+                cursor={{ fill: "hsl(var(--primary) / 0.08)" }}
+              />
+              <Bar dataKey="orders" fill="hsl(var(--primary))" radius={[6, 6, 0, 0]} maxBarSize={32} />
+            </BarChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
+
       <div className="rounded-2xl border border-border/50 bg-card/60 backdrop-blur-xl p-5 shadow-sm space-y-3">
         <div className="flex items-center justify-between">
           <span className="text-sm font-medium text-muted-foreground">Store Completeness</span>
