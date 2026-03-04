@@ -35,7 +35,7 @@ const DashboardOverview = () => {
   const [storeSlug, setStoreSlug] = useState("");
   const [storeName, setStoreName] = useState("");
   const [profilePicUrl, setProfilePicUrl] = useState("");
-  
+  const [category, setCategory] = useState("");
   const [bannerDismissed, setBannerDismissed] = useState(
     () => localStorage.getItem("afristall_banner_dismissed") === "true"
   );
