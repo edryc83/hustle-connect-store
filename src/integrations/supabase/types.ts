@@ -14,7 +14,92 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      products: {
+        Row: {
+          created_at: string
+          description: string | null
+          id: string
+          image_url: string | null
+          name: string
+          price: number
+          updated_at: string
+          user_id: string
+          variants_text: string | null
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          name: string
+          price: number
+          updated_at?: string
+          user_id: string
+          variants_text?: string | null
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          id?: string
+          image_url?: string | null
+          name?: string
+          price?: number
+          updated_at?: string
+          user_id?: string
+          variants_text?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "products_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          category: string | null
+          city: string | null
+          created_at: string
+          email: string | null
+          id: string
+          last_active_at: string
+          phone: string | null
+          profile_picture_url: string | null
+          store_name: string | null
+          store_slug: string | null
+          whatsapp_number: string | null
+        }
+        Insert: {
+          category?: string | null
+          city?: string | null
+          created_at?: string
+          email?: string | null
+          id: string
+          last_active_at?: string
+          phone?: string | null
+          profile_picture_url?: string | null
+          store_name?: string | null
+          store_slug?: string | null
+          whatsapp_number?: string | null
+        }
+        Update: {
+          category?: string | null
+          city?: string | null
+          created_at?: string
+          email?: string | null
+          id?: string
+          last_active_at?: string
+          phone?: string | null
+          profile_picture_url?: string | null
+          store_name?: string | null
+          store_slug?: string | null
+          whatsapp_number?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
