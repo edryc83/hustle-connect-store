@@ -77,6 +77,15 @@ function ProductCard({
   currency: string;
   onClick: () => void;
 }) {
+  const { addItem } = useCart();
+
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.stopPropagation();
+    const imageUrl = images[0] || product.image_url || undefined;
+    addItem(product, imageUrl);
+    toast.success(`${product.name} added to cart`);
+  };
+
   return (
     <Card
       className="group cursor-pointer overflow-hidden border-0 shadow-sm transition-all hover:shadow-lg hover:-translate-y-0.5"
@@ -103,6 +112,14 @@ function ProductCard({
             </Badge>
           )}
         </div>
+        {/* Add to cart button */}
+        <button
+          onClick={handleAddToCart}
+          className="absolute bottom-2 right-2 flex h-8 w-8 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-md opacity-0 group-hover:opacity-100 transition-opacity hover:bg-primary/90"
+          title="Add to cart"
+        >
+          <ShoppingCart className="h-4 w-4" />
+        </button>
       </div>
       <CardContent className="p-3 space-y-0.5">
         <p className="font-semibold text-sm truncate">{product.name}</p>
