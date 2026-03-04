@@ -169,10 +169,16 @@ const Storefront = () => {
 
           <ShareButton storeName={profile.store_name ?? "Store"} storeSlug={storeSlug ?? ""} />
         </div>
-          {(profile as any).store_bio && (
+          {profile.store_bio && (
             <p className="mt-4 text-sm text-muted-foreground leading-relaxed">
-              {(profile as any).store_bio}
+              {profile.store_bio}
             </p>
+          )}
+          {(profile as any).delivery_areas && (
+            <div className="mt-3 flex items-center gap-1.5 text-xs text-muted-foreground">
+              <MapPin className="h-3 w-3" />
+              <span>Delivers to: {(profile as any).delivery_areas}</span>
+            </div>
           )}
         </div>
       </header>
