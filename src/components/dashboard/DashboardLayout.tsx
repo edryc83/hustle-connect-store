@@ -1,12 +1,14 @@
 import { ReactNode } from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { DashboardSidebar } from "./DashboardSidebar";
 import { MobileBottomNav } from "./MobileBottomNav";
 import AfristallLogo from "@/components/AfristallLogo";
 import { useTheme } from "@/hooks/useTheme";
-import { Moon, Sun } from "lucide-react";
+import { Moon, Sun, Eye } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useEffect, useState } from "react";
 
 export function DashboardLayout({ children }: { children: ReactNode }) {
   const { user, loading } = useAuth();
