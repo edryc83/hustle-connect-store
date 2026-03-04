@@ -440,6 +440,7 @@ function ProductDetailView({
 
 const StorefrontInner = () => {
   const { addItem } = useCart();
+  const { items: wishlistItems } = useWishlist();
   const { theme, toggleTheme } = useTheme();
   const { user } = useAuth();
   const { storeSlug, productId } = useParams<{ storeSlug: string; productId?: string }>();
