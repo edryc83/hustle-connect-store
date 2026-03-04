@@ -15,10 +15,11 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Plus, Pencil, Trash2, ImageIcon, Package, Sparkles, Loader2, Wrench } from "lucide-react";
+import { Plus, Pencil, Trash2, ImageIcon, Package, Sparkles, Loader2, Wrench, X } from "lucide-react";
 import { toast } from "sonner";
 import { formatPrice } from "@/lib/currency";
 import { Badge } from "@/components/ui/badge";
+import { ProductImageCarousel } from "@/components/storefront/ProductImageCarousel";
 import type { Tables } from "@/integrations/supabase/types";
 
 type Product = Tables<"products">;
@@ -38,6 +39,7 @@ const DashboardProducts = () => {
   const { user } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
   const [products, setProducts] = useState<Product[]>([]);
+  const [productImages, setProductImages] = useState<Record<string, string[]>>({});
   const [loading, setLoading] = useState(true);
   const [dialogOpen, setDialogOpen] = useState(searchParams.get("add") === "true");
   const [saving, setSaving] = useState(false);
@@ -50,19 +52,38 @@ const DashboardProducts = () => {
   const [price, setPrice] = useState("");
   const [description, setDescription] = useState("");
   const [variantsText, setVariantsText] = useState("");
-  const [imageFile, setImageFile] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState("");
+  const [imageFiles, setImageFiles] = useState<File[]>([]);
+  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+  const [existingImages, setExistingImages] = useState<string[]>([]);
   const [listingType, setListingType] = useState("product");
   const [condition, setCondition] = useState("");
 
   const fetchProducts = async () => {
     if (!user) return;
-    const [{ data }, { data: profile }] = await Promise.all([
+    const [{ data }, { data: profile }, { data: images }] = await Promise.all([
       supabase.from("products").select("*").eq("user_id", user.id).order("created_at", { ascending: false }),
       supabase.from("profiles").select("currency").eq("id", user.id).single(),
+      supabase.from("product_images").select("*").order("position", { ascending: true }),
     ]);
     setProducts(data ?? []);
     setCurrency((profile as any)?.currency ?? "UGX");
+
+    // Build images map
+    const imgMap: Record<string, string[]> = {};
+    const productIds = new Set((data ?? []).map((p) => p.id));
+    (images ?? []).forEach((img: any) => {
+      if (productIds.has(img.product_id)) {
+        if (!imgMap[img.product_id]) imgMap[img.product_id] = [];
+        imgMap[img.product_id].push(img.image_url);
+      }
+    });
+    // Also add legacy image_url as fallback
+    (data ?? []).forEach((p) => {
+      if (p.image_url && (!imgMap[p.id] || imgMap[p.id].length === 0)) {
+        imgMap[p.id] = [p.image_url];
+      }
+    });
+    setProductImages(imgMap);
     setLoading(false);
   };
 
@@ -75,8 +96,9 @@ const DashboardProducts = () => {
     setPrice("");
     setDescription("");
     setVariantsText("");
-    setImageFile(null);
-    setImagePreview("");
+    setImageFiles([]);
+    setImagePreviews([]);
+    setExistingImages([]);
     setEditingProduct(null);
     setListingType("product");
     setCondition("");
@@ -93,22 +115,38 @@ const DashboardProducts = () => {
     setPrice(String(product.price));
     setDescription(product.description ?? "");
     setVariantsText(product.variants_text ?? "");
-    setImagePreview(product.image_url ?? "");
+    setExistingImages(productImages[product.id] ?? (product.image_url ? [product.image_url] : []));
+    setImageFiles([]);
+    setImagePreviews([]);
     setListingType((product as any).listing_type ?? "product");
     setCondition((product as any).condition ?? "");
     setDialogOpen(true);
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
+    const files = Array.from(e.target.files ?? []);
+    const totalImages = existingImages.length + imagePreviews.length + files.length;
+    if (totalImages > 5) {
+      toast.error("Maximum 5 images per listing");
+      return;
+    }
+    for (const file of files) {
       if (file.size > 5 * 1024 * 1024) {
-        toast.error("Image must be under 5MB");
+        toast.error(`${file.name} is over 5MB`);
         return;
       }
-      setImageFile(file);
-      setImagePreview(URL.createObjectURL(file));
     }
+    setImageFiles((prev) => [...prev, ...files]);
+    setImagePreviews((prev) => [...prev, ...files.map((f) => URL.createObjectURL(f))]);
+  };
+
+  const removeExistingImage = (idx: number) => {
+    setExistingImages((prev) => prev.filter((_, i) => i !== idx));
+  };
+
+  const removeNewImage = (idx: number) => {
+    setImageFiles((prev) => prev.filter((_, i) => i !== idx));
+    setImagePreviews((prev) => prev.filter((_, i) => i !== idx));
   };
 
   const handleGenerateDesc = async () => {
@@ -138,29 +176,34 @@ const DashboardProducts = () => {
 
     setSaving(true);
     try {
-      let imageUrl = editingProduct?.image_url ?? null;
-
-      if (imageFile) {
-        const ext = imageFile.name.split(".").pop();
-        const path = `${user.id}/${Date.now()}.${ext}`;
+      // Upload new images
+      const newImageUrls: string[] = [];
+      for (const file of imageFiles) {
+        const ext = file.name.split(".").pop();
+        const path = `${user.id}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`;
         const { error: uploadErr } = await supabase.storage
           .from("product-images")
-          .upload(path, imageFile, { upsert: true });
+          .upload(path, file, { upsert: true });
         if (!uploadErr) {
           const { data: urlData } = supabase.storage.from("product-images").getPublicUrl(path);
-          imageUrl = urlData.publicUrl;
+          newImageUrls.push(urlData.publicUrl);
         }
       }
+
+      const allImages = [...existingImages, ...newImageUrls];
+      const primaryImage = allImages[0] ?? null;
 
       const payload = {
         name: name.trim(),
         price: numericPrice,
         description: description.trim() || null,
         variants_text: variantsText.trim() || null,
-        image_url: imageUrl,
+        image_url: primaryImage,
         listing_type: listingType,
         condition: listingType === "product" ? (condition || null) : null,
       } as any;
+
+      let productId: string;
 
       if (editingProduct) {
         const { error } = await supabase
@@ -168,16 +211,31 @@ const DashboardProducts = () => {
           .update(payload)
           .eq("id", editingProduct.id);
         if (error) throw error;
-        toast.success("Listing updated!");
+        productId = editingProduct.id;
+
+        // Clear old product_images and re-insert
+        await supabase.from("product_images").delete().eq("product_id", productId);
       } else {
-        const { error } = await supabase.from("products").insert({
+        const { data: inserted, error } = await supabase.from("products").insert({
           user_id: user.id,
           ...payload,
-        });
+        }).select("id").single();
         if (error) throw error;
-        toast.success("Listing added! 🎉");
+        productId = inserted.id;
       }
 
+      // Insert all images into product_images table
+      if (allImages.length > 0) {
+        await supabase.from("product_images").insert(
+          allImages.map((url, i) => ({
+            product_id: productId,
+            image_url: url,
+            position: i,
+          }))
+        );
+      }
+
+      toast.success(editingProduct ? "Listing updated!" : "Listing added! 🎉");
       setDialogOpen(false);
       resetForm();
       searchParams.delete("add");
@@ -203,6 +261,8 @@ const DashboardProducts = () => {
   if (loading) {
     return <div className="animate-pulse text-muted-foreground py-12 text-center">Loading listings…</div>;
   }
+
+  const allFormImages = [...existingImages, ...imagePreviews];
 
   return (
     <div className="space-y-6">
@@ -296,24 +356,48 @@ const DashboardProducts = () => {
                 <Label htmlFor="productVariants">Variants / Options</Label>
                 <Input id="productVariants" placeholder="e.g. Small, Medium, Large" value={variantsText} onChange={(e) => setVariantsText(e.target.value)} />
               </div>
+
+              {/* Multi-image upload */}
               <div className="space-y-1.5">
-                <Label>Image</Label>
-                <div className="flex items-center gap-3">
-                  {imagePreview ? (
-                    <img src={imagePreview} alt="Preview" className="h-16 w-16 rounded-lg object-cover border" />
-                  ) : (
-                    <div className="flex h-16 w-16 items-center justify-center rounded-lg bg-muted">
-                      <ImageIcon className="h-6 w-6 text-muted-foreground" />
-                    </div>
-                  )}
-                  <label className="cursor-pointer">
+                <Label>Images <span className="text-muted-foreground font-normal">(up to 5)</span></Label>
+                {allFormImages.length > 0 && (
+                  <div className="flex gap-2 flex-wrap">
+                    {existingImages.map((url, i) => (
+                      <div key={`existing-${i}`} className="relative h-16 w-16">
+                        <img src={url} alt="" className="h-16 w-16 rounded-lg object-cover border" />
+                        <button
+                          type="button"
+                          onClick={() => removeExistingImage(i)}
+                          className="absolute -top-1.5 -right-1.5 rounded-full bg-destructive text-destructive-foreground p-0.5"
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </div>
+                    ))}
+                    {imagePreviews.map((url, i) => (
+                      <div key={`new-${i}`} className="relative h-16 w-16">
+                        <img src={url} alt="" className="h-16 w-16 rounded-lg object-cover border" />
+                        <button
+                          type="button"
+                          onClick={() => removeNewImage(i)}
+                          className="absolute -top-1.5 -right-1.5 rounded-full bg-destructive text-destructive-foreground p-0.5"
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+                {allFormImages.length < 5 && (
+                  <label className="cursor-pointer inline-block">
                     <span className="text-sm font-medium text-primary hover:underline">
-                      {imagePreview ? "Change" : "Upload"}
+                      {allFormImages.length > 0 ? "+ Add more" : "Upload images"}
                     </span>
-                    <input type="file" accept="image/*" className="hidden" onChange={handleImageChange} />
+                    <input type="file" accept="image/*" multiple className="hidden" onChange={handleImageChange} />
                   </label>
-                </div>
+                )}
               </div>
+
               <Button className="w-full" onClick={handleSave} disabled={saving}>
                 {saving ? "Saving…" : editingProduct ? "Update Listing" : "Add Listing"}
               </Button>
@@ -335,48 +419,45 @@ const DashboardProducts = () => {
         </Card>
       ) : (
         <div className="grid gap-4 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
-          {products.map((product) => (
-            <Card key={product.id} className="group overflow-hidden">
-              <div className="relative aspect-square bg-muted">
-                {product.image_url ? (
-                  <img src={product.image_url} alt={product.name} className="h-full w-full object-cover" />
-                ) : (
-                  <div className="flex h-full w-full items-center justify-center">
-                    {(product as any).listing_type === "service"
-                      ? <Wrench className="h-8 w-8 text-muted-foreground/40" />
-                      : <ImageIcon className="h-8 w-8 text-muted-foreground/40" />
-                    }
+          {products.map((product) => {
+            const imgs = productImages[product.id] ?? (product.image_url ? [product.image_url] : []);
+            return (
+              <Card key={product.id} className="group overflow-hidden">
+                <div className="relative aspect-square bg-muted">
+                  <ProductImageCarousel images={imgs} alt={product.name} listingType={(product as any).listing_type} />
+                  <div className="absolute inset-0 flex items-start justify-end gap-1 p-2 opacity-0 transition-opacity group-hover:opacity-100">
+                    <Button size="icon" variant="secondary" className="h-8 w-8" onClick={() => openEdit(product)}>
+                      <Pencil className="h-3.5 w-3.5" />
+                    </Button>
+                    <Button size="icon" variant="destructive" className="h-8 w-8" onClick={() => handleDelete(product.id)}>
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </Button>
                   </div>
-                )}
-                <div className="absolute inset-0 flex items-start justify-end gap-1 p-2 opacity-0 transition-opacity group-hover:opacity-100">
-                  <Button size="icon" variant="secondary" className="h-8 w-8" onClick={() => openEdit(product)}>
-                    <Pencil className="h-3.5 w-3.5" />
-                  </Button>
-                  <Button size="icon" variant="destructive" className="h-8 w-8" onClick={() => handleDelete(product.id)}>
-                    <Trash2 className="h-3.5 w-3.5" />
-                  </Button>
+                  {/* Badges */}
+                  <div className="absolute top-1.5 left-1.5 flex flex-col gap-1">
+                    {(product as any).listing_type === "service" && (
+                      <Badge variant="secondary" className="text-[10px] px-1.5 py-0">Service</Badge>
+                    )}
+                    {(product as any).condition && (
+                      <Badge variant="outline" className="text-[10px] px-1.5 py-0 bg-background/80">
+                        {(product as any).condition === "new" ? "New" : (product as any).condition === "used" ? "Used" : "Refurbished"}
+                      </Badge>
+                    )}
+                    {imgs.length > 1 && (
+                      <Badge variant="secondary" className="text-[10px] px-1.5 py-0">{imgs.length} 📷</Badge>
+                    )}
+                  </div>
                 </div>
-                {/* Badges */}
-                <div className="absolute top-1.5 left-1.5 flex flex-col gap-1">
-                  {(product as any).listing_type === "service" && (
-                    <Badge variant="secondary" className="text-[10px] px-1.5 py-0">Service</Badge>
+                <CardContent className="p-3">
+                  <p className="font-medium text-sm truncate">{product.name}</p>
+                  <p className="text-primary font-bold text-sm">{formatPrice(Number(product.price), currency)}</p>
+                  {product.variants_text && (
+                    <p className="text-xs text-muted-foreground truncate mt-0.5">{product.variants_text}</p>
                   )}
-                  {(product as any).condition && (
-                    <Badge variant="outline" className="text-[10px] px-1.5 py-0 bg-background/80">
-                      {(product as any).condition === "new" ? "New" : (product as any).condition === "used" ? "Used" : "Refurbished"}
-                    </Badge>
-                  )}
-                </div>
-              </div>
-              <CardContent className="p-3">
-                <p className="font-medium text-sm truncate">{product.name}</p>
-                <p className="text-primary font-bold text-sm">{formatPrice(Number(product.price), currency)}</p>
-                {product.variants_text && (
-                  <p className="text-xs text-muted-foreground truncate mt-0.5">{product.variants_text}</p>
-                )}
-              </CardContent>
-            </Card>
-          ))}
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
       )}
     </div>

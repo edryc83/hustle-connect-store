@@ -47,10 +47,12 @@ const Explore = () => {
 
   const filtered = useMemo(() => {
     return stores.filter((s) => {
+      const q = search.trim().toLowerCase().replace(/^@/, "");
       const matchesSearch =
-        !search.trim() ||
-        s.store_name?.toLowerCase().includes(search.toLowerCase()) ||
-        s.category?.toLowerCase().includes(search.toLowerCase());
+        !q ||
+        s.store_name?.toLowerCase().includes(q) ||
+        s.store_slug?.toLowerCase().includes(q) ||
+        s.category?.toLowerCase().includes(q);
       const matchesCategory = selectedCategory === "All" || s.category === selectedCategory;
       const matchesCity = selectedCity === "All" || s.city === selectedCity;
       return matchesSearch && matchesCategory && matchesCity;
@@ -175,6 +177,9 @@ const Explore = () => {
                         )}
                         <div>
                           <p className="font-semibold text-sm truncate">{store.store_name}</p>
+                          {store.store_slug && (
+                            <p className="text-xs text-muted-foreground">@{store.store_slug}</p>
+                          )}
                           {store.city && (
                             <p className="flex items-center justify-center gap-1 text-xs text-muted-foreground mt-0.5">
                               <MapPin className="h-3 w-3" /> {store.city}

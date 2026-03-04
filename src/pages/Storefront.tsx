@@ -5,6 +5,7 @@ import { Store, MapPin, ImageIcon, ShoppingBag, Share2, Copy, Check, Wrench } fr
 import { categoriesToDisplay } from "@/components/CategoryPicker";
 import { formatPrice } from "@/lib/currency";
 import AfristallLogo from "@/components/AfristallLogo";
+import { ProductImageCarousel } from "@/components/storefront/ProductImageCarousel";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -79,6 +80,7 @@ const Storefront = () => {
   const [notFound, setNotFound] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
   const [orderOpen, setOrderOpen] = useState(false);
+  const [productImagesMap, setProductImagesMap] = useState<Record<string, string[]>>({});
 
   useEffect(() => {
     const fetchStore = async () => {
@@ -96,13 +98,28 @@ const Storefront = () => {
 
       setProfile(prof);
 
-      const { data: prods } = await supabase
-        .from("products")
-        .select("*")
-        .eq("user_id", prof.id)
-        .order("created_at", { ascending: false });
+      const [{ data: prods }, { data: imgs }] = await Promise.all([
+        supabase.from("products").select("*").eq("user_id", prof.id).order("created_at", { ascending: false }),
+        supabase.from("product_images").select("*").order("position", { ascending: true }),
+      ]);
 
       setProducts(prods ?? []);
+
+      // Build images map
+      const imgMap: Record<string, string[]> = {};
+      const productIds = new Set((prods ?? []).map((p: any) => p.id));
+      (imgs ?? []).forEach((img: any) => {
+        if (productIds.has(img.product_id)) {
+          if (!imgMap[img.product_id]) imgMap[img.product_id] = [];
+          imgMap[img.product_id].push(img.image_url);
+        }
+      });
+      (prods ?? []).forEach((p: any) => {
+        if (p.image_url && (!imgMap[p.id] || imgMap[p.id].length === 0)) {
+          imgMap[p.id] = [p.image_url];
+        }
+      });
+      setProductImagesMap(imgMap);
       setLoading(false);
     };
 
@@ -155,6 +172,9 @@ const Storefront = () => {
             )}
             <div>
               <h1 className="text-2xl font-bold">{profile.store_name}</h1>
+              {profile.store_slug && (
+                <p className="text-sm text-muted-foreground">@{profile.store_slug}</p>
+              )}
               <div className="flex items-center gap-3 text-sm text-muted-foreground mt-1">
                 {profile.city && (
                   <span className="flex items-center gap-1">
@@ -207,21 +227,11 @@ const Storefront = () => {
                   onClick={() => openOrder(product)}
                 >
                   <div className="relative aspect-square bg-muted">
-                    {product.image_url ? (
-                      <img
-                        src={product.image_url}
-                        alt={product.name}
-                        className="h-full w-full object-cover"
-                        loading="lazy"
-                      />
-                    ) : (
-                      <div className="flex h-full w-full items-center justify-center">
-                        {(product as any).listing_type === "service"
-                          ? <Wrench className="h-8 w-8 text-muted-foreground/30" />
-                          : <ImageIcon className="h-8 w-8 text-muted-foreground/30" />
-                        }
-                      </div>
-                    )}
+                    <ProductImageCarousel
+                      images={productImagesMap[product.id] ?? (product.image_url ? [product.image_url] : [])}
+                      alt={product.name}
+                      listingType={(product as any).listing_type}
+                    />
                     <div className="absolute top-1.5 left-1.5 flex flex-col gap-1">
                       {(product as any).listing_type === "service" && (
                         <Badge variant="secondary" className="text-[10px] px-1.5 py-0">Service</Badge>
