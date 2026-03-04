@@ -15,9 +15,10 @@ interface DesignTemplate {
   category: string;
   defaultHeadline: string;
   defaultSubtitle: string;
-  previewBg: string;        // CSS bg for the thumbnail card
-  previewTextColor: string;  // text color for the thumbnail
-  previewAccent: string;     // accent element color
+  previewImage: string;      // real preview image path
+  previewBg: string;
+  previewTextColor: string;
+  previewAccent: string;
   previewLayout: "full-bleed" | "split" | "centered" | "grid";
 }
 
@@ -31,18 +32,18 @@ interface Product {
 
 const TEMPLATES: DesignTemplate[] = [
   // Editorial
-  { id: "editorial-highlight", name: "Highlight", category: "Editorial", defaultHeadline: "No limits.\nNo compromise.", defaultSubtitle: "Just everyday essentials, done properly.", previewBg: "linear-gradient(135deg, #1a1a1a 0%, #333 100%)", previewTextColor: "#fff", previewAccent: "#FF6B35", previewLayout: "full-bleed" },
-  { id: "editorial-magazine", name: "Magazine", category: "Editorial", defaultHeadline: "NEW\nCOLLECTION", defaultSubtitle: "Curated pieces you'll love.", previewBg: "linear-gradient(180deg, #0a0a0a 0%, #2a1a10 100%)", previewTextColor: "#fff", previewAccent: "#d4a574", previewLayout: "full-bleed" },
-  { id: "editorial-minimal", name: "Minimal", category: "Editorial", defaultHeadline: "SHOP\nNOW", defaultSubtitle: "Discover what's trending.", previewBg: "linear-gradient(180deg, #111 0%, #222 100%)", previewTextColor: "#fff", previewAccent: "#FF6B35", previewLayout: "full-bleed" },
+  { id: "editorial-highlight", name: "Highlight", category: "Editorial", defaultHeadline: "No limits.\nNo compromise.", defaultSubtitle: "Just everyday essentials, done properly.", previewImage: "/templates/editorial-1.jpeg", previewBg: "#1a1a1a", previewTextColor: "#fff", previewAccent: "#FF6B35", previewLayout: "full-bleed" },
+  { id: "editorial-magazine", name: "Magazine", category: "Editorial", defaultHeadline: "NEW\nCOLLECTION", defaultSubtitle: "Curated pieces you'll love.", previewImage: "/templates/editorial-3.jpg", previewBg: "#0a0a0a", previewTextColor: "#fff", previewAccent: "#d4a574", previewLayout: "full-bleed" },
+  { id: "editorial-minimal", name: "Minimal", category: "Editorial", defaultHeadline: "SHOP\nNOW", defaultSubtitle: "Discover what's trending.", previewImage: "/templates/spotlight-1.jpeg", previewBg: "#111", previewTextColor: "#fff", previewAccent: "#FF6B35", previewLayout: "full-bleed" },
   // Spotlight
-  { id: "spotlight-hero", name: "Hero Shot", category: "Spotlight", defaultHeadline: "FEATURED\nPRODUCT", defaultSubtitle: "The one everyone's talking about.", previewBg: "linear-gradient(180deg, #f5f3ef 0%, #ece8e0 100%)", previewTextColor: "#1a1a1a", previewAccent: "#FF6B35", previewLayout: "split" },
-  { id: "spotlight-split", name: "Split View", category: "Spotlight", defaultHeadline: "BEST\nSELLER", defaultSubtitle: "See why it's #1.", previewBg: "linear-gradient(180deg, #1a1a2e 50%, #fff 50%)", previewTextColor: "#fff", previewAccent: "#FF6B35", previewLayout: "split" },
+  { id: "spotlight-hero", name: "Hero Shot", category: "Spotlight", defaultHeadline: "FEATURED\nPRODUCT", defaultSubtitle: "The one everyone's talking about.", previewImage: "/templates/spotlight-2.jpeg", previewBg: "#f5f3ef", previewTextColor: "#1a1a1a", previewAccent: "#FF6B35", previewLayout: "split" },
+  { id: "spotlight-split", name: "Split View", category: "Spotlight", defaultHeadline: "BEST\nSELLER", defaultSubtitle: "See why it's #1.", previewImage: "/templates/brand-2.png", previewBg: "#1a1a2e", previewTextColor: "#fff", previewAccent: "#FF6B35", previewLayout: "split" },
   // Brand Card
-  { id: "brand-profile", name: "Profile Card", category: "Brand Card", defaultHeadline: "VISIT\nMY STORE", defaultSubtitle: "Quality products, great prices.", previewBg: "#ffffff", previewTextColor: "#111827", previewAccent: "#FF6B35", previewLayout: "centered" },
-  { id: "brand-elegant", name: "Elegant Dark", category: "Brand Card", defaultHeadline: "EXPLORE\nOUR RANGE", defaultSubtitle: "Something for everyone.", previewBg: "linear-gradient(180deg, #1a1a2e 0%, #0d0d1a 100%)", previewTextColor: "#fff", previewAccent: "#d4a574", previewLayout: "centered" },
+  { id: "brand-profile", name: "Profile Card", category: "Brand Card", defaultHeadline: "VISIT\nMY STORE", defaultSubtitle: "Quality products, great prices.", previewImage: "/templates/brand-1.jpeg", previewBg: "#ffffff", previewTextColor: "#111827", previewAccent: "#FF6B35", previewLayout: "centered" },
+  { id: "brand-elegant", name: "Elegant Dark", category: "Brand Card", defaultHeadline: "EXPLORE\nOUR RANGE", defaultSubtitle: "Something for everyone.", previewImage: "/templates/brand-3.png", previewBg: "#1a1a2e", previewTextColor: "#fff", previewAccent: "#d4a574", previewLayout: "centered" },
   // Collage
-  { id: "collage-grid", name: "Grid Layout", category: "Collage", defaultHeadline: "NEW ARRIVALS", defaultSubtitle: "Fresh stock just dropped!", previewBg: "#faf9f7", previewTextColor: "#111827", previewAccent: "#FF6B35", previewLayout: "grid" },
-  { id: "collage-mosaic", name: "Mosaic", category: "Collage", defaultHeadline: "TOP PICKS", defaultSubtitle: "Our best sellers, curated for you.", previewBg: "#faf9f7", previewTextColor: "#111827", previewAccent: "#FF8F5E", previewLayout: "grid" },
+  { id: "collage-grid", name: "Grid Layout", category: "Collage", defaultHeadline: "NEW ARRIVALS", defaultSubtitle: "Fresh stock just dropped!", previewImage: "/templates/collage-1.png", previewBg: "#faf9f7", previewTextColor: "#111827", previewAccent: "#FF6B35", previewLayout: "grid" },
+  { id: "collage-mosaic", name: "Mosaic", category: "Collage", defaultHeadline: "TOP PICKS", defaultSubtitle: "Our best sellers, curated for you.", previewImage: "/templates/collage-2.png", previewBg: "#faf9f7", previewTextColor: "#111827", previewAccent: "#FF8F5E", previewLayout: "grid" },
 ];
 
 const BG_COLORS = [
@@ -640,66 +641,12 @@ const DashboardShareCard = () => {
                       : "border-border/50 hover:border-primary/40 hover:shadow-md"
                   }`}
                 >
-                  {/* Preview card */}
-                  <div
-                    className="absolute inset-0 flex flex-col items-center justify-center p-4"
-                    style={{ background: t.previewBg }}
-                  >
-                    {/* Mini layout preview */}
-                    {t.previewLayout === "full-bleed" && (
-                      <div className="w-full h-full flex flex-col justify-between relative">
-                        {/* Simulated photo area */}
-                        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/60 rounded-lg" />
-                        <div className="relative z-10 flex justify-between items-start p-2">
-                          <div className="flex items-center gap-1">
-                            <div className="h-4 w-4 rounded bg-white/30" />
-                            <div className="h-2 w-8 rounded-full bg-white/40" />
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <div className="h-3 w-3 rounded-full" style={{ backgroundColor: t.previewAccent }} />
-                          </div>
-                        </div>
-                        <div className="relative z-10 p-3 space-y-1.5">
-                          <div className="h-3 w-3/4 rounded-sm" style={{ backgroundColor: t.previewAccent }} />
-                          <div className="h-3 w-1/2 rounded-sm" style={{ backgroundColor: t.previewAccent, opacity: 0.7 }} />
-                          <div className="h-1.5 w-full rounded-full bg-white/30 mt-2" />
-                          <div className="h-1.5 w-2/3 rounded-full bg-white/20" />
-                        </div>
-                      </div>
-                    )}
-                    {t.previewLayout === "split" && (
-                      <div className="w-full h-full flex flex-col">
-                        <div className="flex-1 rounded-t-lg" style={{ background: `linear-gradient(135deg, ${t.previewAccent}40, ${t.previewAccent}20)` }} />
-                        <div className="h-2/5 p-3 flex flex-col justify-center" style={{ backgroundColor: t.previewTextColor === "#fff" ? "#1a1a2e" : "#ffffff" }}>
-                          <div className="h-3 w-3/4 rounded-sm mb-1.5" style={{ backgroundColor: t.previewAccent }} />
-                          <div className="h-3 w-1/2 rounded-sm mb-2" style={{ backgroundColor: t.previewAccent, opacity: 0.6 }} />
-                          <div className="h-1.5 w-full rounded-full" style={{ backgroundColor: t.previewTextColor === "#fff" ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.1)" }} />
-                        </div>
-                      </div>
-                    )}
-                    {t.previewLayout === "centered" && (
-                      <div className="w-full h-full flex flex-col items-center justify-center gap-2 p-3">
-                        <div className="w-3/4 aspect-square rounded-xl" style={{ background: `linear-gradient(135deg, ${t.previewAccent}30, ${t.previewAccent}10)`, border: `1px solid ${t.previewAccent}30` }} />
-                        <div className="h-3 w-2/3 rounded-sm" style={{ backgroundColor: t.previewTextColor, opacity: 0.8 }} />
-                        <div className="h-1.5 w-1/2 rounded-full" style={{ backgroundColor: t.previewTextColor, opacity: 0.3 }} />
-                        <div className="h-6 w-3/4 rounded-full mt-1" style={{ backgroundColor: t.previewAccent }} />
-                      </div>
-                    )}
-                    {t.previewLayout === "grid" && (
-                      <div className="w-full h-full flex flex-col gap-1.5 p-2">
-                        <div className="flex items-center gap-1 mb-1">
-                          <div className="h-4 w-4 rounded-full" style={{ backgroundColor: t.previewAccent, opacity: 0.5 }} />
-                          <div className="h-2 w-10 rounded-full" style={{ backgroundColor: t.previewTextColor, opacity: 0.4 }} />
-                        </div>
-                        <div className="flex-1 grid grid-cols-2 gap-1">
-                          {[1,2,3,4].map(i => (
-                            <div key={i} className="rounded-lg" style={{ background: `linear-gradient(135deg, ${t.previewAccent}${i*10+10}, ${t.previewAccent}${i*5+5})` }} />
-                          ))}
-                        </div>
-                        <div className="h-5 w-2/3 mx-auto rounded-full" style={{ backgroundColor: t.previewAccent }} />
-                      </div>
-                    )}
-                  </div>
+                  {/* Real design preview image */}
+                  <img
+                    src={t.previewImage}
+                    alt={t.name}
+                    className="absolute inset-0 w-full h-full object-cover"
+                  />
 
                   {/* Name overlay */}
                   <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-3 pt-8">
