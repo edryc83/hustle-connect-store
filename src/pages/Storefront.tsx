@@ -93,7 +93,7 @@ function ProductCard({
             </Badge>
           )}
           {product.listing_type === "service" && (
-            <Badge variant="secondary" className="text-[10px] px-1.5 py-0 shadow-sm">Service</Badge>
+            <Badge variant="secondary" className="text-[10px] px-1.5 py-0 shadow-sm">Package</Badge>
           )}
           {product.condition && (
             <Badge variant="outline" className="text-[10px] px-1.5 py-0 bg-background/90 shadow-sm">
@@ -104,9 +104,14 @@ function ProductCard({
       </div>
       <CardContent className="p-3 space-y-0.5">
         <p className="font-semibold text-sm truncate">{product.name}</p>
-        <p className="text-primary font-bold text-sm">
-          {formatPrice(Number(product.price), currency)}
-        </p>
+        {(product as any).discount_price ? (
+          <div className="flex items-center gap-1.5">
+            <p className="text-primary font-bold text-sm">{formatPrice(Number((product as any).discount_price), currency)}</p>
+            <p className="text-xs text-muted-foreground line-through">{formatPrice(Number(product.price), currency)}</p>
+          </div>
+        ) : (
+          <p className="text-primary font-bold text-sm">{formatPrice(Number(product.price), currency)}</p>
+        )}
         {product.variants_text && (
           <p className="text-xs text-muted-foreground truncate">
             {product.variants_text}
@@ -253,13 +258,27 @@ const Storefront = () => {
           <div>
             <div className="flex items-start justify-between gap-4">
               <h2 className="text-2xl font-bold">{viewProduct.name}</h2>
-              <p className="text-2xl font-bold text-primary whitespace-nowrap">{formatPrice(Number(viewProduct.price), currency)}</p>
+              <div className="text-right shrink-0">
+                {(viewProduct as any).discount_price ? (
+                  <>
+                    <p className="text-2xl font-bold text-primary">{formatPrice(Number((viewProduct as any).discount_price), currency)}</p>
+                    <p className="text-sm text-muted-foreground line-through">{formatPrice(Number(viewProduct.price), currency)}</p>
+                  </>
+                ) : (
+                  <p className="text-2xl font-bold text-primary">{formatPrice(Number(viewProduct.price), currency)}</p>
+                )}
+              </div>
             </div>
             <div className="flex gap-2 mt-2">
-              {viewProduct.listing_type === "service" && <Badge variant="secondary">Service</Badge>}
+              {viewProduct.listing_type === "service" && <Badge variant="secondary">Package</Badge>}
               {viewProduct.condition && (
                 <Badge variant="outline">
                   {viewProduct.condition === "new" ? "New" : viewProduct.condition === "used" ? "Used" : "Refurbished"}
+                </Badge>
+              )}
+              {(viewProduct as any).discount_price && (
+                <Badge className="bg-green-500/10 text-green-700 border-green-300 text-xs">
+                  {Math.round((1 - Number((viewProduct as any).discount_price) / Number(viewProduct.price)) * 100)}% OFF
                 </Badge>
               )}
             </div>

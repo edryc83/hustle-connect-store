@@ -197,7 +197,7 @@ const DashboardSettings = () => {
         country: country.trim() || null,
         district: district.trim() || null,
         city: city.trim(),
-        store_bio: storeBio.trim() || null,
+        store_bio: welcomeMessage.trim() || null,
         category: serializeCategories(categories) || null,
         delivery_areas: deliveryAreas.trim() || null,
         currency: currency,
@@ -357,7 +357,7 @@ const DashboardSettings = () => {
 
           <div className="space-y-1.5">
             <div className="flex items-center justify-between">
-              <Label>Store Bio / Welcome Message</Label>
+              <Label>Welcome Message</Label>
               <Button
                 type="button"
                 variant="ghost"
@@ -371,25 +371,13 @@ const DashboardSettings = () => {
               </Button>
             </div>
             <Textarea
-              value={storeBio}
-              onChange={(e) => setStoreBio(e.target.value)}
-              placeholder="e.g. Welcome to my store! We sell fresh organic food delivered to your door 🚀"
-              rows={3}
-              maxLength={300}
-            />
-            <p className="text-xs text-muted-foreground">{storeBio.length}/300 — shown on your storefront</p>
-          </div>
-
-          <div className="space-y-1.5">
-            <Label>Welcome Message</Label>
-            <Textarea
               value={welcomeMessage}
               onChange={(e) => setWelcomeMessage(e.target.value)}
               placeholder="e.g. Thanks for stopping by! Browse around and hit me up on WhatsApp to order 🧡"
-              rows={2}
-              maxLength={200}
+              rows={3}
+              maxLength={300}
             />
-            <p className="text-xs text-muted-foreground">{welcomeMessage.length}/200 — greeting visitors see when they open your store</p>
+            <p className="text-xs text-muted-foreground">{welcomeMessage.length}/300 — greeting visitors see when they open your store</p>
           </div>
 
           <div className="space-y-1.5">
