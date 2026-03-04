@@ -71,7 +71,7 @@ const DashboardSettings = () => {
           setCategories(deserializeCategories(d.category));
           setDeliveryAreas(d.delivery_areas ?? "");
           setCurrency(d.currency ?? "UGX");
-          setWelcomeMessage(d.welcome_message ?? "");
+          setWelcomeMessage(d.welcome_message || d.store_bio || "");
         }
         setLoading(false);
       });
