@@ -91,17 +91,17 @@ const DashboardOrders = () => {
       </div>
 
       {orders.length === 0 ? (
-        <Card className="py-16">
+        <div className="rounded-2xl border border-border/50 bg-card/60 backdrop-blur-xl py-16">
           <CardContent className="flex flex-col items-center gap-3 text-center">
             <ClipboardList className="h-12 w-12 text-muted-foreground/50" />
             <p className="text-lg font-medium">No orders yet</p>
             <p className="text-sm text-muted-foreground">Orders will appear here when buyers place them from your storefront.</p>
           </CardContent>
-        </Card>
+        </div>
       ) : (
         <div className="space-y-3">
           {orders.map((order) => (
-            <Card key={order.id} className="overflow-hidden">
+            <div key={order.id} className="rounded-2xl border border-border/50 bg-card/60 backdrop-blur-xl overflow-hidden">
               <CardContent className="p-4">
                 <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                   <div className="space-y-1 flex-1">
@@ -163,7 +163,7 @@ const DashboardOrders = () => {
                   </div>
                 </div>
               </CardContent>
-            </Card>
+            </div>
           ))}
         </div>
       )}

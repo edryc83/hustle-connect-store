@@ -1,6 +1,5 @@
-import { LayoutDashboard, Package, Settings, ClipboardList, Moon, Sun } from "lucide-react";
+import { LayoutDashboard, Package, Settings, ClipboardList } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
-import { useTheme } from "@/hooks/useTheme";
 
 const navItems = [
   { title: "Overview", url: "/dashboard", icon: LayoutDashboard },
@@ -10,10 +9,8 @@ const navItems = [
 ];
 
 export function MobileBottomNav() {
-  const { theme, toggleTheme } = useTheme();
-
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t bg-background md:hidden">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t bg-background/80 backdrop-blur-xl md:hidden">
       <div className="flex items-center justify-around py-2">
         {navItems.map((item) => (
           <NavLink
@@ -27,13 +24,6 @@ export function MobileBottomNav() {
             <span>{item.title}</span>
           </NavLink>
         ))}
-        <button
-          onClick={toggleTheme}
-          className="flex flex-col items-center gap-0.5 px-3 py-1 text-xs text-muted-foreground"
-        >
-          {theme === "dark" ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
-          <span>{theme === "dark" ? "Light" : "Dark"}</span>
-        </button>
       </div>
     </nav>
   );

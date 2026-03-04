@@ -135,7 +135,7 @@ const DashboardSettings = () => {
     <div className="max-w-lg space-y-6">
       <h1 className="text-2xl font-bold">Settings</h1>
 
-      <Card>
+      <div className="rounded-2xl border border-border/50 bg-card/60 backdrop-blur-xl">
         <CardHeader>
           <CardTitle className="text-base">Your Profile</CardTitle>
         </CardHeader>
@@ -180,9 +180,9 @@ const DashboardSettings = () => {
             <Input value={firstName} onChange={(e) => setFirstName(e.target.value)} placeholder="e.g. johndoe" />
           </div>
         </CardContent>
-      </Card>
+      </div>
 
-      <Card>
+      <div className="rounded-2xl border border-border/50 bg-card/60 backdrop-blur-xl">
         <CardHeader>
           <CardTitle className="text-base">Store Details</CardTitle>
         </CardHeader>
@@ -263,7 +263,7 @@ const DashboardSettings = () => {
             {saving ? "Saving…" : "Save Changes"}
           </Button>
         </CardContent>
-      </Card>
+      </div>
     </div>
   );
 };
