@@ -45,6 +45,7 @@ export function useInstallPrompt() {
       setIsInstalled(true);
       setCanInstall(false);
       deferredPrompt = null;
+      localStorage.setItem("afristall_pwa_installed", "true");
     };
     window.addEventListener("appinstalled", installedHandler);
 
