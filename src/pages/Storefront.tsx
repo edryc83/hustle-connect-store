@@ -418,7 +418,7 @@ function ProductDetailView({
   );
 }
 
-
+const StorefrontInner = () => {
   const { addItem } = useCart();
   const { theme, toggleTheme } = useTheme();
   const { user } = useAuth();
