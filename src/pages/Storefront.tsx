@@ -169,6 +169,11 @@ const Storefront = () => {
 
           <ShareButton storeName={profile.store_name ?? "Store"} storeSlug={storeSlug ?? ""} />
         </div>
+          {(profile as any).store_bio && (
+            <p className="mt-4 text-sm text-muted-foreground leading-relaxed">
+              {(profile as any).store_bio}
+            </p>
+          )}
         </div>
       </header>
 
