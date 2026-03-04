@@ -42,6 +42,10 @@ const DashboardSettings = () => {
   const [country, setCountry] = useState("");
   const [district, setDistrict] = useState("");
   const [city, setCity] = useState("");
+  const [street, setStreet] = useState("");
+  const [shopNumber, setShopNumber] = useState("");
+  const [building, setBuilding] = useState("");
+  const [isOnlineOnly, setIsOnlineOnly] = useState(false);
   
   const [categories, setCategories] = useState<CategorySelection>({});
   const [deliveryAreas, setDeliveryAreas] = useState("");
@@ -53,7 +57,7 @@ const DashboardSettings = () => {
     if (!user) return;
     supabase
       .from("profiles")
-      .select("first_name, profile_picture_url, store_name, store_slug, whatsapp_number, city, store_bio, category, delivery_areas, currency, welcome_message, cover_photo_url, country, district")
+      .select("first_name, profile_picture_url, store_name, store_slug, whatsapp_number, city, store_bio, category, delivery_areas, currency, welcome_message, cover_photo_url, country, district, street, shop_number, building, is_online_only")
       .eq("id", user.id)
       .single()
       .then(({ data }) => {
@@ -67,6 +71,10 @@ const DashboardSettings = () => {
           setCountry(d.country ?? "");
           setDistrict(d.district ?? "");
           setCity(d.city ?? "");
+          setStreet(d.street ?? "");
+          setShopNumber(d.shop_number ?? "");
+          setBuilding(d.building ?? "");
+          setIsOnlineOnly(d.is_online_only ?? false);
           // storeBio merged into welcomeMessage
           setCategories(deserializeCategories(d.category));
           setDeliveryAreas(d.delivery_areas ?? "");
@@ -197,6 +205,10 @@ const DashboardSettings = () => {
         country: country.trim() || null,
         district: district.trim() || null,
         city: city.trim(),
+        street: street.trim() || null,
+        shop_number: isOnlineOnly ? null : shopNumber.trim() || null,
+        building: isOnlineOnly ? null : building.trim() || null,
+        is_online_only: isOnlineOnly,
         store_bio: welcomeMessage.trim() || null,
         category: serializeCategories(categories) || null,
         delivery_areas: deliveryAreas.trim() || null,
@@ -413,6 +425,41 @@ const DashboardSettings = () => {
             <Label>City / Town</Label>
             <Input value={city} onChange={(e) => setCity(e.target.value)} placeholder="e.g. Kampala, Nairobi, Lagos" />
           </div>
+
+          <div className="space-y-1.5">
+            <Label>Street</Label>
+            <Input value={street} onChange={(e) => setStreet(e.target.value)} placeholder="e.g. Kira Road, Allen Avenue" />
+          </div>
+
+          {/* Online Only Toggle */}
+          <div className="flex items-center justify-between rounded-lg border border-border/50 px-4 py-3">
+            <div>
+              <p className="text-sm font-medium">Online Only</p>
+              <p className="text-xs text-muted-foreground">Toggle if you don't have a physical location</p>
+            </div>
+            <label className="relative inline-flex items-center cursor-pointer">
+              <input
+                type="checkbox"
+                checked={isOnlineOnly}
+                onChange={(e) => setIsOnlineOnly(e.target.checked)}
+                className="sr-only peer"
+              />
+              <div className="w-9 h-5 bg-muted rounded-full peer peer-checked:bg-primary transition-colors after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-background after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-full" />
+            </label>
+          </div>
+
+          {!isOnlineOnly && (
+            <div className="grid grid-cols-2 gap-3">
+              <div className="space-y-1.5">
+                <Label>Building</Label>
+                <Input value={building} onChange={(e) => setBuilding(e.target.value)} placeholder="e.g. Garden City Mall" />
+              </div>
+              <div className="space-y-1.5">
+                <Label>Shop Number</Label>
+                <Input value={shopNumber} onChange={(e) => setShopNumber(e.target.value)} placeholder="e.g. Shop 12, Floor 2" />
+              </div>
+            </div>
+          )}
 
           <div className="space-y-1.5">
             <Label>Delivery Areas</Label>
