@@ -6,8 +6,37 @@ import { Label } from "@/components/ui/label";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
-import { Share2, Download, Loader2, Camera, Sparkles } from "lucide-react";
+import { Share2, Download, Loader2, Camera, Sparkles, Sun, Moon } from "lucide-react";
 import { toast } from "sonner";
+
+type CardTheme = "light" | "dark";
+
+const themes = {
+  light: {
+    bg: "#ffffff",
+    accentFrom: "#FF6B35",
+    accentTo: "#FF8F5E",
+    name: "#111827",
+    msg: "#6b7280",
+    pillBg: "#FFF3ED",
+    pillText: "#FF6B35",
+    branding: "#d1d5db",
+    placeholderBg: "#f3f4f6",
+    placeholderText: "#9ca3af",
+  },
+  dark: {
+    bg: "#1a1a2e",
+    accentFrom: "#FF6B35",
+    accentTo: "#FF8F5E",
+    name: "#f9fafb",
+    msg: "#9ca3af",
+    pillBg: "#FF6B3522",
+    pillText: "#FF8F5E",
+    branding: "#4b5563",
+    placeholderBg: "#2a2a3e",
+    placeholderText: "#6b7280",
+  },
+};
 
 interface ShareCardModalProps {
   open: boolean;
@@ -23,8 +52,8 @@ export function ShareCardModal({ open, onOpenChange, storeName, storeSlug, profi
   const [customImage, setCustomImage] = useState<string | null>(null);
   const [cardMessage, setCardMessage] = useState("");
   const [generatingMsg, setGeneratingMsg] = useState(false);
+  const [cardTheme, setCardTheme] = useState<CardTheme>("light");
 
-  // Reset state when modal opens
   useEffect(() => {
     if (open) {
       setCardGenerated(false);
@@ -70,15 +99,23 @@ export function ShareCardModal({ open, onOpenChange, storeName, storeSlug, profi
     const H = 1280;
     canvas.width = W;
     canvas.height = H;
+    const t = themes[cardTheme];
 
-    // White/light card background
-    ctx.fillStyle = "#ffffff";
+    // Background
+    if (cardTheme === "dark") {
+      const grad = ctx.createLinearGradient(0, 0, 0, H);
+      grad.addColorStop(0, "#1a1a2e");
+      grad.addColorStop(1, "#16213e");
+      ctx.fillStyle = grad;
+    } else {
+      ctx.fillStyle = t.bg;
+    }
     ctx.fillRect(0, 0, W, H);
 
-    // Subtle top gradient accent
+    // Top accent bar
     const topGrad = ctx.createLinearGradient(0, 0, W, 0);
-    topGrad.addColorStop(0, "#FF6B35");
-    topGrad.addColorStop(1, "#FF8F5E");
+    topGrad.addColorStop(0, t.accentFrom);
+    topGrad.addColorStop(1, t.accentTo);
     ctx.fillStyle = topGrad;
     ctx.fillRect(0, 0, W, 6);
 
@@ -87,7 +124,7 @@ export function ShareCardModal({ open, onOpenChange, storeName, storeSlug, profi
       const imgY = 180;
       const imgX = (W - imgSize) / 2;
 
-      // Rounded rect clip for image (like reference card)
+      // Rounded rect clip for image
       const radius = 24;
       ctx.save();
       ctx.beginPath();
@@ -104,37 +141,34 @@ export function ShareCardModal({ open, onOpenChange, storeName, storeSlug, profi
       ctx.clip();
 
       if (img) {
-        // Cover-fit the image
         const scale = Math.max(imgSize / img.width, imgSize / img.height);
         const sw = img.width * scale;
         const sh = img.height * scale;
         ctx.drawImage(img, imgX - (sw - imgSize) / 2, imgY - (sh - imgSize) / 2, sw, sh);
       } else {
-        ctx.fillStyle = "#f3f4f6";
+        ctx.fillStyle = t.placeholderBg;
         ctx.fillRect(imgX, imgY, imgSize, imgSize);
-        ctx.fillStyle = "#9ca3af";
+        ctx.fillStyle = t.placeholderText;
         ctx.font = "bold 72px system-ui, sans-serif";
         ctx.textAlign = "center";
         ctx.fillText((storeName || "S")[0].toUpperCase(), W / 2, imgY + imgSize / 2 + 24);
       }
       ctx.restore();
 
-      // Shadow behind image area
       ctx.shadowColor = "transparent";
 
       // Store name
       const nameY = imgY + imgSize + 60;
-      ctx.fillStyle = "#111827";
+      ctx.fillStyle = t.name;
       ctx.font = "bold 44px system-ui, sans-serif";
       ctx.textAlign = "center";
       ctx.fillText(storeName || "My Store", W / 2, nameY);
 
       // Card message
       const msgY = nameY + 50;
-      ctx.fillStyle = "#6b7280";
+      ctx.fillStyle = t.msg;
       ctx.font = "28px system-ui, sans-serif";
       const msg = cardMessage || "Click the link below to visit my shop! 👇";
-      // Word wrap
       const words = msg.split(" ");
       let line = "";
       let lineY = msgY;
@@ -150,26 +184,23 @@ export function ShareCardModal({ open, onOpenChange, storeName, storeSlug, profi
       }
       if (line) ctx.fillText(line, W / 2, lineY);
 
-      // URL in orange pill
+      // URL pill
       const urlY = lineY + 70;
-      const urlText = storeUrl;
       ctx.font = "bold 26px system-ui, sans-serif";
-      const urlWidth = ctx.measureText(urlText).width + 48;
+      const urlWidth = ctx.measureText(storeUrl).width + 48;
       const pillX = (W - urlWidth) / 2;
       const pillH = 48;
 
-      // Pill background
-      ctx.fillStyle = "#FFF3ED";
+      ctx.fillStyle = t.pillBg;
       ctx.beginPath();
       ctx.roundRect(pillX, urlY - 30, urlWidth, pillH, 24);
       ctx.fill();
 
-      // Pill text
-      ctx.fillStyle = "#FF6B35";
-      ctx.fillText(urlText, W / 2, urlY);
+      ctx.fillStyle = t.pillText;
+      ctx.fillText(storeUrl, W / 2, urlY);
 
-      // Branding at bottom
-      ctx.fillStyle = "#d1d5db";
+      // Branding
+      ctx.fillStyle = t.branding;
       ctx.font = "20px system-ui, sans-serif";
       ctx.fillText("Powered by Afristall", W / 2, H - 60);
 
@@ -185,7 +216,7 @@ export function ShareCardModal({ open, onOpenChange, storeName, storeSlug, profi
     } else {
       drawContent();
     }
-  }, [imageToUse, storeName, storeSlug, cardMessage]);
+  }, [imageToUse, storeName, storeSlug, cardMessage, cardTheme]);
 
   const shareOrDownload = async () => {
     const canvas = canvasRef.current;
@@ -222,6 +253,29 @@ export function ShareCardModal({ open, onOpenChange, storeName, storeSlug, profi
           <DialogTitle>Create Status Card</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
+          {/* Theme toggle */}
+          <div>
+            <Label className="text-xs">Card Style</Label>
+            <div className="flex gap-2 mt-1.5">
+              <Button
+                variant={cardTheme === "light" ? "default" : "outline"}
+                size="sm"
+                className="rounded-xl gap-1.5 flex-1"
+                onClick={() => { setCardTheme("light"); setCardGenerated(false); }}
+              >
+                <Sun className="h-3.5 w-3.5" /> Light
+              </Button>
+              <Button
+                variant={cardTheme === "dark" ? "default" : "outline"}
+                size="sm"
+                className="rounded-xl gap-1.5 flex-1"
+                onClick={() => { setCardTheme("dark"); setCardGenerated(false); }}
+              >
+                <Moon className="h-3.5 w-3.5" /> Dark
+              </Button>
+            </div>
+          </div>
+
           {/* Image selector */}
           <div>
             <Label className="text-xs">Card Image</Label>
