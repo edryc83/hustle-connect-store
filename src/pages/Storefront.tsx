@@ -158,17 +158,19 @@ const Storefront = () => {
 
       supabase.rpc("increment_store_views", { slug: storeSlug! }).then(() => {});
 
-      const [{ data: prods }, { data: imgs }] = await Promise.all([
-        supabase.from("products").select("*").eq("user_id", prof.id).order("created_at", { ascending: false }),
-        supabase.from("product_images").select("*").order("position", { ascending: true }),
-      ]);
+      const { data: prods } = await supabase.from("products").select("*").eq("user_id", prof.id).order("created_at", { ascending: false });
+
+      const productIds = (prods ?? []).map((p) => p.id);
+      const { data: imgs } = productIds.length > 0
+        ? await supabase.from("product_images").select("*").in("product_id", productIds).order("position", { ascending: true })
+        : { data: [] };
 
       setProducts(prods ?? []);
 
       const imgMap: Record<string, string[]> = {};
-      const productIds = new Set((prods ?? []).map((p) => p.id));
+      const productIdSet = new Set((prods ?? []).map((p) => p.id));
       (imgs ?? []).forEach((img) => {
-        if (productIds.has(img.product_id)) {
+        if (productIdSet.has(img.product_id)) {
           if (!imgMap[img.product_id]) imgMap[img.product_id] = [];
           imgMap[img.product_id].push(img.image_url);
         }
@@ -294,7 +296,7 @@ const Storefront = () => {
                 quantity: 1,
                 total: Number(viewProduct.price),
                 customer_name: visitorName || "Store visitor",
-                customer_phone: "",
+                customer_phone: visitorName || "WhatsApp order",
               } as any).then(() => {});
               supabase.rpc("increment_whatsapp_taps", { p_id: viewProduct.id }).then(() => {});
               window.open(`https://wa.me/${cleanNumber.replace("+", "")}?text=${encodeURIComponent(message)}`, "_blank");

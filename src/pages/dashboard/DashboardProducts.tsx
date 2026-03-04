@@ -66,11 +66,14 @@ const DashboardProducts = () => {
 
   const fetchProducts = async () => {
     if (!user) return;
-    const [{ data }, { data: profile }, { data: images }] = await Promise.all([
+    const [{ data }, { data: profile }] = await Promise.all([
       supabase.from("products").select("*").eq("user_id", user.id).order("created_at", { ascending: false }),
       supabase.from("profiles").select("currency").eq("id", user.id).single(),
-      supabase.from("product_images").select("*").order("position", { ascending: true }),
     ]);
+    const productIds = (data ?? []).map((p) => p.id);
+    const { data: images } = productIds.length > 0
+      ? await supabase.from("product_images").select("*").in("product_id", productIds).order("position", { ascending: true })
+      : { data: [] };
     setProducts(data ?? []);
     setCurrency((profile as any)?.currency ?? "UGX");
 

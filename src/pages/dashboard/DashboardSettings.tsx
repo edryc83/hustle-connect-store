@@ -59,7 +59,7 @@ const DashboardSettings = () => {
       .then(({ data }) => {
         if (data) {
           const d = data as any;
-          setFirstName(d.store_slug ?? d.first_name ?? "");
+          setFirstName(d.store_slug ?? "");
           setProfilePicUrl(d.profile_picture_url ?? "");
           setCoverPhotoUrl(d.cover_photo_url ?? "");
           setStoreName(d.store_name ?? "");
@@ -191,7 +191,6 @@ const DashboardSettings = () => {
     const { error } = await supabase
       .from("profiles")
       .update({
-        first_name: username,
         store_slug: username,
         store_name: storeName.trim(),
         whatsapp_number: whatsappNumber.trim(),

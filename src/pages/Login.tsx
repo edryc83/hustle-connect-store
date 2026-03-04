@@ -4,23 +4,12 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Mail, Phone, Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff } from "lucide-react";
 import AfristallLogo from "@/components/AfristallLogo";
 import EmojiGrid from "@/components/landing/EmojiGrid";
 import { toast } from "sonner";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
-const COUNTRY_CODES = [
-  { code: "+256", country: "🇺🇬 Uganda" },
-  { code: "+254", country: "🇰🇪 Kenya" },
-  { code: "+234", country: "🇳🇬 Nigeria" },
-  { code: "+233", country: "🇬🇭 Ghana" },
-  { code: "+255", country: "🇹🇿 Tanzania" },
-  { code: "+250", country: "🇷🇼 Rwanda" },
-  { code: "+27", country: "🇿🇦 South Africa" },
-  { code: "+1", country: "🇺🇸 USA" },
-  { code: "+44", country: "🇬🇧 UK" },
-];
 
 const Login = () => {
   const navigate = useNavigate();
