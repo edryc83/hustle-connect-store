@@ -1,16 +1,26 @@
 import { ReactNode } from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { DashboardSidebar } from "./DashboardSidebar";
 import { MobileBottomNav } from "./MobileBottomNav";
 import AfristallLogo from "@/components/AfristallLogo";
 import { useTheme } from "@/hooks/useTheme";
-import { Moon, Sun } from "lucide-react";
+import { Moon, Sun, Eye } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useEffect, useState } from "react";
 
 export function DashboardLayout({ children }: { children: ReactNode }) {
   const { user, loading } = useAuth();
   const { theme, toggleTheme } = useTheme();
+  const [storeSlug, setStoreSlug] = useState("");
+
+  useEffect(() => {
+    if (!user) return;
+    supabase.from("profiles").select("store_slug").eq("id", user.id).single().then(({ data }) => {
+      setStoreSlug((data as any)?.store_slug ?? "");
+    });
+  }, [user]);
 
   if (loading) {
     return (
@@ -40,13 +50,25 @@ export function DashboardLayout({ children }: { children: ReactNode }) {
                 </span>
               </div>
             </div>
-            <button
-              onClick={toggleTheme}
-              className="flex h-9 w-9 items-center justify-center rounded-full border bg-card/60 backdrop-blur-sm text-muted-foreground hover:text-foreground transition-colors"
-              aria-label="Toggle theme"
-            >
-              {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-            </button>
+            <div className="flex items-center gap-2">
+              {storeSlug && (
+                <Link
+                  to={`/${storeSlug}`}
+                  target="_blank"
+                  className="flex h-9 w-9 items-center justify-center rounded-full border bg-card/60 backdrop-blur-sm text-muted-foreground hover:text-foreground transition-colors"
+                  title="Preview your store"
+                >
+                  <Eye className="h-4 w-4" />
+                </Link>
+              )}
+              <button
+                onClick={toggleTheme}
+                className="flex h-9 w-9 items-center justify-center rounded-full border bg-card/60 backdrop-blur-sm text-muted-foreground hover:text-foreground transition-colors"
+                aria-label="Toggle theme"
+              >
+                {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+              </button>
+            </div>
           </header>
 
           <main className="flex-1 p-4 md:p-6 pb-20 md:pb-6">
