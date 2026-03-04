@@ -201,7 +201,7 @@ const Explore = () => {
               </p>
               {hasFilters && (
                 <button
-                  onClick={() => { setSearch(""); setSelectedCategory("All"); setSelectedCountry("All"); }}
+                  onClick={() => { setSearch(""); setSelectedCategory("All"); setSelectedCountry("All"); setSelectedLocation("All"); }}
                   className="text-sm text-primary font-medium hover:underline"
                 >
                   Clear all filters
