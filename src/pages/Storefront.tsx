@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { useParams, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Store, MapPin, ImageIcon, ShoppingBag, Share2, Copy, Check } from "lucide-react";
+import { categoriesToDisplay } from "@/components/CategoryPicker";
 import AfristallLogo from "@/components/AfristallLogo";
 import {
   DropdownMenu,
