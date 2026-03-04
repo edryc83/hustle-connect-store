@@ -641,66 +641,12 @@ const DashboardShareCard = () => {
                       : "border-border/50 hover:border-primary/40 hover:shadow-md"
                   }`}
                 >
-                  {/* Preview card */}
-                  <div
-                    className="absolute inset-0 flex flex-col items-center justify-center p-4"
-                    style={{ background: t.previewBg }}
-                  >
-                    {/* Mini layout preview */}
-                    {t.previewLayout === "full-bleed" && (
-                      <div className="w-full h-full flex flex-col justify-between relative">
-                        {/* Simulated photo area */}
-                        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/60 rounded-lg" />
-                        <div className="relative z-10 flex justify-between items-start p-2">
-                          <div className="flex items-center gap-1">
-                            <div className="h-4 w-4 rounded bg-white/30" />
-                            <div className="h-2 w-8 rounded-full bg-white/40" />
-                          </div>
-                          <div className="flex items-center gap-1">
-                            <div className="h-3 w-3 rounded-full" style={{ backgroundColor: t.previewAccent }} />
-                          </div>
-                        </div>
-                        <div className="relative z-10 p-3 space-y-1.5">
-                          <div className="h-3 w-3/4 rounded-sm" style={{ backgroundColor: t.previewAccent }} />
-                          <div className="h-3 w-1/2 rounded-sm" style={{ backgroundColor: t.previewAccent, opacity: 0.7 }} />
-                          <div className="h-1.5 w-full rounded-full bg-white/30 mt-2" />
-                          <div className="h-1.5 w-2/3 rounded-full bg-white/20" />
-                        </div>
-                      </div>
-                    )}
-                    {t.previewLayout === "split" && (
-                      <div className="w-full h-full flex flex-col">
-                        <div className="flex-1 rounded-t-lg" style={{ background: `linear-gradient(135deg, ${t.previewAccent}40, ${t.previewAccent}20)` }} />
-                        <div className="h-2/5 p-3 flex flex-col justify-center" style={{ backgroundColor: t.previewTextColor === "#fff" ? "#1a1a2e" : "#ffffff" }}>
-                          <div className="h-3 w-3/4 rounded-sm mb-1.5" style={{ backgroundColor: t.previewAccent }} />
-                          <div className="h-3 w-1/2 rounded-sm mb-2" style={{ backgroundColor: t.previewAccent, opacity: 0.6 }} />
-                          <div className="h-1.5 w-full rounded-full" style={{ backgroundColor: t.previewTextColor === "#fff" ? "rgba(255,255,255,0.2)" : "rgba(0,0,0,0.1)" }} />
-                        </div>
-                      </div>
-                    )}
-                    {t.previewLayout === "centered" && (
-                      <div className="w-full h-full flex flex-col items-center justify-center gap-2 p-3">
-                        <div className="w-3/4 aspect-square rounded-xl" style={{ background: `linear-gradient(135deg, ${t.previewAccent}30, ${t.previewAccent}10)`, border: `1px solid ${t.previewAccent}30` }} />
-                        <div className="h-3 w-2/3 rounded-sm" style={{ backgroundColor: t.previewTextColor, opacity: 0.8 }} />
-                        <div className="h-1.5 w-1/2 rounded-full" style={{ backgroundColor: t.previewTextColor, opacity: 0.3 }} />
-                        <div className="h-6 w-3/4 rounded-full mt-1" style={{ backgroundColor: t.previewAccent }} />
-                      </div>
-                    )}
-                    {t.previewLayout === "grid" && (
-                      <div className="w-full h-full flex flex-col gap-1.5 p-2">
-                        <div className="flex items-center gap-1 mb-1">
-                          <div className="h-4 w-4 rounded-full" style={{ backgroundColor: t.previewAccent, opacity: 0.5 }} />
-                          <div className="h-2 w-10 rounded-full" style={{ backgroundColor: t.previewTextColor, opacity: 0.4 }} />
-                        </div>
-                        <div className="flex-1 grid grid-cols-2 gap-1">
-                          {[1,2,3,4].map(i => (
-                            <div key={i} className="rounded-lg" style={{ background: `linear-gradient(135deg, ${t.previewAccent}${i*10+10}, ${t.previewAccent}${i*5+5})` }} />
-                          ))}
-                        </div>
-                        <div className="h-5 w-2/3 mx-auto rounded-full" style={{ backgroundColor: t.previewAccent }} />
-                      </div>
-                    )}
-                  </div>
+                  {/* Real design preview image */}
+                  <img
+                    src={t.previewImage}
+                    alt={t.name}
+                    className="absolute inset-0 w-full h-full object-cover"
+                  />
 
                   {/* Name overlay */}
                   <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent p-3 pt-8">
