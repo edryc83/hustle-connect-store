@@ -73,6 +73,35 @@ function ShareButton({ storeName, storeSlug }: { storeName: string; storeSlug: s
   );
 }
 
+function getAttributeChips(product: Product): string[] {
+  const attrs = (product as any).attributes as Record<string, any> | null;
+  if (!attrs || !attrs.product_type) return [];
+  const chips: string[] = [];
+  // Sizes (fashion, shoes)
+  if (Array.isArray(attrs.sizes) && attrs.sizes.length > 0) {
+    chips.push(attrs.sizes.length <= 3 ? attrs.sizes.join(", ") : `${attrs.sizes[0]}–${attrs.sizes[attrs.sizes.length - 1]}`);
+  }
+  // Condition
+  if (attrs.condition && typeof attrs.condition === "string") chips.push(attrs.condition);
+  // Gender
+  if (attrs.gender) chips.push(attrs.gender);
+  // Material (pills value)
+  if (attrs.material && typeof attrs.material === "string" && attrs.material.length < 20) chips.push(attrs.material);
+  // Storage (phones)
+  if (Array.isArray(attrs.storage) && attrs.storage.length > 0) {
+    chips.push(attrs.storage.join(" · "));
+  }
+  // Texture (wigs)
+  if (attrs.texture) chips.push(attrs.texture);
+  // Length (wigs)
+  if (attrs.length) chips.push(attrs.length);
+  // Cake size
+  if (attrs.cake_size) chips.push(attrs.cake_size);
+  // Hair type
+  if (attrs.hair_type) chips.push(attrs.hair_type);
+  return chips.slice(0, 3); // max 3 chips
+}
+
 function ProductCard({
   product,
   images,
@@ -98,6 +127,8 @@ function ProductCard({
   const discountPercent = hasDiscount
     ? Math.round((1 - Number((product as any).discount_price) / Number(product.price)) * 100)
     : 0;
+
+  const attrChips = getAttributeChips(product);
 
   return (
     <div
@@ -147,6 +178,16 @@ function ProductCard({
         <p className="font-semibold text-sm leading-tight truncate">{product.name}</p>
         {product.description && (
           <p className="text-[11px] text-muted-foreground line-clamp-1">{product.description}</p>
+        )}
+        {/* Attribute chips */}
+        {attrChips.length > 0 && (
+          <div className="flex flex-wrap gap-1">
+            {attrChips.map((chip) => (
+              <span key={chip} className="rounded-full bg-muted/80 border border-border/40 px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
+                {chip}
+              </span>
+            ))}
+          </div>
         )}
         <div className="flex items-center justify-between gap-1 pt-0.5">
           <div className="flex items-baseline gap-1.5 min-w-0">
