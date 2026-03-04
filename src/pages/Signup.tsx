@@ -196,9 +196,10 @@ const Signup = () => {
           store_slug: storeSlug.trim(),
           city,
           category,
+          business_type: businessType,
           whatsapp_number: fullWhatsapp,
           profile_picture_url: profilePictureUrl,
-        })
+        } as any)
         .eq("id", authData.user.id);
 
       if (profileError) throw profileError;
