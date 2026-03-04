@@ -141,7 +141,8 @@ function ProductCard({
   );
 }
 
-const Storefront = () => {
+const StorefrontInner = () => {
+  const { addItem } = useCart();
   const { storeSlug, productId } = useParams<{ storeSlug: string; productId?: string }>();
   const navigate = useNavigate();
   const [profile, setProfile] = useState<Profile | null>(null);
@@ -321,29 +322,47 @@ const Storefront = () => {
             </div>
           )}
 
-          <Button
-            size="lg"
-            className="w-full gap-2 text-base"
-            onClick={() => {
-              const cleanNumber = (profile.whatsapp_number ?? "").replace(/[^0-9+]/g, "");
-              const displayPrice = (viewProduct as any).discount_price ? Number((viewProduct as any).discount_price) : Number(viewProduct.price);
-              const message = `🛒 Hi! I'd like to order *${viewProduct.name}* (${formatPrice(displayPrice, currency)}) from your Afristall store.`;
-              supabase.from("orders").insert({
-                seller_id: profile.id,
-                product_id: viewProduct.id,
-                product_name: viewProduct.name,
-                quantity: 1,
-                total: Number(viewProduct.price),
-                customer_name: visitorName || "Store visitor",
-                customer_phone: visitorName || "WhatsApp order",
-              } as any).then(() => {});
-              supabase.rpc("increment_whatsapp_taps", { p_id: viewProduct.id }).then(() => {});
-              window.open(`https://wa.me/${cleanNumber.replace("+", "")}?text=${encodeURIComponent(message)}`, "_blank");
-            }}
-          >
-            <span className="text-lg">💬</span>
-            Order via WhatsApp
-          </Button>
+          <div className="flex gap-3">
+            <Button
+              size="lg"
+              className="flex-1 gap-2 text-base"
+              onClick={() => {
+                const imageUrl = imgs[0] || viewProduct.image_url || undefined;
+                addItem(viewProduct, imageUrl);
+                toast.success(`${viewProduct.name} added to cart`);
+              }}
+            >
+              <ShoppingCart className="h-5 w-5" />
+              Add to Cart
+            </Button>
+            <Button
+              size="lg"
+              variant="outline"
+              className="gap-2 text-base"
+              onClick={() => {
+                const cleanNumber = (profile.whatsapp_number ?? "").replace(/[^0-9+]/g, "");
+                const displayPrice = (viewProduct as any).discount_price ? Number((viewProduct as any).discount_price) : Number(viewProduct.price);
+                const message = [
+                  `🛒 Hi! I'd like to order *${viewProduct.name}* (${formatPrice(displayPrice, currency)}) from your Afristall store.`,
+                  viewProduct.image_url ? `\n📷 ${viewProduct.image_url}` : null,
+                ].filter(Boolean).join("\n");
+                supabase.from("orders").insert({
+                  seller_id: profile.id,
+                  product_id: viewProduct.id,
+                  product_name: viewProduct.name,
+                  quantity: 1,
+                  total: Number(viewProduct.price),
+                  customer_name: visitorName || "Store visitor",
+                  customer_phone: visitorName || "WhatsApp order",
+                } as any).then(() => {});
+                supabase.rpc("increment_whatsapp_taps", { p_id: viewProduct.id }).then(() => {});
+                window.open(`https://wa.me/${cleanNumber.replace("+", "")}?text=${encodeURIComponent(message)}`, "_blank");
+              }}
+            >
+              <span className="text-lg">💬</span>
+              WhatsApp
+            </Button>
+          </div>
 
           <div className="border-t pt-4">
             <Link to={`/${storeSlug}`} className="flex items-center gap-3">
