@@ -5,12 +5,24 @@ import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 
 import {
-  Package, CalendarDays, Copy, Share2, X, Plus,
+  Package, CalendarDays, Copy, Share2, X, Plus, Download,
 } from "lucide-react";
 import AfristallLogo from "@/components/AfristallLogo";
 import { toast } from "sonner";
 import DailySellingTip from "@/components/dashboard/DailySellingTip";
 import CaptionGenerator from "@/components/dashboard/CaptionGenerator";
+
+function useIsInstalledPWA() {
+  const [installed, setInstalled] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(display-mode: standalone)");
+    setInstalled(mq.matches || (navigator as any).standalone === true);
+    const handler = (e: MediaQueryListEvent) => setInstalled(e.matches);
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
+  }, []);
+  return installed;
+}
 
 function getGreeting(): { text: string; emoji: string } {
   const hour = new Date().getHours();
@@ -30,6 +42,7 @@ function getFormattedDate() {
 
 const DashboardOverview = () => {
   const { user } = useAuth();
+  const isInstalled = useIsInstalledPWA();
   const [productCount, setProductCount] = useState(0);
   const [firstName, setFirstName] = useState("");
   const [storeSlug, setStoreSlug] = useState("");
@@ -128,6 +141,23 @@ const DashboardOverview = () => {
 
       {/* Daily selling tip */}
       <DailySellingTip />
+
+      {/* Install app banner — hidden once installed */}
+      {!isInstalled && (
+        <Link
+          to="/dashboard/settings#install-app"
+          className="flex items-center gap-3 rounded-2xl border border-border/50 bg-card/60 backdrop-blur-xl p-4 shadow-sm hover:bg-muted/40 transition-colors"
+        >
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
+            <Download className="h-5 w-5 text-primary" />
+          </div>
+          <div className="flex-1">
+            <p className="text-sm font-semibold">Install Afristall App</p>
+            <p className="text-xs text-muted-foreground">Add to home screen for quick access</p>
+          </div>
+          <span className="text-xs text-primary font-medium">How →</span>
+        </Link>
+      )}
 
       {/* Onboarding banner */}
       {productCount === 0 && !bannerDismissed && (
