@@ -10,6 +10,7 @@ import {
 import AfristallLogo from "@/components/AfristallLogo";
 import { toast } from "sonner";
 import DailySellingTip from "@/components/dashboard/DailySellingTip";
+import CaptionGenerator from "@/components/dashboard/CaptionGenerator";
 
 function getGreeting(): { text: string; emoji: string } {
   const hour = new Date().getHours();
@@ -46,7 +47,7 @@ const DashboardOverview = () => {
     const fetchData = async () => {
       const [{ count }, { data: profile }] = await Promise.all([
         supabase.from("products").select("*", { count: "exact", head: true }).eq("user_id", user.id),
-        supabase.from("profiles").select("store_name, store_slug, first_name, profile_picture_url").eq("id", user.id).single(),
+        supabase.from("profiles").select("store_name, store_slug, first_name, profile_picture_url, category").eq("id", user.id).single(),
       ]);
       setProductCount(count ?? 0);
       const p = profile as any;
