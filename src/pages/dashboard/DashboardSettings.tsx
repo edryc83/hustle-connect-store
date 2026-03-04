@@ -20,6 +20,7 @@ import {
   serializeCategories,
   deserializeCategories,
 } from "@/components/CategoryPicker";
+import { DISTRICTS, getTowns } from "@/lib/locations";
 
 const COUNTRIES = [
   "Uganda", "Kenya", "Nigeria", "Ghana", "Tanzania", "Rwanda",
