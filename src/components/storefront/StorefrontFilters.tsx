@@ -33,7 +33,7 @@ interface StorefrontFiltersProps {
   products?: any[]; // pass store products to derive available categories
 }
 
-export function StorefrontFilters({ filters, onChange, totalCount, filteredCount }: StorefrontFiltersProps) {
+export function StorefrontFilters({ filters, onChange, totalCount, filteredCount, products = [] }: StorefrontFiltersProps) {
   const [showFilters, setShowFilters] = useState(false);
 
   const hasActiveFilters = filters.category || filters.condition || filters.priceRange;
@@ -43,8 +43,25 @@ export function StorefrontFilters({ filters, onChange, totalCount, filteredCount
 
   const clearAll = () => onChange({ search: "", category: "", condition: "", priceRange: null });
 
-  // Derive categories that actually exist in products (we show all for discoverability)
-  const categories = [{ value: "", label: "All", emoji: "" }, ...PRODUCT_CATEGORIES.map((c) => ({ value: c.value, label: c.label, emoji: c.emoji }))];
+  // Only show categories that exist in this store's products
+  const storeCategories = new Set(
+    products
+      .map((p) => (p.attributes as Record<string, any> | null)?.product_type)
+      .filter(Boolean)
+  );
+  const categories = [
+    { value: "", label: "All", emoji: "" },
+    ...PRODUCT_CATEGORIES.filter((c) => storeCategories.has(c.value)).map((c) => ({ value: c.value, label: c.label, emoji: c.emoji })),
+  ];
+
+  // Only show conditions that exist in this store's products
+  const storeConditions = new Set(
+    products
+      .map((p) => p.condition || (p.attributes as Record<string, any> | null)?.condition)
+      .filter(Boolean)
+      .map((c: string) => c.toLowerCase())
+  );
+  const availableConditions = CONDITIONS.filter((c) => !c.value || storeConditions.has(c.value));
 
   return (
     <div className="space-y-3">
