@@ -45,7 +45,7 @@ const DashboardOverview = () => {
     () => localStorage.getItem("afristall_banner_dismissed") === "true"
   );
   const [copied, setCopied] = useState(false);
-  const [shareModalOpen, setShareModalOpen] = useState(false);
+  
 
   useEffect(() => {
     if (!user) return;
