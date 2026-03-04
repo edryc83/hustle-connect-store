@@ -1,11 +1,15 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import { Card, CardContent } from "@/components/ui/card";
+import { CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ClipboardList, Phone, MessageCircle } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { ClipboardList, Phone, MessageCircle, Plus } from "lucide-react";
 import { formatPrice } from "@/lib/currency";
 import { toast } from "sonner";
 
@@ -34,6 +38,16 @@ const DashboardOrders = () => {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [currency, setCurrency] = useState("UGX");
+  const [modalOpen, setModalOpen] = useState(false);
+  const [saving, setSaving] = useState(false);
+
+  // Form state
+  const [formName, setFormName] = useState("");
+  const [formPhone, setFormPhone] = useState("");
+  const [formProduct, setFormProduct] = useState("");
+  const [formAmount, setFormAmount] = useState("");
+  const [formNotes, setFormNotes] = useState("");
+  const [formStatus, setFormStatus] = useState("pending");
 
   const fetchOrders = async () => {
     if (!user) return;
@@ -75,6 +89,38 @@ const DashboardOrders = () => {
   const openWhatsApp = (phone: string) => {
     const clean = phone.replace(/[^0-9+]/g, "").replace("+", "");
     window.open(`https://wa.me/${clean}`, "_blank");
+  };
+
+  const resetForm = () => {
+    setFormName(""); setFormPhone(""); setFormProduct(""); setFormAmount(""); setFormNotes(""); setFormStatus("pending");
+  };
+
+  const handleAddOrder = async () => {
+    if (!formName.trim()) { toast.error("Customer name is required"); return; }
+    if (!formPhone.trim()) { toast.error("Customer phone is required"); return; }
+    if (!user) return;
+
+    setSaving(true);
+    const { error, data } = await supabase.from("orders").insert({
+      seller_id: user.id,
+      customer_name: formName.trim(),
+      customer_phone: formPhone.trim(),
+      product_name: formProduct.trim() || "Manual order",
+      total: parseFloat(formAmount) || 0,
+      quantity: 1,
+      notes: formNotes.trim() || null,
+      status: formStatus,
+    } as any).select().single();
+
+    setSaving(false);
+    if (error) {
+      toast.error("Failed to add order");
+    } else {
+      setOrders((prev) => [data as any, ...prev]);
+      toast.success("Order added");
+      setModalOpen(false);
+      resetForm();
+    }
   };
 
   if (loading) {
@@ -132,11 +178,7 @@ const DashboardOrders = () => {
                     )}
                     <p className="text-xs text-muted-foreground">
                       {new Date(order.created_at).toLocaleDateString("en-GB", {
-                        day: "numeric",
-                        month: "short",
-                        year: "numeric",
-                        hour: "2-digit",
-                        minute: "2-digit",
+                        day: "numeric", month: "short", year: "numeric", hour: "2-digit", minute: "2-digit",
                       })}
                     </p>
                   </div>
@@ -152,12 +194,7 @@ const DashboardOrders = () => {
                         ))}
                       </SelectContent>
                     </Select>
-                    <Button
-                      size="icon"
-                      variant="outline"
-                      className="h-8 w-8"
-                      onClick={() => openWhatsApp(order.customer_phone)}
-                    >
+                    <Button size="icon" variant="outline" className="h-8 w-8" onClick={() => openWhatsApp(order.customer_phone)}>
                       <MessageCircle className="h-3.5 w-3.5" />
                     </Button>
                   </div>
@@ -167,6 +204,59 @@ const DashboardOrders = () => {
           ))}
         </div>
       )}
+
+      {/* Floating Add Button */}
+      <button
+        onClick={() => setModalOpen(true)}
+        className="fixed bottom-24 right-6 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-lg shadow-primary/30 hover:bg-primary/90 transition-colors md:bottom-8"
+      >
+        <Plus className="h-6 w-6" />
+      </button>
+
+      {/* Add Order Modal */}
+      <Dialog open={modalOpen} onOpenChange={setModalOpen}>
+        <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Log an Order</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4 pt-2">
+            <div className="space-y-1.5">
+              <Label>Customer name *</Label>
+              <Input placeholder="e.g. John" value={formName} onChange={(e) => setFormName(e.target.value)} />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Customer phone *</Label>
+              <Input type="tel" placeholder="07XX XXX XXX" value={formPhone} onChange={(e) => setFormPhone(e.target.value)} />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Product name</Label>
+              <Input placeholder="e.g. Nike Air Max" value={formProduct} onChange={(e) => setFormProduct(e.target.value)} />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Amount</Label>
+              <Input type="number" placeholder="0" value={formAmount} onChange={(e) => setFormAmount(e.target.value)} />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Notes</Label>
+              <Textarea rows={2} placeholder="Any notes…" value={formNotes} onChange={(e) => setFormNotes(e.target.value)} />
+            </div>
+            <div className="space-y-1.5">
+              <Label>Status</Label>
+              <Select value={formStatus} onValueChange={setFormStatus}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="pending">Pending</SelectItem>
+                  <SelectItem value="delivered">Delivered</SelectItem>
+                  <SelectItem value="cancelled">Cancelled</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <Button className="w-full rounded-xl" onClick={handleAddOrder} disabled={saving}>
+              {saving ? "Saving…" : "Add Order"}
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
