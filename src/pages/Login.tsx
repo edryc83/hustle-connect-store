@@ -77,7 +77,7 @@ const Login = () => {
       <Link to="/" className="mb-8 flex items-center gap-2">
         <Store className="h-7 w-7 text-primary" />
         <span className="text-xl font-extrabold tracking-tight">
-          Afro<span className="text-primary">Duka</span>
+          Afri<span className="text-primary">stall</span>
         </span>
       </Link>
 

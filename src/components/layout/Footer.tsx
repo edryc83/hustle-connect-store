@@ -6,10 +6,10 @@ const Footer = () => (
       <div className="flex items-center gap-2">
         <Store className="h-5 w-5 text-primary" />
         <span className="font-bold text-foreground">
-          Afro<span className="text-primary">Duka</span>
+          Afri<span className="text-primary">stall</span>
         </span>
       </div>
-      <p className="text-sm text-muted-foreground">© {new Date().getFullYear()} AfroDuka</p>
+      <p className="text-sm text-muted-foreground">© {new Date().getFullYear()} Afristall</p>
     </div>
   </footer>
 );

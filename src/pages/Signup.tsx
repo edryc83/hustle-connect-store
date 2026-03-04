@@ -201,7 +201,7 @@ const Signup = () => {
 
       if (profileError) throw profileError;
 
-      toast.success("Welcome to AfroDuka! 🎉");
+      toast.success("Welcome to Afristall! 🎉");
       navigate("/dashboard");
     } catch (error: any) {
       toast.error(error.message || "Something went wrong");
@@ -215,7 +215,7 @@ const Signup = () => {
       <Link to="/" className="mb-8 flex items-center gap-2">
         <Store className="h-7 w-7 text-primary" />
         <span className="text-xl font-extrabold tracking-tight">
-          Afro<span className="text-primary">Duka</span>
+          Afri<span className="text-primary">stall</span>
         </span>
       </Link>
 
@@ -386,7 +386,7 @@ const Signup = () => {
               <div className="space-y-1.5">
                 <Label htmlFor="storeSlug">Store URL</Label>
                 <div className="flex items-center gap-1.5">
-                  <span className="text-sm text-muted-foreground whitespace-nowrap">afroduka.com/</span>
+                  <span className="text-sm text-muted-foreground whitespace-nowrap">afristall.com/</span>
                   <Input
                     id="storeSlug"
                     placeholder="my-store"

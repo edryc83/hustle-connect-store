@@ -60,7 +60,7 @@ const DashboardOverview = () => {
                 className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:underline"
               >
                 <Eye className="h-3.5 w-3.5" />
-                afroduka.com/{storeSlug}
+                afristall.com/{storeSlug}
               </Link>
             </CardContent>
           </Card>

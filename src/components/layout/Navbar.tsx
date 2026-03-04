@@ -12,7 +12,7 @@ const Navbar = () => {
         <Link to="/" className="flex items-center gap-2">
           <Store className="h-7 w-7 text-primary" />
           <span className="text-xl font-extrabold tracking-tight text-foreground">
-            Afro<span className="text-primary">Duka</span>
+            Afri<span className="text-primary">stall</span>
           </span>
         </Link>
 
