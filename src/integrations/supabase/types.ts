@@ -178,6 +178,7 @@ export type Database = {
       }
       profiles: {
         Row: {
+          building: string | null
           business_type: string | null
           category: string | null
           city: string | null
@@ -190,17 +191,21 @@ export type Database = {
           email: string | null
           first_name: string | null
           id: string
+          is_online_only: boolean
           last_active_at: string
           phone: string | null
           profile_picture_url: string | null
+          shop_number: string | null
           store_bio: string | null
           store_name: string | null
           store_slug: string | null
+          street: string | null
           view_count: number
           welcome_message: string | null
           whatsapp_number: string | null
         }
         Insert: {
+          building?: string | null
           business_type?: string | null
           category?: string | null
           city?: string | null
@@ -213,17 +218,21 @@ export type Database = {
           email?: string | null
           first_name?: string | null
           id: string
+          is_online_only?: boolean
           last_active_at?: string
           phone?: string | null
           profile_picture_url?: string | null
+          shop_number?: string | null
           store_bio?: string | null
           store_name?: string | null
           store_slug?: string | null
+          street?: string | null
           view_count?: number
           welcome_message?: string | null
           whatsapp_number?: string | null
         }
         Update: {
+          building?: string | null
           business_type?: string | null
           category?: string | null
           city?: string | null
@@ -236,12 +245,15 @@ export type Database = {
           email?: string | null
           first_name?: string | null
           id?: string
+          is_online_only?: boolean
           last_active_at?: string
           phone?: string | null
           profile_picture_url?: string | null
+          shop_number?: string | null
           store_bio?: string | null
           store_name?: string | null
           store_slug?: string | null
+          street?: string | null
           view_count?: number
           welcome_message?: string | null
           whatsapp_number?: string | null

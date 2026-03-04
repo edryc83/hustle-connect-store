@@ -1,0 +1,5 @@
+ALTER TABLE public.profiles
+  ADD COLUMN IF NOT EXISTS shop_number text DEFAULT NULL,
+  ADD COLUMN IF NOT EXISTS building text DEFAULT NULL,
+  ADD COLUMN IF NOT EXISTS street text DEFAULT NULL,
+  ADD COLUMN IF NOT EXISTS is_online_only boolean NOT NULL DEFAULT false;
