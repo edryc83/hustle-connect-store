@@ -104,6 +104,7 @@ export type Database = {
           condition: string | null
           created_at: string
           description: string | null
+          discount_price: number | null
           id: string
           image_url: string | null
           is_featured: boolean
@@ -119,6 +120,7 @@ export type Database = {
           condition?: string | null
           created_at?: string
           description?: string | null
+          discount_price?: number | null
           id?: string
           image_url?: string | null
           is_featured?: boolean
@@ -134,6 +136,7 @@ export type Database = {
           condition?: string | null
           created_at?: string
           description?: string | null
+          discount_price?: number | null
           id?: string
           image_url?: string | null
           is_featured?: boolean
