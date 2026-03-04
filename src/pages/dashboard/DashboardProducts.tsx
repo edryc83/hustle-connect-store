@@ -279,7 +279,7 @@ const DashboardProducts = () => {
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="productName">Name</Label>
-                <Input id="productName" placeholder={listingType === "service" ? "e.g. Hair braiding" : "e.g. Rolex wrap"} value={name} onChange={(e) => setName(e.target.value)} maxLength={100} />
+                <Input id="productName" placeholder={listingType === "service" ? "e.g. Birthday Party Package" : "e.g. Rolex wrap"} value={name} onChange={(e) => setName(e.target.value)} maxLength={100} />
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="productPrice">Price ({currency})</Label>
