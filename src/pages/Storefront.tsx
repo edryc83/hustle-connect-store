@@ -6,7 +6,7 @@ import { formatPrice } from "@/lib/currency";
 import AfristallLogo from "@/components/AfristallLogo";
 import { ProductImageCarousel } from "@/components/storefront/ProductImageCarousel";
 import { StorefrontHeader } from "@/components/storefront/StorefrontHeader";
-import { VisitorNameModal } from "@/components/storefront/VisitorNameModal";
+
 import { CartDrawer } from "@/components/storefront/CartDrawer";
 import { useTheme } from "@/hooks/useTheme";
 import { useAuth } from "@/hooks/useAuth";
