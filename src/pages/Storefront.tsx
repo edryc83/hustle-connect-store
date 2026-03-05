@@ -759,16 +759,9 @@ const StorefrontInner = () => {
             <Link to="/dashboard"><LayoutDashboard className="h-4 w-4" /></Link>
           </Button>
         ) : (
-          <>
-            {!user && (
-              <Button variant="ghost" size="icon" className="shrink-0 rounded-full text-muted-foreground" asChild>
-                <Link to="/login"><LogIn className="h-4 w-4" /></Link>
-              </Button>
-            )}
-            <Button size="sm" className="rounded-full text-xs bg-primary text-primary-foreground hover:bg-primary/90 backdrop-blur-sm" asChild>
-              <Link to="/">Create Your Store</Link>
-            </Button>
-          </>
+          <Button size="sm" className="rounded-full text-xs gap-1.5 bg-primary text-primary-foreground hover:bg-primary/90 backdrop-blur-sm" asChild>
+            <Link to="/"><Store className="h-3.5 w-3.5" /> Create Your Store</Link>
+          </Button>
         )}
       </div>
 
