@@ -26,7 +26,7 @@ export function ProductImageCarousel({ images, alt, listingType, className = "" 
   }
 
   if (images.length === 1) {
-    return <img src={images[0]} alt={alt} className={`h-full w-full object-cover ${className}`} loading="lazy" />;
+    return <img src={images[0]} alt={alt} className={`h-full w-full object-contain bg-secondary/50 ${className}`} loading="lazy" />;
   }
 
   const handleTouchStart = (e: React.TouchEvent) => {
@@ -56,7 +56,7 @@ export function ProductImageCarousel({ images, alt, listingType, className = "" 
       onTouchMove={handleTouchMove}
       onTouchEnd={handleTouchEnd}
     >
-      <img src={images[current]} alt={`${alt} ${current + 1}`} className="h-full w-full object-cover" loading="lazy" />
+      <img src={images[current]} alt={`${alt} ${current + 1}`} className="h-full w-full object-contain bg-secondary/50" loading="lazy" />
 
       {/* Dots */}
       <div className="absolute bottom-1.5 left-1/2 -translate-x-1/2 flex gap-1">
