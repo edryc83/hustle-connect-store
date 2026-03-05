@@ -109,7 +109,8 @@ const Explore = () => {
     });
   }, [countryStores, search, selectedCategory, selectedLocation]);
 
-  const hasFilters = selectedCategory !== "All" || selectedLocation !== "All" || search.trim();
+  const activeFilterCount = (selectedCategory !== "All" ? 1 : 0) + (selectedLocation !== "All" ? 1 : 0);
+  const hasFilters = activeFilterCount > 0 || search.trim() !== "";
 
   return (
     <div className="min-h-screen flex flex-col">
