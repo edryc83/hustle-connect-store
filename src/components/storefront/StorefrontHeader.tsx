@@ -118,11 +118,11 @@ export function StorefrontHeader({ profile, visitorName }: StorefrontHeaderProps
         )}
 
         {/* Message Button + Social Icons — inline row */}
-        <div className="flex items-center gap-2.5 max-w-sm pt-1">
+        <div className="flex items-center gap-2 pt-1">
           {profile.whatsapp_number && (
             <Button
-              size="lg"
-              className="flex-1 gap-2 text-base rounded-2xl h-12 bg-green-600 hover:bg-green-700 text-white shadow-lg shadow-green-600/20"
+              size="sm"
+              className="gap-1.5 text-sm rounded-xl h-9 px-5 bg-green-600 hover:bg-green-700 text-white shadow-sm"
               onClick={() => {
                 const cleanNumber = (profile.whatsapp_number ?? "").replace(/[^0-9+]/g, "").replace(/^\+/, "");
                 window.open(
@@ -131,7 +131,7 @@ export function StorefrontHeader({ profile, visitorName }: StorefrontHeaderProps
                 );
               }}
             >
-              <MessageCircle className="h-5 w-5" />
+              <MessageCircle className="h-4 w-4" />
               Message
             </Button>
           )}
