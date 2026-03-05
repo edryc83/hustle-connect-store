@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { Input } from "@/components/ui/input";
-import { Search, Store, MapPin, X } from "lucide-react";
+import { Search, Store, MapPin, X, SlidersHorizontal } from "lucide-react";
 import AfristallLogo from "@/components/AfristallLogo";
 import { categoriesToDisplay } from "@/components/CategoryPicker";
 
@@ -46,6 +46,7 @@ const Explore = () => {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [detectedCountry, setDetectedCountry] = useState<string | null>(null);
   const [selectedLocation, setSelectedLocation] = useState("All");
+  const [showFilters, setShowFilters] = useState(false);
 
   // Auto-detect country
   useEffect(() => {
@@ -124,65 +125,84 @@ const Explore = () => {
             <p className="text-muted-foreground mb-6 max-w-md mx-auto">
               Discover African sellers and shop via WhatsApp
             </p>
-            <div className="relative mx-auto max-w-md">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search stores…"
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="pl-10 h-11"
-              />
-              {search && (
-                <button
-                  onClick={() => setSearch("")}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                >
-                  <X className="h-4 w-4" />
-                </button>
-              )}
+            <div className="relative mx-auto max-w-md flex gap-2">
+              <div className="relative flex-1">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search stores…"
+                  value={search}
+                  onChange={(e) => setSearch(e.target.value)}
+                  className="pl-10 h-11"
+                />
+                {search && (
+                  <button
+                    onClick={() => setSearch("")}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                )}
+              </div>
+              <button
+                onClick={() => setShowFilters(!showFilters)}
+                className={`h-11 w-11 shrink-0 rounded-xl border flex items-center justify-center transition-colors ${
+                  showFilters || activeFilterCount > 0
+                    ? "border-primary bg-primary/10 text-primary"
+                    : "border-border text-muted-foreground hover:border-primary/30"
+                }`}
+              >
+                <SlidersHorizontal className="h-4 w-4" />
+                {activeFilterCount > 0 && (
+                  <span className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-primary text-[10px] font-bold text-primary-foreground flex items-center justify-center">
+                    {activeFilterCount}
+                  </span>
+                )}
+              </button>
             </div>
           </div>
         </section>
 
-        {/* Filters */}
-        <section className="border-b">
-          <div className="mx-auto max-w-5xl px-4 py-4 space-y-3">
-            {/* Categories */}
-            <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
-              {CATEGORIES.map((cat) => (
-                <button
-                  key={cat.label}
-                  onClick={() => setSelectedCategory(cat.label)}
-                  className={`flex items-center gap-1.5 whitespace-nowrap rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors ${
-                    selectedCategory === cat.label
-                      ? "border-primary bg-primary/10 text-primary"
-                      : "border-border text-muted-foreground hover:border-primary/30"
-                  }`}
-                >
-                  <span>{cat.icon}</span> {cat.label}
-                </button>
-              ))}
-            </div>
-            {/* City / District */}
-            {locationOptions.length > 1 && (
+        {/* Filters - collapsible */}
+        {showFilters && (
+          <section className="border-b animate-in slide-in-from-top-2 duration-200">
+            <div className="mx-auto max-w-5xl px-4 py-4 space-y-3">
+              {/* Categories */}
               <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
-                {locationOptions.map((loc) => (
+                {CATEGORIES.map((cat) => (
                   <button
-                    key={loc}
-                    onClick={() => setSelectedLocation(loc)}
-                    className={`flex items-center gap-1 whitespace-nowrap rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
-                      selectedLocation === loc
+                    key={cat.label}
+                    onClick={() => setSelectedCategory(cat.label)}
+                    className={`flex items-center gap-1.5 whitespace-nowrap rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors ${
+                      selectedCategory === cat.label
                         ? "border-primary bg-primary/10 text-primary"
                         : "border-border text-muted-foreground hover:border-primary/30"
                     }`}
                   >
-                    {loc !== "All" && <MapPin className="h-2.5 w-2.5" />} {loc}
+                    <span>{cat.icon}</span> {cat.label}
                   </button>
                 ))}
               </div>
-            )}
-          </div>
-        </section>
+              {/* City / District */}
+              {locationOptions.length > 1 && (
+                <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+                  {locationOptions.map((loc) => (
+                    <button
+                      key={loc}
+                      onClick={() => setSelectedLocation(loc)}
+                      className={`flex items-center gap-1 whitespace-nowrap rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
+                        selectedLocation === loc
+                          ? "border-primary bg-primary/10 text-primary"
+                          : "border-border text-muted-foreground hover:border-primary/30"
+                      }`}
+                    >
+                      {loc !== "All" && <MapPin className="h-2.5 w-2.5" />} {loc}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          </section>
+        )}
 
         {/* Results */}
         <section className="mx-auto max-w-5xl px-4 py-6">
