@@ -53,30 +53,32 @@ export function StorefrontHeader({ profile, visitorName }: StorefrontHeaderProps
         ) : null}
       </div>
 
-      <div className="mx-auto max-w-5xl px-4 -mt-12 pb-5 flex flex-col items-center text-center gap-2.5">
-        {/* Profile Picture */}
-        {profile.profile_picture_url ? (
-          <img
-            src={profile.profile_picture_url}
-            alt={profile.store_name ?? "Store"}
-            className="h-24 w-24 rounded-full object-cover border-4 border-background shadow-lg"
-          />
-        ) : (
-          <div className="flex h-24 w-24 items-center justify-center rounded-full bg-primary/10 border-4 border-background shadow-lg">
-            <AfristallLogo className="h-10 w-10" />
-          </div>
-        )}
-
-        {/* Store Name + slug */}
-        <div>
-          <h1 className="text-2xl font-extrabold tracking-tight">{profile.store_name}</h1>
-          {profile.store_slug && (
-            <p className="text-sm text-muted-foreground">@{profile.store_slug}</p>
+      <div className="mx-auto max-w-5xl px-4 -mt-10 pb-5 flex flex-col items-start gap-3">
+        {/* Profile Picture + Name row */}
+        <div className="flex items-end gap-3">
+          {profile.profile_picture_url ? (
+            <img
+              src={profile.profile_picture_url}
+              alt={profile.store_name ?? "Store"}
+              className="h-20 w-20 rounded-full object-cover border-4 border-background shadow-lg"
+            />
+          ) : (
+            <div className="flex h-20 w-20 items-center justify-center rounded-full bg-primary/10 border-4 border-background shadow-lg">
+              <AfristallLogo className="h-8 w-8" />
+            </div>
           )}
+
+          {/* Store Name + slug */}
+          <div className="pb-1">
+            <h1 className="text-xl font-extrabold tracking-tight leading-tight">{profile.store_name}</h1>
+            {profile.store_slug && (
+              <p className="text-sm text-muted-foreground">@{profile.store_slug}</p>
+            )}
+          </div>
         </div>
 
         {/* Main category + City — compact row */}
-        <div className="flex flex-wrap items-center justify-center gap-2 text-sm">
+        <div className="flex flex-wrap items-center gap-2 text-sm">
           {mainCat && (
             <span className="rounded-full bg-primary/10 px-3 py-0.5 text-xs font-medium text-primary">
               {mainCat}
@@ -110,13 +112,13 @@ export function StorefrontHeader({ profile, visitorName }: StorefrontHeaderProps
 
         {/* Bio */}
         {profile.store_bio && (
-          <p className="text-sm text-muted-foreground leading-relaxed max-w-md mx-auto">
+          <p className="text-sm text-muted-foreground leading-relaxed max-w-md">
             {profile.store_bio}
           </p>
         )}
 
         {/* Message Button + Social Icons — inline row */}
-        <div className="flex items-center justify-center gap-2.5 max-w-sm mx-auto pt-1">
+        <div className="flex items-center gap-2.5 max-w-sm pt-1">
           {profile.whatsapp_number && (
             <Button
               size="lg"

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Store, ShoppingBag, Share2, Copy, Check, Star, ShoppingCart, Sun, Moon, LogIn, LayoutDashboard, Minus, Plus, Heart } from "lucide-react";
+import { Store, ShoppingBag, Share2, Copy, Check, Star, ShoppingCart, Sun, Moon, LayoutDashboard, Minus, Plus, Heart } from "lucide-react";
 import { formatPrice } from "@/lib/currency";
 import AfristallLogo from "@/components/AfristallLogo";
 import { ProductImageCarousel } from "@/components/storefront/ProductImageCarousel";
@@ -759,16 +759,9 @@ const StorefrontInner = () => {
             <Link to="/dashboard"><LayoutDashboard className="h-4 w-4" /></Link>
           </Button>
         ) : (
-          <>
-            {!user && (
-              <Button variant="ghost" size="icon" className="shrink-0 rounded-full text-muted-foreground" asChild>
-                <Link to="/login"><LogIn className="h-4 w-4" /></Link>
-              </Button>
-            )}
-            <Button size="sm" className="rounded-full text-xs bg-primary text-primary-foreground hover:bg-primary/90 backdrop-blur-sm" asChild>
-              <Link to="/">Create Your Store</Link>
-            </Button>
-          </>
+          <Button size="sm" className="rounded-full text-xs gap-1.5 bg-primary text-primary-foreground hover:bg-primary/90 backdrop-blur-sm" asChild>
+            <Link to="/"><Store className="h-3.5 w-3.5" /> Create Your Store</Link>
+          </Button>
         )}
       </div>
 
