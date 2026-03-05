@@ -193,6 +193,7 @@ export type Database = {
           delivery_areas: string | null
           district: string | null
           email: string | null
+          facebook_url: string | null
           first_name: string | null
           id: string
           instagram_url: string | null
@@ -223,6 +224,7 @@ export type Database = {
           delivery_areas?: string | null
           district?: string | null
           email?: string | null
+          facebook_url?: string | null
           first_name?: string | null
           id: string
           instagram_url?: string | null
@@ -253,6 +255,7 @@ export type Database = {
           delivery_areas?: string | null
           district?: string | null
           email?: string | null
+          facebook_url?: string | null
           first_name?: string | null
           id?: string
           instagram_url?: string | null
