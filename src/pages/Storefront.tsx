@@ -338,9 +338,12 @@ function ProductDetailView({
 
       <main className="mx-auto max-w-2xl px-4 py-6 space-y-6">
         {/* Main Image */}
-        <div className="aspect-square rounded-2xl overflow-hidden bg-muted border border-border/40">
+        <div className="aspect-square rounded-2xl overflow-hidden bg-muted border border-border/40 relative">
           {images.length > 0 ? (
-            <img src={images[selectedImg]} alt={product.name} className="h-full w-full object-contain bg-secondary/50" />
+            <>
+              <img src={images[selectedImg]} alt="" className="absolute inset-0 h-full w-full object-cover scale-110 blur-2xl opacity-60" aria-hidden="true" />
+              <img src={images[selectedImg]} alt={product.name} className="relative h-full w-full object-contain" />
+            </>
           ) : (
             <div className="flex h-full w-full items-center justify-center">
               <ShoppingBag className="h-12 w-12 text-muted-foreground/30" />
@@ -548,9 +551,12 @@ function ProductDetailView({
                     onClick={() => onNavigate(p.id)}
                     className="rounded-xl border border-border/60 bg-card p-2 text-left hover:shadow-md transition-shadow"
                   >
-                    <div className="aspect-square rounded-lg overflow-hidden bg-muted/30 border border-border/30 mb-2">
+                    <div className="aspect-square rounded-lg overflow-hidden bg-muted/30 border border-border/30 mb-2 relative">
                       {pImgs[0] ? (
-                        <img src={pImgs[0]} alt={p.name} className="h-full w-full object-contain bg-secondary/50" />
+                        <>
+                          <img src={pImgs[0]} alt="" className="absolute inset-0 h-full w-full object-cover scale-110 blur-2xl opacity-60" aria-hidden="true" />
+                          <img src={pImgs[0]} alt={p.name} className="relative h-full w-full object-contain" />
+                        </>
                       ) : (
                         <div className="flex h-full w-full items-center justify-center">
                           <ShoppingBag className="h-6 w-6 text-muted-foreground/20" />
