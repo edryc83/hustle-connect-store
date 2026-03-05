@@ -6,7 +6,7 @@ import { formatPrice } from "@/lib/currency";
 import AfristallLogo from "@/components/AfristallLogo";
 import { ProductImageCarousel } from "@/components/storefront/ProductImageCarousel";
 import { StorefrontHeader } from "@/components/storefront/StorefrontHeader";
-import { VisitorNameModal } from "@/components/storefront/VisitorNameModal";
+
 import { CartDrawer } from "@/components/storefront/CartDrawer";
 import { useTheme } from "@/hooks/useTheme";
 import { useAuth } from "@/hooks/useAuth";
@@ -598,7 +598,6 @@ const StorefrontInner = () => {
   const [notFound, setNotFound] = useState(false);
   const [productImagesMap, setProductImagesMap] = useState<Record<string, string[]>>({});
   const [visitorName, setVisitorName] = useState<string | null>(null);
-  const [showNameModal, setShowNameModal] = useState(false);
   const [filters, setFilters] = useState<FilterState>({ search: "", category: "", condition: "", priceRange: null });
 
   // Load visitor name from localStorage
@@ -606,10 +605,6 @@ const StorefrontInner = () => {
     const stored = localStorage.getItem(`visitor_name_${storeSlug}`);
     if (stored) {
       setVisitorName(stored);
-    } else {
-      // Show modal after a short delay so page loads first
-      const timer = setTimeout(() => setShowNameModal(true), 800);
-      return () => clearTimeout(timer);
     }
   }, [storeSlug]);
 
@@ -698,11 +693,6 @@ const StorefrontInner = () => {
     }
   }, []);
 
-  const handleVisitorName = (name: string) => {
-    localStorage.setItem(`visitor_name_${storeSlug}`, name);
-    setVisitorName(name);
-    setShowNameModal(false);
-  };
 
   if (loading) {
     return (
@@ -761,12 +751,6 @@ const StorefrontInner = () => {
   // Shop view
   return (
     <div className="min-h-screen bg-background">
-      {/* Visitor Name Modal */}
-      <VisitorNameModal
-        open={showNameModal}
-        storeName={profile.store_name ?? "this store"}
-        onSubmit={handleVisitorName}
-      />
 
       {/* Floating top-left: Dashboard / Sign In + Create Store for non-owners */}
       <div className="fixed top-4 left-4 z-30 flex items-center gap-2">
