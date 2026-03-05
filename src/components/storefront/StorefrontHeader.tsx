@@ -153,10 +153,10 @@ export function StorefrontHeader({ profile, visitorName }: StorefrontHeaderProps
               href={tt}
               target="_blank"
               rel="noopener noreferrer"
-              className="h-12 w-12 shrink-0 rounded-2xl border border-border/60 bg-background flex items-center justify-center hover:bg-muted transition-colors shadow-sm"
+              className="h-9 w-9 shrink-0 rounded-xl border border-border/60 bg-background flex items-center justify-center hover:bg-muted transition-colors"
               aria-label="TikTok"
             >
-              <svg viewBox="0 0 448 512" className="h-5 w-5 fill-current"><path d="M448 209.91a210.06 210.06 0 01-122.77-39.25v178.72A162.55 162.55 0 11185 188.31v89.89a74.62 74.62 0 1052.23 71.18V0h88a121 121 0 00.2 13.46 121.74 121.74 0 0068.18 89.41 120.42 120.42 0 0054.39 17.13z"/></svg>
+              <svg viewBox="0 0 448 512" className="h-4 w-4 fill-current"><path d="M448 209.91a210.06 210.06 0 01-122.77-39.25v178.72A162.55 162.55 0 11185 188.31v89.89a74.62 74.62 0 1052.23 71.18V0h88a121 121 0 00.2 13.46 121.74 121.74 0 0068.18 89.41 120.42 120.42 0 0054.39 17.13z"/></svg>
             </a>
           )}
 
@@ -165,10 +165,10 @@ export function StorefrontHeader({ profile, visitorName }: StorefrontHeaderProps
               href={fb}
               target="_blank"
               rel="noopener noreferrer"
-              className="h-12 w-12 shrink-0 rounded-2xl border border-border/60 bg-background flex items-center justify-center hover:bg-muted transition-colors shadow-sm"
+              className="h-9 w-9 shrink-0 rounded-xl border border-border/60 bg-background flex items-center justify-center hover:bg-muted transition-colors"
               aria-label="Facebook"
             >
-              <svg viewBox="0 0 24 24" className="h-5 w-5 fill-current"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+              <svg viewBox="0 0 24 24" className="h-4 w-4 fill-current"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
             </a>
           )}
         </div>
