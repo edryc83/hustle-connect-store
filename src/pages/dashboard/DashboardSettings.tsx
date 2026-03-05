@@ -66,6 +66,7 @@ const DashboardSettings = () => {
   const [welcomeMessage, setWelcomeMessage] = useState("");
   const [instagramUrl, setInstagramUrl] = useState("");
   const [tiktokUrl, setTiktokUrl] = useState("");
+  const [facebookUrl, setFacebookUrl] = useState("");
   const [aiAssistantEnabled, setAiAssistantEnabled] = useState(true);
   const [productCount, setProductCount] = useState(0);
 
@@ -73,7 +74,7 @@ const DashboardSettings = () => {
     if (!user) return;
     supabase
       .from("profiles")
-      .select("first_name, profile_picture_url, store_name, store_slug, whatsapp_number, city, store_bio, category, delivery_areas, currency, welcome_message, cover_photo_url, country, district, street, shop_number, building, is_online_only, instagram_url, tiktok_url, ai_assistant_enabled")
+      .select("first_name, profile_picture_url, store_name, store_slug, whatsapp_number, city, store_bio, category, delivery_areas, currency, welcome_message, cover_photo_url, country, district, street, shop_number, building, is_online_only, instagram_url, tiktok_url, facebook_url, ai_assistant_enabled")
       .eq("id", user.id)
       .single()
       .then(({ data }) => {
@@ -93,6 +94,7 @@ const DashboardSettings = () => {
           setIsOnlineOnly(d.is_online_only ?? false);
           setInstagramUrl(d.instagram_url ?? "");
           setTiktokUrl(d.tiktok_url ?? "");
+          setFacebookUrl(d.facebook_url ?? "");
           setAiAssistantEnabled(d.ai_assistant_enabled !== false);
           setCategories(deserializeCategories(d.category));
           setDeliveryAreas(d.delivery_areas ?? "");
@@ -234,6 +236,7 @@ const DashboardSettings = () => {
         welcome_message: welcomeMessage.trim() || null,
         instagram_url: instagramUrl.trim() || null,
         tiktok_url: tiktokUrl.trim() || null,
+        facebook_url: facebookUrl.trim() || null,
         ai_assistant_enabled: aiAssistantEnabled,
       } as any)
       .eq("id", user.id);
@@ -523,6 +526,14 @@ const DashboardSettings = () => {
               value={tiktokUrl}
               onChange={(e) => setTiktokUrl(e.target.value)}
               placeholder="e.g. https://tiktok.com/@yourstore"
+            />
+          </div>
+          <div className="space-y-1.5">
+            <Label>Facebook</Label>
+            <Input
+              value={facebookUrl}
+              onChange={(e) => setFacebookUrl(e.target.value)}
+              placeholder="e.g. https://facebook.com/yourstore"
             />
           </div>
 
