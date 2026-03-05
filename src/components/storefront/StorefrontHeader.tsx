@@ -53,53 +53,55 @@ export function StorefrontHeader({ profile, visitorName }: StorefrontHeaderProps
         ) : null}
       </div>
 
-      <div className="mx-auto max-w-5xl px-4 -mt-10 pb-5 flex flex-col items-start gap-3">
-        {/* Profile Picture + Name row */}
-        <div className="flex items-end gap-3">
-          {profile.profile_picture_url ? (
-            <img
-              src={profile.profile_picture_url}
-              alt={profile.store_name ?? "Store"}
-              className="h-20 w-20 rounded-full object-cover border-4 border-background shadow-lg"
-            />
-          ) : (
-            <div className="flex h-20 w-20 items-center justify-center rounded-full bg-primary/10 border-4 border-background shadow-lg">
-              <AfristallLogo className="h-8 w-8" />
-            </div>
-          )}
-
-          {/* Store Name + slug */}
-          <div className="pb-1">
-            <h1 className="text-xl font-extrabold tracking-tight leading-tight">{profile.store_name}</h1>
-            {profile.store_slug && (
-              <p className="text-sm text-muted-foreground">@{profile.store_slug}</p>
-            )}
+      <div className="mx-auto max-w-5xl px-4 -mt-10 pb-5 flex flex-col items-start gap-1.5">
+        {/* Profile Picture */}
+        {profile.profile_picture_url ? (
+          <img
+            src={profile.profile_picture_url}
+            alt={profile.store_name ?? "Store"}
+            className="h-20 w-20 rounded-full object-cover border-4 border-background shadow-lg"
+          />
+        ) : (
+          <div className="flex h-20 w-20 items-center justify-center rounded-full bg-primary/10 border-4 border-background shadow-lg">
+            <AfristallLogo className="h-8 w-8" />
           </div>
-        </div>
+        )}
 
-        {/* Main category + City — compact row */}
-        <div className="flex flex-wrap items-center gap-2 text-sm">
-          {mainCat && (
-            <span className="rounded-full bg-primary/10 px-3 py-0.5 text-xs font-medium text-primary">
-              {mainCat}
-            </span>
-          )}
-          {profile.city && (
-            <span className="flex items-center gap-1 text-muted-foreground text-xs">
-              <MapPin className="h-3 w-3" /> {profile.city}
-            </span>
-          )}
-        </div>
+        {/* Store Name */}
+        <h1 className="text-xl font-extrabold tracking-tight leading-tight mt-1">{profile.store_name}</h1>
 
-        {/* Physical shop location */}
-        {hasPhysicalAddress && (
-          <p className="text-xs text-muted-foreground">
-            📍 {addressParts.join(", ")}
+        {/* Username */}
+        {profile.store_slug && (
+          <p className="text-sm text-muted-foreground -mt-0.5">@{profile.store_slug}</p>
+        )}
+
+        {/* Bio — two line max */}
+        {profile.store_bio && (
+          <p className="text-sm text-muted-foreground leading-relaxed max-w-md line-clamp-2">
+            {profile.store_bio}
           </p>
         )}
 
+        {/* Category badge */}
+        {mainCat && (
+          <span className="rounded-full bg-primary/10 px-3 py-0.5 text-xs font-medium text-primary mt-1">
+            {mainCat}
+          </span>
+        )}
+
+        {/* Online / Physical location */}
         {(profile as any).is_online_only && (
           <p className="text-xs text-muted-foreground">🌐 Online Store</p>
+        )}
+        {hasPhysicalAddress && (
+          <p className="text-xs text-muted-foreground">
+            📍 {addressParts.join(", ")}{profile.city ? `, ${profile.city}` : ""}
+          </p>
+        )}
+        {!hasPhysicalAddress && !((profile as any).is_online_only) && profile.city && (
+          <span className="flex items-center gap-1 text-muted-foreground text-xs">
+            <MapPin className="h-3 w-3" /> {profile.city}
+          </span>
         )}
 
         {/* Delivery Areas */}
@@ -108,13 +110,6 @@ export function StorefrontHeader({ profile, visitorName }: StorefrontHeaderProps
             <MapPin className="h-3 w-3" />
             <span>Delivers to: {(profile as any).delivery_areas}</span>
           </div>
-        )}
-
-        {/* Bio */}
-        {profile.store_bio && (
-          <p className="text-sm text-muted-foreground leading-relaxed max-w-md">
-            {profile.store_bio}
-          </p>
         )}
 
         {/* Message Button + Social Icons — inline row */}
