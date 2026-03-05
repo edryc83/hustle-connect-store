@@ -134,7 +134,7 @@ function ProductCard({
 
   return (
     <div
-      className="group cursor-pointer rounded-2xl border border-border/60 bg-card p-2.5 shadow-sm hover:shadow-md transition-shadow"
+      className="group cursor-pointer rounded-2xl border border-border/60 bg-card p-1.5 shadow-sm hover:shadow-md transition-shadow"
       onClick={onClick}
     >
       {/* Framed Image */}
@@ -192,8 +192,8 @@ function ProductCard({
           </div>
         )}
         <div className="flex items-center justify-between gap-1 pt-0.5">
-          <div className="flex items-baseline gap-1.5 min-w-0">
-            <p className="font-bold text-sm truncate">{formatPrice(Number(displayPrice), currency)}</p>
+          <div className="flex flex-col min-w-0">
+            <p className="font-extrabold text-sm truncate">{formatPrice(Number(displayPrice), currency)}</p>
             {hasDiscount && (
               <p className="text-[10px] text-muted-foreground line-through shrink-0">{formatPrice(Number(product.price), currency)}</p>
             )}
@@ -765,8 +765,8 @@ const StorefrontInner = () => {
                 <Link to="/login"><LogIn className="h-4 w-4" /></Link>
               </Button>
             )}
-            <Button variant="outline" size="sm" className="rounded-full text-xs gap-1.5 bg-background/80 backdrop-blur-sm" asChild>
-              <Link to="/"><Store className="h-3.5 w-3.5" /> Create Store</Link>
+            <Button size="sm" className="rounded-full text-xs bg-primary text-primary-foreground hover:bg-primary/90 backdrop-blur-sm" asChild>
+              <Link to="/">Create Your Store</Link>
             </Button>
           </>
         )}
