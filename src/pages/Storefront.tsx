@@ -340,7 +340,7 @@ function ProductDetailView({
         {/* Main Image */}
         <div className="aspect-square rounded-2xl overflow-hidden bg-muted border border-border/40">
           {images.length > 0 ? (
-            <img src={images[selectedImg]} alt={product.name} className="h-full w-full object-cover" />
+            <img src={images[selectedImg]} alt={product.name} className="h-full w-full object-contain bg-secondary/50" />
           ) : (
             <div className="flex h-full w-full items-center justify-center">
               <ShoppingBag className="h-12 w-12 text-muted-foreground/30" />
@@ -550,7 +550,7 @@ function ProductDetailView({
                   >
                     <div className="aspect-square rounded-lg overflow-hidden bg-muted/30 border border-border/30 mb-2">
                       {pImgs[0] ? (
-                        <img src={pImgs[0]} alt={p.name} className="h-full w-full object-cover" />
+                        <img src={pImgs[0]} alt={p.name} className="h-full w-full object-contain bg-secondary/50" />
                       ) : (
                         <div className="flex h-full w-full items-center justify-center">
                           <ShoppingBag className="h-6 w-6 text-muted-foreground/20" />
