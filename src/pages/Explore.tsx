@@ -32,10 +32,10 @@ const CATEGORIES = [
   { label: "Other", icon: "📦" },
 ];
 
-const COUNTRIES = ["All", "Uganda", "Kenya", "Nigeria", "Ghana", "Tanzania", "Rwanda", "South Africa"];
+
 
 function getLocationLabel(store: StoreProfile) {
-  const parts = [store.city, store.district, store.country].filter(Boolean);
+  const parts = [store.city, store.district].filter(Boolean);
   return parts.length > 0 ? parts.join(", ") : null;
 }
 
@@ -44,8 +44,18 @@ const Explore = () => {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("All");
-  const [selectedCountry, setSelectedCountry] = useState("All");
+  const [detectedCountry, setDetectedCountry] = useState<string | null>(null);
   const [selectedLocation, setSelectedLocation] = useState("All");
+
+  // Auto-detect country
+  useEffect(() => {
+    fetch("https://ipapi.co/json/")
+      .then((r) => r.json())
+      .then((data) => {
+        if (data?.country_name) setDetectedCountry(data.country_name);
+      })
+      .catch(() => {});
+  }, []);
 
   useEffect(() => {
     const fetchStores = async () => {
@@ -61,42 +71,44 @@ const Explore = () => {
     fetchStores();
   }, []);
 
-  // Build dynamic location options from stores matching the selected country
+  // Filter stores by detected country first
+  const countryStores = useMemo(() => {
+    if (!detectedCountry) return stores;
+    const local = stores.filter((s) => s.country?.toLowerCase() === detectedCountry.toLowerCase());
+    return local.length > 0 ? local : stores;
+  }, [stores, detectedCountry]);
+
   const locationOptions = useMemo(() => {
     const locs = new Set<string>();
-    stores.forEach((s) => {
-      if (selectedCountry !== "All" && s.country !== selectedCountry) return;
+    countryStores.forEach((s) => {
       if (s.city) locs.add(s.city);
       if (s.district) locs.add(s.district);
     });
     return ["All", ...Array.from(locs).sort()];
-  }, [stores, selectedCountry]);
+  }, [countryStores]);
 
   const filtered = useMemo(() => {
-    return stores.filter((s) => {
+    return countryStores.filter((s) => {
       const q = search.trim().toLowerCase().replace(/^@/, "");
       const matchesSearch =
         !q ||
         s.store_name?.toLowerCase().includes(q) ||
         s.store_slug?.toLowerCase().includes(q) ||
         s.category?.toLowerCase().includes(q) ||
-        s.country?.toLowerCase().includes(q) ||
         s.city?.toLowerCase().includes(q) ||
         s.district?.toLowerCase().includes(q);
       const matchesCategory =
         selectedCategory === "All" ||
         (s.category && s.category.toLowerCase().includes(selectedCategory.toLowerCase()));
-      const matchesCountry =
-        selectedCountry === "All" || s.country === selectedCountry;
       const matchesLocation =
         selectedLocation === "All" ||
         s.city === selectedLocation ||
         s.district === selectedLocation;
-      return matchesSearch && matchesCategory && matchesCountry && matchesLocation;
+      return matchesSearch && matchesCategory && matchesLocation;
     });
-  }, [stores, search, selectedCategory, selectedCountry, selectedLocation]);
+  }, [countryStores, search, selectedCategory, selectedLocation]);
 
-  const hasFilters = selectedCategory !== "All" || selectedCountry !== "All" || selectedLocation !== "All" || search.trim();
+  const hasFilters = selectedCategory !== "All" || selectedLocation !== "All" || search.trim();
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -151,22 +163,6 @@ const Explore = () => {
                 </button>
               ))}
             </div>
-            {/* Countries */}
-            <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
-              {COUNTRIES.map((c) => (
-                <button
-                  key={c}
-                  onClick={() => { setSelectedCountry(c); setSelectedLocation("All"); }}
-                  className={`flex items-center gap-1 whitespace-nowrap rounded-full border px-3 py-1.5 text-sm font-medium transition-colors ${
-                    selectedCountry === c
-                      ? "border-primary bg-primary/10 text-primary"
-                      : "border-border text-muted-foreground hover:border-primary/30"
-                  }`}
-                >
-                  {c !== "All" && <MapPin className="h-3 w-3" />} {c}
-                </button>
-              ))}
-            </div>
             {/* City / District */}
             {locationOptions.length > 1 && (
               <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
@@ -201,7 +197,7 @@ const Explore = () => {
               </p>
               {hasFilters && (
                 <button
-                  onClick={() => { setSearch(""); setSelectedCategory("All"); setSelectedCountry("All"); setSelectedLocation("All"); }}
+                  onClick={() => { setSearch(""); setSelectedCategory("All"); setSelectedLocation("All"); }}
                   className="text-sm text-primary font-medium hover:underline"
                 >
                   Clear all filters
