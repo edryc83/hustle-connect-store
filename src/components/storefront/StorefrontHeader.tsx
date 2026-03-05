@@ -78,7 +78,7 @@ export function StorefrontHeader({ profile, visitorName }: StorefrontHeaderProps
         </div>
 
         {/* Main category + City — compact row */}
-        <div className="flex flex-wrap items-center justify-center gap-2 text-sm">
+        <div className="flex flex-wrap items-center gap-2 text-sm">
           {mainCat && (
             <span className="rounded-full bg-primary/10 px-3 py-0.5 text-xs font-medium text-primary">
               {mainCat}
@@ -112,13 +112,13 @@ export function StorefrontHeader({ profile, visitorName }: StorefrontHeaderProps
 
         {/* Bio */}
         {profile.store_bio && (
-          <p className="text-sm text-muted-foreground leading-relaxed max-w-md mx-auto">
+          <p className="text-sm text-muted-foreground leading-relaxed max-w-md">
             {profile.store_bio}
           </p>
         )}
 
         {/* Message Button + Social Icons — inline row */}
-        <div className="flex items-center justify-center gap-2.5 max-w-sm mx-auto pt-1">
+        <div className="flex items-center gap-2.5 max-w-sm pt-1">
           {profile.whatsapp_number && (
             <Button
               size="lg"
