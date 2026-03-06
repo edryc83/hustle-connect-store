@@ -1,3 +1,5 @@
+import whatsappIcon from "@/assets/whatsapp-icon.png";
+
 interface StoreAssistantProps {
   whatsappNumber: string;
 }
