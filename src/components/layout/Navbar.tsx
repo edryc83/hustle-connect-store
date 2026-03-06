@@ -21,6 +21,13 @@ const Navbar = () => {
 
         {/* Desktop nav */}
         <div className="hidden items-center gap-3 sm:flex">
+          <button
+            onClick={toggleTheme}
+            className="h-9 w-9 rounded-xl border border-border/50 bg-card/40 backdrop-blur-sm flex items-center justify-center hover:bg-muted transition-colors"
+            aria-label="Toggle theme"
+          >
+            {theme === "light" ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
+          </button>
           <Link to="/explore">
             <Button variant="ghost" size="sm">Explore Stores</Button>
           </Link>
@@ -32,13 +39,21 @@ const Navbar = () => {
           </Link>
         </div>
 
-        {/* Mobile hamburger */}
-        <button
-          className="sm:hidden p-2"
-          onClick={() => setMobileOpen(!mobileOpen)}
-        >
-          {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-        </button>
+        <div className="flex items-center gap-2 sm:hidden">
+          <button
+            onClick={toggleTheme}
+            className="h-9 w-9 rounded-xl border border-border/50 bg-card/40 flex items-center justify-center"
+            aria-label="Toggle theme"
+          >
+            {theme === "light" ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
+          </button>
+          <button
+            className="p-2"
+            onClick={() => setMobileOpen(!mobileOpen)}
+          >
+            {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
+          </button>
+        </div>
       </div>
 
       {/* Mobile menu */}
