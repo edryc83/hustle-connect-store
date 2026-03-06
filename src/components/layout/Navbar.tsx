@@ -1,8 +1,9 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Sun, Moon } from "lucide-react";
 import { useState } from "react";
 import AfristallLogo from "@/components/AfristallLogo";
+import { useTheme } from "@/hooks/useTheme";
 
 const Navbar = () => {
   const [mobileOpen, setMobileOpen] = useState(false);

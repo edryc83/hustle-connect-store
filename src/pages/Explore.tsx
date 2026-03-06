@@ -238,7 +238,7 @@ const Explore = () => {
                     <Link key={store.id} to={`/${store.store_slug}`}>
                       <div className="group rounded-2xl border border-border/50 bg-card/60 backdrop-blur-xl overflow-hidden transition-all hover:shadow-lg hover:border-primary/20 h-full">
                         {/* Cover Photo */}
-                        <div className="h-24 bg-gradient-to-br from-primary/10 to-primary/5 overflow-hidden">
+                        <div className="h-24 bg-gradient-to-br from-primary/10 to-primary/5">
                           {store.cover_photo_url ? (
                             <img
                               src={store.cover_photo_url}
