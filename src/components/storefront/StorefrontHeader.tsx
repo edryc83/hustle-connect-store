@@ -1,6 +1,5 @@
-import { MapPin, MessageCircle } from "lucide-react";
+import { MapPin } from "lucide-react";
 import AfristallLogo from "@/components/AfristallLogo";
-import { Button } from "@/components/ui/button";
 import type { Tables } from "@/integrations/supabase/types";
 
 type Profile = Tables<"profiles">;
@@ -112,24 +111,8 @@ export function StorefrontHeader({ profile, visitorName }: StorefrontHeaderProps
           </div>
         )}
 
-        {/* Message Button + Social Icons — inline row */}
+        {/* Social Icons */}
         <div className="flex items-center gap-2 pt-1">
-          {profile.whatsapp_number && (
-            <Button
-              size="sm"
-              className="gap-1.5 text-sm rounded-xl h-9 px-5 bg-green-600 hover:bg-green-700 text-white shadow-sm"
-              onClick={() => {
-                const cleanNumber = (profile.whatsapp_number ?? "").replace(/[^0-9+]/g, "").replace(/^\+/, "");
-                window.open(
-                  `https://wa.me/${cleanNumber}?text=${encodeURIComponent(`Hi! I'm browsing your store on Afristall 🛍️`)}`,
-                  "_blank"
-                );
-              }}
-            >
-              <MessageCircle className="h-4 w-4" />
-              Message
-            </Button>
-          )}
 
           {ig && (
             <a
