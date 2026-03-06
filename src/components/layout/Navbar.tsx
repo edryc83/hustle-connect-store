@@ -21,13 +21,6 @@ const Navbar = () => {
 
         {/* Desktop nav */}
         <div className="hidden items-center gap-3 sm:flex">
-          <button
-            onClick={toggleTheme}
-            className="h-9 w-9 rounded-xl border border-border/50 bg-card/40 backdrop-blur-sm flex items-center justify-center hover:bg-muted transition-colors"
-            aria-label="Toggle theme"
-          >
-            {theme === "light" ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
-          </button>
           <Link to="/explore">
             <Button variant="ghost" size="sm">Explore Stores</Button>
           </Link>
@@ -37,6 +30,13 @@ const Navbar = () => {
           <Link to="/signup">
             <Button size="sm" className="shadow-sm shadow-primary/20">Create Your Store</Button>
           </Link>
+          <button
+            onClick={toggleTheme}
+            className="h-9 w-9 rounded-xl border border-border/50 bg-card/40 backdrop-blur-sm flex items-center justify-center hover:bg-muted transition-colors"
+            aria-label="Toggle theme"
+          >
+            {theme === "light" ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
+          </button>
         </div>
 
         <div className="flex items-center gap-2 sm:hidden">
