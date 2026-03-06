@@ -912,14 +912,10 @@ const StorefrontInner = () => {
         visitorName={visitorName}
       />
 
-      {/* AI Store Assistant */}
-      {(profile as any).ai_assistant_enabled !== false && (
+      {/* WhatsApp Button */}
+      {profile.whatsapp_number && (
         <StoreAssistantButton
-          storeSlug={storeSlug ?? ""}
-          storeName={profile.store_name ?? "Store"}
-          profilePicUrl={profile.profile_picture_url}
-          whatsappNumber={profile.whatsapp_number ?? ""}
-          sellerId={profile.id}
+          whatsappNumber={profile.whatsapp_number}
         />
       )}
     </div>
