@@ -140,6 +140,36 @@ const DashboardProducts = () => {
     setDialogOpen(true);
   };
 
+  const analyzeImage = async (file: File) => {
+    setAnalyzing(true);
+    try {
+      const reader = new FileReader();
+      const base64 = await new Promise<string>((resolve) => {
+        reader.onload = () => {
+          const result = reader.result as string;
+          resolve(result.split(",")[1]);
+        };
+        reader.readAsDataURL(file);
+      });
+
+      const { data, error } = await supabase.functions.invoke("analyze-product-image", {
+        body: { imageBase64: base64, mimeType: file.type },
+      });
+
+      if (error) throw error;
+      if (data) {
+        if (data.name && !name.trim()) setName(data.name);
+        if (data.description && !description.trim()) setDescription(data.description);
+        if (data.condition && !condition) setCondition(data.condition);
+        if (data.listing_type) setListingType(data.listing_type);
+        toast.success("Product details auto-filled from image! ✨");
+      }
+    } catch {
+      // Silent fail — user can still fill manually
+    }
+    setAnalyzing(false);
+  };
+
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files ?? []);
     const totalImages = existingImages.length + imagePreviews.length + files.length;
@@ -149,6 +179,12 @@ const DashboardProducts = () => {
     }
     setImageFiles((prev) => [...prev, ...files]);
     setImagePreviews((prev) => [...prev, ...files.map((f) => URL.createObjectURL(f))]);
+
+    // Auto-analyze the first image if no name has been entered yet
+    const isFirstImage = existingImages.length === 0 && imagePreviews.length === 0;
+    if (isFirstImage && files.length > 0 && !name.trim()) {
+      analyzeImage(files[0]);
+    }
   };
 
   const removeExistingImage = (idx: number) => setExistingImages((prev) => prev.filter((_, i) => i !== idx));
