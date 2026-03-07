@@ -55,6 +55,7 @@ const DashboardProducts = () => {
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [currency, setCurrency] = useState("UGX");
   const [generatingDesc, setGeneratingDesc] = useState(false);
+  const [analyzing, setAnalyzing] = useState(false);
 
   // Form state
   const [name, setName] = useState("");
