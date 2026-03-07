@@ -215,6 +215,32 @@ const DashboardSettings = () => {
       return;
     }
 
+    const normalizeSocialUrl = (value: string, platform: "instagram" | "tiktok" | "facebook") => {
+      const raw = value.trim();
+      if (!raw) return null;
+      if (/^https?:\/\//i.test(raw)) return raw;
+
+      const cleaned = raw.replace(/^\/+/, "");
+
+      if (platform === "instagram") {
+        const handle = cleaned.replace(/^@/, "");
+        return cleaned.toLowerCase().includes("instagram.com/")
+          ? `https://${cleaned}`
+          : `https://instagram.com/${handle}`;
+      }
+
+      if (platform === "tiktok") {
+        if (cleaned.toLowerCase().includes("tiktok.com/")) return `https://${cleaned}`;
+        const handle = cleaned.startsWith("@") ? cleaned : `@${cleaned}`;
+        return `https://tiktok.com/${handle}`;
+      }
+
+      const page = cleaned.replace(/^@/, "");
+      return cleaned.toLowerCase().includes("facebook.com/")
+        ? `https://${cleaned}`
+        : `https://facebook.com/${page}`;
+    };
+
     setSaving(true);
     const { error } = await supabase
       .from("profiles")
@@ -224,7 +250,7 @@ const DashboardSettings = () => {
         whatsapp_number: whatsappNumber.trim(),
         country: country.trim() || null,
         district: district.trim() || null,
-        city: city.trim(),
+        city: city.trim() || null,
         street: street.trim() || null,
         shop_number: isOnlineOnly ? null : shopNumber.trim() || null,
         building: isOnlineOnly ? null : building.trim() || null,
@@ -234,9 +260,9 @@ const DashboardSettings = () => {
         delivery_areas: deliveryAreas.trim() || null,
         currency: currency,
         welcome_message: welcomeMessage.trim() || null,
-        instagram_url: instagramUrl.trim() || null,
-        tiktok_url: tiktokUrl.trim() || null,
-        facebook_url: facebookUrl.trim() || null,
+        instagram_url: normalizeSocialUrl(instagramUrl, "instagram"),
+        tiktok_url: normalizeSocialUrl(tiktokUrl, "tiktok"),
+        facebook_url: normalizeSocialUrl(facebookUrl, "facebook"),
         ai_assistant_enabled: aiAssistantEnabled,
       } as any)
       .eq("id", user.id);
@@ -424,16 +450,17 @@ const DashboardSettings = () => {
           {/* Location */}
           <div className="space-y-1.5">
             <Label>Country</Label>
-            <Select value={country} onValueChange={setCountry}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select country" />
-              </SelectTrigger>
-              <SelectContent>
-                {COUNTRIES.map((c) => (
-                  <SelectItem key={c} value={c}>{c}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Input
+              value={country}
+              onChange={(e) => setCountry(e.target.value)}
+              placeholder="e.g. Uganda"
+              list="country-options"
+            />
+            <datalist id="country-options">
+              {COUNTRIES.map((c) => (
+                <option key={c} value={c} />
+              ))}
+            </datalist>
           </div>
 
           <div className="space-y-1.5">
