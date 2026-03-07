@@ -469,6 +469,19 @@ function ProductDetailView({
             <span className="font-bold text-lg">{formatPrice(Number(displayPrice) * qty, currency)}</span>
           </div>
 
+          {/* Delivery Address */}
+          <div className="space-y-1.5">
+            <Label htmlFor="deliveryAddr" className="text-sm font-medium">Delivery address (optional)</Label>
+            <Textarea
+              id="deliveryAddr"
+              placeholder="Where should we deliver? e.g. Plot 12, Kampala Road"
+              rows={2}
+              value={deliveryAddress}
+              onChange={(e) => setDeliveryAddress(e.target.value)}
+              className="text-sm"
+            />
+          </div>
+
           <div className="flex gap-3">
             <Button
               size="lg"

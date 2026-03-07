@@ -28,6 +28,7 @@ export function OrderModal({ product, whatsappNumber, storeName, sellerId, curre
   const [quantity, setQuantity] = useState("1");
   const [notes, setNotes] = useState("");
   const [variant, setVariant] = useState("");
+  const [deliveryAddress, setDeliveryAddress] = useState("");
 
   if (!product) return null;
 
@@ -52,6 +53,7 @@ export function OrderModal({ product, whatsappNumber, storeName, sellerId, curre
         customer_phone: phone.trim(),
         variant: variant || null,
         notes: notes.trim() || null,
+        delivery_address: deliveryAddress.trim() || null,
       } as any);
     } catch {
       // Don't block the WhatsApp redirect if logging fails
@@ -66,6 +68,7 @@ export function OrderModal({ product, whatsappNumber, storeName, sellerId, curre
       `*Total:* ${formatPrice(total, currency)}`,
       ``,
       notes.trim() ? `*Notes:* ${notes.trim()}` : null,
+      deliveryAddress.trim() ? `📍 *Delivery address:* ${deliveryAddress.trim()}` : null,
       notes.trim() ? `*Notes:* ${notes.trim()}` : null,
       product.image_url ? `\n📷 *Product Image:*\n${product.image_url}` : null,
     ]
