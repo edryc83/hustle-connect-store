@@ -43,7 +43,11 @@ const CaptionGenerator = ({ storeName, storeSlug, category, productCount }: Prop
     setLoading(false);
   };
 
-  useEffect(() => { fetchCaptions(); }, []);
+  useEffect(() => {
+    if (storeName || storeSlug) fetchCaptions();
+    else setCaptions(fallbacks);
+    setLoading(false);
+  }, [storeName, storeSlug]);
 
   const handleCopy = async (text: string, idx: number) => {
     await navigator.clipboard.writeText(text);
