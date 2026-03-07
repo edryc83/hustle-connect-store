@@ -34,7 +34,6 @@ type Profile = Tables<"profiles">;
 function ShareButton({ storeName, storeSlug }: { storeName: string; storeSlug: string }) {
   const [copied, setCopied] = useState(false);
   const storeUrl = `${window.location.origin}/${storeSlug}`;
-  const ogProxyUrl = `https://${import.meta.env.VITE_SUPABASE_PROJECT_ID}.supabase.co/functions/v1/og-store?slug=${storeSlug}`;
   const shareText = `🛍️ Check out ${storeName} on Afristall — order directly on WhatsApp!`;
 
   const copyLink = async () => {
@@ -44,10 +43,9 @@ function ShareButton({ storeName, storeSlug }: { storeName: string; storeSlug: s
     setTimeout(() => setCopied(false), 2000);
   };
 
-  // Use the OG proxy URL for social sharing so crawlers get the right meta tags
-  const shareWhatsApp = () => window.open(`https://wa.me/?text=${encodeURIComponent(`${shareText}\n${ogProxyUrl}`)}`, "_blank");
-  const shareFacebook = () => window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(ogProxyUrl)}`, "_blank");
-  const shareTwitter = () => window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(ogProxyUrl)}`, "_blank");
+  const shareWhatsApp = () => window.open(`https://wa.me/?text=${encodeURIComponent(`${shareText}\n${storeUrl}`)}`, "_blank");
+  const shareFacebook = () => window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(storeUrl)}`, "_blank");
+  const shareTwitter = () => window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(storeUrl)}`, "_blank");
 
   return (
     <DropdownMenu>

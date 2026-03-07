@@ -11,11 +11,11 @@ export default function WhatsAppTestCard({ whatsappNumber, storeName, storeSlug 
   if (!whatsappNumber) return null;
 
   const cleanNumber = whatsappNumber.replace(/[^0-9+]/g, "").replace(/^\+/, "");
-  const ogProxyUrl = storeSlug
-    ? `https://${import.meta.env.VITE_SUPABASE_PROJECT_ID}.supabase.co/functions/v1/og-store?slug=${storeSlug}`
-    : `${window.location.origin}/${storeSlug || ""}`;
+  const storeUrl = storeSlug
+    ? `${window.location.origin}/${storeSlug}`
+    : window.location.origin;
   const testMessage = encodeURIComponent(
-    `🛍️ Check out ${storeName || "my store"} on Afristall — order directly on WhatsApp!\n${ogProxyUrl}`
+    `🛍️ Check out ${storeName || "my store"} on Afristall — order directly on WhatsApp!\n${storeUrl}`
   );
   const whatsappUrl = `https://wa.me/${cleanNumber}?text=${testMessage}`;
 
