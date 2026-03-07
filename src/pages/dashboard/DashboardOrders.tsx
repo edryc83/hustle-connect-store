@@ -207,6 +207,9 @@ const DashboardOrders = () => {
                     <Button size="icon" variant="outline" className="h-8 w-8" onClick={() => openWhatsApp(order.customer_phone)}>
                       <MessageCircle className="h-3.5 w-3.5" />
                     </Button>
+                    <Button size="icon" variant="ghost" className="h-8 w-8 text-destructive hover:text-destructive" onClick={() => deleteOrder(order.id)} title="Delete order">
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </Button>
                   </div>
                 </div>
               </CardContent>
