@@ -374,8 +374,11 @@ const DashboardProducts = () => {
                 )}
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="productName">Name</Label>
-                <Input id="productName" placeholder={listingType === "service" ? "e.g. Birthday Party Package" : "e.g. Rolex wrap"} value={name} onChange={(e) => setName(e.target.value)} maxLength={100} />
+                <div className="flex items-center gap-2">
+                  <Label htmlFor="productName">Name</Label>
+                  {aiFilledFields.has("name") && <span className="text-[10px] text-primary font-medium flex items-center gap-0.5"><Sparkles className="h-2.5 w-2.5" />AI filled</span>}
+                </div>
+                <Input id="productName" placeholder={listingType === "service" ? "e.g. Birthday Party Package" : "e.g. Rolex wrap"} value={name} onChange={(e) => { setName(e.target.value); setAiFilledFields((prev) => { const n = new Set(prev); n.delete("name"); return n; }); }} maxLength={100} />
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="productPrice">Price ({currency})</Label>
