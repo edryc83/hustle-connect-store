@@ -25,7 +25,7 @@ export function CartDrawer({ currency, whatsappNumber, storeName, sellerId, visi
     const lines = [
       `🛒 *New Order from Afristall*`,
       `*Store:* ${storeName}`,
-      `*Customer:* ${visitorName || "Store visitor"}`,
+      
       ``,
       `📦 *Items:*`,
     ];

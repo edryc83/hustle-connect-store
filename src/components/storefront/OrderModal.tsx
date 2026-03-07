@@ -65,8 +65,7 @@ export function OrderModal({ product, whatsappNumber, storeName, sellerId, curre
       `*Quantity:* ${qty}`,
       `*Total:* ${formatPrice(total, currency)}`,
       ``,
-      `*Customer:* ${name.trim()}`,
-      `*Phone:* ${phone.trim()}`,
+      notes.trim() ? `*Notes:* ${notes.trim()}` : null,
       notes.trim() ? `*Notes:* ${notes.trim()}` : null,
       product.image_url ? `\n📷 *Product Image:*\n${product.image_url}` : null,
     ]

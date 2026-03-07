@@ -295,7 +295,7 @@ function ProductDetailView({
       }
     }
 
-    if (visitorName) lines.push(``, `👤 Customer: ${visitorName}`);
+    
     // Image URL removed — long storage links clutter WhatsApp messages
     lines.push(``, `🔗 ${window.location.origin}/${storeSlug}`);
 
