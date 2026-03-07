@@ -160,11 +160,24 @@ const DashboardProducts = () => {
 
       if (error) throw error;
       if (data) {
-        if (data.name && !name.trim()) setName(data.name);
-        if (data.description && !description.trim()) setDescription(data.description);
-        if (data.condition && !condition) setCondition(data.condition);
-        if (data.listing_type) setListingType(data.listing_type);
-        toast.success("Product details auto-filled from image! ✨");
+        const filled = new Set<string>();
+        if (data.name && !name.trim()) { setName(data.name); filled.add("name"); }
+        if (data.description && !description.trim()) { setDescription(data.description); filled.add("description"); }
+        if (data.condition && !condition) { setCondition(data.condition); filled.add("condition"); }
+        if (data.listing_type) { setListingType(data.listing_type); filled.add("type"); }
+        if (data.category) {
+          // Map AI category to our product_type values
+          const categoryMap: Record<string, string> = {
+            fashion: "fashion", beauty: "beauty", food: "food", phones: "phones",
+            wigs: "wigs", shoes: "shoes", home: "home", jewellery: "jewellery",
+            cakes: "cakes", plants: "plants", other: "other",
+          };
+          const mapped = categoryMap[data.category.toLowerCase()] || "other";
+          setAttributes((prev) => ({ ...prev, product_type: mapped }));
+          filled.add("category");
+        }
+        setAiFilledFields(filled);
+        if (filled.size > 0) toast.success("✨ AI auto-filled product details from your photo!");
       }
     } catch {
       // Silent fail — user can still fill manually
