@@ -12,11 +12,12 @@ interface CartDrawerProps {
   currency: string;
   whatsappNumber: string;
   storeName: string;
+  storeSlug: string;
   sellerId: string;
   visitorName: string | null;
 }
 
-export function CartDrawer({ currency, whatsappNumber, storeName, sellerId, visitorName }: CartDrawerProps) {
+export function CartDrawer({ currency, whatsappNumber, storeName, storeSlug, sellerId, visitorName }: CartDrawerProps) {
   const { items, removeItem, updateQuantity, clearCart, totalItems, totalPrice, isOpen, setIsOpen } = useCart();
   const [deliveryAddress, setDeliveryAddress] = useState("");
 
