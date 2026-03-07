@@ -83,6 +83,16 @@ const DashboardOrders = () => {
     }
   };
 
+  const deleteOrder = async (orderId: string) => {
+    const { error } = await supabase.from("orders").delete().eq("id", orderId);
+    if (error) {
+      toast.error("Failed to delete order");
+    } else {
+      setOrders((prev) => prev.filter((o) => o.id !== orderId));
+      toast.success("Order deleted");
+    }
+  };
+
   const getStatusStyle = (status: string) =>
     STATUS_OPTIONS.find((s) => s.value === status)?.color ?? "";
 
