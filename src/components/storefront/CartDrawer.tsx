@@ -153,6 +153,17 @@ export function CartDrawer({ currency, whatsappNumber, storeName, sellerId, visi
               </div>
 
               <div className="border-t pt-4 space-y-3">
+                <div className="space-y-1.5">
+                  <Label htmlFor="cartDeliveryAddr" className="text-sm font-medium">Delivery address (optional)</Label>
+                  <Textarea
+                    id="cartDeliveryAddr"
+                    placeholder="Where should we deliver?"
+                    rows={2}
+                    value={deliveryAddress}
+                    onChange={(e) => setDeliveryAddress(e.target.value)}
+                    className="text-sm"
+                  />
+                </div>
                 <div className="flex items-center justify-between text-lg font-bold">
                   <span>Total</span>
                   <span className="text-primary">{formatPrice(totalPrice, currency)}</span>
