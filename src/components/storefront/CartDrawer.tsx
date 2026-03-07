@@ -27,11 +27,8 @@ export function CartDrawer({ currency, whatsappNumber, storeName, sellerId, visi
 
     // Build consolidated message
     const lines = [
-      `🛒 *New Order from Afristall*`,
-      `*Store:* ${storeName}`,
-      
+      `Hello, I would like to order:`,
       ``,
-      `📦 *Items:*`,
     ];
 
     items.forEach((item, i) => {
@@ -39,6 +36,7 @@ export function CartDrawer({ currency, whatsappNumber, storeName, sellerId, visi
       const subtotal = Number(price) * item.quantity;
       lines.push(`${i + 1}. *${item.product.name}*${item.variant ? ` (${item.variant})` : ""}`);
       lines.push(`   Qty: ${item.quantity} × ${formatPrice(Number(price), currency)} = ${formatPrice(subtotal, currency)}`);
+      lines.push(`   ${window.location.origin}/${storeName}/${item.product.id}`);
     });
 
     lines.push(``);
