@@ -414,7 +414,7 @@ const DashboardProducts = () => {
                     {generatingDesc ? "Generating…" : "AI Generate"}
                   </Button>
                 </div>
-                <Textarea id="productDesc" placeholder={listingType === "service" ? "What does this service package include?" : "What makes this product special?"} value={description} onChange={(e) => setDescription(e.target.value)} rows={3} />
+                <Textarea id="productDesc" placeholder={listingType === "service" ? "What does this service package include?" : "What makes this product special?"} value={description} onChange={(e) => { setDescription(e.target.value); setAiFilledFields((prev) => { const n = new Set(prev); n.delete("description"); return n; }); }} rows={3} />
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="productVariants">Variants / Options</Label>
@@ -425,8 +425,9 @@ const DashboardProducts = () => {
                 <div className="space-y-1.5">
                   <Label className="text-sm font-semibold flex items-center gap-1.5">
                     📋 Product Options <span className="text-muted-foreground font-normal text-xs">(optional)</span>
+                    {aiFilledFields.has("category") && <span className="text-[10px] text-primary font-medium flex items-center gap-0.5"><Sparkles className="h-2.5 w-2.5" />AI filled</span>}
                   </Label>
-                  <ProductAttributeForm attributes={attributes} onChange={setAttributes} />
+                  <ProductAttributeForm attributes={attributes} onChange={(attrs) => { setAttributes(attrs); setAiFilledFields((prev) => { const n = new Set(prev); n.delete("category"); return n; }); }} />
                 </div>
               )}
               <Button className="w-full" onClick={handleSave} disabled={saving}>
