@@ -405,7 +405,10 @@ const DashboardProducts = () => {
               )}
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="productDesc">Description</Label>
+                  <div className="flex items-center gap-2">
+                    <Label htmlFor="productDesc">Description</Label>
+                    {aiFilledFields.has("description") && <span className="text-[10px] text-primary font-medium flex items-center gap-0.5"><Sparkles className="h-2.5 w-2.5" />AI filled</span>}
+                  </div>
                   <Button type="button" variant="ghost" size="sm" className="h-7 gap-1 text-xs text-primary" onClick={handleGenerateDesc} disabled={generatingDesc}>
                     {generatingDesc ? <Loader2 className="h-3 w-3 animate-spin" /> : <Sparkles className="h-3 w-3" />}
                     {generatingDesc ? "Generating…" : "AI Generate"}
