@@ -36,14 +36,17 @@ Deno.serve(async (req) => {
               },
               {
                 type: 'text',
-                text: `You are a product listing assistant for an African e-commerce marketplace. Analyze this product image and return a JSON object with:
-- "name": a concise product name (max 60 chars, no brand guesses)
-- "description": a short selling description (max 200 chars, highlight key features)
-- "condition": "new", "used", or "refurbished" (best guess from image)
-- "listing_type": "product" or "service"
-
-Return ONLY valid JSON, no markdown, no explanation.
-Example: {"name":"Black Leather Wallet","description":"Premium leather bifold wallet with multiple card slots and coin pocket. Compact and stylish.","condition":"new","listing_type":"product"}`,
+                text: `You are a product listing assistant for African marketplace sellers.
+Look at this product image and return ONLY valid JSON:
+{
+  "name": "short product name (max 5 words)",
+  "description": "2 sentence selling description, warm and direct tone",
+  "category": "one of: fashion, beauty, food, phones, wigs, shoes, home, jewellery, cakes, plants, other",
+  "condition": "new" or "used" or "refurbished",
+  "listing_type": "product" or "service"
+}
+No explanation. JSON only.
+Category guide: wigs includes weaves, extensions, braids. phones includes tablets, laptops, electronics, phone cases. fashion includes clothing, bags, accessories. beauty includes skincare, makeup, perfumes. cakes includes all baked goods. jewellery includes watches, bracelets, necklaces, earrings.`,
               },
             ],
           },

@@ -56,6 +56,7 @@ const DashboardProducts = () => {
   const [currency, setCurrency] = useState("UGX");
   const [generatingDesc, setGeneratingDesc] = useState(false);
   const [analyzing, setAnalyzing] = useState(false);
+  const [aiFilledFields, setAiFilledFields] = useState<Set<string>>(new Set());
 
   // Form state
   const [name, setName] = useState("");
@@ -106,6 +107,7 @@ const DashboardProducts = () => {
     setName(""); setPrice(""); setDiscountPrice(""); setDescription(""); setVariantsText("");
     setImageFiles([]); setImagePreviews([]); setExistingImages([]);
     setEditingProduct(null); setListingType("product"); setCondition(""); setAttributes({});
+    setAiFilledFields(new Set());
   };
 
   const openAdd = () => { resetForm(); setDialogOpen(true); };
@@ -158,11 +160,24 @@ const DashboardProducts = () => {
 
       if (error) throw error;
       if (data) {
-        if (data.name && !name.trim()) setName(data.name);
-        if (data.description && !description.trim()) setDescription(data.description);
-        if (data.condition && !condition) setCondition(data.condition);
-        if (data.listing_type) setListingType(data.listing_type);
-        toast.success("Product details auto-filled from image! ✨");
+        const filled = new Set<string>();
+        if (data.name && !name.trim()) { setName(data.name); filled.add("name"); }
+        if (data.description && !description.trim()) { setDescription(data.description); filled.add("description"); }
+        if (data.condition && !condition) { setCondition(data.condition); filled.add("condition"); }
+        if (data.listing_type) { setListingType(data.listing_type); filled.add("type"); }
+        if (data.category) {
+          // Map AI category to our product_type values
+          const categoryMap: Record<string, string> = {
+            fashion: "fashion", beauty: "beauty", food: "food", phones: "phones",
+            wigs: "wigs", shoes: "shoes", home: "home", jewellery: "jewellery",
+            cakes: "cakes", plants: "plants", other: "other",
+          };
+          const mapped = categoryMap[data.category.toLowerCase()] || "other";
+          setAttributes((prev) => ({ ...prev, product_type: mapped }));
+          filled.add("category");
+        }
+        setAiFilledFields(filled);
+        if (filled.size > 0) toast.success("✨ AI auto-filled product details from your photo!");
       }
     } catch {
       // Silent fail — user can still fill manually
@@ -359,8 +374,11 @@ const DashboardProducts = () => {
                 )}
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="productName">Name</Label>
-                <Input id="productName" placeholder={listingType === "service" ? "e.g. Birthday Party Package" : "e.g. Rolex wrap"} value={name} onChange={(e) => setName(e.target.value)} maxLength={100} />
+                <div className="flex items-center gap-2">
+                  <Label htmlFor="productName">Name</Label>
+                  {aiFilledFields.has("name") && <span className="text-[10px] text-primary font-medium flex items-center gap-0.5"><Sparkles className="h-2.5 w-2.5" />AI filled</span>}
+                </div>
+                <Input id="productName" placeholder={listingType === "service" ? "e.g. Birthday Party Package" : "e.g. Rolex wrap"} value={name} onChange={(e) => { setName(e.target.value); setAiFilledFields((prev) => { const n = new Set(prev); n.delete("name"); return n; }); }} maxLength={100} />
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="productPrice">Price ({currency})</Label>
@@ -375,8 +393,11 @@ const DashboardProducts = () => {
               </div>
               {listingType === "product" && (
                 <div className="space-y-1.5">
-                  <Label>Condition</Label>
-                  <Select value={condition} onValueChange={setCondition}>
+                  <div className="flex items-center gap-2">
+                    <Label>Condition</Label>
+                    {aiFilledFields.has("condition") && <span className="text-[10px] text-primary font-medium flex items-center gap-0.5"><Sparkles className="h-2.5 w-2.5" />AI filled</span>}
+                  </div>
+                  <Select value={condition} onValueChange={(v) => { setCondition(v); setAiFilledFields((prev) => { const n = new Set(prev); n.delete("condition"); return n; }); }}>
                     <SelectTrigger><SelectValue placeholder="Select condition (optional)" /></SelectTrigger>
                     <SelectContent>{CONDITIONS.map((c) => (<SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>))}</SelectContent>
                   </Select>
@@ -384,13 +405,16 @@ const DashboardProducts = () => {
               )}
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
-                  <Label htmlFor="productDesc">Description</Label>
+                  <div className="flex items-center gap-2">
+                    <Label htmlFor="productDesc">Description</Label>
+                    {aiFilledFields.has("description") && <span className="text-[10px] text-primary font-medium flex items-center gap-0.5"><Sparkles className="h-2.5 w-2.5" />AI filled</span>}
+                  </div>
                   <Button type="button" variant="ghost" size="sm" className="h-7 gap-1 text-xs text-primary" onClick={handleGenerateDesc} disabled={generatingDesc}>
                     {generatingDesc ? <Loader2 className="h-3 w-3 animate-spin" /> : <Sparkles className="h-3 w-3" />}
                     {generatingDesc ? "Generating…" : "AI Generate"}
                   </Button>
                 </div>
-                <Textarea id="productDesc" placeholder={listingType === "service" ? "What does this service package include?" : "What makes this product special?"} value={description} onChange={(e) => setDescription(e.target.value)} rows={3} />
+                <Textarea id="productDesc" placeholder={listingType === "service" ? "What does this service package include?" : "What makes this product special?"} value={description} onChange={(e) => { setDescription(e.target.value); setAiFilledFields((prev) => { const n = new Set(prev); n.delete("description"); return n; }); }} rows={3} />
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="productVariants">Variants / Options</Label>
@@ -401,8 +425,9 @@ const DashboardProducts = () => {
                 <div className="space-y-1.5">
                   <Label className="text-sm font-semibold flex items-center gap-1.5">
                     📋 Product Options <span className="text-muted-foreground font-normal text-xs">(optional)</span>
+                    {aiFilledFields.has("category") && <span className="text-[10px] text-primary font-medium flex items-center gap-0.5"><Sparkles className="h-2.5 w-2.5" />AI filled</span>}
                   </Label>
-                  <ProductAttributeForm attributes={attributes} onChange={setAttributes} />
+                  <ProductAttributeForm attributes={attributes} onChange={(attrs) => { setAttributes(attrs); setAiFilledFields((prev) => { const n = new Set(prev); n.delete("category"); return n; }); }} />
                 </div>
               )}
               <Button className="w-full" onClick={handleSave} disabled={saving}>
