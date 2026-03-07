@@ -43,6 +43,9 @@ export function CartDrawer({ currency, whatsappNumber, storeName, sellerId, visi
 
     lines.push(``);
     lines.push(`💰 *Total: ${formatPrice(totalPrice, currency)}*`);
+    if (deliveryAddress.trim()) {
+      lines.push(``, `📍 *Delivery address:* ${deliveryAddress.trim()}`);
+    }
 
     // Log orders to database
     for (const item of items) {
