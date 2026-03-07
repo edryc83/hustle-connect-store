@@ -276,11 +276,11 @@ function ProductDetailView({
 
   const buildWhatsAppMessage = () => {
     const dp = Number(displayPrice);
+    const productUrl = `${window.location.origin}/${storeSlug}/${product.id}`;
     const lines: string[] = [
-      `🛍️ New Order from Afristall`,
+      `Hello, I would like to order:`,
       ``,
-      `Store: ${profile.store_name || storeSlug}`,
-      `Product: ${product.name}${qty > 1 ? ` x${qty}` : ""}`,
+      `*${product.name}*${qty > 1 ? ` x${qty}` : ""}`,
       `Price: ${formatPrice(dp * qty, currency)}`,
     ];
 
@@ -301,8 +301,7 @@ function ProductDetailView({
     if (deliveryAddress.trim()) {
       lines.push(``, `📍 Delivery address: ${deliveryAddress.trim()}`);
     }
-    // Image URL removed — long storage links clutter WhatsApp messages
-    lines.push(``, `🔗 ${window.location.origin}/${storeSlug}`);
+    lines.push(``, productUrl);
 
     return lines.join("\n");
   };
@@ -601,6 +600,7 @@ function ProductDetailView({
         currency={currency}
         whatsappNumber={profile.whatsapp_number ?? ""}
         storeName={profile.store_name ?? "Store"}
+        storeSlug={storeSlug}
         sellerId={profile.id}
         visitorName={visitorName}
       />
@@ -925,6 +925,7 @@ const StorefrontInner = () => {
         currency={currency}
         whatsappNumber={profile.whatsapp_number ?? ""}
         storeName={profile.store_name ?? "Store"}
+        storeSlug={storeSlug}
         sellerId={profile.id}
         visitorName={visitorName}
       />

@@ -12,11 +12,12 @@ interface CartDrawerProps {
   currency: string;
   whatsappNumber: string;
   storeName: string;
+  storeSlug: string;
   sellerId: string;
   visitorName: string | null;
 }
 
-export function CartDrawer({ currency, whatsappNumber, storeName, sellerId, visitorName }: CartDrawerProps) {
+export function CartDrawer({ currency, whatsappNumber, storeName, storeSlug, sellerId, visitorName }: CartDrawerProps) {
   const { items, removeItem, updateQuantity, clearCart, totalItems, totalPrice, isOpen, setIsOpen } = useCart();
   const [deliveryAddress, setDeliveryAddress] = useState("");
 
@@ -27,11 +28,8 @@ export function CartDrawer({ currency, whatsappNumber, storeName, sellerId, visi
 
     // Build consolidated message
     const lines = [
-      `🛒 *New Order from Afristall*`,
-      `*Store:* ${storeName}`,
-      
+      `Hello, I would like to order:`,
       ``,
-      `📦 *Items:*`,
     ];
 
     items.forEach((item, i) => {
@@ -39,6 +37,7 @@ export function CartDrawer({ currency, whatsappNumber, storeName, sellerId, visi
       const subtotal = Number(price) * item.quantity;
       lines.push(`${i + 1}. *${item.product.name}*${item.variant ? ` (${item.variant})` : ""}`);
       lines.push(`   Qty: ${item.quantity} × ${formatPrice(Number(price), currency)} = ${formatPrice(subtotal, currency)}`);
+      lines.push(`   ${window.location.origin}/${storeSlug}/${item.product.id}`);
     });
 
     lines.push(``);

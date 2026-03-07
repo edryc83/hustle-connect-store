@@ -16,12 +16,11 @@ Deno.serve(async (req) => {
   try {
     const url = new URL(req.url);
     const slug = url.searchParams.get("slug");
+    const productId = url.searchParams.get("productId");
 
     if (!slug) {
       return Response.redirect(APP_URL, 302);
     }
-
-    const storeUrl = `${APP_URL}/${slug}`;
 
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseKey = Deno.env.get("SUPABASE_ANON_KEY")!;
@@ -29,21 +28,62 @@ Deno.serve(async (req) => {
 
     const { data: profile } = await supabase
       .from("profiles")
-      .select("store_name, store_bio, profile_picture_url, category, city, country")
+      .select("store_name, store_bio, profile_picture_url, category, city, country, id")
       .eq("store_slug", slug)
       .single();
 
     if (!profile) {
-      return Response.redirect(storeUrl, 302);
+      return Response.redirect(`${APP_URL}/${slug}`, 302);
     }
 
+    // Product-level OG
+    if (productId) {
+      const { data: product } = await supabase
+        .from("products")
+        .select("name, description, price, discount_price, image_url")
+        .eq("id", productId)
+        .eq("user_id", profile.id)
+        .single();
+
+      if (product) {
+        // Try to get first product image
+        const { data: imgRow } = await supabase
+          .from("product_images")
+          .select("image_url")
+          .eq("product_id", productId)
+          .order("position", { ascending: true })
+          .limit(1)
+          .single();
+
+        const productUrl = `${APP_URL}/${slug}/${productId}`;
+        const price = product.discount_price ?? product.price;
+        const title = `${product.name} — ${profile.store_name || slug}`;
+        const description = product.description || `${product.name} for ${price}. Order on WhatsApp!`;
+        const image = imgRow?.image_url || product.image_url || profile.profile_picture_url || FALLBACK_IMAGE;
+
+        return new Response(buildHtml({ title, description, image, pageUrl: productUrl, storeName: profile.store_name || slug }), {
+          headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "public, max-age=300, s-maxage=300" },
+        });
+      }
+    }
+
+    // Store-level OG (fallback)
+    const storeUrl = `${APP_URL}/${slug}`;
     const title = `${profile.store_name || slug} — Shop on Afristall`;
     const description = profile.store_bio ||
       `Check out ${profile.store_name || slug}${profile.category ? ` for ${profile.category}` : ""}${profile.city ? ` in ${profile.city}` : ""}. Order directly on WhatsApp! 🛒`;
     const image = profile.profile_picture_url || FALLBACK_IMAGE;
-    const location = [profile.city, profile.country].filter(Boolean).join(", ");
 
-    const html = `<!DOCTYPE html>
+    return new Response(buildHtml({ title, description, image, pageUrl: storeUrl, storeName: profile.store_name || slug }), {
+      headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "public, max-age=300, s-maxage=300" },
+    });
+  } catch (error) {
+    return Response.redirect(APP_URL, 302);
+  }
+});
+
+function buildHtml({ title, description, image, pageUrl, storeName }: { title: string; description: string; image: string; pageUrl: string; storeName: string }) {
+  return `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -53,14 +93,13 @@ Deno.serve(async (req) => {
 
   <!-- Open Graph -->
   <meta property="og:type" content="website" />
-  <meta property="og:url" content="${storeUrl}" />
+  <meta property="og:url" content="${pageUrl}" />
   <meta property="og:title" content="${escapeHtml(title)}" />
   <meta property="og:description" content="${escapeHtml(description)}" />
   <meta property="og:image" content="${escapeHtml(image)}" />
   <meta property="og:image:width" content="400" />
   <meta property="og:image:height" content="400" />
   <meta property="og:site_name" content="Afristall" />
-  ${location ? `<meta property="og:locale" content="en_US" />` : ""}
 
   <!-- Twitter -->
   <meta name="twitter:card" content="summary_large_image" />
@@ -69,26 +108,16 @@ Deno.serve(async (req) => {
   <meta name="twitter:description" content="${escapeHtml(description)}" />
   <meta name="twitter:image" content="${escapeHtml(image)}" />
 
-  <!-- Auto-redirect to actual store -->
-  <meta http-equiv="refresh" content="0;url=${storeUrl}" />
-  <link rel="canonical" href="${storeUrl}" />
+  <!-- Auto-redirect to actual page -->
+  <meta http-equiv="refresh" content="0;url=${pageUrl}" />
+  <link rel="canonical" href="${pageUrl}" />
 </head>
 <body>
-  <p>Redirecting to <a href="${storeUrl}">${escapeHtml(profile.store_name || slug)}</a>...</p>
-  <script>window.location.replace("${storeUrl}");</script>
+  <p>Redirecting to <a href="${pageUrl}">${escapeHtml(storeName)}</a>...</p>
+  <script>window.location.replace("${pageUrl}");</script>
 </body>
 </html>`;
-
-    return new Response(html, {
-      headers: {
-        "Content-Type": "text/html; charset=utf-8",
-        "Cache-Control": "public, max-age=300, s-maxage=300",
-      },
-    });
-  } catch (error) {
-    return Response.redirect(APP_URL, 302);
-  }
-});
+}
 
 function escapeHtml(str: string): string {
   return str

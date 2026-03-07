@@ -16,13 +16,14 @@ interface OrderModalProps {
   product: Product | null;
   whatsappNumber: string;
   storeName: string;
+  storeSlug: string;
   sellerId: string;
   currency?: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-export function OrderModal({ product, whatsappNumber, storeName, sellerId, currency = "UGX", open, onOpenChange }: OrderModalProps) {
+export function OrderModal({ product, whatsappNumber, storeName, storeSlug, sellerId, currency = "UGX", open, onOpenChange }: OrderModalProps) {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [quantity, setQuantity] = useState("1");
@@ -59,18 +60,18 @@ export function OrderModal({ product, whatsappNumber, storeName, sellerId, curre
       // Don't block the WhatsApp redirect if logging fails
     }
 
+    const productUrl = `${window.location.origin}/${storeSlug}/${product.id}`;
     const message = [
-      `🛒 *New Order from Afristall*`,
+      `Hello, I would like to order:`,
       ``,
-      `*Product:* ${product.name}`,
+      `*${product.name}*`,
       variant ? `*Variant:* ${variant}` : null,
       `*Quantity:* ${qty}`,
       `*Total:* ${formatPrice(total, currency)}`,
-      ``,
       notes.trim() ? `*Notes:* ${notes.trim()}` : null,
       deliveryAddress.trim() ? `📍 *Delivery address:* ${deliveryAddress.trim()}` : null,
-      notes.trim() ? `*Notes:* ${notes.trim()}` : null,
-      product.image_url ? `\n📷 *Product Image:*\n${product.image_url}` : null,
+      ``,
+      productUrl,
     ]
       .filter(Boolean)
       .join("\n");
