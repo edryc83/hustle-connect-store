@@ -64,9 +64,6 @@ const DashboardOverview = () => {
   const greeting = getGreeting();
 
   const storeUrl = `${window.location.origin}/${storeSlug}`;
-  const ogProxyUrl = storeSlug
-    ? `https://${import.meta.env.VITE_SUPABASE_PROJECT_ID}.supabase.co/functions/v1/og-store?slug=${storeSlug}`
-    : storeUrl;
 
   const dismissBanner = () => {
     setBannerDismissed(true);
@@ -83,10 +80,10 @@ const DashboardOverview = () => {
   const shareStore = async () => {
     if (navigator.share) {
       try {
-        await navigator.share({ title: storeName, text: `🛍️ Check out ${storeName || "my store"} on Afristall — order directly on WhatsApp!`, url: ogProxyUrl });
+        await navigator.share({ title: storeName, text: `🛍️ Check out ${storeName || "my store"} on Afristall — order directly on WhatsApp!`, url: storeUrl });
       } catch { /* user cancelled */ }
     } else {
-      await navigator.clipboard.writeText(ogProxyUrl);
+      await navigator.clipboard.writeText(storeUrl);
       setCopied(true);
       toast.success("Share link copied!");
       setTimeout(() => setCopied(false), 2000);
@@ -164,6 +161,18 @@ const DashboardOverview = () => {
         </Link>
       </div>
 
+      {/* Share bar */}
+      {storeSlug && (
+        <div className="flex items-center gap-2 rounded-2xl bg-card/40 backdrop-blur-xl border border-border/40 px-4 py-3">
+          <span className="text-sm font-medium truncate flex-1 text-muted-foreground">afristall.com/{storeSlug}</span>
+          <button onClick={copyLink} className="text-muted-foreground hover:text-foreground shrink-0 p-1.5 rounded-lg hover:bg-muted/50 transition-colors" title="Copy link">
+            <Copy className="h-4 w-4" />
+          </button>
+          <button onClick={shareStore} className="text-muted-foreground hover:text-primary shrink-0 p-1.5 rounded-lg hover:bg-muted/50 transition-colors" title="Share store">
+            <Share2 className="h-4 w-4" />
+          </button>
+        </div>
+      )}
 
       {/* Install app banner */}
       {!isInstalled && (
@@ -210,19 +219,6 @@ const DashboardOverview = () => {
               </Button>
             </div>
           </div>
-        </div>
-      )}
-
-      {/* Share bar */}
-      {storeSlug && (
-        <div className="flex items-center gap-2 rounded-2xl bg-card/40 backdrop-blur-xl border border-border/40 px-4 py-3">
-          <span className="text-sm font-medium truncate flex-1 text-muted-foreground">afristall.com/{storeSlug}</span>
-          <button onClick={copyLink} className="text-muted-foreground hover:text-foreground shrink-0 p-1.5 rounded-lg hover:bg-muted/50 transition-colors" title="Copy link">
-            <Copy className="h-4 w-4" />
-          </button>
-          <button onClick={shareStore} className="text-muted-foreground hover:text-primary shrink-0 p-1.5 rounded-lg hover:bg-muted/50 transition-colors" title="Share store">
-            <Share2 className="h-4 w-4" />
-          </button>
         </div>
       )}
 
