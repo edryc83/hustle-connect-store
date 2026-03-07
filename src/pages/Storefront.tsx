@@ -600,6 +600,7 @@ function ProductDetailView({
         currency={currency}
         whatsappNumber={profile.whatsapp_number ?? ""}
         storeName={profile.store_name ?? "Store"}
+        storeSlug={storeSlug}
         sellerId={profile.id}
         visitorName={visitorName}
       />
@@ -924,6 +925,7 @@ const StorefrontInner = () => {
         currency={currency}
         whatsappNumber={profile.whatsapp_number ?? ""}
         storeName={profile.store_name ?? "Store"}
+        storeSlug={storeSlug}
         sellerId={profile.id}
         visitorName={visitorName}
       />
