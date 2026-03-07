@@ -1,5 +1,8 @@
+import { useState } from "react";
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { useCart } from "@/hooks/useCart";
 import { formatPrice } from "@/lib/currency";
 import { Minus, Plus, Trash2, MessageCircle, ShoppingCart } from "lucide-react";
@@ -15,6 +18,7 @@ interface CartDrawerProps {
 
 export function CartDrawer({ currency, whatsappNumber, storeName, sellerId, visitorName }: CartDrawerProps) {
   const { items, removeItem, updateQuantity, clearCart, totalItems, totalPrice, isOpen, setIsOpen } = useCart();
+  const [deliveryAddress, setDeliveryAddress] = useState("");
 
   const handleCheckout = async () => {
     if (items.length === 0) return;
@@ -39,6 +43,9 @@ export function CartDrawer({ currency, whatsappNumber, storeName, sellerId, visi
 
     lines.push(``);
     lines.push(`💰 *Total: ${formatPrice(totalPrice, currency)}*`);
+    if (deliveryAddress.trim()) {
+      lines.push(``, `📍 *Delivery address:* ${deliveryAddress.trim()}`);
+    }
 
     // Log orders to database
     for (const item of items) {
@@ -53,6 +60,7 @@ export function CartDrawer({ currency, whatsappNumber, storeName, sellerId, visi
           customer_name: visitorName || "Store visitor",
           customer_phone: visitorName || "WhatsApp order",
           variant: item.variant || null,
+          delivery_address: deliveryAddress.trim() || null,
         } as any);
         supabase.rpc("increment_whatsapp_taps", { p_id: item.product.id }).then(() => {});
       } catch {
@@ -145,6 +153,17 @@ export function CartDrawer({ currency, whatsappNumber, storeName, sellerId, visi
               </div>
 
               <div className="border-t pt-4 space-y-3">
+                <div className="space-y-1.5">
+                  <Label htmlFor="cartDeliveryAddr" className="text-sm font-medium">Delivery address (optional)</Label>
+                  <Textarea
+                    id="cartDeliveryAddr"
+                    placeholder="Where should we deliver?"
+                    rows={2}
+                    value={deliveryAddress}
+                    onChange={(e) => setDeliveryAddress(e.target.value)}
+                    className="text-sm"
+                  />
+                </div>
                 <div className="flex items-center justify-between text-lg font-bold">
                   <span>Total</span>
                   <span className="text-primary">{formatPrice(totalPrice, currency)}</span>

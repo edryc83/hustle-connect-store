@@ -26,6 +26,8 @@ import { toast } from "sonner";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import type { Tables } from "@/integrations/supabase/types";
 
 type Product = Tables<"products">;
@@ -240,6 +242,7 @@ function ProductDetailView({
   const [attrTextInputs, setAttrTextInputs] = useState<Record<string, string>>({});
   const [cakeMessage, setCakeMessage] = useState("");
   const [personalisation, setPersonalisation] = useState("");
+  const [deliveryAddress, setDeliveryAddress] = useState("");
 
   const attrs = (product as any).attributes as Record<string, any> | null;
   const hasAttributes = attrs && attrs.product_type;
@@ -295,7 +298,9 @@ function ProductDetailView({
       }
     }
 
-    
+    if (deliveryAddress.trim()) {
+      lines.push(``, `📍 Delivery address: ${deliveryAddress.trim()}`);
+    }
     // Image URL removed — long storage links clutter WhatsApp messages
     lines.push(``, `🔗 ${window.location.origin}/${storeSlug}`);
 
@@ -466,6 +471,19 @@ function ProductDetailView({
             <span className="font-bold text-lg">{formatPrice(Number(displayPrice) * qty, currency)}</span>
           </div>
 
+          {/* Delivery Address */}
+          <div className="space-y-1.5">
+            <Label htmlFor="deliveryAddr" className="text-sm font-medium">Delivery address (optional)</Label>
+            <Textarea
+              id="deliveryAddr"
+              placeholder="Where should we deliver? e.g. Plot 12, Kampala Road"
+              rows={2}
+              value={deliveryAddress}
+              onChange={(e) => setDeliveryAddress(e.target.value)}
+              className="text-sm"
+            />
+          </div>
+
           <div className="flex gap-3">
             <Button
               size="lg"
@@ -507,6 +525,7 @@ function ProductDetailView({
                   total: Number(displayPrice) * qty,
                   customer_name: visitorName || "Store visitor",
                   customer_phone: visitorName || "WhatsApp order",
+                  delivery_address: deliveryAddress.trim() || null,
                 } as any).then(() => {});
                 supabase.rpc("increment_whatsapp_taps", { p_id: product.id }).then(() => {});
                 window.open(`https://wa.me/${cleanNumber.replace("+", "")}?text=${encodeURIComponent(message)}`, "_blank");
