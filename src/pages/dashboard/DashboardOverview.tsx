@@ -164,19 +164,6 @@ const DashboardOverview = () => {
         </Link>
       </div>
 
-      {/* Quick Actions */}
-      <div className="flex gap-2.5">
-        <Button asChild className="flex-1 rounded-xl h-11 gap-2">
-          <Link to="/dashboard/products?add=true">
-            <Plus className="h-4 w-4" /> Add {terms.singular}
-          </Link>
-        </Button>
-        <Button asChild variant="outline" className="flex-1 rounded-xl h-11 gap-2 border-border/40 bg-card/40 backdrop-blur-xl">
-          <Link to="/dashboard/products">
-            <Package className="h-4 w-4" /> My {terms.plural}
-          </Link>
-        </Button>
-      </div>
 
       {/* Install app banner */}
       {!isInstalled && (
