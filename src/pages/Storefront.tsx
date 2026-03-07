@@ -276,7 +276,7 @@ function ProductDetailView({
 
   const buildWhatsAppMessage = () => {
     const dp = Number(displayPrice);
-    const productUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/og-store?slug=${storeSlug}&productId=${product.id}`;
+    const productUrl = `${window.location.origin}/${storeSlug}/${product.id}`;
     const lines: string[] = [
       `Hello, I would like to order:`,
       ``,
