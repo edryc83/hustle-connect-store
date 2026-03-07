@@ -240,6 +240,7 @@ function ProductDetailView({
   const [attrTextInputs, setAttrTextInputs] = useState<Record<string, string>>({});
   const [cakeMessage, setCakeMessage] = useState("");
   const [personalisation, setPersonalisation] = useState("");
+  const [deliveryAddress, setDeliveryAddress] = useState("");
 
   const attrs = (product as any).attributes as Record<string, any> | null;
   const hasAttributes = attrs && attrs.product_type;
@@ -295,7 +296,9 @@ function ProductDetailView({
       }
     }
 
-    
+    if (deliveryAddress.trim()) {
+      lines.push(``, `📍 Delivery address: ${deliveryAddress.trim()}`);
+    }
     // Image URL removed — long storage links clutter WhatsApp messages
     lines.push(``, `🔗 ${window.location.origin}/${storeSlug}`);
 
@@ -507,6 +510,7 @@ function ProductDetailView({
                   total: Number(displayPrice) * qty,
                   customer_name: visitorName || "Store visitor",
                   customer_phone: visitorName || "WhatsApp order",
+                  delivery_address: deliveryAddress.trim() || null,
                 } as any).then(() => {});
                 supabase.rpc("increment_whatsapp_taps", { p_id: product.id }).then(() => {});
                 window.open(`https://wa.me/${cleanNumber.replace("+", "")}?text=${encodeURIComponent(message)}`, "_blank");
