@@ -142,6 +142,11 @@ export function OrderModal({ product, whatsappNumber, storeName, sellerId, curre
           </div>
 
           <div className="space-y-1.5">
+            <Label htmlFor="orderAddress">Delivery address (optional)</Label>
+            <Textarea id="orderAddress" placeholder="Where should we deliver?" rows={2} value={deliveryAddress} onChange={(e) => setDeliveryAddress(e.target.value)} />
+          </div>
+
+          <div className="space-y-1.5">
             <Label htmlFor="orderNotes">Notes (optional)</Label>
             <Textarea id="orderNotes" placeholder="Any special requests?" rows={2} value={notes} onChange={(e) => setNotes(e.target.value)} />
           </div>
