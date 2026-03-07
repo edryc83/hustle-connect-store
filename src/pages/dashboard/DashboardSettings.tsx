@@ -624,7 +624,7 @@ const DashboardSettings = () => {
             <ol className="space-y-2.5 text-sm text-muted-foreground ml-1">
               <li className="flex items-start gap-2">
                 <span className="font-bold text-foreground shrink-0">1.</span>
-                <span>Open Afristall in <strong className="text-foreground">Safari</strong> (this won't work in Chrome or other browsers on iPhone)</span>
+                <span>Open Afristall in <strong className="text-foreground">Safari</strong> or <strong className="text-foreground">Chrome</strong></span>
               </li>
               <li className="flex items-start gap-2">
                 <span className="font-bold text-foreground shrink-0">2.</span>
