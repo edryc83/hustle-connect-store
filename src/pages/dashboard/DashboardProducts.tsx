@@ -393,8 +393,11 @@ const DashboardProducts = () => {
               </div>
               {listingType === "product" && (
                 <div className="space-y-1.5">
-                  <Label>Condition</Label>
-                  <Select value={condition} onValueChange={setCondition}>
+                  <div className="flex items-center gap-2">
+                    <Label>Condition</Label>
+                    {aiFilledFields.has("condition") && <span className="text-[10px] text-primary font-medium flex items-center gap-0.5"><Sparkles className="h-2.5 w-2.5" />AI filled</span>}
+                  </div>
+                  <Select value={condition} onValueChange={(v) => { setCondition(v); setAiFilledFields((prev) => { const n = new Set(prev); n.delete("condition"); return n; }); }}>
                     <SelectTrigger><SelectValue placeholder="Select condition (optional)" /></SelectTrigger>
                     <SelectContent>{CONDITIONS.map((c) => (<SelectItem key={c.value} value={c.value}>{c.label}</SelectItem>))}</SelectContent>
                   </Select>
