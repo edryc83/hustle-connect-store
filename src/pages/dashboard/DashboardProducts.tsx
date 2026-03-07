@@ -56,6 +56,7 @@ const DashboardProducts = () => {
   const [currency, setCurrency] = useState("UGX");
   const [generatingDesc, setGeneratingDesc] = useState(false);
   const [analyzing, setAnalyzing] = useState(false);
+  const [aiFilledFields, setAiFilledFields] = useState<Set<string>>(new Set());
 
   // Form state
   const [name, setName] = useState("");
