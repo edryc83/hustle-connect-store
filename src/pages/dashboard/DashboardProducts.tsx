@@ -351,6 +351,12 @@ const DashboardProducts = () => {
                     <input type="file" accept="image/*" multiple className="hidden" onChange={handleImageChange} />
                   </label>
                 )}
+                {analyzing && (
+                  <div className="flex items-center gap-2 rounded-lg bg-primary/5 border border-primary/20 px-3 py-2">
+                    <Loader2 className="h-3.5 w-3.5 animate-spin text-primary" />
+                    <span className="text-xs text-primary font-medium">Analyzing image & auto-filling details…</span>
+                  </div>
+                )}
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="productName">Name</Label>
