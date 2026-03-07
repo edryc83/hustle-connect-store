@@ -1,0 +1,1 @@
+CREATE POLICY "Sellers can delete own orders" ON public.orders FOR DELETE TO authenticated USING (auth.uid() = seller_id);
