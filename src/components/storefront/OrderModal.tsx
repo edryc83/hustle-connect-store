@@ -16,13 +16,14 @@ interface OrderModalProps {
   product: Product | null;
   whatsappNumber: string;
   storeName: string;
+  storeSlug: string;
   sellerId: string;
   currency?: string;
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-export function OrderModal({ product, whatsappNumber, storeName, sellerId, currency = "UGX", open, onOpenChange }: OrderModalProps) {
+export function OrderModal({ product, whatsappNumber, storeName, storeSlug, sellerId, currency = "UGX", open, onOpenChange }: OrderModalProps) {
   const [name, setName] = useState("");
   const [phone, setPhone] = useState("");
   const [quantity, setQuantity] = useState("1");
