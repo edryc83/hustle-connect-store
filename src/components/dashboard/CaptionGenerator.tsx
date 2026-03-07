@@ -5,11 +5,15 @@ import { supabase } from "@/integrations/supabase/client";
 
 type Caption = { vibe: string; text: string };
 
-const FALLBACKS: Caption[] = [
-  { vibe: "🆕 Fresh", text: "New stuff just dropped 👀\nCheck before it's gone\nafristall.com/yourname" },
-  { vibe: "🔥 Hustle", text: "Still open. Still the plug.\nafristall.com/yourname" },
-  { vibe: "💛 Real", text: "Small business, big heart 🧡\nafristall.com/yourname" },
-];
+const getFallbacks = (slug: string, storeName: string): Caption[] => {
+  const link = slug ? `afristall.com/${slug}` : "afristall.com/yourname";
+  const name = storeName || "My store";
+  return [
+    { vibe: "🆕 Fresh", text: `New stuff just dropped at ${name} 👀\nCheck before it's gone\n${link}` },
+    { vibe: "🔥 Hustle", text: `${name} is still open. Still the plug.\n${link}` },
+    { vibe: "💛 Real", text: `Small business, big heart 🧡\nShop ${name}\n${link}` },
+  ];
+};
 
 interface Props {
   storeName: string;
@@ -23,6 +27,8 @@ const CaptionGenerator = ({ storeName, storeSlug, category, productCount }: Prop
   const [loading, setLoading] = useState(true);
   const [copiedIdx, setCopiedIdx] = useState<number | null>(null);
 
+  const fallbacks = getFallbacks(storeSlug, storeName);
+
   const fetchCaptions = async () => {
     setLoading(true);
     try {
@@ -30,9 +36,9 @@ const CaptionGenerator = ({ storeName, storeSlug, category, productCount }: Prop
         body: { storeName, storeSlug, category, productCount },
       });
       if (error) throw error;
-      setCaptions(data?.captions?.length ? data.captions : FALLBACKS);
+      setCaptions(data?.captions?.length ? data.captions : fallbacks);
     } catch {
-      setCaptions(FALLBACKS);
+      setCaptions(fallbacks);
     }
     setLoading(false);
   };
