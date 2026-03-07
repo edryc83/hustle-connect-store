@@ -9,7 +9,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { ClipboardList, Phone, MessageCircle, Plus } from "lucide-react";
+import { ClipboardList, Phone, MessageCircle, Plus, Trash2 } from "lucide-react";
 import { formatPrice } from "@/lib/currency";
 import { toast } from "sonner";
 
@@ -80,6 +80,16 @@ const DashboardOrders = () => {
         prev.map((o) => (o.id === orderId ? { ...o, status: newStatus } : o))
       );
       toast.success("Status updated");
+    }
+  };
+
+  const deleteOrder = async (orderId: string) => {
+    const { error } = await supabase.from("orders").delete().eq("id", orderId);
+    if (error) {
+      toast.error("Failed to delete order");
+    } else {
+      setOrders((prev) => prev.filter((o) => o.id !== orderId));
+      toast.success("Order deleted");
     }
   };
 
@@ -196,6 +206,9 @@ const DashboardOrders = () => {
                     </Select>
                     <Button size="icon" variant="outline" className="h-8 w-8" onClick={() => openWhatsApp(order.customer_phone)}>
                       <MessageCircle className="h-3.5 w-3.5" />
+                    </Button>
+                    <Button size="icon" variant="ghost" className="h-8 w-8 text-destructive hover:text-destructive" onClick={() => deleteOrder(order.id)} title="Delete order">
+                      <Trash2 className="h-3.5 w-3.5" />
                     </Button>
                   </div>
                 </div>
