@@ -49,6 +49,24 @@ export default function TextStep({
 
   return (
     <div className="space-y-4 pb-4">
+      {/* Image preview + remove bg */}
+      {imagePreview ? (
+        <div className="rounded-xl border border-border overflow-hidden bg-muted/30">
+          <img src={imagePreview} alt="Product" className="w-full max-h-48 object-contain bg-muted/20" />
+          <div className="flex items-center justify-between px-3 py-2 border-t border-border">
+            <div>
+              <Label className="text-sm font-medium">Remove Background</Label>
+              <p className="text-[11px] text-muted-foreground">Auto-strip for cleaner design</p>
+            </div>
+            <Switch checked={removeBg} onCheckedChange={onRemoveBgChange} />
+          </div>
+        </div>
+      ) : (
+        <div className="rounded-xl border border-border p-6 flex items-center justify-center bg-muted/30">
+          <ImageIcon className="h-10 w-10 text-muted-foreground" />
+        </div>
+      )}
+
       <h2 className="text-base font-semibold">Edit text</h2>
 
       <div className="space-y-1.5">
