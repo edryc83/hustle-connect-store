@@ -1,6 +1,6 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-const APP_URL = "https://hustle-connect-store.lovable.app";
+const APP_URL = "https://afristall.com";
 const FALLBACK_IMAGE = `${APP_URL}/logo-glow.png`;
 
 Deno.serve(async (req) => {
