@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { X, Pencil, Plus, Check, MessageCircle } from "lucide-react";
-import { ATTRIBUTE_TYPES, type AttributeType } from "@/lib/productAttributes";
+import { ATTRIBUTE_TYPES, COLOUR_HEX, type AttributeType } from "@/lib/productAttributes";
 import {
   Sheet,
   SheetContent,
