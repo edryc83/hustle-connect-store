@@ -131,11 +131,11 @@ function ProductCard({
               <Star className="h-2.5 w-2.5 mr-0.5 fill-current" /> Featured
             </Badge>
           )}
-          {hasDiscount && (
-            <Badge className="text-[10px] px-2 py-0.5 bg-destructive text-destructive-foreground shadow-sm rounded-full font-medium">
-              {discountPercent}% OFF
-            </Badge>
-          )}
+           {hasDiscount && (
+             <Badge className="text-[11px] px-2.5 py-1 bg-gradient-to-r from-destructive to-destructive/80 text-destructive-foreground shadow-lg shadow-destructive/40 rounded-full font-bold tracking-tight">
+               {discountPercent}% OFF
+             </Badge>
+           )}
           {product.listing_type === "service" && (
             <Badge variant="secondary" className="text-[10px] px-2 py-0.5 shadow-sm rounded-full">Service</Badge>
           )}
