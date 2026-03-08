@@ -1,4 +1,4 @@
-import { Package, LayoutDashboard, Settings, LogOut, ClipboardList, BarChart3, Moon, Sun } from "lucide-react";
+import { Package, LayoutDashboard, User, Settings, LogOut, ClipboardList, BarChart3, Moon, Sun } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useAuth } from "@/hooks/useAuth";
 import { useTheme } from "@/hooks/useTheme";
@@ -32,6 +32,7 @@ export function DashboardSidebar() {
     { title: terms.plural, url: "/dashboard/products", icon: Package },
     { title: "Orders", url: "/dashboard/orders", icon: ClipboardList },
     { title: "Analytics", url: "/dashboard/analytics", icon: BarChart3 },
+    { title: "Profile", url: "/dashboard/profile", icon: User },
     { title: "Settings", url: "/dashboard/settings", icon: Settings },
   ];
 

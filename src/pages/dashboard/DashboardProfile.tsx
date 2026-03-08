@@ -1,0 +1,363 @@
+import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
+import { useBusinessTerms } from "@/hooks/useBusinessTerms";
+import { Button } from "@/components/ui/button";
+import { Textarea } from "@/components/ui/textarea";
+import { toast } from "sonner";
+import { formatPrice } from "@/lib/currency";
+import {
+  Camera, Loader2, Sparkles, Eye, ShoppingCart, Settings, Pencil, Check, X,
+} from "lucide-react";
+import AfristallLogo from "@/components/AfristallLogo";
+import type { Tables } from "@/integrations/supabase/types";
+import {
+  Dialog, DialogContent, DialogHeader, DialogTitle,
+} from "@/components/ui/dialog";
+
+type Product = Tables<"products">;
+
+const DashboardProfile = () => {
+  const { user } = useAuth();
+  const terms = useBusinessTerms();
+
+  const [loading, setLoading] = useState(true);
+  const [profile, setProfile] = useState<any>(null);
+  const [products, setProducts] = useState<Product[]>([]);
+  const [productImages, setProductImages] = useState<Record<string, string>>({});
+  const [viewCount, setViewCount] = useState(0);
+  const [orderCount, setOrderCount] = useState(0);
+  const [uploadingPic, setUploadingPic] = useState(false);
+  const [uploadingCover, setUploadingCover] = useState(false);
+
+  // Inline bio editing
+  const [editingBio, setEditingBio] = useState(false);
+  const [bioText, setBioText] = useState("");
+  const [savingBio, setSavingBio] = useState(false);
+  const [generatingBio, setGeneratingBio] = useState(false);
+
+  // Product detail modal
+  const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+
+  useEffect(() => {
+    if (!user) return;
+    const load = async () => {
+      const [{ data: prof }, { data: prods }, { count: orders }] = await Promise.all([
+        supabase.from("profiles").select("*").eq("id", user.id).single(),
+        supabase.from("products").select("*").eq("user_id", user.id).order("created_at", { ascending: false }),
+        supabase.from("orders").select("*", { count: "exact", head: true }).eq("seller_id", user.id).eq("status", "confirmed"),
+      ]);
+      const p = prof as any;
+      setProfile(p);
+      setBioText(p?.store_bio || p?.welcome_message || "");
+      setViewCount(p?.view_count ?? 0);
+      setOrderCount(orders ?? 0);
+      setProducts(prods ?? []);
+
+      // Fetch first image for each product
+      if (prods && prods.length > 0) {
+        const ids = prods.map((pr) => pr.id);
+        const { data: imgs } = await supabase
+          .from("product_images")
+          .select("product_id, image_url")
+          .in("product_id", ids)
+          .order("position", { ascending: true });
+        const map: Record<string, string> = {};
+        imgs?.forEach((img) => {
+          if (!map[img.product_id]) map[img.product_id] = img.image_url;
+        });
+        setProductImages(map);
+      }
+      setLoading(false);
+    };
+    load();
+  }, [user]);
+
+  const handleProfilePicChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    let file = e.target.files?.[0];
+    if (!file || !user) return;
+    if (file.size > 5 * 1024 * 1024) { toast.error("Image must be under 5MB"); return; }
+    setUploadingPic(true);
+    try {
+      const { compressImage } = await import("@/lib/imageCompression");
+      file = await compressImage(file);
+      const ext = file.name.split(".").pop();
+      const path = `${user.id}/profile.${ext}`;
+      await supabase.storage.from("store-images").upload(path, file, { upsert: true });
+      const { data: urlData } = supabase.storage.from("store-images").getPublicUrl(path);
+      await supabase.from("profiles").update({ profile_picture_url: urlData.publicUrl } as any).eq("id", user.id);
+      setProfile((prev: any) => ({ ...prev, profile_picture_url: `${urlData.publicUrl}?t=${Date.now()}` }));
+      toast.success("Profile picture updated!");
+    } catch { toast.error("Failed to upload"); }
+    setUploadingPic(false);
+  };
+
+  const handleCoverChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    let file = e.target.files?.[0];
+    if (!file || !user) return;
+    if (file.size > 5 * 1024 * 1024) { toast.error("Image must be under 5MB"); return; }
+    setUploadingCover(true);
+    try {
+      const { compressImage } = await import("@/lib/imageCompression");
+      file = await compressImage(file);
+      const ext = file.name.split(".").pop();
+      const path = `${user.id}/cover.${ext}`;
+      await supabase.storage.from("store-images").upload(path, file, { upsert: true });
+      const { data: urlData } = supabase.storage.from("store-images").getPublicUrl(path);
+      await supabase.from("profiles").update({ cover_photo_url: urlData.publicUrl } as any).eq("id", user.id);
+      setProfile((prev: any) => ({ ...prev, cover_photo_url: `${urlData.publicUrl}?t=${Date.now()}` }));
+      toast.success("Cover photo updated!");
+    } catch { toast.error("Failed to upload"); }
+    setUploadingCover(false);
+  };
+
+  const handleSaveBio = async () => {
+    if (!user) return;
+    setSavingBio(true);
+    const { error } = await supabase.from("profiles").update({
+      store_bio: bioText.trim() || null,
+      welcome_message: bioText.trim() || null,
+    } as any).eq("id", user.id);
+    if (error) toast.error("Failed to save");
+    else {
+      toast.success("Bio updated!");
+      setProfile((prev: any) => ({ ...prev, store_bio: bioText.trim(), welcome_message: bioText.trim() }));
+    }
+    setSavingBio(false);
+    setEditingBio(false);
+  };
+
+  const handleGenerateBio = async () => {
+    if (!profile) return;
+    setGeneratingBio(true);
+    try {
+      const res = await supabase.functions.invoke("generate-bio", {
+        body: { storeName: profile.store_name, category: profile.category || "", city: profile.city || "" },
+      });
+      if (res.data?.bio) {
+        setBioText(res.data.bio);
+        toast.success("Bio generated!");
+      }
+    } catch { toast.error("Failed to generate"); }
+    setGeneratingBio(false);
+  };
+
+  if (loading) return <div className="animate-pulse text-muted-foreground py-12 text-center">Loading…</div>;
+  if (!profile) return null;
+
+  const currency = profile.currency || "UGX";
+
+  return (
+    <div className="max-w-lg mx-auto -mx-4 md:mx-auto -mt-4 md:mt-0">
+      {/* Cover Photo */}
+      <div className="relative h-36 sm:h-44 bg-gradient-to-br from-primary/15 via-primary/5 to-accent/10 overflow-hidden group">
+        {profile.cover_photo_url ? (
+          <img src={profile.cover_photo_url} alt="" className="w-full h-full object-cover" />
+        ) : (
+          <div className="w-full h-full flex items-center justify-center text-muted-foreground/30">
+            <Camera className="h-10 w-10" />
+          </div>
+        )}
+        <label className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
+          {uploadingCover ? <Loader2 className="h-6 w-6 text-white animate-spin" /> : (
+            <div className="text-white text-center">
+              <Camera className="h-6 w-6 mx-auto" />
+              <span className="text-xs mt-1 block">Change cover</span>
+            </div>
+          )}
+          <input type="file" accept="image/*" className="hidden" onChange={handleCoverChange} disabled={uploadingCover} />
+        </label>
+
+        {/* Settings gear */}
+        <Link
+          to="/dashboard/settings"
+          className="absolute top-3 right-3 h-8 w-8 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center text-white hover:bg-black/60 transition-colors"
+        >
+          <Settings className="h-4 w-4" />
+        </Link>
+      </div>
+
+      {/* Profile section */}
+      <div className="px-4 -mt-10 relative z-10">
+        {/* Profile Picture */}
+        <div className="relative group w-fit">
+          {profile.profile_picture_url ? (
+            <img
+              src={profile.profile_picture_url}
+              alt={profile.store_name ?? "Store"}
+              className="h-20 w-20 rounded-full object-cover border-4 border-background shadow-lg"
+            />
+          ) : (
+            <div className="flex h-20 w-20 items-center justify-center rounded-full bg-primary/10 border-4 border-background shadow-lg">
+              <AfristallLogo className="h-8 w-8" />
+            </div>
+          )}
+          <label className="absolute inset-0 flex items-center justify-center rounded-full bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
+            {uploadingPic ? <Loader2 className="h-5 w-5 text-white animate-spin" /> : <Camera className="h-5 w-5 text-white" />}
+            <input type="file" accept="image/*" className="hidden" onChange={handleProfilePicChange} disabled={uploadingPic} />
+          </label>
+        </div>
+
+        {/* Name & username */}
+        <h1 className="text-xl font-extrabold tracking-tight mt-2">{profile.store_name || "Your Store"}</h1>
+        {profile.store_slug && (
+          <p className="text-sm text-muted-foreground">@{profile.store_slug}</p>
+        )}
+
+        {/* Bio - inline editable */}
+        <div className="mt-2">
+          {editingBio ? (
+            <div className="space-y-2">
+              <Textarea
+                value={bioText}
+                onChange={(e) => setBioText(e.target.value)}
+                rows={3}
+                maxLength={300}
+                className="text-sm"
+                autoFocus
+              />
+              <div className="flex items-center gap-2">
+                <Button size="sm" onClick={handleSaveBio} disabled={savingBio} className="gap-1.5 rounded-xl">
+                  <Check className="h-3.5 w-3.5" /> {savingBio ? "Saving…" : "Save"}
+                </Button>
+                <Button size="sm" variant="ghost" onClick={() => { setEditingBio(false); setBioText(profile.store_bio || profile.welcome_message || ""); }} className="rounded-xl">
+                  <X className="h-3.5 w-3.5" />
+                </Button>
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={handleGenerateBio}
+                  disabled={generatingBio}
+                  className="gap-1 text-xs text-primary rounded-xl ml-auto"
+                >
+                  {generatingBio ? <Loader2 className="h-3 w-3 animate-spin" /> : <Sparkles className="h-3 w-3" />}
+                  AI
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <button
+              onClick={() => setEditingBio(true)}
+              className="text-left group/bio w-full"
+            >
+              <p className="text-sm text-muted-foreground leading-relaxed line-clamp-3">
+                {profile.store_bio || profile.welcome_message || (
+                  <span className="italic text-muted-foreground/60">Tap to add a bio…</span>
+                )}
+                <Pencil className="inline h-3 w-3 ml-1.5 opacity-0 group-hover/bio:opacity-100 transition-opacity text-primary" />
+              </p>
+            </button>
+          )}
+        </div>
+
+        {/* Stats row — Instagram style */}
+        <div className="flex items-center justify-around mt-4 py-3 border-y border-border/50">
+          <Link to="/dashboard/products" className="text-center group">
+            <p className="text-lg font-bold group-hover:text-primary transition-colors">{products.length}</p>
+            <p className="text-xs text-muted-foreground">{terms.plural}</p>
+          </Link>
+          <Link to="/dashboard/analytics" className="text-center group">
+            <p className="text-lg font-bold group-hover:text-primary transition-colors">{viewCount}</p>
+            <p className="text-xs text-muted-foreground">Views</p>
+          </Link>
+          <Link to="/dashboard/orders" className="text-center group">
+            <p className="text-lg font-bold group-hover:text-primary transition-colors">{orderCount}</p>
+            <p className="text-xs text-muted-foreground">Sales</p>
+          </Link>
+        </div>
+
+        {/* View as buyer button */}
+        {profile.store_slug && (
+          <div className="mt-3">
+            <Button asChild variant="outline" className="w-full rounded-xl gap-2" size="sm">
+              <Link to={`/${profile.store_slug}`} target="_blank">
+                <Eye className="h-4 w-4" /> View as buyer
+              </Link>
+            </Button>
+          </div>
+        )}
+      </div>
+
+      {/* Product Grid — Instagram 3-column */}
+      <div className="mt-5 px-0.5">
+        {products.length === 0 ? (
+          <div className="text-center py-16 space-y-3">
+            <span className="text-4xl">{terms.emoji}</span>
+            <p className="text-sm text-muted-foreground">No {terms.plural.toLowerCase()} yet</p>
+            <Button asChild size="sm" className="rounded-xl">
+              <Link to="/dashboard/products?add=true">Add {terms.singular}</Link>
+            </Button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-3 gap-0.5">
+            {products.map((product) => {
+              const imgUrl = productImages[product.id] || product.image_url;
+              return (
+                <button
+                  key={product.id}
+                  onClick={() => setSelectedProduct(product)}
+                  className="relative aspect-square overflow-hidden bg-muted/30 group"
+                >
+                  {imgUrl ? (
+                    <img src={imgUrl} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200" />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-muted-foreground/40">
+                      <AfristallLogo className="h-8 w-8" />
+                    </div>
+                  )}
+                  {/* Hover overlay with price */}
+                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                    <span className="text-white text-sm font-bold">
+                      {formatPrice(product.discount_price ?? product.price, currency)}
+                    </span>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        )}
+      </div>
+
+      {/* Product detail / edit modal */}
+      <Dialog open={!!selectedProduct} onOpenChange={(open) => !open && setSelectedProduct(null)}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="truncate">{selectedProduct?.name}</DialogTitle>
+          </DialogHeader>
+          {selectedProduct && (
+            <div className="space-y-4">
+              {(productImages[selectedProduct.id] || selectedProduct.image_url) && (
+                <img
+                  src={productImages[selectedProduct.id] || selectedProduct.image_url || ""}
+                  alt={selectedProduct.name}
+                  className="w-full aspect-square object-cover rounded-xl"
+                />
+              )}
+              <div className="space-y-1">
+                <p className="text-lg font-bold">
+                  {formatPrice(selectedProduct.discount_price ?? selectedProduct.price, currency)}
+                </p>
+                {selectedProduct.discount_price && (
+                  <p className="text-sm text-muted-foreground line-through">
+                    {formatPrice(selectedProduct.price, currency)}
+                  </p>
+                )}
+              </div>
+              {selectedProduct.description && (
+                <p className="text-sm text-muted-foreground">{selectedProduct.description}</p>
+              )}
+              <Button asChild className="w-full rounded-xl gap-2">
+                <Link to={`/dashboard/products?edit=${selectedProduct.id}`} onClick={() => setSelectedProduct(null)}>
+                  <Pencil className="h-4 w-4" /> Edit {terms.singular}
+                </Link>
+              </Button>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+};
+
+export default DashboardProfile;

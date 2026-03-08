@@ -13,6 +13,7 @@ import Login from "./pages/Login";
 import DashboardOverview from "./pages/dashboard/DashboardOverview";
 import DashboardProducts from "./pages/dashboard/DashboardProducts";
 import DashboardSettings from "./pages/dashboard/DashboardSettings";
+import DashboardProfile from "./pages/dashboard/DashboardProfile";
 import DashboardOrders from "./pages/dashboard/DashboardOrders";
 import DashboardAnalytics from "./pages/dashboard/DashboardAnalytics";
 import AdminOverview from "./pages/admin/AdminOverview";
@@ -42,6 +43,7 @@ const App = () => (
               <Route path="/reset-password" element={<ResetPassword />} />
               <Route path="/dashboard" element={<DashboardLayout><DashboardOverview /></DashboardLayout>} />
               <Route path="/dashboard/products" element={<DashboardLayout><DashboardProducts /></DashboardLayout>} />
+              <Route path="/dashboard/profile" element={<DashboardLayout><DashboardProfile /></DashboardLayout>} />
               <Route path="/dashboard/settings" element={<DashboardLayout><DashboardSettings /></DashboardLayout>} />
               <Route path="/dashboard/orders" element={<DashboardLayout><DashboardOrders /></DashboardLayout>} />
               <Route path="/dashboard/analytics" element={<DashboardLayout><DashboardAnalytics /></DashboardLayout>} />
