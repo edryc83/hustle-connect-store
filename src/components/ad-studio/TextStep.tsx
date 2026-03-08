@@ -44,11 +44,12 @@ interface TextStepProps {
 
 export default function TextStep({
   productName, setProductName, price, setPrice, tagline, setTagline,
-  subtitle, setSubtitle, storeLogo, setStoreLogo,
+  subtitle, setSubtitle,
   imagePreview, removeBg, onRemoveBgChange, onProcessedImage,
   bgImageUrl, setBgImageUrl, bgColor, setBgColor, bgType, setBgType,
 }: TextStepProps) {
   const [aiLoading, setAiLoading] = useState(false);
+  const [subtitleAiLoading, setSubtitleAiLoading] = useState(false);
   const [bgRemovalLoading, setBgRemovalLoading] = useState(false);
   const [processedUrl, setProcessedUrl] = useState<string | null>(null);
   const originalImageRef = useRef<string | null>(null);
