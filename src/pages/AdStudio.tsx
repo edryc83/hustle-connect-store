@@ -38,6 +38,7 @@ export default function AdStudio() {
   const [productName, setProductName] = useState("");
   const [price, setPrice] = useState("");
   const [tagline, setTagline] = useState("");
+  const [processedImageUrl, setProcessedImageUrl] = useState<string | null>(null);
 
   // Generation
   const [generating, setGenerating] = useState(false);
