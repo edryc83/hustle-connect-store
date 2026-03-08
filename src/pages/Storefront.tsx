@@ -12,8 +12,8 @@ import { useTheme } from "@/hooks/useTheme";
 import { useAuth } from "@/hooks/useAuth";
 import { CartProvider, useCart } from "@/hooks/useCart";
 import { WishlistProvider, useWishlist } from "@/hooks/useWishlist";
-import { BuyerAttributePicker, BuyerCakeMessageInput, BuyerPersonalisationInput } from "@/components/storefront/BuyerAttributePicker";
-import { getCategoryByValue, buildAttributeLines, parseTextToOptions } from "@/lib/productAttributes";
+import { BuyerAttributePicker, ChatOnlyBanner } from "@/components/storefront/BuyerAttributePicker";
+import { getAttributeSummary, getSelectableKeys, buildAttributeLines } from "@/lib/productAttributes";
 import { StorefrontFilters, applyFilters, type FilterState } from "@/components/storefront/StorefrontFilters";
 import { StoreAssistantButton } from "@/components/storefront/StoreAssistant";
 import {
@@ -77,31 +77,10 @@ function ShareButton({ storeName, storeSlug }: { storeName: string; storeSlug: s
 
 function getAttributeChips(product: Product): string[] {
   const attrs = (product as any).attributes as Record<string, any> | null;
-  if (!attrs || !attrs.product_type) return [];
-  const chips: string[] = [];
-  // Sizes (fashion, shoes)
-  if (Array.isArray(attrs.sizes) && attrs.sizes.length > 0) {
-    chips.push(attrs.sizes.length <= 3 ? attrs.sizes.join(", ") : `${attrs.sizes[0]}–${attrs.sizes[attrs.sizes.length - 1]}`);
-  }
-  // Condition
-  if (attrs.condition && typeof attrs.condition === "string") chips.push(attrs.condition);
-  // Gender
-  if (attrs.gender) chips.push(attrs.gender);
-  // Material (pills value)
-  if (attrs.material && typeof attrs.material === "string" && attrs.material.length < 20) chips.push(attrs.material);
-  // Storage (phones)
-  if (Array.isArray(attrs.storage) && attrs.storage.length > 0) {
-    chips.push(attrs.storage.join(" · "));
-  }
-  // Texture (wigs)
-  if (attrs.texture) chips.push(attrs.texture);
-  // Length (wigs)
-  if (attrs.length) chips.push(attrs.length);
-  // Cake size
-  if (attrs.cake_size) chips.push(attrs.cake_size);
-  // Hair type
-  if (attrs.hair_type) chips.push(attrs.hair_type);
-  return chips.slice(0, 3); // max 3 chips
+  if (!attrs) return [];
+  if (attrs.chat_only) return ["💬 Chat to order"];
+  const summary = getAttributeSummary(attrs);
+  return summary ? summary.split("  •  ").slice(0, 3) : [];
 }
 
 function ProductCard({
@@ -238,40 +217,32 @@ function ProductDetailView({
   const { toggle, isWished } = useWishlist();
   const [selectedImg, setSelectedImg] = useState(0);
   const [qty, setQty] = useState(1);
-  const [attrSelections, setAttrSelections] = useState<Record<string, string | string[]>>({});
-  const [attrTextInputs, setAttrTextInputs] = useState<Record<string, string>>({});
-  const [cakeMessage, setCakeMessage] = useState("");
-  const [personalisation, setPersonalisation] = useState("");
+  const [attrSelections, setAttrSelections] = useState<Record<string, string>>({});
+  const [validationErrors, setValidationErrors] = useState<Record<string, boolean>>({});
   const [deliveryAddress, setDeliveryAddress] = useState("");
 
   const attrs = (product as any).attributes as Record<string, any> | null;
-  const hasAttributes = attrs && attrs.product_type;
+  const isChatOnly = attrs?.chat_only === true;
+  const selectableKeys = attrs ? getSelectableKeys(attrs) : [];
+  const hasAttributes = selectableKeys.length > 0;
 
-  const handleAttrSelect = (key: string, value: string | string[]) => {
+  const handleAttrSelect = (key: string, value: string) => {
     setAttrSelections((prev) => ({ ...prev, [key]: value }));
-  };
-  const handleAttrText = (key: string, value: string) => {
-    setAttrTextInputs((prev) => ({ ...prev, [key]: value }));
+    setValidationErrors((prev) => ({ ...prev, [key]: false }));
   };
 
-  // Check if required selectable attributes are filled
-  const getSelectableFields = () => {
-    if (!hasAttributes || !attrs) return [];
-    const category = getCategoryByValue(attrs.product_type);
-    if (!category) return [];
-    return category.fields.filter((f) => {
-      const val = attrs[f.key];
-      if (!val) return false;
-      if (f.type === "toggle" || f.type === "number") return false; // info-only
-      if (Array.isArray(val) && val.length === 0) return false;
-      if (typeof val === "string" && !val.trim()) return false;
-      // For text fields, check if they parse to multiple options
-      if (f.type === "text") {
-        const opts = parseTextToOptions(val);
-        return opts.length > 0;
+  const validateSelections = (): boolean => {
+    if (isChatOnly || !hasAttributes) return true;
+    const errors: Record<string, boolean> = {};
+    let valid = true;
+    for (const key of selectableKeys) {
+      if (!attrSelections[key]) {
+        errors[key] = true;
+        valid = false;
       }
-      return true;
-    });
+    }
+    setValidationErrors(errors);
+    return valid;
   };
 
   const buildWhatsAppMessage = () => {
@@ -284,17 +255,13 @@ function ProductDetailView({
       `Price: ${formatPrice(dp * qty, currency)}`,
     ];
 
-    if (hasAttributes && attrs) {
-      const allTextInputs = { ...attrTextInputs };
-      if (cakeMessage) allTextInputs["cake_message_text"] = cakeMessage;
-      if (personalisation) allTextInputs["personalisation_text"] = personalisation;
-
-      const attrLines = buildAttributeLines(attrs, attrSelections, allTextInputs);
+    if (isChatOnly) {
+      lines.push(``, `I'd like to discuss the details with you directly.`);
+    } else if (hasAttributes && attrs) {
+      const attrLines = buildAttributeLines(attrs, attrSelections);
       if (attrLines.length > 0) {
         lines.push(``, `📋 Order Details:`);
         lines.push(...attrLines);
-        if (cakeMessage) lines.push(`- Message on cake: "${cakeMessage}"`);
-        if (personalisation) lines.push(`- Personalisation: ${personalisation}`);
       }
     }
 
@@ -421,25 +388,17 @@ function ProductDetailView({
         )}
 
         {/* Dynamic Attribute Selectors */}
-        {hasAttributes && attrs && (
+        {isChatOnly && (
+          <ChatOnlyBanner />
+        )}
+        {hasAttributes && attrs && !isChatOnly && (
           <div className="rounded-2xl border border-border/60 bg-card p-4 space-y-4">
             <p className="text-sm font-semibold">Customize your order</p>
             <BuyerAttributePicker
               attributes={attrs}
               selections={attrSelections}
-              textInputs={attrTextInputs}
-              onSelectionChange={handleAttrSelect}
-              onTextInputChange={handleAttrText}
-            />
-            <BuyerCakeMessageInput
-              attributes={attrs}
-              value={cakeMessage}
-              onChange={setCakeMessage}
-            />
-            <BuyerPersonalisationInput
-              attributes={attrs}
-              value={personalisation}
-              onChange={setPersonalisation}
+              onSelect={handleAttrSelect}
+              validationErrors={validationErrors}
             />
           </div>
         )}
@@ -498,20 +457,9 @@ function ProductDetailView({
               className="gap-2 text-base"
               onClick={() => {
                 // Validate required attribute selections
-                if (hasAttributes && attrs) {
-                  const selectableFields = getSelectableFields();
-                  for (const field of selectableFields) {
-                    const sel = attrSelections[field.key];
-                    const txt = attrTextInputs[field.key];
-                    if (!sel && !txt) {
-                      toast.error(`Please select a ${field.label.toLowerCase()} before ordering`);
-                      return;
-                    }
-                    if (typeof sel === "string" && !sel.trim()) {
-                      toast.error(`Please select a ${field.label.toLowerCase()} before ordering`);
-                      return;
-                    }
-                  }
+                if (!validateSelections()) {
+                  toast.error("Please select all required options before ordering");
+                  return;
                 }
 
                 const cleanNumber = (profile.whatsapp_number ?? "").replace(/[^0-9+]/g, "");

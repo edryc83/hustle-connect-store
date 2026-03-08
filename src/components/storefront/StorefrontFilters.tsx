@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Search, SlidersHorizontal, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { PRODUCT_CATEGORIES } from "@/lib/productAttributes";
+import { ATTRIBUTE_TYPES } from "@/lib/productAttributes";
 
 export interface FilterState {
   search: string;
@@ -43,15 +43,9 @@ export function StorefrontFilters({ filters, onChange, totalCount, filteredCount
 
   const clearAll = () => onChange({ search: "", category: "", condition: "", priceRange: null });
 
-  // Only show categories that exist in this store's products
-  const storeCategories = new Set(
-    products
-      .map((p) => (p.attributes as Record<string, any> | null)?.product_type)
-      .filter(Boolean)
-  );
+  // Categories no longer used with the new flat attribute system
   const categories = [
     { value: "", label: "All", emoji: "" },
-    ...PRODUCT_CATEGORIES.filter((c) => storeCategories.has(c.value)).map((c) => ({ value: c.value, label: c.label, emoji: c.emoji })),
   ];
 
   // Only show conditions that exist in this store's products
@@ -192,8 +186,7 @@ export function StorefrontFilters({ filters, onChange, totalCount, filteredCount
         <div className="flex flex-wrap gap-1.5 items-center">
           {filters.category && (
             <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 border border-primary/30 px-2.5 py-1 text-xs font-medium text-primary">
-              {PRODUCT_CATEGORIES.find((c) => c.value === filters.category)?.emoji}{" "}
-              {PRODUCT_CATEGORIES.find((c) => c.value === filters.category)?.label}
+              {filters.category}
               <button onClick={() => update({ category: "" })} className="hover:text-primary/70"><X className="h-3 w-3" /></button>
             </span>
           )}
