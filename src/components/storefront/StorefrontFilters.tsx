@@ -43,15 +43,9 @@ export function StorefrontFilters({ filters, onChange, totalCount, filteredCount
 
   const clearAll = () => onChange({ search: "", category: "", condition: "", priceRange: null });
 
-  // Only show categories that exist in this store's products
-  const storeCategories = new Set(
-    products
-      .map((p) => (p.attributes as Record<string, any> | null)?.product_type)
-      .filter(Boolean)
-  );
+  // Categories no longer used with the new flat attribute system
   const categories = [
     { value: "", label: "All", emoji: "" },
-    ...PRODUCT_CATEGORIES.filter((c) => storeCategories.has(c.value)).map((c) => ({ value: c.value, label: c.label, emoji: c.emoji })),
   ];
 
   // Only show conditions that exist in this store's products
