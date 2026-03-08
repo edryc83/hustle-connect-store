@@ -51,7 +51,7 @@ export function MobileBottomNav() {
                 <img
                   src={profilePic}
                   alt="Profile"
-                  className="h-5 w-5 rounded-full object-cover ring-1 ring-border"
+                  className={`h-5 w-5 rounded-full object-cover ring-2 ${isProfileActive ? "ring-primary" : "ring-border"}`}
                 />
               ) : (
                 <User className="h-5 w-5" />
