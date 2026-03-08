@@ -129,10 +129,10 @@ export function ProductAttributeForm({ attributes, onChange }: ProductAttributeF
   if (isChatOnly) {
     return (
       <div className="space-y-2">
-        <div className="rounded-xl border border-border/60 bg-muted/30 p-3 flex items-center justify-between">
+        <div className="rounded-xl border border-[#25D366]/30 bg-[#25D366]/10 p-3 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <MessageCircle className="h-4 w-4 text-primary" />
-            <span className="text-sm font-medium">💬 Chat to order</span>
+            <img src={whatsappIcon} alt="WhatsApp" className="h-5 w-5" />
+            <span className="text-sm font-medium text-[#25D366]">Chat to order</span>
           </div>
           <button
             type="button"
