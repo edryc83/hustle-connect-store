@@ -302,7 +302,6 @@ export function ProductAttributeForm({ attributes, onChange }: ProductAttributeF
                         </button>
                       );
                     })}
-                    ))}
                   </div>
                 )}
 
