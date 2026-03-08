@@ -136,6 +136,9 @@ const DashboardProducts = () => {
     setName(product.name);
     setPrice(formatCommaInput(String(product.price)));
     setDiscountPrice((product as any).discount_price ? formatCommaInput(String((product as any).discount_price)) : "");
+    if ((product as any).discount_price && product.price > 0) {
+      setDiscountPercent(String(Math.round(((product.price - Number((product as any).discount_price)) / product.price) * 100)));
+    } else { setDiscountPercent(""); }
     setDescription(product.description ?? "");
     setVariantsText(product.variants_text ?? "");
     setExistingImages(productImages[product.id] ?? (product.image_url ? [product.image_url] : []));
