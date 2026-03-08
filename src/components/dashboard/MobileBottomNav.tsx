@@ -1,5 +1,6 @@
 import { LayoutDashboard, Package, User, ClipboardList, BarChart3 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
+import { useLocation } from "react-router-dom";
 import { useBusinessTerms } from "@/hooks/useBusinessTerms";
 import { useAuth } from "@/hooks/useAuth";
 import { useQuery } from "@tanstack/react-query";
