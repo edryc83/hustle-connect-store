@@ -39,7 +39,6 @@ export default function AdStudio() {
   const [price, setPrice] = useState("");
   const [tagline, setTagline] = useState("");
   const [subtitle, setSubtitle] = useState("");
-  const [storeLogo, setStoreLogo] = useState<string | null>(null);
   const [processedImageUrl, setProcessedImageUrl] = useState<string | null>(null);
   const [bgImageUrl, setBgImageUrl] = useState<string | null>(null);
   const [bgColor, setBgColor] = useState("#000000");
@@ -155,17 +154,6 @@ export default function AdStudio() {
         modifications.push({ name: "subtitle", text: subtitle });
       }
 
-      if (storeLogo) {
-        // If it's a blob URL, upload first
-        let logoUrl = storeLogo;
-        if (storeLogo.startsWith("blob:")) {
-          const logoFile = (window as any).__adStudioLogoFile as File | undefined;
-          if (logoFile) {
-            logoUrl = await uploadImage(logoFile);
-          }
-        }
-        modifications.push({ name: "store_logo", image_url: logoUrl });
-      }
 
       if (bgType === "color" && bgColor) {
         modifications.push({ name: "background", color: bgColor });
@@ -276,8 +264,6 @@ export default function AdStudio() {
             setTagline={setTagline}
             subtitle={subtitle}
             setSubtitle={setSubtitle}
-            storeLogo={storeLogo}
-            setStoreLogo={setStoreLogo}
             imagePreview={imagePreview}
             removeBg={removeBg}
             onRemoveBgChange={setRemoveBg}
