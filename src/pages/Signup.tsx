@@ -221,6 +221,16 @@ const Signup = () => {
 
       if (profileError) throw profileError;
 
+      // Auto-generate bio if none provided (fire-and-forget)
+      const catString = serializeCategories(categorySelection);
+      supabase.functions.invoke("generate-bio", {
+        body: { storeName: storeName.trim(), category: catString, city: city || "" },
+      }).then(({ data }) => {
+        if (data?.bio) {
+          supabase.from("profiles").update({ welcome_message: data.bio } as any).eq("id", authData.user.id);
+        }
+      }).catch(() => {});
+
       toast.success("Welcome to Afristall! 🎉");
       navigate("/dashboard");
     } catch (error: any) {

@@ -181,30 +181,7 @@ const DashboardOverview = () => {
         </div>
       )}
 
-      {/* Install app banner */}
-      {!isInstalled && (
-        <button
-          onClick={async () => {
-            if (canInstall) {
-              await promptInstall();
-            } else {
-              window.location.href = "/dashboard/settings#install-app";
-            }
-          }}
-          className="flex w-full items-center gap-3 rounded-2xl border-2 border-primary bg-primary/5 backdrop-blur-xl p-4 shadow-sm hover:bg-primary/10 transition-colors text-left animate-[pulse_2s_cubic-bezier(0.4,0,0.6,1)_infinite] ring-2 ring-primary/30"
-        >
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
-            <Download className="h-5 w-5 text-primary" />
-          </div>
-          <div className="flex-1">
-            <p className="text-sm font-semibold">Install App</p>
-            <p className="text-xs text-muted-foreground">
-              {canInstall ? "Tap to install now" : "Add to home screen"}
-            </p>
-          </div>
-          <span className="text-xs text-primary font-medium">{canInstall ? "Install" : "How →"}</span>
-        </button>
-      )}
+
 
 
 
