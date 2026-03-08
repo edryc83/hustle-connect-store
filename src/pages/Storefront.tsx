@@ -681,6 +681,13 @@ const StorefrontInner = () => {
     }
   }, []);
 
+  // Scroll to top when viewing a product detail
+  useEffect(() => {
+    if (productId) {
+      window.scrollTo({ top: 0, behavior: "instant" });
+    }
+  }, [productId]);
+
 
   if (loading) {
     return (
@@ -711,6 +718,7 @@ const StorefrontInner = () => {
 
   // Product detail view
   const viewProduct = productId ? products.find((p) => p.id === productId) : null;
+
 
   if (viewProduct) {
     const imgs = productImagesMap[viewProduct.id] ?? (viewProduct.image_url ? [viewProduct.image_url] : []);
