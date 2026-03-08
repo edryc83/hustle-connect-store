@@ -417,19 +417,17 @@ const DashboardProducts = () => {
                 <Textarea id="productDesc" placeholder={listingType === "service" ? "What does this service package include?" : "What makes this product special?"} value={description} onChange={(e) => { setDescription(e.target.value); setAiFilledFields((prev) => { const n = new Set(prev); n.delete("description"); return n; }); }} rows={3} />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="productVariants">Variants / Options</Label>
+                <Label htmlFor="productVariants">Variants / Options <span className="text-muted-foreground font-normal">(optional)</span></Label>
                 <Input id="productVariants" placeholder="e.g. Small, Medium, Large" value={variantsText} onChange={(e) => setVariantsText(e.target.value)} />
               </div>
               {/* Dynamic Product Attributes */}
-              {listingType === "product" && (
-                <div className="space-y-1.5">
-                  <Label className="text-sm font-semibold flex items-center gap-1.5">
-                    📋 Product Options <span className="text-muted-foreground font-normal text-xs">(optional)</span>
-                    {aiFilledFields.has("category") && <span className="text-[10px] text-primary font-medium flex items-center gap-0.5"><Sparkles className="h-2.5 w-2.5" />AI filled</span>}
-                  </Label>
-                  <ProductAttributeForm attributes={attributes} onChange={(attrs) => { setAttributes(attrs); setAiFilledFields((prev) => { const n = new Set(prev); n.delete("category"); return n; }); }} />
-                </div>
-              )}
+              <div className="space-y-1.5">
+                <Label className="text-sm font-semibold flex items-center gap-1.5">
+                  📋 Product Details <span className="text-muted-foreground font-normal text-xs">(optional)</span>
+                  {aiFilledFields.has("category") && <span className="text-[10px] text-primary font-medium flex items-center gap-0.5"><Sparkles className="h-2.5 w-2.5" />AI filled</span>}
+                </Label>
+                <ProductAttributeForm attributes={attributes} onChange={(attrs) => { setAttributes(attrs); setAiFilledFields((prev) => { const n = new Set(prev); n.delete("category"); return n; }); }} />
+              </div>
               <Button className="w-full" onClick={handleSave} disabled={saving}>
                 {saving ? "Saving…" : editingProduct ? `Update ${terms.singular}` : `Add ${terms.singular}`}
               </Button>
