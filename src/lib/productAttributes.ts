@@ -20,6 +20,28 @@ export interface AttributeType {
   isCustom?: boolean; // "Other" type with custom label
 }
 
+/** Map colour names to hex values for swatches */
+export const COLOUR_HEX: Record<string, string> = {
+  Black: "#000000",
+  White: "#FFFFFF",
+  Red: "#EF4444",
+  Blue: "#3B82F6",
+  Yellow: "#EAB308",
+  Green: "#22C55E",
+  Orange: "#F97316",
+  Purple: "#A855F7",
+  Pink: "#EC4899",
+  Brown: "#92400E",
+  Grey: "#6B7280",
+  Gold: "#D4A017",
+  Silver: "#C0C0C0",
+  Navy: "#1E3A5F",
+  Beige: "#F5F5DC",
+  Maroon: "#800000",
+  Teal: "#14B8A6",
+  Cream: "#FFFDD0",
+};
+
 export const ATTRIBUTE_TYPES: AttributeType[] = [
   {
     key: "size",

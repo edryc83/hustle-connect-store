@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { X, Pencil, Plus, Check, MessageCircle } from "lucide-react";
-import { ATTRIBUTE_TYPES, type AttributeType } from "@/lib/productAttributes";
+import { ATTRIBUTE_TYPES, COLOUR_HEX, type AttributeType } from "@/lib/productAttributes";
 import {
   Sheet,
   SheetContent,
@@ -186,8 +186,11 @@ export function ProductAttributeForm({ attributes, onChange }: ProductAttributeF
                   {values.map((v) => (
                     <span
                       key={v}
-                      className="rounded-full bg-primary/10 border border-primary/20 px-2.5 py-0.5 text-xs font-medium text-primary"
+                      className="rounded-full bg-primary/10 border border-primary/20 px-2.5 py-0.5 text-xs font-medium text-primary flex items-center gap-1.5"
                     >
+                      {key === "colour" && COLOUR_HEX[v] && (
+                        <span className="inline-block h-3 w-3 rounded-full border border-border/60 shrink-0" style={{ backgroundColor: COLOUR_HEX[v] }} />
+                      )}
                       {v}
                     </span>
                   ))}
@@ -274,21 +277,31 @@ export function ProductAttributeForm({ attributes, onChange }: ProductAttributeF
                 {/* Preset chips */}
                 {activeType.presets.length > 0 && (
                   <div className="flex flex-wrap gap-2">
-                    {activeType.presets.map((opt) => (
-                      <button
-                        key={opt}
-                        type="button"
-                        onClick={() => togglePreset(opt)}
-                        className={`rounded-full border-2 px-4 py-2 text-sm font-medium transition-all ${
-                          tempSelected.includes(opt)
-                            ? "border-primary bg-primary text-primary-foreground"
-                            : "border-border text-foreground hover:border-primary/40"
-                        }`}
-                      >
-                        {tempSelected.includes(opt) && <Check className="h-3 w-3 inline mr-1" />}
-                        {opt}
-                      </button>
-                    ))}
+                    {activeType.presets.map((opt) => {
+                      const isColour = activeType.key === "colour";
+                      const hex = isColour ? COLOUR_HEX[opt] : undefined;
+                      return (
+                        <button
+                          key={opt}
+                          type="button"
+                          onClick={() => togglePreset(opt)}
+                          className={`rounded-full border-2 px-4 py-2 text-sm font-medium transition-all flex items-center gap-2 ${
+                            tempSelected.includes(opt)
+                              ? "border-primary bg-primary text-primary-foreground"
+                              : "border-border text-foreground hover:border-primary/40"
+                          }`}
+                        >
+                          {isColour && hex && (
+                            <span
+                              className="inline-block h-4 w-4 rounded-full border border-border/60 shrink-0"
+                              style={{ backgroundColor: hex }}
+                            />
+                          )}
+                          {tempSelected.includes(opt) && <Check className="h-3 w-3 inline" />}
+                          {opt}
+                        </button>
+                      );
+                    })}
                   </div>
                 )}
 

@@ -1,4 +1,4 @@
-import { ATTRIBUTE_TYPES, getSelectableKeys } from "@/lib/productAttributes";
+import { ATTRIBUTE_TYPES, COLOUR_HEX, getSelectableKeys } from "@/lib/productAttributes";
 import { Check } from "lucide-react";
 
 interface BuyerAttributePickerProps {
@@ -39,23 +39,30 @@ export function BuyerAttributePicker({
               {hasError && <span className="text-xs ml-1">— required</span>}
             </p>
             <div className="flex flex-wrap gap-2">
-              {options.map((opt) => (
-                <button
-                  key={opt}
-                  type="button"
-                  onClick={() => onSelect(key, selected === opt ? "" : opt)}
-                  className={`rounded-full border-2 px-4 py-2 text-sm font-medium transition-all ${
-                    selected === opt
-                      ? "border-primary bg-primary text-primary-foreground"
-                      : hasError
-                      ? "border-destructive/40 text-foreground hover:border-destructive/60"
-                      : "border-border text-foreground hover:border-primary/40"
-                  }`}
-                >
-                  {selected === opt && <Check className="h-3 w-3 inline mr-1" />}
-                  {opt}
-                </button>
-              ))}
+              {options.map((opt) => {
+                const isColour = key === "colour" || key.includes("colour");
+                const hex = isColour ? COLOUR_HEX[opt] : undefined;
+                return (
+                  <button
+                    key={opt}
+                    type="button"
+                    onClick={() => onSelect(key, selected === opt ? "" : opt)}
+                    className={`rounded-full border-2 px-4 py-2 text-sm font-medium transition-all flex items-center gap-2 ${
+                      selected === opt
+                        ? "border-primary bg-primary text-primary-foreground"
+                        : hasError
+                        ? "border-destructive/40 text-foreground hover:border-destructive/60"
+                        : "border-border text-foreground hover:border-primary/40"
+                    }`}
+                  >
+                    {isColour && hex && (
+                      <span className="inline-block h-4 w-4 rounded-full border border-border/60 shrink-0" style={{ backgroundColor: hex }} />
+                    )}
+                    {selected === opt && <Check className="h-3 w-3 inline" />}
+                    {opt}
+                  </button>
+                );
+              })}
             </div>
           </div>
         );
