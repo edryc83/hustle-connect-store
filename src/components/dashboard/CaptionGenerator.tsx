@@ -90,20 +90,17 @@ const CaptionGenerator = ({ storeName, storeSlug, category, productCount }: Prop
                 </div>
               ))
             : captions.map((c, i) => (
-                <div
-                  key={i}
-                  className="rounded-xl bg-[#DCF8C6] dark:bg-[#005C4B] p-3 flex items-start gap-3 shadow-sm"
-                >
-                  <div className="flex-1 min-w-0">
-                    <span className="inline-block rounded-full bg-[#25D366]/20 border border-[#25D366]/30 px-2 py-0.5 text-[10px] font-semibold text-[#075E54] dark:text-[#25D366] mb-1.5">
-                      {c.vibe}
-                    </span>
-                    <p className="text-xs leading-relaxed whitespace-pre-line text-[#111B21] dark:text-[#E9EDEF]">{c.text}</p>
-                  </div>
-                  <div className="shrink-0 flex flex-col items-end gap-1.5 mt-1">
+                <div key={i} className="rounded-xl bg-[#DCF8C6] dark:bg-[#005C4B] p-3 shadow-sm space-y-2.5">
+                  <div className="flex items-start gap-3">
+                    <div className="flex-1 min-w-0">
+                      <span className="inline-block rounded-full bg-[#25D366]/20 border border-[#25D366]/30 px-2 py-0.5 text-[10px] font-semibold text-[#075E54] dark:text-[#25D366] mb-1.5">
+                        {c.vibe}
+                      </span>
+                      <p className="text-xs leading-relaxed whitespace-pre-line text-[#111B21] dark:text-[#E9EDEF]">{c.text}</p>
+                    </div>
                     <button
                       onClick={() => handleCopy(c.text, i)}
-                      className={`p-1.5 rounded-lg transition-colors ${
+                      className={`shrink-0 mt-1 p-1.5 rounded-lg transition-colors ${
                         copiedIdx === i
                           ? "text-[#25D366]"
                           : "text-[#075E54]/50 dark:text-[#E9EDEF]/50 hover:text-[#075E54] dark:hover:text-[#E9EDEF]"
@@ -112,16 +109,16 @@ const CaptionGenerator = ({ storeName, storeSlug, category, productCount }: Prop
                     >
                       {copiedIdx === i ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
                     </button>
-                    <button
-                      onClick={() => {
-                        window.open(`https://wa.me/?text=${encodeURIComponent(c.text)}`, "_blank");
-                      }}
-                      className="flex items-center gap-1.5 rounded-full bg-[#25D366] hover:bg-[#128C7E] text-white px-3 py-1.5 text-[10px] font-semibold transition-colors shadow-sm"
-                    >
-                      <img src={whatsappIcon} alt="" className="h-3 w-3" />
-                      Share to Status
-                    </button>
                   </div>
+                  <button
+                    onClick={() => {
+                      window.open(`https://wa.me/?text=${encodeURIComponent(c.text)}`, "_blank");
+                    }}
+                    className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#25D366] hover:bg-[#128C7E] text-white py-2 text-xs font-bold transition-colors shadow-sm"
+                  >
+                    <img src={whatsappIcon} alt="" className="h-4 w-4" />
+                    Post to Status
+                  </button>
                 </div>
               ))}
         </div>
