@@ -185,20 +185,25 @@ const DashboardProducts = () => {
     setAnalyzing(false);
   };
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = Array.from(e.target.files ?? []);
-    const totalImages = existingImages.length + imagePreviews.length + files.length;
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const rawFiles = Array.from(e.target.files ?? []);
+    const totalImages = existingImages.length + imagePreviews.length + rawFiles.length;
     if (totalImages > 5) { toast.error(`Maximum 5 images per ${terms.singular.toLowerCase()}`); return; }
-    for (const file of files) {
+    for (const file of rawFiles) {
       if (file.size > 5 * 1024 * 1024) { toast.error(`${file.name} is over 5MB`); return; }
     }
+
+    // Compress images before storing
+    const { compressImages } = await import("@/lib/imageCompression");
+    const files = await compressImages(rawFiles);
+
     setImageFiles((prev) => [...prev, ...files]);
     setImagePreviews((prev) => [...prev, ...files.map((f) => URL.createObjectURL(f))]);
 
     // Auto-analyze the first image if no name has been entered yet
     const isFirstImage = existingImages.length === 0 && imagePreviews.length === 0;
-    if (isFirstImage && files.length > 0 && !name.trim()) {
-      analyzeImage(files[0]);
+    if (isFirstImage && rawFiles.length > 0 && !name.trim()) {
+      analyzeImage(rawFiles[0]);
     }
   };
 
