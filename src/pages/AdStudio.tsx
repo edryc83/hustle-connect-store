@@ -273,7 +273,6 @@ export default function AdStudio() {
             bgType={bgType}
             setBgType={setBgType}
           />
-          />
         )}
 
         {error && (
