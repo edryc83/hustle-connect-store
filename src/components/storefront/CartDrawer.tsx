@@ -81,7 +81,13 @@ export function CartDrawer({ currency, whatsappNumber, storeName, storeSlug, sel
     });
 
     const waUrl = `https://wa.me/${cleanNumber}?text=${encodeURIComponent(lines.join("\n"))}`;
-    window.open(waUrl, "_blank");
+    const a = document.createElement("a");
+    a.href = waUrl;
+    a.target = "_blank";
+    a.rel = "noopener noreferrer";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
     clearCart();
     setIsOpen(false);
   };

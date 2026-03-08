@@ -485,7 +485,14 @@ function ProductDetailView({
                   });
                 });
                 supabase.rpc("increment_whatsapp_taps", { p_id: product.id }).then(() => {});
-                window.open(`https://wa.me/${cleanNumber.replace("+", "")}?text=${encodeURIComponent(message)}`, "_blank");
+                const waUrl = `https://wa.me/${cleanNumber.replace("+", "")}?text=${encodeURIComponent(message)}`;
+                const a = document.createElement("a");
+                a.href = waUrl;
+                a.target = "_blank";
+                a.rel = "noopener noreferrer";
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
               }}
             >
               <img src={whatsappIcon} alt="" className="h-5 w-5" />
