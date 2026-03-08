@@ -28,7 +28,7 @@ export function MobileBottomNav() {
   });
 
   const navItems = [
-    { title: "Home", url: "/dashboard", icon: LayoutDashboard },
+    { title: "Home", url: "/dashboard", icon: Home },
     { title: terms.plural, url: "/dashboard/products", icon: Package },
     { title: "Orders", url: "/dashboard/orders", icon: ClipboardList },
     { title: "Analytics", url: "/dashboard/analytics", icon: BarChart3 },
