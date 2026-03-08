@@ -40,6 +40,8 @@ export default function AdStudio() {
   const [tagline, setTagline] = useState("");
   const [processedImageUrl, setProcessedImageUrl] = useState<string | null>(null);
   const [bgImageUrl, setBgImageUrl] = useState<string | null>(null);
+  const [bgColor, setBgColor] = useState("#000000");
+  const [bgType, setBgType] = useState<"color" | "image">("color");
 
   // Generation
   const [generating, setGenerating] = useState(false);
@@ -147,7 +149,9 @@ export default function AdStudio() {
         { name: "store_name", text: profile?.store_slug || profile?.store_name || "My Store" },
       ];
 
-      if (bgImageUrl) {
+      if (bgType === "color" && bgColor) {
+        modifications.push({ name: "background", color: bgColor });
+      } else if (bgType === "image" && bgImageUrl) {
         modifications.push({ name: "background", image_url: bgImageUrl });
       }
 
@@ -258,6 +262,10 @@ export default function AdStudio() {
             onProcessedImage={setProcessedImageUrl}
             bgImageUrl={bgImageUrl}
             setBgImageUrl={setBgImageUrl}
+            bgColor={bgColor}
+            setBgColor={setBgColor}
+            bgType={bgType}
+            setBgType={setBgType}
           />
         )}
 

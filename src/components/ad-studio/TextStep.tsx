@@ -3,7 +3,8 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { Sparkles, Loader2, ImageIcon, Search, X } from "lucide-react";
+import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
+import { Sparkles, Loader2, ImageIcon, Search, X, Check } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { removeBackground } from "@imgly/background-removal";
 
@@ -14,6 +15,11 @@ type WallpaperResult = {
   source: string;
   photographer?: string;
 };
+
+const PRESET_COLORS = [
+  "#000000", "#FFFFFF", "#1a1a2e", "#FF6B6B",
+  "#A8D5BA", "#0D1B2A", "#F4C430", "#FFB6C1",
+];
 
 interface TextStepProps {
   productName: string;
@@ -28,47 +34,35 @@ interface TextStepProps {
   onProcessedImage: (blobUrl: string | null) => void;
   bgImageUrl: string | null;
   setBgImageUrl: (v: string | null) => void;
+  bgColor: string;
+  setBgColor: (v: string) => void;
+  bgType: "color" | "image";
+  setBgType: (v: "color" | "image") => void;
 }
 
 export default function TextStep({
-  productName,
-  setProductName,
-  price,
-  setPrice,
-  tagline,
-  setTagline,
-  imagePreview,
-  removeBg,
-  onRemoveBgChange,
-  onProcessedImage,
-  bgImageUrl,
-  setBgImageUrl,
+  productName, setProductName, price, setPrice, tagline, setTagline,
+  imagePreview, removeBg, onRemoveBgChange, onProcessedImage,
+  bgImageUrl, setBgImageUrl, bgColor, setBgColor, bgType, setBgType,
 }: TextStepProps) {
   const [aiLoading, setAiLoading] = useState(false);
   const [bgRemovalLoading, setBgRemovalLoading] = useState(false);
   const [processedUrl, setProcessedUrl] = useState<string | null>(null);
   const originalImageRef = useRef<string | null>(null);
 
-  // Background search state
   const [bgQuery, setBgQuery] = useState("");
   const [bgResults, setBgResults] = useState<WallpaperResult[]>([]);
   const [bgSearching, setBgSearching] = useState(false);
-  const [bgExpanded, setBgExpanded] = useState(!bgImageUrl);
+  const [customHex, setCustomHex] = useState(bgColor);
 
-  // Track the original image so we can restore it
   useEffect(() => {
-    if (imagePreview && !processedUrl) {
-      originalImageRef.current = imagePreview;
-    }
+    if (imagePreview && !processedUrl) originalImageRef.current = imagePreview;
   }, [imagePreview, processedUrl]);
 
-  // Run background removal when toggled ON
   useEffect(() => {
     if (!removeBg || !imagePreview || processedUrl) return;
-
     const source = originalImageRef.current || imagePreview;
     let cancelled = false;
-
     const run = async () => {
       setBgRemovalLoading(true);
       try {
@@ -84,13 +78,11 @@ export default function TextStep({
         if (!cancelled) setBgRemovalLoading(false);
       }
     };
-
     run();
     return () => { cancelled = true; };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [removeBg]);
 
-  // When toggled OFF, restore original
   useEffect(() => {
     if (!removeBg && processedUrl) {
       URL.revokeObjectURL(processedUrl);
@@ -111,11 +103,7 @@ export default function TextStep({
       });
       if (error) throw error;
       if (data?.tagline) setTagline(data.tagline);
-    } catch {
-      // silent fail
-    } finally {
-      setAiLoading(false);
-    }
+    } catch { /* silent */ } finally { setAiLoading(false); }
   };
 
   const handleBgSearch = async () => {
@@ -127,16 +115,25 @@ export default function TextStep({
       });
       if (error) throw error;
       setBgResults(data?.results || []);
-    } catch {
-      // silent
-    } finally {
-      setBgSearching(false);
-    }
+    } catch { /* silent */ } finally { setBgSearching(false); }
   };
 
   const handleSelectBg = (wp: WallpaperResult) => {
     setBgImageUrl(wp.url);
-    setBgExpanded(false);
+    setBgType("image");
+  };
+
+  const handleSelectColor = (hex: string) => {
+    setBgColor(hex);
+    setCustomHex(hex);
+    setBgType("color");
+  };
+
+  const handleCustomHexSubmit = () => {
+    if (/^#[0-9A-Fa-f]{6}$/.test(customHex)) {
+      setBgColor(customHex);
+      setBgType("color");
+    }
   };
 
   return (
@@ -145,11 +142,7 @@ export default function TextStep({
       {displayImage ? (
         <div className="rounded-xl border border-border overflow-hidden bg-muted/30">
           <div className="relative">
-            <img
-              src={displayImage}
-              alt="Product"
-              className="w-full max-h-48 object-contain bg-muted/20"
-            />
+            <img src={displayImage} alt="Product" className="w-full max-h-48 object-contain bg-muted/20" />
             {bgRemovalLoading && (
               <div className="absolute inset-0 flex flex-col items-center justify-center bg-background/70 backdrop-blur-sm">
                 <Loader2 className="h-6 w-6 animate-spin text-primary mb-2" />
@@ -162,11 +155,7 @@ export default function TextStep({
               <Label className="text-sm font-medium">Remove Background</Label>
               <p className="text-[11px] text-muted-foreground">Auto-strip for cleaner design</p>
             </div>
-            <Switch
-              checked={removeBg}
-              onCheckedChange={onRemoveBgChange}
-              disabled={bgRemovalLoading}
-            />
+            <Switch checked={removeBg} onCheckedChange={onRemoveBgChange} disabled={bgRemovalLoading} />
           </div>
         </div>
       ) : (
@@ -175,38 +164,77 @@ export default function TextStep({
         </div>
       )}
 
-      {/* Background picker */}
+      {/* Background picker — Tabs */}
       <div className="rounded-xl border border-border overflow-hidden bg-muted/30">
-        <div className="px-3 py-2">
+        <div className="px-3 pt-2">
           <Label className="text-sm font-medium">Ad Background</Label>
-          <p className="text-[11px] text-muted-foreground">Search free photos from Unsplash & Pexels</p>
         </div>
+        <Tabs value={bgType} onValueChange={(v) => setBgType(v as "color" | "image")} className="px-3 pb-3">
+          <TabsList className="w-full h-8 mt-1.5">
+            <TabsTrigger value="color" className="flex-1 text-xs h-6">Color</TabsTrigger>
+            <TabsTrigger value="image" className="flex-1 text-xs h-6">Image</TabsTrigger>
+          </TabsList>
 
-        {/* Selected preview */}
-        {bgImageUrl && !bgExpanded && (
-          <div className="relative mx-3 mb-2 rounded-lg overflow-hidden border border-border">
-            <img src={bgImageUrl} alt="Selected background" className="w-full h-24 object-cover" />
-            <div className="absolute inset-0 flex items-center justify-center gap-2 bg-black/30 opacity-0 hover:opacity-100 transition-opacity">
-              <Button size="sm" variant="secondary" className="h-7 text-xs" onClick={() => setBgExpanded(true)}>
-                Change
-              </Button>
-              <Button size="sm" variant="secondary" className="h-7 text-xs" onClick={() => setBgImageUrl(null)}>
-                <X className="h-3 w-3" />
+          {/* Color tab */}
+          <TabsContent value="color" className="space-y-2 mt-2">
+            <div className="grid grid-cols-4 gap-2">
+              {PRESET_COLORS.map((hex) => (
+                <button
+                  key={hex}
+                  onClick={() => handleSelectColor(hex)}
+                  className="relative w-full aspect-square rounded-lg border-2 transition-all focus:outline-none focus:ring-2 focus:ring-ring"
+                  style={{
+                    backgroundColor: hex,
+                    borderColor: bgType === "color" && bgColor === hex ? "hsl(var(--primary))" : "hsl(var(--border))",
+                  }}
+                >
+                  {bgType === "color" && bgColor === hex && (
+                    <Check
+                      className="absolute inset-0 m-auto h-4 w-4"
+                      style={{ color: ["#FFFFFF", "#F4C430", "#A8D5BA", "#FFB6C1"].includes(hex) ? "#000" : "#fff" }}
+                    />
+                  )}
+                </button>
+              ))}
+            </div>
+            <div className="flex gap-2">
+              <div className="relative flex-1">
+                <Input
+                  value={customHex}
+                  onChange={(e) => setCustomHex(e.target.value)}
+                  placeholder="#FF5500"
+                  className="h-8 text-sm font-mono pl-9"
+                  maxLength={7}
+                  onKeyDown={(e) => e.key === "Enter" && handleCustomHexSubmit()}
+                />
+                <div
+                  className="absolute left-2 top-1/2 -translate-y-1/2 h-4 w-4 rounded border border-border"
+                  style={{ backgroundColor: /^#[0-9A-Fa-f]{6}$/.test(customHex) ? customHex : "transparent" }}
+                />
+              </div>
+              <Button size="sm" variant="secondary" className="h-8 text-xs" onClick={handleCustomHexSubmit}>
+                Apply
               </Button>
             </div>
-          </div>
-        )}
+          </TabsContent>
 
-        {/* Search UI */}
-        {(bgExpanded || !bgImageUrl) && (
-          <div className="px-3 pb-3 space-y-2">
+          {/* Image tab */}
+          <TabsContent value="image" className="space-y-2 mt-2">
+            <p className="text-[10px] text-muted-foreground">Search Unsplash & Pexels (may not render on all templates)</p>
+
+            {bgImageUrl && bgType === "image" && (
+              <div className="relative rounded-lg overflow-hidden border border-border">
+                <img src={bgImageUrl} alt="Selected background" className="w-full h-20 object-cover" />
+                <div className="absolute inset-0 flex items-center justify-center gap-2 bg-black/30 opacity-0 hover:opacity-100 transition-opacity">
+                  <Button size="sm" variant="secondary" className="h-7 text-xs" onClick={() => setBgImageUrl(null)}>
+                    <X className="h-3 w-3 mr-1" /> Remove
+                  </Button>
+                </div>
+              </div>
+            )}
+
             <form onSubmit={(e) => { e.preventDefault(); handleBgSearch(); }} className="flex gap-2">
-              <Input
-                placeholder="e.g. abstract, fashion, gradient…"
-                value={bgQuery}
-                onChange={(e) => setBgQuery(e.target.value)}
-                className="flex-1 h-8 text-sm"
-              />
+              <Input placeholder="e.g. abstract, gradient…" value={bgQuery} onChange={(e) => setBgQuery(e.target.value)} className="flex-1 h-8 text-sm" />
               <Button type="submit" size="sm" disabled={bgSearching} className="h-8 px-2.5">
                 {bgSearching ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Search className="h-3.5 w-3.5" />}
               </Button>
@@ -215,26 +243,15 @@ export default function TextStep({
             {bgResults.length > 0 && (
               <div className="grid grid-cols-3 gap-1.5 max-h-40 overflow-y-auto">
                 {bgResults.map((wp) => (
-                  <button
-                    key={wp.id}
-                    onClick={() => handleSelectBg(wp)}
-                    className="group relative rounded-md overflow-hidden border border-border/50 hover:border-primary/50 transition-colors focus:outline-none focus:ring-2 focus:ring-ring"
-                  >
-                    <img
-                      src={wp.thumb}
-                      alt={`By ${wp.photographer}`}
-                      className="w-full h-16 object-cover"
-                      loading="lazy"
-                    />
-                    <span className="absolute bottom-0 left-0 right-0 text-[8px] text-white/0 group-hover:text-white/90 bg-black/0 group-hover:bg-black/40 px-1 py-0.5 truncate transition-colors">
-                      {wp.photographer}
-                    </span>
+                  <button key={wp.id} onClick={() => handleSelectBg(wp)} className="group relative rounded-md overflow-hidden border border-border/50 hover:border-primary/50 transition-colors focus:outline-none focus:ring-2 focus:ring-ring">
+                    <img src={wp.thumb} alt={`By ${wp.photographer}`} className="w-full h-16 object-cover" loading="lazy" />
+                    <span className="absolute bottom-0 left-0 right-0 text-[8px] text-white/0 group-hover:text-white/90 bg-black/0 group-hover:bg-black/40 px-1 py-0.5 truncate transition-colors">{wp.photographer}</span>
                   </button>
                 ))}
               </div>
             )}
-          </div>
-        )}
+          </TabsContent>
+        </Tabs>
       </div>
 
       <h2 className="text-base font-semibold">Edit text</h2>
@@ -243,22 +260,14 @@ export default function TextStep({
         <Label htmlFor="product-name">Product Name</Label>
         <Input id="product-name" placeholder="e.g. Silk Bonnet" value={productName} onChange={(e) => setProductName(e.target.value)} />
       </div>
-
       <div className="space-y-1.5">
         <Label htmlFor="price">Price</Label>
         <Input id="price" placeholder="e.g. KES 1,500" value={price} onChange={(e) => setPrice(e.target.value)} />
       </div>
-
       <div className="space-y-1.5">
         <div className="flex items-center justify-between">
           <Label htmlFor="tagline">Tagline</Label>
-          <Button
-            variant="ghost"
-            size="sm"
-            className="h-7 text-xs gap-1 text-primary"
-            onClick={handleAiWrite}
-            disabled={aiLoading || !productName.trim()}
-          >
+          <Button variant="ghost" size="sm" className="h-7 text-xs gap-1 text-primary" onClick={handleAiWrite} disabled={aiLoading || !productName.trim()}>
             {aiLoading ? <Loader2 className="h-3 w-3 animate-spin" /> : <Sparkles className="h-3 w-3" />}
             AI Write
           </Button>
