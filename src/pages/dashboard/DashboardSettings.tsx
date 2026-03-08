@@ -103,7 +103,7 @@ const DashboardSettings = () => {
   const [instagramUrl, setInstagramUrl] = useState("");
   const [tiktokUrl, setTiktokUrl] = useState("");
   const [facebookUrl, setFacebookUrl] = useState("");
-  const [aiAssistantEnabled, setAiAssistantEnabled] = useState(true);
+  
   const [productCount, setProductCount] = useState(0);
 
   useEffect(() => {
