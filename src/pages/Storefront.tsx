@@ -5,6 +5,7 @@ import { Store, ShoppingBag, Share2, Copy, Check, Star, ShoppingCart, Sun, Moon,
 import { formatPrice } from "@/lib/currency";
 import AfristallLogo from "@/components/AfristallLogo";
 import whatsappIcon from "@/assets/whatsapp-icon.png";
+import { ProductImageCarousel } from "@/components/storefront/ProductImageCarousel";
 import { StorefrontHeader } from "@/components/storefront/StorefrontHeader";
 
 import { CartDrawer } from "@/components/storefront/CartDrawer";
