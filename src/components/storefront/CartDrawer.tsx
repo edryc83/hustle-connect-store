@@ -5,7 +5,8 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useCart } from "@/hooks/useCart";
 import { formatPrice } from "@/lib/currency";
-import { Minus, Plus, Trash2, MessageCircle, ShoppingCart } from "lucide-react";
+import { Minus, Plus, Trash2, ShoppingCart } from "lucide-react";
+import whatsappIcon from "@/assets/whatsapp-icon.png";
 import { supabase } from "@/integrations/supabase/client";
 
 interface CartDrawerProps {
