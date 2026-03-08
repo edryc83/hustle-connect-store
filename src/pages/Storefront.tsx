@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Store, ShoppingBag, Share2, Copy, Check, Star, ShoppingCart, Sun, Moon, LayoutDashboard, Minus, Plus, Heart } from "lucide-react";
 import { formatPrice } from "@/lib/currency";
 import AfristallLogo from "@/components/AfristallLogo";
-import { ProductImageCarousel } from "@/components/storefront/ProductImageCarousel";
+import whatsappIcon from "@/assets/whatsapp-icon.png";
 import { StorefrontHeader } from "@/components/storefront/StorefrontHeader";
 
 import { CartDrawer } from "@/components/storefront/CartDrawer";
