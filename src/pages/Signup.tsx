@@ -96,13 +96,15 @@ const Signup = () => {
     checkSlugAvailability(newSlug);
   };
 
-  const handleProfilePicture = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
+  const handleProfilePicture = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    let file = e.target.files?.[0];
     if (file) {
       if (file.size > 2 * 1024 * 1024) {
         toast.error("Image must be under 2MB");
         return;
       }
+      const { compressImage } = await import("@/lib/imageCompression");
+      file = await compressImage(file);
       setProfilePicture(file);
       setProfilePicturePreview(URL.createObjectURL(file));
     }

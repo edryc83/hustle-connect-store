@@ -142,12 +142,14 @@ const DashboardSettings = () => {
   };
 
   const handleCoverPhotoChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
+    let file = e.target.files?.[0];
     if (!file || !user) return;
     if (file.size > 5 * 1024 * 1024) { toast.error("Image must be under 5MB"); return; }
 
     setUploadingCover(true);
     try {
+      const { compressImage } = await import("@/lib/imageCompression");
+      file = await compressImage(file);
       const ext = file.name.split(".").pop();
       const path = `${user.id}/cover.${ext}`;
       const { error: uploadErr } = await supabase.storage
