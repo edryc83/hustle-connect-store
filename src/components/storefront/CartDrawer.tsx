@@ -168,8 +168,8 @@ export function CartDrawer({ currency, whatsappNumber, storeName, storeSlug, sel
                   <span>Total</span>
                   <span className="text-primary">{formatPrice(totalPrice, currency)}</span>
                 </div>
-                <Button className="w-full gap-2 text-base" size="lg" onClick={handleCheckout}>
-                  <MessageCircle className="h-5 w-5" />
+                <Button className="w-full gap-2 text-base bg-[#25D366] hover:bg-[#128C7E] text-white" size="lg" onClick={handleCheckout}>
+                  <img src={whatsappIcon} alt="" className="h-5 w-5" />
                   Order All via WhatsApp
                 </Button>
               </div>

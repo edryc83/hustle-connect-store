@@ -1,5 +1,6 @@
 import { ATTRIBUTE_TYPES, COLOUR_HEX, getSelectableKeys } from "@/lib/productAttributes";
 import { Check } from "lucide-react";
+import whatsappIcon from "@/assets/whatsapp-icon.png";
 
 interface BuyerAttributePickerProps {
   attributes: Record<string, any>;

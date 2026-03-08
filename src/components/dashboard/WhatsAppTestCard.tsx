@@ -23,8 +23,8 @@ export default function WhatsAppTestCard({ whatsappNumber, storeName, storeSlug 
   return (
     <div className="rounded-2xl border border-border/50 bg-card/60 backdrop-blur-xl p-5 shadow-sm space-y-3">
       <div className="flex items-center gap-2">
-        <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-green-500/10">
-          <MessageCircle className="h-4 w-4 text-green-600" />
+        <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#25D366]/10">
+          <img src={whatsappIcon} alt="WhatsApp" className="h-4 w-4" />
         </div>
         <span className="text-sm font-semibold text-foreground">Test Your WhatsApp</span>
       </div>

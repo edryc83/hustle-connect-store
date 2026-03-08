@@ -217,8 +217,9 @@ export function ProductAttributeForm({ attributes, onChange }: ProductAttributeF
         <button
           type="button"
           onClick={handleSkip}
-          className="w-full text-center text-xs text-muted-foreground hover:text-foreground transition-colors"
+          className="w-full flex items-center justify-center gap-2 text-xs text-[#25D366] font-medium hover:text-[#128C7E] transition-colors"
         >
+          <img src={whatsappIcon} alt="" className="h-4 w-4" />
           Skip — I'll chat with buyers on WhatsApp
         </button>
       )}
