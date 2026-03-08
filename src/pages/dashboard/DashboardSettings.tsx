@@ -10,7 +10,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Sparkles, Loader2, Camera, ImagePlus, Bot, Bell } from "lucide-react";
+import { Sparkles, Loader2, Camera, ImagePlus, Bell } from "lucide-react";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
 import { Switch } from "@/components/ui/switch";
 import WallpaperPicker from "@/components/dashboard/WallpaperPicker";
@@ -103,7 +103,7 @@ const DashboardSettings = () => {
   const [instagramUrl, setInstagramUrl] = useState("");
   const [tiktokUrl, setTiktokUrl] = useState("");
   const [facebookUrl, setFacebookUrl] = useState("");
-  const [aiAssistantEnabled, setAiAssistantEnabled] = useState(true);
+  
   const [productCount, setProductCount] = useState(0);
 
   useEffect(() => {
@@ -131,7 +131,7 @@ const DashboardSettings = () => {
           setInstagramUrl(d.instagram_url ?? "");
           setTiktokUrl(d.tiktok_url ?? "");
           setFacebookUrl(d.facebook_url ?? "");
-          setAiAssistantEnabled(d.ai_assistant_enabled !== false);
+          
           setCategories(deserializeCategories(d.category));
           setDeliveryAreas(d.delivery_areas ?? "");
           setCurrency(d.currency ?? "UGX");
@@ -303,7 +303,7 @@ const DashboardSettings = () => {
         instagram_url: normalizeSocialUrl(instagramUrl, "instagram"),
         tiktok_url: normalizeSocialUrl(tiktokUrl, "tiktok"),
         facebook_url: normalizeSocialUrl(facebookUrl, "facebook"),
-        ai_assistant_enabled: aiAssistantEnabled,
+        
       } as any)
       .eq("id", user.id);
     if (error) toast.error("Failed to save");
@@ -624,21 +624,6 @@ const DashboardSettings = () => {
         </CardContent>
       </div>
 
-      {/* AI Store Assistant Toggle */}
-      <Card className="border-border/50 bg-card/60 backdrop-blur-xl">
-        <CardContent className="flex items-center justify-between py-5 px-5">
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: "#FF6B35" }}>
-              <Bot className="h-5 w-5 text-white" />
-            </div>
-            <div>
-              <p className="text-sm font-semibold">AI Store Assistant</p>
-              <p className="text-xs text-muted-foreground">Let AI answer buyer questions 24/7 and hand orders to your WhatsApp</p>
-            </div>
-          </div>
-          <Switch checked={aiAssistantEnabled} onCheckedChange={setAiAssistantEnabled} />
-        </CardContent>
-      </Card>
 
       {/* Push Notifications */}
       <NotificationSettings />
