@@ -47,9 +47,9 @@ export default defineConfig(({ mode }) => ({
         start_url: "/",
         scope: "/",
         icons: [
-          { src: "/pwa-192.png", sizes: "192x192", type: "image/png" },
-          { src: "/pwa-512.png", sizes: "512x512", type: "image/png" },
-          { src: "/pwa-512.png", sizes: "512x512", type: "image/png", purpose: "maskable" },
+          { src: "/pwa-192.png", sizes: "1024x1024", type: "image/png" },
+          { src: "/pwa-512.png", sizes: "1024x1024", type: "image/png" },
+          { src: "/pwa-512.png", sizes: "1024x1024", type: "image/png", purpose: "maskable" },
         ],
       },
     }),
