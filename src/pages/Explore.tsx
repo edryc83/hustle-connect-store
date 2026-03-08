@@ -283,9 +283,9 @@ const Explore = () => {
                   <Link key={store.id} to={`/${store.store_slug}`} className="block">
                     <div className="flex items-center gap-3 rounded-2xl bg-card p-3.5 border border-border/50 hover:border-primary/20 hover:shadow-sm transition-all">
                       {store.profile_picture_url ? (
-                        <img src={store.profile_picture_url} alt={store.store_name ?? "Store"} className="h-14 w-14 rounded-xl object-cover shrink-0" loading="lazy" />
+                        <img src={store.profile_picture_url} alt={store.store_name ?? "Store"} className="h-14 w-14 rounded-full object-cover shrink-0" loading="lazy" />
                       ) : (
-                        <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-secondary shrink-0">
+                        <div className="flex h-14 w-14 items-center justify-center rounded-full bg-secondary shrink-0">
                           <AfristallLogo className="h-6 w-6" />
                         </div>
                       )}
