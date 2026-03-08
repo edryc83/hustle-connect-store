@@ -5,7 +5,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useBusinessTerms } from "@/hooks/useBusinessTerms";
 import { Button } from "@/components/ui/button";
 import {
-  Package, Copy, Share2, X, Plus, Download, Eye, ShoppingCart, TrendingUp, Bell,
+  Package, Copy, Share2, X, Plus, Download, Eye, ShoppingCart, TrendingUp,
 } from "lucide-react";
 import AfristallLogo from "@/components/AfristallLogo";
 import { toast } from "sonner";
