@@ -25,6 +25,9 @@ export default function TextStep({
   setPrice,
   tagline,
   setTagline,
+  imagePreview,
+  removeBg,
+  onRemoveBgChange,
 }: TextStepProps) {
   const [aiLoading, setAiLoading] = useState(false);
 
