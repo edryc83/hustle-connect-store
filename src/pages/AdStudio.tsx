@@ -150,9 +150,7 @@ export default function AdStudio() {
         { name: "store_name", text: profile?.store_slug || profile?.store_name || "My Store" },
       ];
 
-      if (subtitle.trim()) {
-        modifications.push({ name: "subtitle", text: subtitle });
-      }
+      modifications.push({ name: "subtitle", text: subtitle.trim() || " " });
 
 
       if (bgType === "color" && bgColor) {

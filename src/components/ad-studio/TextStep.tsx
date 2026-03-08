@@ -154,11 +154,11 @@ export default function TextStep({
 
   return (
     <div className="space-y-4 pb-4">
-      {/* Image preview + remove bg */}
+      {/* Sticky image preview + remove bg */}
       {displayImage ? (
-        <div className="rounded-xl border border-border overflow-hidden bg-muted/30">
+        <div className="sticky top-0 z-10 rounded-xl border border-border overflow-hidden bg-muted/30 shadow-sm">
           <div className="relative">
-            <img src={displayImage} alt="Product" className="w-full max-h-48 object-contain bg-muted/20" />
+            <img src={displayImage} alt="Product" className="w-full max-h-64 object-contain bg-muted/20" />
             {bgRemovalLoading && (
               <div className="absolute inset-0 flex flex-col items-center justify-center bg-background/70 backdrop-blur-sm">
                 <Loader2 className="h-6 w-6 animate-spin text-primary mb-2" />
@@ -179,6 +179,37 @@ export default function TextStep({
           <ImageIcon className="h-10 w-10 text-muted-foreground" />
         </div>
       )}
+
+      <h2 className="text-base font-semibold">Edit text</h2>
+
+      <div className="space-y-1.5">
+        <Label htmlFor="product-name">Product Name</Label>
+        <Input id="product-name" placeholder="e.g. Silk Bonnet" value={productName} onChange={(e) => setProductName(e.target.value)} />
+      </div>
+      <div className="space-y-1.5">
+        <Label htmlFor="price">Price</Label>
+        <Input id="price" placeholder="e.g. KES 1,500" value={price} onChange={(e) => setPrice(e.target.value)} />
+      </div>
+      <div className="space-y-1.5">
+        <div className="flex items-center justify-between">
+          <Label htmlFor="tagline">Tagline</Label>
+          <Button variant="ghost" size="sm" className="h-7 text-xs gap-1 text-primary" onClick={handleAiWrite} disabled={aiLoading || !productName.trim()}>
+            {aiLoading ? <Loader2 className="h-3 w-3 animate-spin" /> : <Sparkles className="h-3 w-3" />}
+            AI Write
+          </Button>
+        </div>
+        <Input id="tagline" placeholder="e.g. Sleep in luxury ✨" value={tagline} onChange={(e) => setTagline(e.target.value)} />
+      </div>
+      <div className="space-y-1.5">
+        <div className="flex items-center justify-between">
+          <Label htmlFor="subtitle">Subtitle</Label>
+          <Button variant="ghost" size="sm" className="h-7 text-xs gap-1 text-primary" onClick={handleAiSubtitle} disabled={subtitleAiLoading || !productName.trim()}>
+            {subtitleAiLoading ? <Loader2 className="h-3 w-3 animate-spin" /> : <Sparkles className="h-3 w-3" />}
+            AI Write
+          </Button>
+        </div>
+        <Input id="subtitle" placeholder="e.g. Free delivery countrywide" value={subtitle} onChange={(e) => setSubtitle(e.target.value)} />
+      </div>
 
       {/* Background picker — Tabs */}
       <div className="rounded-xl border border-border overflow-hidden bg-muted/30">
@@ -266,37 +297,6 @@ export default function TextStep({
             )}
           </TabsContent>
         </Tabs>
-      </div>
-
-      <h2 className="text-base font-semibold">Edit text</h2>
-
-      <div className="space-y-1.5">
-        <Label htmlFor="product-name">Product Name</Label>
-        <Input id="product-name" placeholder="e.g. Silk Bonnet" value={productName} onChange={(e) => setProductName(e.target.value)} />
-      </div>
-      <div className="space-y-1.5">
-        <Label htmlFor="price">Price</Label>
-        <Input id="price" placeholder="e.g. KES 1,500" value={price} onChange={(e) => setPrice(e.target.value)} />
-      </div>
-      <div className="space-y-1.5">
-        <div className="flex items-center justify-between">
-          <Label htmlFor="tagline">Tagline</Label>
-          <Button variant="ghost" size="sm" className="h-7 text-xs gap-1 text-primary" onClick={handleAiWrite} disabled={aiLoading || !productName.trim()}>
-            {aiLoading ? <Loader2 className="h-3 w-3 animate-spin" /> : <Sparkles className="h-3 w-3" />}
-            AI Write
-          </Button>
-        </div>
-        <Input id="tagline" placeholder="e.g. Sleep in luxury ✨" value={tagline} onChange={(e) => setTagline(e.target.value)} />
-      </div>
-      <div className="space-y-1.5">
-        <div className="flex items-center justify-between">
-          <Label htmlFor="subtitle">Subtitle</Label>
-          <Button variant="ghost" size="sm" className="h-7 text-xs gap-1 text-primary" onClick={handleAiSubtitle} disabled={subtitleAiLoading || !productName.trim()}>
-            {subtitleAiLoading ? <Loader2 className="h-3 w-3 animate-spin" /> : <Sparkles className="h-3 w-3" />}
-            AI Write
-          </Button>
-        </div>
-        <Input id="subtitle" placeholder="e.g. Free delivery countrywide" value={subtitle} onChange={(e) => setSubtitle(e.target.value)} />
       </div>
     </div>
   );
