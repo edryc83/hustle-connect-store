@@ -203,7 +203,7 @@ const Explore = () => {
         )}
 
         {/* Top Stores Near You */}
-        <section className="mx-auto max-w-2xl px-4 py-8">
+        <section className="mx-auto max-w-2xl sm:max-w-5xl px-4 py-8">
           <div className="flex items-center justify-between mb-5">
             <h2 className="text-lg font-bold text-foreground">
               {activeTab === "services" ? "Top Services Near You" : "Top Stores Near You"}
@@ -274,33 +274,23 @@ const Explore = () => {
               )}
             </div>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-3 sm:hidden">
               {filtered.map((store) => {
                 const businessLabel = getBusinessLabel(store);
                 const location = getLocationLabel(store);
                 return (
                   <Link key={store.id} to={`/${store.store_slug}`} className="block">
                     <div className="flex items-center gap-3 rounded-2xl bg-card p-3.5 border border-border/50 hover:border-primary/20 hover:shadow-sm transition-all">
-                      {/* Profile picture */}
                       {store.profile_picture_url ? (
-                        <img
-                          src={store.profile_picture_url}
-                          alt={store.store_name ?? "Store"}
-                          className="h-14 w-14 rounded-xl object-cover shrink-0"
-                          loading="lazy"
-                        />
+                        <img src={store.profile_picture_url} alt={store.store_name ?? "Store"} className="h-14 w-14 rounded-xl object-cover shrink-0" loading="lazy" />
                       ) : (
                         <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-secondary shrink-0">
                           <AfristallLogo className="h-6 w-6" />
                         </div>
                       )}
-
-                      {/* Info */}
                       <div className="flex-1 min-w-0">
                         {businessLabel && (
-                          <span className="inline-block rounded bg-primary/10 px-1.5 py-0.5 text-[10px] font-semibold text-primary uppercase tracking-wide mb-0.5">
-                            {businessLabel}
-                          </span>
+                          <span className="inline-block rounded bg-primary/10 px-1.5 py-0.5 text-[10px] font-semibold text-primary uppercase tracking-wide mb-0.5">{businessLabel}</span>
                         )}
                         <h3 className="font-semibold text-sm text-foreground truncate">{store.store_name}</h3>
                         {location && (
@@ -309,9 +299,53 @@ const Explore = () => {
                           </p>
                         )}
                       </div>
-
-                      {/* Bookmark icon */}
                       <Bookmark className="h-5 w-5 text-muted-foreground/40 shrink-0" />
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+
+            {/* Desktop card grid */}
+            <div className="hidden sm:grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {filtered.map((store) => {
+                const businessLabel = getBusinessLabel(store);
+                const location = getLocationLabel(store);
+                return (
+                  <Link key={store.id} to={`/${store.store_slug}`} className="block group">
+                    <div className="rounded-2xl bg-card border border-border/50 hover:border-primary/20 hover:shadow-md transition-all overflow-hidden h-full">
+                      {/* Cover / avatar area */}
+                      <div className="relative h-28 bg-secondary/50">
+                        {store.cover_photo_url ? (
+                          <img src={store.cover_photo_url} alt="" className="h-full w-full object-cover" loading="lazy" />
+                        ) : (
+                          <div className="h-full w-full bg-gradient-to-br from-primary/10 to-secondary" />
+                        )}
+                        <div className="absolute -bottom-6 left-4">
+                          {store.profile_picture_url ? (
+                            <img src={store.profile_picture_url} alt={store.store_name ?? "Store"} className="h-14 w-14 rounded-xl object-cover border-2 border-card shadow-sm" loading="lazy" />
+                          ) : (
+                            <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-card border-2 border-card shadow-sm">
+                              <AfristallLogo className="h-6 w-6" />
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                      {/* Info */}
+                      <div className="pt-8 px-4 pb-4">
+                        {businessLabel && (
+                          <span className="inline-block rounded bg-primary/10 px-1.5 py-0.5 text-[10px] font-semibold text-primary uppercase tracking-wide mb-1">{businessLabel}</span>
+                        )}
+                        <h3 className="font-semibold text-sm text-foreground truncate">{store.store_name}</h3>
+                        {store.store_slug && (
+                          <p className="text-xs text-muted-foreground mt-0.5">@{store.store_slug}</p>
+                        )}
+                        {location && (
+                          <p className="flex items-center gap-1 text-xs text-muted-foreground mt-1.5 truncate">
+                            <MapPin className="h-3 w-3 shrink-0" /> {location}
+                          </p>
+                        )}
+                      </div>
                     </div>
                   </Link>
                 );
