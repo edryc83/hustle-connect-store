@@ -681,6 +681,13 @@ const StorefrontInner = () => {
     }
   }, []);
 
+  // Scroll to top when viewing a product detail
+  useEffect(() => {
+    if (productId) {
+      window.scrollTo({ top: 0, behavior: "instant" });
+    }
+  }, [productId]);
+
 
   if (loading) {
     return (
