@@ -149,7 +149,6 @@ export default function AdStudio() {
         { name: "short_description", text: tagline.trim() || " " },
         { name: "store_name", text: profile?.store_slug || profile?.store_name || "My Store" },
         { name: "subtitle", text: subtitle.trim() || " " },
-        { name: "body_text", text: " " },
       ];
 
 
