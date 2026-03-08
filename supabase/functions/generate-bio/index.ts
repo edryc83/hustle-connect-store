@@ -10,24 +10,25 @@ serve(async (req) => {
 
   try {
     const { storeName, category, city } = await req.json();
-    const ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY");
-    if (!ANTHROPIC_API_KEY) throw new Error("ANTHROPIC_API_KEY is not configured");
+    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
+    if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
 
-    const response = await fetch("https://api.anthropic.com/v1/messages", {
+    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
-        "x-api-key": ANTHROPIC_API_KEY,
-        "anthropic-version": "2023-06-01",
+        Authorization: `Bearer ${LOVABLE_API_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "claude-sonnet-4-20250514",
-        max_tokens: 256,
-        system: "You are a copywriter for small African businesses. Generate a short, friendly store bio/welcome message (max 2 sentences, under 150 characters). Be warm, include an emoji. Only return the bio text, nothing else.",
+        model: "google/gemini-2.5-flash-lite",
         messages: [
           {
+            role: "system",
+            content: "You are a copywriter for small African businesses. Generate a short, friendly store bio (max 2 sentences, under 120 characters total). Be brief and direct — mention what they sell and where. Include one emoji. Only return the bio text, nothing else.",
+          },
+          {
             role: "user",
-            content: `Store: ${storeName || "My Store"}. Category: ${category || "General"}. City: ${city || ""}. Write a short welcoming store bio.`,
+            content: `Store: ${storeName || "My Store"}. Category: ${category || "General"}. City: ${city || ""}. Write a short store bio.`,
           },
         ],
       }),
@@ -39,13 +40,18 @@ serve(async (req) => {
           status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
+      if (response.status === 402) {
+        return new Response(JSON.stringify({ error: "AI credits exhausted." }), {
+          status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
       const errText = await response.text();
-      console.error("Anthropic error:", response.status, errText);
+      console.error("AI gateway error:", response.status, errText);
       throw new Error("AI error");
     }
 
     const data = await response.json();
-    const bio = data.content?.[0]?.text?.trim() ?? "";
+    const bio = data.choices?.[0]?.message?.content?.trim() ?? "";
 
     return new Response(JSON.stringify({ bio }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },

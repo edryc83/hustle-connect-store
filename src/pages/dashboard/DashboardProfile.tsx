@@ -69,6 +69,22 @@ const DashboardProfile = () => {
         });
         setProductImages(map);
       }
+
+      // Auto-generate bio if missing
+      if (p && !p.store_bio && !p.welcome_message) {
+        try {
+          const res = await supabase.functions.invoke("generate-bio", {
+            body: { storeName: p.store_name, category: p.category || "", city: p.city || "" },
+          });
+          if (res.data?.bio) {
+            const bio = res.data.bio;
+            setBioText(bio);
+            await supabase.from("profiles").update({ store_bio: bio, welcome_message: bio } as any).eq("id", user.id);
+            setProfile((prev: any) => ({ ...prev, store_bio: bio, welcome_message: bio }));
+          }
+        } catch { /* silent */ }
+      }
+
       setLoading(false);
     };
     load();
