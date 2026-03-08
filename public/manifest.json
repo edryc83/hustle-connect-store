@@ -12,7 +12,7 @@
   "icons": [
     {
       "src": "/pwa-192.png",
-      "sizes": "1024x1024",
+      "sizes": "192x192",
       "type": "image/png",
       "purpose": "any"
     },
@@ -47,7 +47,7 @@
       "icons": [
         {
           "src": "/pwa-192.png",
-          "sizes": "1024x1024"
+          "sizes": "192x192"
         }
       ]
     },
@@ -59,7 +59,7 @@
       "icons": [
         {
           "src": "/pwa-192.png",
-          "sizes": "1024x1024"
+          "sizes": "192x192"
         }
       ]
     }
