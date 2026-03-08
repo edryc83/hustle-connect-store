@@ -416,10 +416,6 @@ const DashboardProducts = () => {
                 </div>
                 <Textarea id="productDesc" placeholder={listingType === "service" ? "What does this service package include?" : "What makes this product special?"} value={description} onChange={(e) => { setDescription(e.target.value); setAiFilledFields((prev) => { const n = new Set(prev); n.delete("description"); return n; }); }} rows={3} />
               </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="productVariants">Variants / Options <span className="text-muted-foreground font-normal">(optional)</span></Label>
-                <Input id="productVariants" placeholder="e.g. Small, Medium, Large" value={variantsText} onChange={(e) => setVariantsText(e.target.value)} />
-              </div>
               {/* Dynamic Product Attributes */}
               <div className="space-y-1.5">
                 <Label className="text-sm font-semibold flex items-center gap-1.5">
