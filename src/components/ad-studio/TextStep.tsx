@@ -4,7 +4,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Sparkles, Loader2, ImageIcon, Search, X, Check, Upload } from "lucide-react";
+import { Sparkles, Loader2, ImageIcon, Search, X, Check } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { removeBackground } from "@imgly/background-removal";
 
