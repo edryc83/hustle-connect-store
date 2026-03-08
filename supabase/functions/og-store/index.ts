@@ -70,8 +70,22 @@ Deno.serve(async (req) => {
     // Store-level OG (fallback)
     const storeUrl = `${APP_URL}/${slug}`;
     const title = `${profile.store_name || slug} — Shop on Afristall`;
+    // Parse category — could be a JSON string or plain text
+    let categoryLabel = "";
+    if (profile.category) {
+      try {
+        const parsed = JSON.parse(profile.category);
+        if (typeof parsed === "object" && parsed !== null) {
+          categoryLabel = Object.keys(parsed).join(", ");
+        } else {
+          categoryLabel = String(parsed);
+        }
+      } catch {
+        categoryLabel = profile.category;
+      }
+    }
     const description = profile.store_bio ||
-      `Check out ${profile.store_name || slug}${profile.category ? ` for ${profile.category}` : ""}${profile.city ? ` in ${profile.city}` : ""}. Order directly on WhatsApp! 🛒`;
+      `Check out ${profile.store_name || slug}${categoryLabel ? ` for ${categoryLabel}` : ""}${profile.city ? ` in ${profile.city}` : ""}. Order directly on WhatsApp! 🛒`;
     const image = profile.profile_picture_url || FALLBACK_IMAGE;
 
     return new Response(buildHtml({ title, description, image, pageUrl: storeUrl, storeName: profile.store_name || slug }), {
