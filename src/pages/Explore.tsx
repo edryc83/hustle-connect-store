@@ -4,9 +4,10 @@ import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { Input } from "@/components/ui/input";
-import { Search, Store, MapPin, X, SlidersHorizontal } from "lucide-react";
+import { Search, MapPin, X, SlidersHorizontal, Store, Bookmark } from "lucide-react";
 import AfristallLogo from "@/components/AfristallLogo";
 import { categoriesToDisplay } from "@/components/CategoryPicker";
+import { PRODUCT_CATEGORY_DATA, SERVICE_CATEGORY_DATA } from "@/components/CategoryPicker";
 
 type StoreProfile = {
   id: string;
@@ -18,25 +19,29 @@ type StoreProfile = {
   country: string | null;
   district: string | null;
   city: string | null;
+  business_type: string | null;
 };
 
-const CATEGORIES = [
+type TabType = "stores" | "services";
+
+const STORE_CATEGORIES = [
   { label: "All", icon: "🔥" },
-  { label: "Food & Drinks", icon: "🍲" },
-  { label: "Fashion & Clothes", icon: "👗" },
-  { label: "Beauty & Skincare", icon: "✨" },
-  { label: "Phones & Electronics", icon: "📱" },
-  { label: "Home & Decor", icon: "🏠" },
-  { label: "Catering & Events", icon: "🎉" },
-  { label: "Plants & Garden", icon: "🌿" },
-  { label: "Other", icon: "📦" },
+  ...Object.keys(PRODUCT_CATEGORY_DATA).map((k) => ({ label: k, icon: "" })),
 ];
 
-
+const SERVICE_CATEGORIES = [
+  { label: "All", icon: "🔥" },
+  ...Object.keys(SERVICE_CATEGORY_DATA).map((k) => ({ label: k, icon: "" })),
+];
 
 function getLocationLabel(store: StoreProfile) {
   const parts = [store.city, store.district].filter(Boolean);
   return parts.length > 0 ? parts.join(", ") : null;
+}
+
+function getBusinessLabel(store: StoreProfile): string | null {
+  const tags = categoriesToDisplay(store.category);
+  return tags.length > 0 ? tags[0] : null;
 }
 
 const Explore = () => {
@@ -47,8 +52,8 @@ const Explore = () => {
   const [detectedCountry, setDetectedCountry] = useState<string | null>(null);
   const [selectedLocation, setSelectedLocation] = useState("All");
   const [showFilters, setShowFilters] = useState(false);
+  const [activeTab, setActiveTab] = useState<TabType>("stores");
 
-  // Auto-detect country
   useEffect(() => {
     fetch("https://ipapi.co/json/")
       .then((r) => r.json())
@@ -62,7 +67,7 @@ const Explore = () => {
     const fetchStores = async () => {
       const { data } = await supabase
         .from("profiles")
-        .select("id, store_name, store_slug, profile_picture_url, cover_photo_url, category, country, district, city")
+        .select("id, store_name, store_slug, profile_picture_url, cover_photo_url, category, country, district, city, business_type")
         .not("store_name", "is", null)
         .not("store_slug", "is", null)
         .order("last_active_at", { ascending: false });
@@ -72,24 +77,39 @@ const Explore = () => {
     fetchStores();
   }, []);
 
-  // Filter stores by detected country first
+  // Reset category when switching tabs
+  useEffect(() => {
+    setSelectedCategory("All");
+  }, [activeTab]);
+
   const countryStores = useMemo(() => {
     if (!detectedCountry) return stores;
     const local = stores.filter((s) => s.country?.toLowerCase() === detectedCountry.toLowerCase());
     return local.length > 0 ? local : stores;
   }, [stores, detectedCountry]);
 
+  // Filter by tab (stores vs services)
+  const tabStores = useMemo(() => {
+    if (activeTab === "services") {
+      return countryStores.filter((s) => s.business_type === "service");
+    }
+    // "stores" tab shows products + both
+    return countryStores.filter((s) => s.business_type !== "service");
+  }, [countryStores, activeTab]);
+
+  const categories = activeTab === "services" ? SERVICE_CATEGORIES : STORE_CATEGORIES;
+
   const locationOptions = useMemo(() => {
     const locs = new Set<string>();
-    countryStores.forEach((s) => {
+    tabStores.forEach((s) => {
       if (s.city) locs.add(s.city);
       if (s.district) locs.add(s.district);
     });
     return ["All", ...Array.from(locs).sort()];
-  }, [countryStores]);
+  }, [tabStores]);
 
   const filtered = useMemo(() => {
-    return countryStores.filter((s) => {
+    return tabStores.filter((s) => {
       const q = search.trim().toLowerCase().replace(/^@/, "");
       const matchesSearch =
         !q ||
@@ -107,33 +127,27 @@ const Explore = () => {
         s.district === selectedLocation;
       return matchesSearch && matchesCategory && matchesLocation;
     });
-  }, [countryStores, search, selectedCategory, selectedLocation]);
+  }, [tabStores, search, selectedCategory, selectedLocation]);
 
   const activeFilterCount = (selectedCategory !== "All" ? 1 : 0) + (selectedLocation !== "All" ? 1 : 0);
   const hasFilters = activeFilterCount > 0 || search.trim() !== "";
 
   return (
-    <div className="min-h-screen flex flex-col">
+    <div className="min-h-screen flex flex-col bg-background">
       <Navbar />
 
       <main className="flex-1">
-        {/* Hero */}
-        <section className="bg-gradient-to-b from-primary/5 to-background border-b">
-          <div className="mx-auto max-w-5xl px-4 py-10 sm:py-14 text-center">
-            <h1 className="text-3xl sm:text-4xl font-extrabold mb-2">
-              Explore <span className="text-primary">Stores</span>
-            </h1>
-            <p className="text-muted-foreground mb-6 max-w-md mx-auto">
-              Discover African sellers and shop via WhatsApp
-            </p>
-            <div className="relative mx-auto max-w-md flex gap-2">
+        {/* Search bar */}
+        <section className="border-b border-border/50">
+          <div className="mx-auto max-w-2xl px-4 pt-6 pb-4">
+            <div className="relative flex gap-2">
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
-                  placeholder="Search stores…"
+                  placeholder={activeTab === "services" ? "Search services…" : "Search stores…"}
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="pl-10 h-11"
+                  className="pl-10 h-11 rounded-xl"
                 />
                 {search && (
                   <button
@@ -146,7 +160,7 @@ const Explore = () => {
               </div>
               <button
                 onClick={() => setShowFilters(!showFilters)}
-                className={`h-11 w-11 shrink-0 rounded-xl border flex items-center justify-center transition-colors ${
+                className={`h-11 w-11 shrink-0 rounded-xl border flex items-center justify-center transition-colors relative ${
                   showFilters || activeFilterCount > 0
                     ? "border-primary bg-primary/10 text-primary"
                     : "border-border text-muted-foreground hover:border-primary/30"
@@ -166,24 +180,7 @@ const Explore = () => {
         {/* Filters - collapsible */}
         {showFilters && (
           <section className="border-b animate-in slide-in-from-top-2 duration-200">
-            <div className="mx-auto max-w-5xl px-4 py-4 space-y-3">
-              {/* Categories */}
-              <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
-                {CATEGORIES.map((cat) => (
-                  <button
-                    key={cat.label}
-                    onClick={() => setSelectedCategory(cat.label)}
-                    className={`flex items-center gap-1.5 whitespace-nowrap rounded-full border px-3.5 py-1.5 text-sm font-medium transition-colors ${
-                      selectedCategory === cat.label
-                        ? "border-primary bg-primary/10 text-primary"
-                        : "border-border text-muted-foreground hover:border-primary/30"
-                    }`}
-                  >
-                    <span>{cat.icon}</span> {cat.label}
-                  </button>
-                ))}
-              </div>
-              {/* City / District */}
+            <div className="mx-auto max-w-2xl px-4 py-3 space-y-3">
               {locationOptions.length > 1 && (
                 <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
                   {locationOptions.map((loc) => (
@@ -205,16 +202,67 @@ const Explore = () => {
           </section>
         )}
 
-        {/* Results */}
-        <section className="mx-auto max-w-5xl px-4 py-6">
+        {/* Top Stores Near You */}
+        <section className="mx-auto max-w-2xl px-4 py-5">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-bold text-foreground">
+              {activeTab === "services" ? "Top Services Near You" : "Top Stores Near You"}
+            </h2>
+            <span className="text-xs text-muted-foreground">
+              {filtered.length} result{filtered.length !== 1 ? "s" : ""}
+            </span>
+          </div>
+
+          {/* Stores / Services toggle */}
+          <div className="flex gap-2 mb-4">
+            <button
+              onClick={() => setActiveTab("stores")}
+              className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
+                activeTab === "stores"
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-secondary text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              All Stores
+            </button>
+            <button
+              onClick={() => setActiveTab("services")}
+              className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
+                activeTab === "services"
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-secondary text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              Services
+            </button>
+          </div>
+
+          {/* Category chips */}
+          <div className="flex gap-2 overflow-x-auto pb-3 scrollbar-hide -mx-4 px-4">
+            {categories.map((cat) => (
+              <button
+                key={cat.label}
+                onClick={() => setSelectedCategory(cat.label)}
+                className={`whitespace-nowrap rounded-full border px-3.5 py-1.5 text-xs font-medium transition-colors ${
+                  selectedCategory === cat.label
+                    ? "border-primary bg-primary/10 text-primary"
+                    : "border-border text-muted-foreground hover:border-primary/30"
+                }`}
+              >
+                {cat.icon ? `${cat.icon} ` : ""}{cat.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Results */}
           {loading ? (
-            <div className="py-16 text-center animate-pulse text-muted-foreground">Loading stores…</div>
+            <div className="py-16 text-center animate-pulse text-muted-foreground">Loading…</div>
           ) : filtered.length === 0 ? (
             <div className="flex flex-col items-center gap-3 py-16 text-center">
               <Store className="h-12 w-12 text-muted-foreground/40" />
-              <p className="text-lg font-medium">No stores found</p>
+              <p className="text-lg font-medium">No {activeTab} found</p>
               <p className="text-sm text-muted-foreground">
-                {hasFilters ? "Try adjusting your filters" : "Be the first to create a store!"}
+                {hasFilters ? "Try adjusting your filters" : "Be the first to create one!"}
               </p>
               {hasFilters && (
                 <button
@@ -226,80 +274,49 @@ const Explore = () => {
               )}
             </div>
           ) : (
-            <>
-              <p className="mb-4 text-sm text-muted-foreground">
-                {filtered.length} store{filtered.length !== 1 ? "s" : ""}
-              </p>
-              <div className="grid gap-4 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
-                {filtered.map((store) => {
-                  const tags = categoriesToDisplay(store.category);
-                  const location = getLocationLabel(store);
-                  return (
-                    <Link key={store.id} to={`/${store.store_slug}`}>
-                      <div className="group rounded-2xl border border-border/50 bg-card/60 backdrop-blur-xl transition-all hover:shadow-lg hover:border-primary/20 h-full">
-                        {/* Cover Photo */}
-                        <div className="h-24 rounded-t-2xl overflow-hidden bg-gradient-to-br from-primary/10 to-primary/5">
-                          {store.cover_photo_url ? (
-                            <img
-                              src={store.cover_photo_url}
-                              alt=""
-                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                              loading="lazy"
-                            />
-                          ) : (
-                            <div className="w-full h-full bg-gradient-to-br from-primary/15 via-primary/5 to-accent/10" />
-                          )}
+            <div className="space-y-3">
+              {filtered.map((store) => {
+                const businessLabel = getBusinessLabel(store);
+                const location = getLocationLabel(store);
+                return (
+                  <Link key={store.id} to={`/${store.store_slug}`}>
+                    <div className="flex items-center gap-3 rounded-2xl bg-card p-3 border border-border/50 hover:border-primary/20 hover:shadow-sm transition-all">
+                      {/* Profile picture */}
+                      {store.profile_picture_url ? (
+                        <img
+                          src={store.profile_picture_url}
+                          alt={store.store_name ?? "Store"}
+                          className="h-14 w-14 rounded-xl object-cover shrink-0"
+                          loading="lazy"
+                        />
+                      ) : (
+                        <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-secondary shrink-0">
+                          <AfristallLogo className="h-6 w-6" />
                         </div>
+                      )}
 
-                        {/* Profile pic overlapping cover */}
-                        <div className="flex flex-col items-center -mt-8 px-3 pb-4">
-                          {store.profile_picture_url ? (
-                            <img
-                              src={store.profile_picture_url}
-                              alt={store.store_name ?? "Store"}
-                              className="h-14 w-14 rounded-full object-cover border-3 border-background shadow-md"
-                              loading="lazy"
-                            />
-                          ) : (
-                            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-card border-3 border-background shadow-md">
-                              <AfristallLogo className="h-6 w-6" />
-                            </div>
-                          )}
-
-                          <p className="font-semibold text-sm mt-2 truncate max-w-full">{store.store_name}</p>
-                          {store.store_slug && (
-                            <p className="text-[11px] text-muted-foreground">@{store.store_slug}</p>
-                          )}
-
-                          {location && (
-                            <p className="flex items-center gap-1 text-[11px] text-muted-foreground mt-1">
-                              <MapPin className="h-3 w-3 shrink-0" /> {location}
-                            </p>
-                          )}
-
-                          {/* Category Tags */}
-                          {tags.length > 0 && (
-                            <div className="flex flex-wrap items-center justify-center gap-1 mt-2">
-                              {tags.slice(0, 2).map((tag) => (
-                                <span
-                                  key={tag}
-                                  className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-medium text-primary"
-                                >
-                                  {tag}
-                                </span>
-                              ))}
-                              {tags.length > 2 && (
-                                <span className="text-[10px] text-muted-foreground">+{tags.length - 2}</span>
-                              )}
-                            </div>
-                          )}
-                        </div>
+                      {/* Info */}
+                      <div className="flex-1 min-w-0">
+                        {businessLabel && (
+                          <span className="inline-block rounded bg-primary/10 px-1.5 py-0.5 text-[10px] font-semibold text-primary uppercase tracking-wide mb-0.5">
+                            {businessLabel}
+                          </span>
+                        )}
+                        <h3 className="font-semibold text-sm text-foreground truncate">{store.store_name}</h3>
+                        {location && (
+                          <p className="flex items-center gap-1 text-xs text-muted-foreground mt-0.5 truncate">
+                            <MapPin className="h-3 w-3 shrink-0" /> {location}
+                          </p>
+                        )}
                       </div>
-                    </Link>
-                  );
-                })}
-              </div>
-            </>
+
+                      {/* Bookmark icon */}
+                      <Bookmark className="h-5 w-5 text-muted-foreground/40 shrink-0" />
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
           )}
         </section>
       </main>
