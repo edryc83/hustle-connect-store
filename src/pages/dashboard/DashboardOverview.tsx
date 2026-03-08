@@ -105,7 +105,7 @@ const DashboardOverview = () => {
       {/* Greeting */}
       <div className="flex items-center gap-3.5">
         <div className="shrink-0">
-          <div className="rounded-2xl p-[2px] bg-gradient-to-br from-primary/40 to-primary/10">
+          <div className="rounded-full p-[2px] bg-gradient-to-br from-primary/40 to-primary/10">
             {profilePicUrl ? (
               <img src={profilePicUrl} alt="Profile" className="h-14 w-14 rounded-full object-cover border-2 border-background/50" />
             ) : (
