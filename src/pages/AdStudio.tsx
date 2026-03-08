@@ -256,6 +256,8 @@ export default function AdStudio() {
             removeBg={removeBg}
             onRemoveBgChange={setRemoveBg}
             onProcessedImage={setProcessedImageUrl}
+            bgImageUrl={bgImageUrl}
+            setBgImageUrl={setBgImageUrl}
           />
         )}
 

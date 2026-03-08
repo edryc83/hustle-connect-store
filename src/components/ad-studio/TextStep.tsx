@@ -3,9 +3,17 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { Sparkles, Loader2, ImageIcon } from "lucide-react";
+import { Sparkles, Loader2, ImageIcon, Search, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { removeBackground } from "@imgly/background-removal";
+
+type WallpaperResult = {
+  id: string;
+  url: string;
+  thumb: string;
+  source: string;
+  photographer?: string;
+};
 
 interface TextStepProps {
   productName: string;
@@ -18,6 +26,8 @@ interface TextStepProps {
   removeBg: boolean;
   onRemoveBgChange: (v: boolean) => void;
   onProcessedImage: (blobUrl: string | null) => void;
+  bgImageUrl: string | null;
+  setBgImageUrl: (v: string | null) => void;
 }
 
 export default function TextStep({
@@ -31,11 +41,19 @@ export default function TextStep({
   removeBg,
   onRemoveBgChange,
   onProcessedImage,
+  bgImageUrl,
+  setBgImageUrl,
 }: TextStepProps) {
   const [aiLoading, setAiLoading] = useState(false);
   const [bgRemovalLoading, setBgRemovalLoading] = useState(false);
   const [processedUrl, setProcessedUrl] = useState<string | null>(null);
   const originalImageRef = useRef<string | null>(null);
+
+  // Background search state
+  const [bgQuery, setBgQuery] = useState("");
+  const [bgResults, setBgResults] = useState<WallpaperResult[]>([]);
+  const [bgSearching, setBgSearching] = useState(false);
+  const [bgExpanded, setBgExpanded] = useState(!bgImageUrl);
 
   // Track the original image so we can restore it
   useEffect(() => {
@@ -61,7 +79,6 @@ export default function TextStep({
         onProcessedImage(url);
       } catch (err) {
         console.error("Background removal failed:", err);
-        // Silently revert toggle
         onRemoveBgChange(false);
       } finally {
         if (!cancelled) setBgRemovalLoading(false);
@@ -101,6 +118,27 @@ export default function TextStep({
     }
   };
 
+  const handleBgSearch = async () => {
+    if (!bgQuery.trim()) return;
+    setBgSearching(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("search-wallpapers", {
+        body: { query: bgQuery.trim() },
+      });
+      if (error) throw error;
+      setBgResults(data?.results || []);
+    } catch {
+      // silent
+    } finally {
+      setBgSearching(false);
+    }
+  };
+
+  const handleSelectBg = (wp: WallpaperResult) => {
+    setBgImageUrl(wp.url);
+    setBgExpanded(false);
+  };
+
   return (
     <div className="space-y-4 pb-4">
       {/* Image preview + remove bg */}
@@ -136,6 +174,68 @@ export default function TextStep({
           <ImageIcon className="h-10 w-10 text-muted-foreground" />
         </div>
       )}
+
+      {/* Background picker */}
+      <div className="rounded-xl border border-border overflow-hidden bg-muted/30">
+        <div className="px-3 py-2">
+          <Label className="text-sm font-medium">Ad Background</Label>
+          <p className="text-[11px] text-muted-foreground">Search free photos from Unsplash & Pexels</p>
+        </div>
+
+        {/* Selected preview */}
+        {bgImageUrl && !bgExpanded && (
+          <div className="relative mx-3 mb-2 rounded-lg overflow-hidden border border-border">
+            <img src={bgImageUrl} alt="Selected background" className="w-full h-24 object-cover" />
+            <div className="absolute inset-0 flex items-center justify-center gap-2 bg-black/30 opacity-0 hover:opacity-100 transition-opacity">
+              <Button size="sm" variant="secondary" className="h-7 text-xs" onClick={() => setBgExpanded(true)}>
+                Change
+              </Button>
+              <Button size="sm" variant="secondary" className="h-7 text-xs" onClick={() => setBgImageUrl(null)}>
+                <X className="h-3 w-3" />
+              </Button>
+            </div>
+          </div>
+        )}
+
+        {/* Search UI */}
+        {(bgExpanded || !bgImageUrl) && (
+          <div className="px-3 pb-3 space-y-2">
+            <form onSubmit={(e) => { e.preventDefault(); handleBgSearch(); }} className="flex gap-2">
+              <Input
+                placeholder="e.g. abstract, fashion, gradient…"
+                value={bgQuery}
+                onChange={(e) => setBgQuery(e.target.value)}
+                className="flex-1 h-8 text-sm"
+              />
+              <Button type="submit" size="sm" disabled={bgSearching} className="h-8 px-2.5">
+                {bgSearching ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Search className="h-3.5 w-3.5" />}
+              </Button>
+            </form>
+
+            {bgResults.length > 0 && (
+              <div className="grid grid-cols-3 gap-1.5 max-h-40 overflow-y-auto">
+                {bgResults.map((wp) => (
+                  <button
+                    key={wp.id}
+                    onClick={() => handleSelectBg(wp)}
+                    className="group relative rounded-md overflow-hidden border border-border/50 hover:border-primary/50 transition-colors focus:outline-none focus:ring-2 focus:ring-ring"
+                  >
+                    <img
+                      src={wp.thumb}
+                      alt={`By ${wp.photographer}`}
+                      className="w-full h-16 object-cover"
+                      loading="lazy"
+                    />
+                    <span className="absolute bottom-0 left-0 right-0 text-[8px] text-white/0 group-hover:text-white/90 bg-black/0 group-hover:bg-black/40 px-1 py-0.5 truncate transition-colors">
+                      {wp.photographer}
+                    </span>
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+      </div>
 
       <h2 className="text-base font-semibold">Edit text</h2>
 
