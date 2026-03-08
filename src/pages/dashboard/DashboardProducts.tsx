@@ -495,9 +495,9 @@ const DashboardProducts = () => {
           {/* Featured section */}
           {featured.length > 0 && (
             <section className="space-y-2">
-              <div className="flex items-center gap-2">
-                <Star className="h-4 w-4 text-primary fill-primary" />
-                <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Featured ({featured.length}/6)</h2>
+              <div className="flex items-center gap-1.5">
+                <Star className="h-3 w-3 text-primary fill-primary" />
+                <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Featured ({featured.length}/6)</h2>
               </div>
               <div className="space-y-2">
                 {featured.map((product) => (
@@ -571,7 +571,7 @@ function ListingRow({
             <>
               <p className="text-xs text-primary font-bold">{formatPrice(Number((product as any).discount_price), currency)}</p>
               <p className="text-[10px] text-muted-foreground line-through">{formatPrice(Number(product.price), currency)}</p>
-              <Badge className="text-[10px] px-2.5 py-1 bg-gradient-to-r from-destructive to-destructive/80 text-destructive-foreground shadow-lg shadow-destructive/40 rounded-full font-bold tracking-tight h-auto">
+              <Badge variant="destructive" className="text-[9px] px-1.5 py-0 h-4 rounded font-semibold">
                 {Math.round(((product.price - Number((product as any).discount_price)) / product.price) * 100)}% OFF
               </Badge>
             </>
