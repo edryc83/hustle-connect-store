@@ -276,8 +276,6 @@ export default function AdStudio() {
             setTagline={setTagline}
             subtitle={subtitle}
             setSubtitle={setSubtitle}
-            storeLogo={storeLogo}
-            setStoreLogo={setStoreLogo}
             imagePreview={imagePreview}
             removeBg={removeBg}
             onRemoveBgChange={setRemoveBg}
