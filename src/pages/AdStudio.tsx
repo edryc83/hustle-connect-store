@@ -149,7 +149,9 @@ export default function AdStudio() {
         { name: "store_name", text: profile?.store_slug || profile?.store_name || "My Store" },
       ];
 
-      if (bgImageUrl) {
+      if (bgType === "color" && bgColor) {
+        modifications.push({ name: "background", color: bgColor });
+      } else if (bgType === "image" && bgImageUrl) {
         modifications.push({ name: "background", image_url: bgImageUrl });
       }
 
