@@ -42,7 +42,7 @@ const DashboardOverview = () => {
     const fetchData = async () => {
       const [{ count }, { data: profile }, { count: orders }] = await Promise.all([
         supabase.from("products").select("*", { count: "exact", head: true }).eq("user_id", user.id),
-        supabase.from("profiles").select("store_name, store_slug, first_name, profile_picture_url, category, view_count").eq("id", user.id).single(),
+        supabase.from("profiles").select("store_name, store_slug, first_name, profile_picture_url, category, view_count, welcome_message, city").eq("id", user.id).single(),
         supabase.from("orders").select("*", { count: "exact", head: true }).eq("seller_id", user.id).eq("status", "confirmed"),
       ]);
       setProductCount(count ?? 0);
@@ -55,6 +55,17 @@ const DashboardOverview = () => {
       setProfilePicUrl(p?.profile_picture_url ?? "");
       setCategory(p?.category ?? "");
       setViewCount(p?.view_count ?? 0);
+
+      // Auto-generate bio for existing stores that don't have one
+      if (!p?.welcome_message && p?.store_name) {
+        supabase.functions.invoke("generate-bio", {
+          body: { storeName: p.store_name, category: p.category || "", city: p.city || "" },
+        }).then(({ data }) => {
+          if (data?.bio) {
+            supabase.from("profiles").update({ welcome_message: data.bio } as any).eq("id", user.id);
+          }
+        }).catch(() => {});
+      }
     };
 
     fetchData();
