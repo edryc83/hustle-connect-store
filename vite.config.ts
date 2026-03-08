@@ -21,6 +21,7 @@ export default defineConfig(({ mode }) => ({
       workbox: {
         globPatterns: ["**/*.{js,css,html,ico,png,svg,jpeg,jpg,webp,woff2}"],
         navigateFallbackDenylist: [/^\/~oauth/],
+        importScripts: ["/push-sw.js"],
         runtimeCaching: [
           {
             // Auth endpoints must NEVER be cached — prevents stale tokens causing logouts
