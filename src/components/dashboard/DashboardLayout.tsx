@@ -6,9 +6,8 @@ import { DashboardSidebar } from "./DashboardSidebar";
 import { MobileBottomNav } from "./MobileBottomNav";
 import AfristallLogo from "@/components/AfristallLogo";
 import { useTheme } from "@/hooks/useTheme";
-import { Moon, Sun, Eye } from "lucide-react";
+import { Moon, Sun } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { useEffect, useState } from "react";
 
 export function DashboardLayout({ children }: { children: ReactNode }) {
   const { user, loading } = useAuth();
