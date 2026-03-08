@@ -100,16 +100,29 @@ const CaptionGenerator = ({ storeName, storeSlug, category, productCount }: Prop
                     </span>
                     <p className="text-xs leading-relaxed whitespace-pre-line text-[#111B21] dark:text-[#E9EDEF]">{c.text}</p>
                   </div>
-                  <button
-                    onClick={() => handleCopy(c.text, i)}
-                    className={`shrink-0 mt-1 p-1.5 rounded-lg transition-colors ${
-                      copiedIdx === i
-                        ? "text-[#25D366]"
-                        : "text-[#075E54]/50 dark:text-[#E9EDEF]/50 hover:text-[#075E54] dark:hover:text-[#E9EDEF]"
-                    }`}
-                  >
-                    {copiedIdx === i ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
-                  </button>
+                  <div className="shrink-0 flex flex-col gap-1 mt-1">
+                    <button
+                      onClick={() => handleCopy(c.text, i)}
+                      className={`p-1.5 rounded-lg transition-colors ${
+                        copiedIdx === i
+                          ? "text-[#25D366]"
+                          : "text-[#075E54]/50 dark:text-[#E9EDEF]/50 hover:text-[#075E54] dark:hover:text-[#E9EDEF]"
+                      }`}
+                      title="Copy"
+                    >
+                      {copiedIdx === i ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+                    </button>
+                    <button
+                      onClick={() => {
+                        const waUrl = `https://wa.me/?text=${encodeURIComponent(c.text)}`;
+                        window.open(waUrl, "_blank");
+                      }}
+                      className="p-1.5 rounded-lg transition-colors"
+                      title="Share to WhatsApp"
+                    >
+                      <img src={whatsappIcon} alt="" className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
                 </div>
               ))}
         </div>
