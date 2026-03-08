@@ -30,8 +30,8 @@ export function MobileBottomNav() {
   const navItems = [
     { title: "Home", url: "/dashboard", icon: Home },
     { title: terms.plural, url: "/dashboard/products", icon: Package },
+    { title: "Design", url: "/ad-studio", icon: Sparkles },
     { title: "Orders", url: "/dashboard/orders", icon: ClipboardList },
-    { title: "Analytics", url: "/dashboard/analytics", icon: BarChart3 },
     { title: "Profile", url: "/dashboard/profile", icon: null as any },
   ];
 
