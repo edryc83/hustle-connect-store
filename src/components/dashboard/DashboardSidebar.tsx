@@ -1,4 +1,4 @@
-import { Package, LayoutDashboard, Settings, LogOut, ClipboardList, BarChart3, Moon, Sun } from "lucide-react";
+import { Package, LayoutDashboard, User, Settings, LogOut, ClipboardList, BarChart3, Moon, Sun } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useAuth } from "@/hooks/useAuth";
 import { useTheme } from "@/hooks/useTheme";
