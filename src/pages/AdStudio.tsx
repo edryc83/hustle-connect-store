@@ -29,7 +29,7 @@ export default function AdStudio() {
   } | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [removeBg, setRemoveBg] = useState(true);
+  const [removeBg, setRemoveBg] = useState(false);
 
   // Step 2 — Template
   const [selectedTemplate, setSelectedTemplate] = useState(TEMPLATE_ID);
