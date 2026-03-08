@@ -241,6 +241,9 @@ export function applyFilters(products: any[], filters: FilterState): any[] {
   // Category (from attributes.product_type)
   if (filters.category) {
     result = result.filter((p) => {
+      const type = p.listing_type || "product";
+      if (type === filters.category) return true;
+      // Fallback: check attributes.product_type
       const attrs = p.attributes as Record<string, any> | null;
       return attrs?.product_type === filters.category;
     });
