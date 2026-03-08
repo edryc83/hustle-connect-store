@@ -605,6 +605,9 @@ const DashboardSettings = () => {
         </CardContent>
       </Card>
 
+      {/* Push Notifications */}
+      <NotificationSettings />
+
       {/* WhatsApp Test */}
       <WhatsAppTestCard whatsappNumber={whatsappNumber} storeName={storeName} storeSlug={firstName} />
 
