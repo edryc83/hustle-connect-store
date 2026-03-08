@@ -43,9 +43,23 @@ export function StorefrontFilters({ filters, onChange, totalCount, filteredCount
 
   const clearAll = () => onChange({ search: "", category: "", condition: "", priceRange: null });
 
-  // Categories no longer used with the new flat attribute system
+  // Derive categories from actual product listing_type values
+  const categorySet = new Map<string, number>();
+  products.forEach((p) => {
+    const type = p.listing_type || "product";
+    categorySet.set(type, (categorySet.get(type) || 0) + 1);
+  });
+  const CATEGORY_META: Record<string, { label: string; emoji: string }> = {
+    product: { label: "Products", emoji: "📦" },
+    service: { label: "Services", emoji: "🔧" },
+  };
   const categories = [
     { value: "", label: "All", emoji: "" },
+    ...Array.from(categorySet.entries()).map(([value, count]) => ({
+      value,
+      label: `${CATEGORY_META[value]?.label || value} (${count})`,
+      emoji: CATEGORY_META[value]?.emoji || "📋",
+    })),
   ];
 
   // Only show conditions that exist in this store's products
