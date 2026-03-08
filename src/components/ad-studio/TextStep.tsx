@@ -4,7 +4,7 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { Sparkles, Loader2, ImageIcon, Search, X, Check } from "lucide-react";
+import { Sparkles, Loader2, ImageIcon, Search, X, Check, Upload } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { removeBackground } from "@imgly/background-removal";
 
@@ -28,6 +28,10 @@ interface TextStepProps {
   setPrice: (v: string) => void;
   tagline: string;
   setTagline: (v: string) => void;
+  subtitle: string;
+  setSubtitle: (v: string) => void;
+  storeLogo: string | null;
+  setStoreLogo: (v: string | null) => void;
   imagePreview: string | null;
   removeBg: boolean;
   onRemoveBgChange: (v: boolean) => void;
@@ -42,6 +46,7 @@ interface TextStepProps {
 
 export default function TextStep({
   productName, setProductName, price, setPrice, tagline, setTagline,
+  subtitle, setSubtitle, storeLogo, setStoreLogo,
   imagePreview, removeBg, onRemoveBgChange, onProcessedImage,
   bgImageUrl, setBgImageUrl, bgColor, setBgColor, bgType, setBgType,
 }: TextStepProps) {
@@ -136,6 +141,15 @@ export default function TextStep({
     }
   };
 
+  const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    setStoreLogo(url);
+    // Store file ref for later upload
+    (window as any).__adStudioLogoFile = file;
+  };
+
   return (
     <div className="space-y-4 pb-4">
       {/* Image preview + remove bg */}
@@ -175,7 +189,6 @@ export default function TextStep({
             <TabsTrigger value="image" className="flex-1 text-xs h-6">Image</TabsTrigger>
           </TabsList>
 
-          {/* Color tab */}
           <TabsContent value="color" className="space-y-2 mt-2">
             <div className="grid grid-cols-4 gap-2">
               {PRESET_COLORS.map((hex) => (
@@ -218,7 +231,6 @@ export default function TextStep({
             </div>
           </TabsContent>
 
-          {/* Image tab */}
           <TabsContent value="image" className="space-y-2 mt-2">
             <p className="text-[10px] text-muted-foreground">Search Unsplash & Pexels (may not render on all templates)</p>
 
@@ -273,6 +285,33 @@ export default function TextStep({
           </Button>
         </div>
         <Input id="tagline" placeholder="e.g. Sleep in luxury ✨" value={tagline} onChange={(e) => setTagline(e.target.value)} />
+      </div>
+      <div className="space-y-1.5">
+        <Label htmlFor="subtitle">Subtitle</Label>
+        <Input id="subtitle" placeholder="e.g. Free delivery countrywide" value={subtitle} onChange={(e) => setSubtitle(e.target.value)} />
+      </div>
+
+      {/* Store Logo */}
+      <div className="space-y-1.5">
+        <Label>Store Logo</Label>
+        {storeLogo ? (
+          <div className="flex items-center gap-3">
+            <img src={storeLogo} alt="Store logo" className="h-10 w-10 rounded-lg border border-border object-contain bg-muted/20" />
+            <div className="flex gap-2">
+              <label className="cursor-pointer">
+                <span className="text-xs text-primary hover:underline">Change</span>
+                <input type="file" accept="image/*" className="hidden" onChange={handleLogoUpload} />
+              </label>
+              <button onClick={() => setStoreLogo(null)} className="text-xs text-muted-foreground hover:text-destructive">Remove</button>
+            </div>
+          </div>
+        ) : (
+          <label className="flex items-center gap-2 cursor-pointer rounded-lg border border-dashed border-border px-3 py-2.5 bg-muted/20 hover:bg-muted/40 transition-colors">
+            <Upload className="h-4 w-4 text-muted-foreground" />
+            <span className="text-sm text-muted-foreground">Upload your logo</span>
+            <input type="file" accept="image/*" className="hidden" onChange={handleLogoUpload} />
+          </label>
+        )}
       </div>
     </div>
   );
