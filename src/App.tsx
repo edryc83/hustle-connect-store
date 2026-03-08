@@ -13,6 +13,7 @@ import Login from "./pages/Login";
 import DashboardOverview from "./pages/dashboard/DashboardOverview";
 import DashboardProducts from "./pages/dashboard/DashboardProducts";
 import DashboardSettings from "./pages/dashboard/DashboardSettings";
+import DashboardProfile from "./pages/dashboard/DashboardProfile";
 import DashboardOrders from "./pages/dashboard/DashboardOrders";
 import DashboardAnalytics from "./pages/dashboard/DashboardAnalytics";
 import AdminOverview from "./pages/admin/AdminOverview";
