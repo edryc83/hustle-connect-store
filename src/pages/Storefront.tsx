@@ -478,7 +478,7 @@ function ProductDetailView({
                 window.open(`https://wa.me/${cleanNumber.replace("+", "")}?text=${encodeURIComponent(message)}`, "_blank");
               }}
             >
-              <span className="text-lg">💬</span>
+              <img src={whatsappIcon} alt="" className="h-5 w-5" />
               WhatsApp
             </Button>
           </div>
