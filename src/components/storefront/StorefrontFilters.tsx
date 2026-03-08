@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Search, SlidersHorizontal, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
-import { PRODUCT_CATEGORIES } from "@/lib/productAttributes";
+import { ATTRIBUTE_TYPES } from "@/lib/productAttributes";
 
 export interface FilterState {
   search: string;
