@@ -131,7 +131,7 @@ const DashboardSettings = () => {
           setInstagramUrl(d.instagram_url ?? "");
           setTiktokUrl(d.tiktok_url ?? "");
           setFacebookUrl(d.facebook_url ?? "");
-          setAiAssistantEnabled(d.ai_assistant_enabled !== false);
+          
           setCategories(deserializeCategories(d.category));
           setDeliveryAreas(d.delivery_areas ?? "");
           setCurrency(d.currency ?? "UGX");
