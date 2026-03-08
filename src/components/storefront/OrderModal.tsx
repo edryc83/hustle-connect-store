@@ -8,6 +8,7 @@ import { MessageCircle } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { formatPrice } from "@/lib/currency";
+import { buildShareUrl } from "@/lib/shareUrl";
 import type { Tables } from "@/integrations/supabase/types";
 
 type Product = Tables<"products">;
