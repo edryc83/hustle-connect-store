@@ -14,7 +14,7 @@ export function MobileBottomNav() {
   ];
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-border/40 bg-background/60 backdrop-blur-2xl backdrop-saturate-150 md:hidden supports-[padding:env(safe-area-inset-bottom)]:pb-[env(safe-area-inset-bottom)]">
+    <nav className="mobile-bottom-nav fixed inset-x-0 bottom-0 z-[70] border-t border-border/40 bg-background/60 shadow-lg backdrop-blur-2xl backdrop-saturate-150 md:hidden [transform:translateZ(0)]">
       <div className="flex items-center justify-around py-2">
         {navItems.map((item) => (
           <NavLink
