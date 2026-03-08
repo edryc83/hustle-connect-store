@@ -217,40 +217,33 @@ function ProductDetailView({
   const { toggle, isWished } = useWishlist();
   const [selectedImg, setSelectedImg] = useState(0);
   const [qty, setQty] = useState(1);
-  const [attrSelections, setAttrSelections] = useState<Record<string, string | string[]>>({});
-  const [attrTextInputs, setAttrTextInputs] = useState<Record<string, string>>({});
-  const [cakeMessage, setCakeMessage] = useState("");
-  const [personalisation, setPersonalisation] = useState("");
+  const [attrSelections, setAttrSelections] = useState<Record<string, string>>({});
+  const [validationErrors, setValidationErrors] = useState<Record<string, boolean>>({});
   const [deliveryAddress, setDeliveryAddress] = useState("");
 
   const attrs = (product as any).attributes as Record<string, any> | null;
-  const hasAttributes = attrs && attrs.product_type;
+  const isChatOnly = attrs?.chat_only === true;
+  const selectableKeys = attrs ? getSelectableKeys(attrs) : [];
+  const hasAttributes = selectableKeys.length > 0;
 
-  const handleAttrSelect = (key: string, value: string | string[]) => {
+  const handleAttrSelect = (key: string, value: string) => {
     setAttrSelections((prev) => ({ ...prev, [key]: value }));
-  };
-  const handleAttrText = (key: string, value: string) => {
-    setAttrTextInputs((prev) => ({ ...prev, [key]: value }));
+    setValidationErrors((prev) => ({ ...prev, [key]: false }));
   };
 
-  // Check if required selectable attributes are filled
-  const getSelectableFields = () => {
-    if (!hasAttributes || !attrs) return [];
-    const category = getCategoryByValue(attrs.product_type);
-    if (!category) return [];
-    return category.fields.filter((f) => {
-      const val = attrs[f.key];
-      if (!val) return false;
-      if (f.type === "toggle" || f.type === "number") return false; // info-only
-      if (Array.isArray(val) && val.length === 0) return false;
-      if (typeof val === "string" && !val.trim()) return false;
-      // For text fields, check if they parse to multiple options
-      if (f.type === "text") {
-        const opts = parseTextToOptions(val);
-        return opts.length > 0;
+  const validateSelections = (): boolean => {
+    if (isChatOnly || !hasAttributes) return true;
+    const errors: Record<string, boolean> = {};
+    let valid = true;
+    for (const key of selectableKeys) {
+      if (!attrSelections[key]) {
+        const type = (await import("@/lib/productAttributes")).ATTRIBUTE_TYPES.find((t: any) => t.key === key);
+        errors[key] = true;
+        valid = false;
       }
-      return true;
-    });
+    }
+    setValidationErrors(errors);
+    return valid;
   };
 
   const buildWhatsAppMessage = () => {
@@ -263,17 +256,13 @@ function ProductDetailView({
       `Price: ${formatPrice(dp * qty, currency)}`,
     ];
 
-    if (hasAttributes && attrs) {
-      const allTextInputs = { ...attrTextInputs };
-      if (cakeMessage) allTextInputs["cake_message_text"] = cakeMessage;
-      if (personalisation) allTextInputs["personalisation_text"] = personalisation;
-
-      const attrLines = buildAttributeLines(attrs, attrSelections, allTextInputs);
+    if (isChatOnly) {
+      lines.push(``, `I'd like to discuss the details with you directly.`);
+    } else if (hasAttributes && attrs) {
+      const attrLines = buildAttributeLines(attrs, attrSelections);
       if (attrLines.length > 0) {
         lines.push(``, `📋 Order Details:`);
         lines.push(...attrLines);
-        if (cakeMessage) lines.push(`- Message on cake: "${cakeMessage}"`);
-        if (personalisation) lines.push(`- Personalisation: ${personalisation}`);
       }
     }
 
