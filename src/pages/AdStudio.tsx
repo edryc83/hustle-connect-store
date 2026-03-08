@@ -123,7 +123,14 @@ export default function AdStudio() {
     setResultUrl(null);
     try {
       let imageUrl: string;
-      if (imageFile) {
+
+      // If we have a processed (bg-removed) blob URL, upload it first
+      if (removeBg && processedImageUrl) {
+        const res = await fetch(processedImageUrl);
+        const blob = await res.blob();
+        const file = new File([blob], `bg-removed-${Date.now()}.png`, { type: "image/png" });
+        imageUrl = await uploadImage(file);
+      } else if (imageFile) {
         imageUrl = await uploadImage(imageFile);
       } else if (selectedProductData?.imageUrl) {
         imageUrl = selectedProductData.imageUrl;
@@ -132,7 +139,7 @@ export default function AdStudio() {
       }
 
       const modifications = [
-        { name: "product", image_url: imageUrl, ...(removeBg ? { remove_background: true } : {}) },
+        { name: "product", image_url: imageUrl },
         { name: "product_name", text: productName },
         { name: "price_rectangle", text: price },
         { name: "short_description", text: tagline },
