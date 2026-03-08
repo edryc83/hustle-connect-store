@@ -208,9 +208,9 @@ export default function AdStudio() {
     <div className="min-h-screen bg-background flex flex-col">
       {/* Header */}
       <header className="sticky top-0 z-40 flex h-14 items-center gap-3 border-b bg-background/80 px-4 backdrop-blur-xl">
-        <Link to="/dashboard" className="text-muted-foreground hover:text-foreground transition-colors">
+        <button onClick={() => step > 1 ? setStep(step - 1) : window.history.back()} className="text-muted-foreground hover:text-foreground transition-colors">
           <ArrowLeft className="h-5 w-5" />
-        </Link>
+        </button>
         <h1 className="text-lg font-bold">Ad Studio</h1>
         <Sparkles className="h-4 w-4 text-primary" />
       </header>
