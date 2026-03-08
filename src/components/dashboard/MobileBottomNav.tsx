@@ -1,4 +1,4 @@
-import { LayoutDashboard, Package, Settings, ClipboardList, BarChart3 } from "lucide-react";
+import { LayoutDashboard, Package, User, ClipboardList, BarChart3 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useBusinessTerms } from "@/hooks/useBusinessTerms";
 
@@ -10,7 +10,7 @@ export function MobileBottomNav() {
     { title: terms.plural, url: "/dashboard/products", icon: Package },
     { title: "Orders", url: "/dashboard/orders", icon: ClipboardList },
     { title: "Analytics", url: "/dashboard/analytics", icon: BarChart3 },
-    { title: "Settings", url: "/dashboard/settings", icon: Settings },
+    { title: "Profile", url: "/dashboard/profile", icon: User },
   ];
 
   return (

@@ -51,16 +51,6 @@ export function DashboardLayout({ children }: { children: ReactNode }) {
               </div>
             </div>
             <div className="flex items-center gap-2">
-              {storeSlug && (
-                <Link
-                  to={`/${storeSlug}`}
-                  target="_blank"
-                  className="flex h-9 w-9 items-center justify-center rounded-full border bg-card/60 backdrop-blur-sm text-muted-foreground hover:text-foreground transition-colors"
-                  title="Preview your store"
-                >
-                  <Eye className="h-4 w-4" />
-                </Link>
-              )}
               <button
                 onClick={toggleTheme}
                 className="flex h-9 w-9 items-center justify-center rounded-full border bg-card/60 backdrop-blur-sm text-muted-foreground hover:text-foreground transition-colors"
