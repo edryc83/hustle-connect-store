@@ -571,6 +571,9 @@ function ListingRow({
             <>
               <p className="text-xs text-primary font-bold">{formatPrice(Number((product as any).discount_price), currency)}</p>
               <p className="text-[10px] text-muted-foreground line-through">{formatPrice(Number(product.price), currency)}</p>
+              <Badge variant="destructive" className="text-[9px] px-1.5 py-0 h-4">
+                {Math.round(((product.price - Number((product as any).discount_price)) / product.price) * 100)}% OFF
+              </Badge>
             </>
           ) : (
             <p className="text-xs text-primary font-bold">{formatPrice(Number(product.price), currency)}</p>
