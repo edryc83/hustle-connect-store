@@ -3,10 +3,9 @@ import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useBusinessTerms } from "@/hooks/useBusinessTerms";
-import { usePushNotifications } from "@/hooks/usePushNotifications";
 import { Button } from "@/components/ui/button";
 import {
-  Package, Copy, Share2, X, Plus, Download, Eye, ShoppingCart, TrendingUp, Bell,
+  Package, Copy, Share2, X, Plus, Download, Eye, ShoppingCart, TrendingUp,
 } from "lucide-react";
 import AfristallLogo from "@/components/AfristallLogo";
 import { toast } from "sonner";
@@ -25,7 +24,6 @@ const DashboardOverview = () => {
   const { user } = useAuth();
   const terms = useBusinessTerms();
   const { canInstall, isInstalled, promptInstall } = useInstallPrompt();
-  const { isSubscribed, supported: pushSupported, loading: pushLoading, subscribe: subscribePush } = usePushNotifications();
   const [productCount, setProductCount] = useState(0);
   const [viewCount, setViewCount] = useState(0);
   const [orderCount, setOrderCount] = useState(0);
@@ -163,16 +161,21 @@ const DashboardOverview = () => {
         </Link>
       </div>
 
-      {/* Share bar */}
+      {/* Share bar — glowing */}
       {storeSlug && (
-        <div className="flex items-center gap-2 rounded-2xl bg-card/40 backdrop-blur-xl border border-border/40 px-4 py-3">
-          <span className="text-sm font-medium truncate flex-1 text-muted-foreground">afristall.com/{storeSlug}</span>
-          <button onClick={copyLink} className="text-muted-foreground hover:text-foreground shrink-0 p-1.5 rounded-lg hover:bg-muted/50 transition-colors" title="Copy link">
-            <Copy className="h-4 w-4" />
-          </button>
-          <button onClick={shareStore} className="text-muted-foreground hover:text-primary shrink-0 p-1.5 rounded-lg hover:bg-muted/50 transition-colors" title="Share store">
-            <Share2 className="h-4 w-4" />
-          </button>
+        <div className="space-y-2">
+          <div className="flex items-center gap-2 rounded-2xl border-2 border-primary/60 bg-primary/5 backdrop-blur-xl px-4 py-3 shadow-[0_0_15px_hsl(var(--primary)/0.25)] animate-[pulse_3s_cubic-bezier(0.4,0,0.6,1)_infinite]">
+            <span className="text-sm font-semibold truncate flex-1 text-foreground">afristall.com/{storeSlug}</span>
+            <button onClick={copyLink} className="text-primary hover:text-foreground shrink-0 p-1.5 rounded-lg hover:bg-primary/10 transition-colors" title="Copy link">
+              <Copy className="h-4 w-4" />
+            </button>
+            <button onClick={shareStore} className="text-primary hover:text-foreground shrink-0 p-1.5 rounded-lg hover:bg-primary/10 transition-colors" title="Share store">
+              <Share2 className="h-4 w-4" />
+            </button>
+          </div>
+          <p className="text-[11px] text-muted-foreground leading-relaxed px-1">
+            📌 Post this link to your <strong className="text-foreground">TikTok Shop bio</strong>, <strong className="text-foreground">Facebook bio</strong>, <strong className="text-foreground">Instagram bio</strong> & <strong className="text-foreground">WhatsApp</strong> — always add it to your status caption when posting products!
+          </p>
         </div>
       )}
 
@@ -201,27 +204,8 @@ const DashboardOverview = () => {
         </button>
       )}
 
-      {/* Push notifications banner */}
-      {pushSupported && !isSubscribed && (
-        <button
-          onClick={async () => {
-            const ok = await subscribePush();
-            if (ok) toast.success("Notifications enabled! You'll be notified of new orders.");
-            else if (Notification.permission === "denied") toast.error("Notifications blocked. Please enable them in your browser settings.");
-          }}
-          disabled={pushLoading}
-          className="flex w-full items-center gap-3 rounded-2xl border border-border/40 bg-card/40 backdrop-blur-xl p-4 shadow-sm hover:bg-card/60 transition-colors text-left"
-        >
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-500/10">
-            <Bell className="h-5 w-5 text-amber-500" />
-          </div>
-          <div className="flex-1">
-            <p className="text-sm font-semibold">Enable Notifications</p>
-            <p className="text-xs text-muted-foreground">Get alerted when customers place orders</p>
-          </div>
-          <span className="text-xs text-primary font-medium">{pushLoading ? "…" : "Enable"}</span>
-        </button>
-      )}
+
+
 
       {/* Onboarding banner */}
       {productCount === 0 && !bannerDismissed && (
