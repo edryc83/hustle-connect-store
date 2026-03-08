@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { Navigate, Link } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { DashboardSidebar } from "./DashboardSidebar";
@@ -7,19 +7,10 @@ import { MobileBottomNav } from "./MobileBottomNav";
 import AfristallLogo from "@/components/AfristallLogo";
 import { useTheme } from "@/hooks/useTheme";
 import { Moon, Sun } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
 
 export function DashboardLayout({ children }: { children: ReactNode }) {
   const { user, loading } = useAuth();
   const { theme, toggleTheme } = useTheme();
-  const [storeSlug, setStoreSlug] = useState("");
-
-  useEffect(() => {
-    if (!user) return;
-    supabase.from("profiles").select("store_slug").eq("id", user.id).single().then(({ data }) => {
-      setStoreSlug((data as any)?.store_slug ?? "");
-    });
-  }, [user]);
 
   if (loading) {
     return (
