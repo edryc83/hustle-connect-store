@@ -56,6 +56,16 @@ export function OrderModal({ product, whatsappNumber, storeName, storeSlug, sell
         notes: notes.trim() || null,
         delivery_address: deliveryAddress.trim() || null,
       } as any);
+      
+      // Trigger push notification to seller
+      supabase.functions.invoke("push-notifications", {
+        body: {
+          action: "notify",
+          seller_id: sellerId,
+          title: "New Order! 🎉",
+          body: `${name.trim()} ordered ${product.name}`,
+        },
+      });
     } catch {
       // Don't block the WhatsApp redirect if logging fails
     }

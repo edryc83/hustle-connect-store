@@ -200,6 +200,28 @@ const DashboardOverview = () => {
         </button>
       )}
 
+      {/* Push notifications banner */}
+      {pushSupported && !isSubscribed && (
+        <button
+          onClick={async () => {
+            const ok = await subscribePush();
+            if (ok) toast.success("Notifications enabled! You'll be notified of new orders.");
+            else if (Notification.permission === "denied") toast.error("Notifications blocked. Please enable them in your browser settings.");
+          }}
+          disabled={pushLoading}
+          className="flex w-full items-center gap-3 rounded-2xl border border-border/40 bg-card/40 backdrop-blur-xl p-4 shadow-sm hover:bg-card/60 transition-colors text-left"
+        >
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-500/10">
+            <Bell className="h-5 w-5 text-amber-500" />
+          </div>
+          <div className="flex-1">
+            <p className="text-sm font-semibold">Enable Notifications</p>
+            <p className="text-xs text-muted-foreground">Get alerted when customers place orders</p>
+          </div>
+          <span className="text-xs text-primary font-medium">{pushLoading ? "…" : "Enable"}</span>
+        </button>
+      )}
+
       {/* Onboarding banner */}
       {productCount === 0 && !bannerDismissed && (
         <div className="relative rounded-2xl border border-border/40 bg-card/40 backdrop-blur-xl p-4 shadow-sm border-l-4 border-l-primary">
