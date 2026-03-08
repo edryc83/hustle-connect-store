@@ -1,16 +1,35 @@
 import { LayoutDashboard, Package, User, ClipboardList, BarChart3 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useBusinessTerms } from "@/hooks/useBusinessTerms";
+import { useAuth } from "@/hooks/useAuth";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
 
 export function MobileBottomNav() {
   const terms = useBusinessTerms();
+  const { user } = useAuth();
+
+  const { data: profilePic } = useQuery({
+    queryKey: ["profile-pic", user?.id],
+    queryFn: async () => {
+      if (!user) return null;
+      const { data } = await supabase
+        .from("profiles")
+        .select("profile_picture_url")
+        .eq("id", user.id)
+        .single();
+      return data?.profile_picture_url ?? null;
+    },
+    enabled: !!user,
+    staleTime: 5 * 60 * 1000,
+  });
 
   const navItems = [
     { title: "Home", url: "/dashboard", icon: LayoutDashboard },
     { title: terms.plural, url: "/dashboard/products", icon: Package },
     { title: "Orders", url: "/dashboard/orders", icon: ClipboardList },
     { title: "Analytics", url: "/dashboard/analytics", icon: BarChart3 },
-    { title: "Profile", url: "/dashboard/profile", icon: User },
+    { title: "Profile", url: "/dashboard/profile", icon: null as any },
   ];
 
   return (
@@ -24,7 +43,19 @@ export function MobileBottomNav() {
             className="flex flex-col items-center gap-0.5 px-3 py-1 text-xs text-foreground/60 transition-colors"
             activeClassName="text-primary font-medium"
           >
-            <item.icon className="h-5 w-5" />
+            {item.title === "Profile" ? (
+              profilePic ? (
+                <img
+                  src={profilePic}
+                  alt="Profile"
+                  className="h-5 w-5 rounded-full object-cover ring-1 ring-border"
+                />
+              ) : (
+                <User className="h-5 w-5" />
+              )
+            ) : (
+              <item.icon className="h-5 w-5" />
+            )}
             <span>{item.title}</span>
           </NavLink>
         ))}
