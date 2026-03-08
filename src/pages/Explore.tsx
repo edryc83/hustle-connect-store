@@ -203,8 +203,8 @@ const Explore = () => {
         )}
 
         {/* Top Stores Near You */}
-        <section className="mx-auto max-w-2xl px-4 py-5">
-          <div className="flex items-center justify-between mb-4">
+        <section className="mx-auto max-w-2xl px-4 py-8">
+          <div className="flex items-center justify-between mb-5">
             <h2 className="text-lg font-bold text-foreground">
               {activeTab === "services" ? "Top Services Near You" : "Top Stores Near You"}
             </h2>
@@ -214,7 +214,7 @@ const Explore = () => {
           </div>
 
           {/* Stores / Services toggle */}
-          <div className="flex gap-2 mb-4">
+          <div className="flex gap-2 mb-5">
             <button
               onClick={() => setActiveTab("stores")}
               className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
@@ -238,7 +238,7 @@ const Explore = () => {
           </div>
 
           {/* Category chips */}
-          <div className="flex gap-2 overflow-x-auto pb-3 scrollbar-hide -mx-4 px-4">
+          <div className="flex gap-2 overflow-x-auto pb-5 scrollbar-hide -mx-4 px-4">
             {categories.map((cat) => (
               <button
                 key={cat.label}
@@ -274,7 +274,7 @@ const Explore = () => {
               )}
             </div>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-4">
               {filtered.map((store) => {
                 const businessLabel = getBusinessLabel(store);
                 const location = getLocationLabel(store);
