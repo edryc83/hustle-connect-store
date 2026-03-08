@@ -3,9 +3,10 @@ import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useBusinessTerms } from "@/hooks/useBusinessTerms";
+import { usePushNotifications } from "@/hooks/usePushNotifications";
 import { Button } from "@/components/ui/button";
 import {
-  Package, Copy, Share2, X, Plus, Download, Eye, ShoppingCart, TrendingUp,
+  Package, Copy, Share2, X, Plus, Download, Eye, ShoppingCart, TrendingUp, Bell,
 } from "lucide-react";
 import AfristallLogo from "@/components/AfristallLogo";
 import { toast } from "sonner";
@@ -24,6 +25,7 @@ const DashboardOverview = () => {
   const { user } = useAuth();
   const terms = useBusinessTerms();
   const { canInstall, isInstalled, promptInstall } = useInstallPrompt();
+  const { isSubscribed, supported: pushSupported, loading: pushLoading, subscribe: subscribePush } = usePushNotifications();
   const [productCount, setProductCount] = useState(0);
   const [viewCount, setViewCount] = useState(0);
   const [orderCount, setOrderCount] = useState(0);
@@ -196,6 +198,28 @@ const DashboardOverview = () => {
             </p>
           </div>
           <span className="text-xs text-primary font-medium">{canInstall ? "Install" : "How →"}</span>
+        </button>
+      )}
+
+      {/* Push notifications banner */}
+      {pushSupported && !isSubscribed && (
+        <button
+          onClick={async () => {
+            const ok = await subscribePush();
+            if (ok) toast.success("Notifications enabled! You'll be notified of new orders.");
+            else if (Notification.permission === "denied") toast.error("Notifications blocked. Please enable them in your browser settings.");
+          }}
+          disabled={pushLoading}
+          className="flex w-full items-center gap-3 rounded-2xl border border-border/40 bg-card/40 backdrop-blur-xl p-4 shadow-sm hover:bg-card/60 transition-colors text-left"
+        >
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-500/10">
+            <Bell className="h-5 w-5 text-amber-500" />
+          </div>
+          <div className="flex-1">
+            <p className="text-sm font-semibold">Enable Notifications</p>
+            <p className="text-xs text-muted-foreground">Get alerted when customers place orders</p>
+          </div>
+          <span className="text-xs text-primary font-medium">{pushLoading ? "…" : "Enable"}</span>
         </button>
       )}
 

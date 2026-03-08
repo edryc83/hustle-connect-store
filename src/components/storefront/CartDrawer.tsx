@@ -48,8 +48,10 @@ export function CartDrawer({ currency, whatsappNumber, storeName, storeSlug, sel
     }
 
     // Log orders to database
+    const orderNames: string[] = [];
     for (const item of items) {
       const price = item.product.discount_price ?? item.product.price;
+      orderNames.push(item.product.name);
       try {
         await supabase.from("orders").insert({
           seller_id: sellerId,
@@ -67,6 +69,16 @@ export function CartDrawer({ currency, whatsappNumber, storeName, storeSlug, sel
         // Don't block checkout
       }
     }
+
+    // Trigger push notification to seller
+    supabase.functions.invoke("push-notifications", {
+      body: {
+        action: "notify",
+        seller_id: sellerId,
+        title: "New Order! 🎉",
+        body: `${visitorName || "A customer"} ordered ${orderNames.length > 1 ? `${orderNames.length} items` : orderNames[0]}`,
+      },
+    });
 
     const waUrl = `https://wa.me/${cleanNumber}?text=${encodeURIComponent(lines.join("\n"))}`;
     window.open(waUrl, "_blank");
