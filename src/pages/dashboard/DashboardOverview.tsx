@@ -23,7 +23,6 @@ function getGreeting(): { text: string; emoji: string } {
 const DashboardOverview = () => {
   const { user } = useAuth();
   const terms = useBusinessTerms();
-  const { canInstall, isInstalled, promptInstall } = useInstallPrompt();
   const [productCount, setProductCount] = useState(0);
   const [viewCount, setViewCount] = useState(0);
   const [orderCount, setOrderCount] = useState(0);
