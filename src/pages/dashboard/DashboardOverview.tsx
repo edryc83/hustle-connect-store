@@ -6,12 +6,11 @@ import whatsappIcon from "@/assets/whatsapp-icon.png";
 import { useBusinessTerms } from "@/hooks/useBusinessTerms";
 import { Button } from "@/components/ui/button";
 import {
-  Package, Copy, Share2, X, Plus, Download, Eye, ShoppingCart, TrendingUp,
+  Package, Copy, Share2, X, Plus, Eye, ShoppingCart, TrendingUp,
 } from "lucide-react";
 import AfristallLogo from "@/components/AfristallLogo";
 import { toast } from "sonner";
 import CaptionGenerator from "@/components/dashboard/CaptionGenerator";
-import { useInstallPrompt } from "@/hooks/useInstallPrompt";
 
 function getGreeting(): { text: string; emoji: string } {
   const hour = new Date().getHours();
