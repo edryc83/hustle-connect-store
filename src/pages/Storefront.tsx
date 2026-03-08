@@ -835,19 +835,23 @@ const StorefrontInner = () => {
           <>
             {featured.length > 0 && (
               <section>
-                <div className="flex items-center gap-2 mb-4">
-                  <Star className="h-5 w-5 text-primary fill-primary" />
-                  <h2 className="text-lg font-bold">Featured</h2>
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <Star className="h-5 w-5 text-primary fill-primary" />
+                    <h2 className="text-lg font-bold">Featured Products</h2>
+                  </div>
+                  <span className="text-sm text-muted-foreground">{featured.length}</span>
                 </div>
-                <div className="grid gap-3 sm:gap-4 grid-cols-2 sm:grid-cols-3">
+                <div className="flex gap-3 overflow-x-auto pb-2 snap-x snap-mandatory scrollbar-none">
                   {featured.map((product) => (
-                    <ProductCard
-                      key={product.id}
-                      product={product}
-                      images={productImagesMap[product.id] ?? (product.image_url ? [product.image_url] : [])}
-                      currency={currency}
-                      onClick={() => navigate(`/${storeSlug}/${product.id}`)}
-                    />
+                    <div key={product.id} className="w-40 sm:w-44 shrink-0 snap-start">
+                      <ProductCard
+                        product={product}
+                        images={productImagesMap[product.id] ?? (product.image_url ? [product.image_url] : [])}
+                        currency={currency}
+                        onClick={() => navigate(`/${storeSlug}/${product.id}`)}
+                      />
+                    </div>
                   ))}
                 </div>
               </section>
