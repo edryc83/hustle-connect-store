@@ -63,7 +63,7 @@ function ShareButton({ storeName, storeSlug }: { storeName: string; storeSlug: s
           Copy link
         </DropdownMenuItem>
         <DropdownMenuItem onClick={shareWhatsApp} className="gap-2">
-          <span className="text-base leading-none">💬</span> WhatsApp
+          <img src={whatsappIcon} alt="" className="h-4 w-4" /> WhatsApp
         </DropdownMenuItem>
         <DropdownMenuItem onClick={shareFacebook} className="gap-2">
           <span className="text-base leading-none">📘</span> Facebook
