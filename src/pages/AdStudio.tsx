@@ -146,11 +146,11 @@ export default function AdStudio() {
         { name: "product", image_url: imageUrl },
         { name: "product_name", text: productName },
         { name: "price_rectangle", text: price },
-        { name: "short_description", text: tagline },
+        { name: "short_description", text: tagline.trim() || " " },
         { name: "store_name", text: profile?.store_slug || profile?.store_name || "My Store" },
+        { name: "subtitle", text: subtitle.trim() || " " },
+        { name: "body_text", text: " " },
       ];
-
-      modifications.push({ name: "subtitle", text: subtitle.trim() || " " });
 
 
       if (bgType === "color" && bgColor) {
