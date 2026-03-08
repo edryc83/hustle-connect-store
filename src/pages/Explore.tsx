@@ -279,8 +279,8 @@ const Explore = () => {
                 const businessLabel = getBusinessLabel(store);
                 const location = getLocationLabel(store);
                 return (
-                  <Link key={store.id} to={`/${store.store_slug}`}>
-                    <div className="flex items-center gap-3 rounded-2xl bg-card p-3 border border-border/50 hover:border-primary/20 hover:shadow-sm transition-all">
+                  <Link key={store.id} to={`/${store.store_slug}`} className="block">
+                    <div className="flex items-center gap-4 rounded-2xl bg-card p-4 border border-border/50 hover:border-primary/20 hover:shadow-sm transition-all">
                       {/* Profile picture */}
                       {store.profile_picture_url ? (
                         <img
