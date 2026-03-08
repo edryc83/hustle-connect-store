@@ -216,7 +216,7 @@ const DashboardProfile = () => {
         </div>
 
         {/* Name & username */}
-        <h1 className="text-xl font-extrabold tracking-tight mt-2">{profile.store_name || "Your Store"}</h1>
+        <h1 className="text-xl font-semibold tracking-tight mt-2">{profile.store_name || "Your Store"}</h1>
         {profile.store_slug && (
           <p className="text-sm text-muted-foreground">@{profile.store_slug}</p>
         )}
