@@ -151,6 +151,22 @@ export default function AdStudio() {
         { name: "store_name", text: profile?.store_slug || profile?.store_name || "My Store" },
       ];
 
+      if (subtitle.trim()) {
+        modifications.push({ name: "subtitle", text: subtitle });
+      }
+
+      if (storeLogo) {
+        // If it's a blob URL, upload first
+        let logoUrl = storeLogo;
+        if (storeLogo.startsWith("blob:")) {
+          const logoFile = (window as any).__adStudioLogoFile as File | undefined;
+          if (logoFile) {
+            logoUrl = await uploadImage(logoFile);
+          }
+        }
+        modifications.push({ name: "store_logo", image_url: logoUrl });
+      }
+
       if (bgType === "color" && bgColor) {
         modifications.push({ name: "background", color: bgColor });
       } else if (bgType === "image" && bgImageUrl) {
