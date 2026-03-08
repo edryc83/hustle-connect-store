@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Store, ShoppingBag, Share2, Copy, Check, Star, ShoppingCart, Sun, Moon, LayoutDashboard, Minus, Plus, Heart } from "lucide-react";
 import { formatPrice } from "@/lib/currency";
 import AfristallLogo from "@/components/AfristallLogo";
+import whatsappIcon from "@/assets/whatsapp-icon.png";
 import { ProductImageCarousel } from "@/components/storefront/ProductImageCarousel";
 import { StorefrontHeader } from "@/components/storefront/StorefrontHeader";
 
@@ -62,7 +63,7 @@ function ShareButton({ storeName, storeSlug }: { storeName: string; storeSlug: s
           Copy link
         </DropdownMenuItem>
         <DropdownMenuItem onClick={shareWhatsApp} className="gap-2">
-          <span className="text-base leading-none">💬</span> WhatsApp
+          <img src={whatsappIcon} alt="" className="h-4 w-4" /> WhatsApp
         </DropdownMenuItem>
         <DropdownMenuItem onClick={shareFacebook} className="gap-2">
           <span className="text-base leading-none">📘</span> Facebook
@@ -478,7 +479,7 @@ function ProductDetailView({
                 window.open(`https://wa.me/${cleanNumber.replace("+", "")}?text=${encodeURIComponent(message)}`, "_blank");
               }}
             >
-              <span className="text-lg">💬</span>
+              <img src={whatsappIcon} alt="" className="h-5 w-5" />
               WhatsApp
             </Button>
           </div>

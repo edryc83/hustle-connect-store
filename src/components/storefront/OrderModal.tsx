@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { MessageCircle } from "lucide-react";
+import whatsappIcon from "@/assets/whatsapp-icon.png";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { formatPrice } from "@/lib/currency";
@@ -152,8 +152,8 @@ export function OrderModal({ product, whatsappNumber, storeName, storeSlug, sell
             <Textarea id="orderNotes" placeholder="Any special requests?" rows={2} value={notes} onChange={(e) => setNotes(e.target.value)} />
           </div>
 
-          <Button className="w-full gap-2 text-base" size="lg" onClick={handleOrder}>
-            <MessageCircle className="h-5 w-5" />
+          <Button className="w-full gap-2 text-base bg-[#25D366] hover:bg-[#128C7E] text-white" size="lg" onClick={handleOrder}>
+            <img src={whatsappIcon} alt="" className="h-5 w-5" />
             Order via WhatsApp
           </Button>
         </div>

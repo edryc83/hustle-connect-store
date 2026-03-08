@@ -2,7 +2,8 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { X, Pencil, Plus, Check, MessageCircle } from "lucide-react";
+import { X, Pencil, Plus, Check } from "lucide-react";
+import whatsappIcon from "@/assets/whatsapp-icon.png";
 import { ATTRIBUTE_TYPES, COLOUR_HEX, type AttributeType } from "@/lib/productAttributes";
 import {
   Sheet,
@@ -128,10 +129,10 @@ export function ProductAttributeForm({ attributes, onChange }: ProductAttributeF
   if (isChatOnly) {
     return (
       <div className="space-y-2">
-        <div className="rounded-xl border border-border/60 bg-muted/30 p-3 flex items-center justify-between">
+        <div className="rounded-xl border border-[#25D366]/30 bg-[#25D366]/10 p-3 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <MessageCircle className="h-4 w-4 text-primary" />
-            <span className="text-sm font-medium">💬 Chat to order</span>
+            <img src={whatsappIcon} alt="WhatsApp" className="h-5 w-5" />
+            <span className="text-sm font-medium text-[#25D366]">Chat to order</span>
           </div>
           <button
             type="button"
@@ -216,8 +217,9 @@ export function ProductAttributeForm({ attributes, onChange }: ProductAttributeF
         <button
           type="button"
           onClick={handleSkip}
-          className="w-full text-center text-xs text-muted-foreground hover:text-foreground transition-colors"
+          className="w-full flex items-center justify-center gap-2 text-xs text-[#25D366] font-medium hover:text-[#128C7E] transition-colors"
         >
+          <img src={whatsappIcon} alt="" className="h-4 w-4" />
           Skip — I'll chat with buyers on WhatsApp
         </button>
       )}
