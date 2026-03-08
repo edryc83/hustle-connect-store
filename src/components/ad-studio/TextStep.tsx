@@ -154,11 +154,11 @@ export default function TextStep({
 
   return (
     <div className="space-y-4 pb-4">
-      {/* Image preview + remove bg */}
+      {/* Sticky image preview + remove bg */}
       {displayImage ? (
-        <div className="rounded-xl border border-border overflow-hidden bg-muted/30">
+        <div className="sticky top-0 z-10 rounded-xl border border-border overflow-hidden bg-muted/30 shadow-sm">
           <div className="relative">
-            <img src={displayImage} alt="Product" className="w-full max-h-48 object-contain bg-muted/20" />
+            <img src={displayImage} alt="Product" className="w-full max-h-64 object-contain bg-muted/20" />
             {bgRemovalLoading && (
               <div className="absolute inset-0 flex flex-col items-center justify-center bg-background/70 backdrop-blur-sm">
                 <Loader2 className="h-6 w-6 animate-spin text-primary mb-2" />
