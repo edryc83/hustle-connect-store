@@ -183,10 +183,13 @@ export default function AdStudio() {
           <Button onClick={handleDownload} size="lg" className="gap-2 shadow-lg">
             <Download className="h-5 w-5" /> Download
           </Button>
-          <Button variant="outline" size="lg" onClick={() => { setResultUrl(null); setStep(1); setCompletedSteps([]); }}>
-            <ArrowLeft className="h-4 w-4 mr-2" /> Make Another
+          <Button variant="outline" size="lg" onClick={() => { setResultUrl(null); setStep(3); }}>
+            <ArrowLeft className="h-4 w-4 mr-2" /> Edit Text
           </Button>
         </div>
+        <Button variant="ghost" size="sm" className="text-muted-foreground" onClick={() => { setResultUrl(null); setStep(1); setCompletedSteps([]); }}>
+          Start Over
+        </Button>
       </div>
     );
   }
