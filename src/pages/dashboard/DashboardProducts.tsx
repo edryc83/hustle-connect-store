@@ -495,9 +495,9 @@ const DashboardProducts = () => {
           {/* Featured section */}
           {featured.length > 0 && (
             <section className="space-y-2">
-              <div className="flex items-center gap-2">
-                <Star className="h-4 w-4 text-primary fill-primary" />
-                <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wide">Featured ({featured.length}/6)</h2>
+              <div className="flex items-center gap-1.5">
+                <Star className="h-3 w-3 text-primary fill-primary" />
+                <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Featured ({featured.length}/6)</h2>
               </div>
               <div className="space-y-2">
                 {featured.map((product) => (
