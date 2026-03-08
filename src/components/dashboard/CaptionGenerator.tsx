@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Copy, Check, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import whatsappIcon from "@/assets/whatsapp-icon.png";
 
 type Caption = { vibe: string; text: string };
 
@@ -58,55 +59,60 @@ const CaptionGenerator = ({ storeName, storeSlug, category, productCount }: Prop
 
   return (
     <div className="space-y-3 pt-2">
-      <div className="border-t border-border/50 pt-4">
+      {/* WhatsApp-themed header */}
+      <div className="rounded-2xl bg-[#075E54] dark:bg-[#1F2C34] p-4 pb-3">
         <div className="flex items-center justify-between">
-          <div>
-            <span className="text-base font-semibold">For your WhatsApp status 🔥</span>
-            <p className="text-xs text-muted-foreground mt-0.5">Tap copy → paste on WhatsApp status → stays up for 24hrs</p>
+          <div className="flex items-center gap-2.5">
+            <img src={whatsappIcon} alt="" className="h-5 w-5" />
+            <div>
+              <span className="text-sm font-bold text-white">For your WhatsApp status</span>
+              <p className="text-[11px] text-white/60 mt-0.5">Tap copy → paste on status → stays up for 24hrs</p>
+            </div>
           </div>
           <button
             onClick={fetchCaptions}
             disabled={loading}
-            className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition-colors"
+            className="flex items-center gap-1 text-[11px] text-white/60 hover:text-white transition-colors"
           >
             <RefreshCw className={`h-3.5 w-3.5 ${loading ? "animate-spin" : ""}`} />
             New
           </button>
         </div>
-      </div>
 
-      <div className="space-y-2">
-        {loading
-          ? Array.from({ length: 3 }).map((_, i) => (
-              <div key={i} className="rounded-xl border border-border/50 bg-card/40 backdrop-blur-xl p-3 animate-pulse">
-                <div className="h-3 w-16 rounded-full bg-muted/60 mb-2" />
-                <div className="h-3 w-full rounded bg-muted/50" />
-                <div className="h-3 w-3/4 rounded bg-muted/50 mt-1" />
-              </div>
-            ))
-          : captions.map((c, i) => (
-              <div
-                key={i}
-                className="rounded-xl border border-border/50 bg-card/40 backdrop-blur-xl p-3 flex items-start gap-3"
-              >
-                <div className="flex-1 min-w-0">
-                  <span className="inline-block rounded-full bg-primary/10 border border-primary/20 px-2 py-0.5 text-[10px] font-medium mb-1.5">
-                    {c.vibe}
-                  </span>
-                  <p className="text-xs leading-relaxed whitespace-pre-line">{c.text}</p>
+        {/* Caption cards inside the WhatsApp container */}
+        <div className="space-y-2 mt-3">
+          {loading
+            ? Array.from({ length: 3 }).map((_, i) => (
+                <div key={i} className="rounded-xl bg-[#DCF8C6] dark:bg-[#005C4B] p-3 animate-pulse">
+                  <div className="h-3 w-16 rounded-full bg-[#25D366]/30 mb-2" />
+                  <div className="h-3 w-full rounded bg-[#25D366]/20" />
+                  <div className="h-3 w-3/4 rounded bg-[#25D366]/20 mt-1" />
                 </div>
-                <button
-                  onClick={() => handleCopy(c.text, i)}
-                  className={`shrink-0 mt-1 p-1.5 rounded-lg transition-colors ${
-                    copiedIdx === i
-                      ? "text-green-500"
-                      : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-                  }`}
+              ))
+            : captions.map((c, i) => (
+                <div
+                  key={i}
+                  className="rounded-xl bg-[#DCF8C6] dark:bg-[#005C4B] p-3 flex items-start gap-3 shadow-sm"
                 >
-                  {copiedIdx === i ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
-                </button>
-              </div>
-            ))}
+                  <div className="flex-1 min-w-0">
+                    <span className="inline-block rounded-full bg-[#25D366]/20 border border-[#25D366]/30 px-2 py-0.5 text-[10px] font-semibold text-[#075E54] dark:text-[#25D366] mb-1.5">
+                      {c.vibe}
+                    </span>
+                    <p className="text-xs leading-relaxed whitespace-pre-line text-[#111B21] dark:text-[#E9EDEF]">{c.text}</p>
+                  </div>
+                  <button
+                    onClick={() => handleCopy(c.text, i)}
+                    className={`shrink-0 mt-1 p-1.5 rounded-lg transition-colors ${
+                      copiedIdx === i
+                        ? "text-[#25D366]"
+                        : "text-[#075E54]/50 dark:text-[#E9EDEF]/50 hover:text-[#075E54] dark:hover:text-[#E9EDEF]"
+                    }`}
+                  >
+                    {copiedIdx === i ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
+                  </button>
+                </div>
+              ))}
+        </div>
       </div>
     </div>
   );
