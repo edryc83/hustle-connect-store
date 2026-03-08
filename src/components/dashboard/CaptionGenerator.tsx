@@ -100,7 +100,7 @@ const CaptionGenerator = ({ storeName, storeSlug, category, productCount }: Prop
                     </span>
                     <p className="text-xs leading-relaxed whitespace-pre-line text-[#111B21] dark:text-[#E9EDEF]">{c.text}</p>
                   </div>
-                  <div className="shrink-0 flex flex-col gap-1 mt-1">
+                  <div className="shrink-0 flex flex-col items-end gap-1.5 mt-1">
                     <button
                       onClick={() => handleCopy(c.text, i)}
                       className={`p-1.5 rounded-lg transition-colors ${
@@ -114,13 +114,12 @@ const CaptionGenerator = ({ storeName, storeSlug, category, productCount }: Prop
                     </button>
                     <button
                       onClick={() => {
-                        const waUrl = `https://wa.me/?text=${encodeURIComponent(c.text)}`;
-                        window.open(waUrl, "_blank");
+                        window.open(`https://wa.me/?text=${encodeURIComponent(c.text)}`, "_blank");
                       }}
-                      className="p-1.5 rounded-lg transition-colors"
-                      title="Share to WhatsApp"
+                      className="flex items-center gap-1.5 rounded-full bg-[#25D366] hover:bg-[#128C7E] text-white px-3 py-1.5 text-[10px] font-semibold transition-colors shadow-sm"
                     >
-                      <img src={whatsappIcon} alt="" className="h-3.5 w-3.5" />
+                      <img src={whatsappIcon} alt="" className="h-3 w-3" />
+                      Share to Status
                     </button>
                   </div>
                 </div>
