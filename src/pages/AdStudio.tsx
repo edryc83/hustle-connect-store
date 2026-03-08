@@ -39,6 +39,7 @@ export default function AdStudio() {
   const [price, setPrice] = useState("");
   const [tagline, setTagline] = useState("");
   const [processedImageUrl, setProcessedImageUrl] = useState<string | null>(null);
+  const [bgImageUrl, setBgImageUrl] = useState<string | null>(null);
 
   // Generation
   const [generating, setGenerating] = useState(false);
@@ -138,13 +139,17 @@ export default function AdStudio() {
         throw new Error("No image selected");
       }
 
-      const modifications = [
+      const modifications: any[] = [
         { name: "product", image_url: imageUrl },
         { name: "product_name", text: productName },
         { name: "price_rectangle", text: price },
         { name: "short_description", text: tagline },
         { name: "store_name", text: profile?.store_slug || profile?.store_name || "My Store" },
       ];
+
+      if (bgImageUrl) {
+        modifications.push({ name: "background", image_url: bgImageUrl });
+      }
 
       const createRes = await fetch(
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/bannerbear-generate?action=create`,
@@ -251,6 +256,8 @@ export default function AdStudio() {
             removeBg={removeBg}
             onRemoveBgChange={setRemoveBg}
             onProcessedImage={setProcessedImageUrl}
+            bgImageUrl={bgImageUrl}
+            setBgImageUrl={setBgImageUrl}
           />
         )}
 
