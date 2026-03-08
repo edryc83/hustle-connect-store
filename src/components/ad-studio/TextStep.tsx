@@ -286,31 +286,14 @@ export default function TextStep({
         <Input id="tagline" placeholder="e.g. Sleep in luxury ✨" value={tagline} onChange={(e) => setTagline(e.target.value)} />
       </div>
       <div className="space-y-1.5">
-        <Label htmlFor="subtitle">Subtitle</Label>
+        <div className="flex items-center justify-between">
+          <Label htmlFor="subtitle">Subtitle</Label>
+          <Button variant="ghost" size="sm" className="h-7 text-xs gap-1 text-primary" onClick={handleAiSubtitle} disabled={subtitleAiLoading || !productName.trim()}>
+            {subtitleAiLoading ? <Loader2 className="h-3 w-3 animate-spin" /> : <Sparkles className="h-3 w-3" />}
+            AI Write
+          </Button>
+        </div>
         <Input id="subtitle" placeholder="e.g. Free delivery countrywide" value={subtitle} onChange={(e) => setSubtitle(e.target.value)} />
-      </div>
-
-      {/* Store Logo */}
-      <div className="space-y-1.5">
-        <Label>Store Logo</Label>
-        {storeLogo ? (
-          <div className="flex items-center gap-3">
-            <img src={storeLogo} alt="Store logo" className="h-10 w-10 rounded-lg border border-border object-contain bg-muted/20" />
-            <div className="flex gap-2">
-              <label className="cursor-pointer">
-                <span className="text-xs text-primary hover:underline">Change</span>
-                <input type="file" accept="image/*" className="hidden" onChange={handleLogoUpload} />
-              </label>
-              <button onClick={() => setStoreLogo(null)} className="text-xs text-muted-foreground hover:text-destructive">Remove</button>
-            </div>
-          </div>
-        ) : (
-          <label className="flex items-center gap-2 cursor-pointer rounded-lg border border-dashed border-border px-3 py-2.5 bg-muted/20 hover:bg-muted/40 transition-colors">
-            <Upload className="h-4 w-4 text-muted-foreground" />
-            <span className="text-sm text-muted-foreground">Upload your logo</span>
-            <input type="file" accept="image/*" className="hidden" onChange={handleLogoUpload} />
-          </label>
-        )}
       </div>
     </div>
   );
