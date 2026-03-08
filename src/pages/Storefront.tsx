@@ -277,7 +277,7 @@ function ProductDetailView({
 
   const buildWhatsAppMessage = () => {
     const dp = Number(displayPrice);
-    const productUrl = `${window.location.origin}/${storeSlug}/${product.id}`;
+    const productUrl = buildShareUrl(storeSlug, product.id);
     const lines: string[] = [
       `Hello, I would like to order:`,
       ``,
