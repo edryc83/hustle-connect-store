@@ -1,4 +1,5 @@
-import { MessageCircle, ExternalLink } from "lucide-react";
+import { ExternalLink } from "lucide-react";
+import whatsappIcon from "@/assets/whatsapp-icon.png";
 import { Button } from "@/components/ui/button";
 
 interface WhatsAppTestCardProps {
