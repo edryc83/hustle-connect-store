@@ -161,16 +161,21 @@ const DashboardOverview = () => {
         </Link>
       </div>
 
-      {/* Share bar */}
+      {/* Share bar — glowing */}
       {storeSlug && (
-        <div className="flex items-center gap-2 rounded-2xl bg-card/40 backdrop-blur-xl border border-border/40 px-4 py-3">
-          <span className="text-sm font-medium truncate flex-1 text-muted-foreground">afristall.com/{storeSlug}</span>
-          <button onClick={copyLink} className="text-muted-foreground hover:text-foreground shrink-0 p-1.5 rounded-lg hover:bg-muted/50 transition-colors" title="Copy link">
-            <Copy className="h-4 w-4" />
-          </button>
-          <button onClick={shareStore} className="text-muted-foreground hover:text-primary shrink-0 p-1.5 rounded-lg hover:bg-muted/50 transition-colors" title="Share store">
-            <Share2 className="h-4 w-4" />
-          </button>
+        <div className="space-y-2">
+          <div className="flex items-center gap-2 rounded-2xl border-2 border-primary/60 bg-primary/5 backdrop-blur-xl px-4 py-3 shadow-[0_0_15px_hsl(var(--primary)/0.25)] animate-[pulse_3s_cubic-bezier(0.4,0,0.6,1)_infinite]">
+            <span className="text-sm font-semibold truncate flex-1 text-foreground">afristall.com/{storeSlug}</span>
+            <button onClick={copyLink} className="text-primary hover:text-foreground shrink-0 p-1.5 rounded-lg hover:bg-primary/10 transition-colors" title="Copy link">
+              <Copy className="h-4 w-4" />
+            </button>
+            <button onClick={shareStore} className="text-primary hover:text-foreground shrink-0 p-1.5 rounded-lg hover:bg-primary/10 transition-colors" title="Share store">
+              <Share2 className="h-4 w-4" />
+            </button>
+          </div>
+          <p className="text-[11px] text-muted-foreground leading-relaxed px-1">
+            📌 Post this link to your <strong className="text-foreground">TikTok Shop bio</strong>, <strong className="text-foreground">Facebook bio</strong>, <strong className="text-foreground">Instagram bio</strong> & <strong className="text-foreground">WhatsApp</strong> — always add it to your status caption when posting products!
+          </p>
         </div>
       )}
 
