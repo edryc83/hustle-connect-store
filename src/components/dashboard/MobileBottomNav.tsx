@@ -8,7 +8,8 @@ import { supabase } from "@/integrations/supabase/client";
 
 export function MobileBottomNav() {
   const terms = useBusinessTerms();
-  const { user } = useAuth();
+  const { pathname } = useLocation();
+  const isProfileActive = pathname === "/dashboard/profile";
 
   const { data: profilePic } = useQuery({
     queryKey: ["profile-pic", user?.id],
