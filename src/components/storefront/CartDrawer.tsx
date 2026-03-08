@@ -7,6 +7,7 @@ import { useCart } from "@/hooks/useCart";
 import { formatPrice } from "@/lib/currency";
 import { Minus, Plus, Trash2, MessageCircle, ShoppingCart } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { buildShareUrl } from "@/lib/shareUrl";
 
 interface CartDrawerProps {
   currency: string;
@@ -37,7 +38,7 @@ export function CartDrawer({ currency, whatsappNumber, storeName, storeSlug, sel
       const subtotal = Number(price) * item.quantity;
       lines.push(`${i + 1}. *${item.product.name}*${item.variant ? ` (${item.variant})` : ""}`);
       lines.push(`   Qty: ${item.quantity} × ${formatPrice(Number(price), currency)} = ${formatPrice(subtotal, currency)}`);
-      lines.push(`   ${window.location.origin}/${storeSlug}/${item.product.id}`);
+      lines.push(`   ${buildShareUrl(storeSlug, item.product.id)}`);
     });
 
     lines.push(``);
