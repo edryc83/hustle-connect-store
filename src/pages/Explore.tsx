@@ -282,13 +282,15 @@ const Explore = () => {
                 return (
                   <Link key={store.id} to={`/${store.store_slug}`} className="block">
                     <div className="flex items-center gap-3 rounded-2xl bg-card p-3.5 border border-border/50 hover:border-primary/20 hover:shadow-sm transition-all">
-                      {store.profile_picture_url ? (
-                        <img src={store.profile_picture_url} alt={store.store_name ?? "Store"} className="h-14 w-14 rounded-full object-cover shrink-0" loading="lazy" />
-                      ) : (
-                        <div className="flex h-14 w-14 items-center justify-center rounded-full bg-secondary shrink-0">
-                          <AfristallLogo className="h-6 w-6" />
-                        </div>
-                      )}
+                      <div className="ig-ring ig-ring-sm shrink-0">
+                        {store.profile_picture_url ? (
+                          <img src={store.profile_picture_url} alt={store.store_name ?? "Store"} className="h-12 w-12 rounded-full object-cover border-2 border-background" loading="lazy" />
+                        ) : (
+                          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-secondary border-2 border-background">
+                            <AfristallLogo className="h-5 w-5" />
+                          </div>
+                        )}
+                      </div>
                       <div className="flex-1 min-w-0">
                         {businessLabel && (
                           <span className="inline-block rounded bg-primary/10 px-1.5 py-0.5 text-[10px] font-semibold text-primary uppercase tracking-wide mb-0.5">{businessLabel}</span>
@@ -322,12 +324,12 @@ const Explore = () => {
                         ) : (
                           <div className="h-full w-full bg-gradient-to-br from-primary/10 to-secondary" />
                         )}
-                        <div className="absolute -bottom-6 left-4">
+                        <div className="absolute -bottom-6 left-4 ig-ring ig-ring-sm">
                           {store.profile_picture_url ? (
-                            <img src={store.profile_picture_url} alt={store.store_name ?? "Store"} className="h-14 w-14 rounded-full object-cover border-2 border-card shadow-sm" loading="lazy" />
+                            <img src={store.profile_picture_url} alt={store.store_name ?? "Store"} className="h-12 w-12 rounded-full object-cover border-2 border-card" loading="lazy" />
                           ) : (
-                            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-card border-2 border-card shadow-sm">
-                              <AfristallLogo className="h-6 w-6" />
+                            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-card border-2 border-card">
+                              <AfristallLogo className="h-5 w-5" />
                             </div>
                           )}
                         </div>

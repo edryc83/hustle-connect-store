@@ -133,3 +133,18 @@
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
 }
+
+/* Instagram gradient ring for profile pictures */
+.ig-ring {
+  background: linear-gradient(135deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+  padding: 2.5px;
+  border-radius: 9999px;
+  display: inline-flex;
+}
+.ig-ring-sm {
+  padding: 1.5px;
+}
+.ig-ring > img,
+.ig-ring > div {
+  border: 2px solid hsl(var(--background));
+}
