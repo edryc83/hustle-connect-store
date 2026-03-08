@@ -352,6 +352,7 @@ const Explore = () => {
                 );
               })}
             </div>
+            </>
           )}
         </section>
       </main>
