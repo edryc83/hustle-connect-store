@@ -7,7 +7,6 @@ import { useCart } from "@/hooks/useCart";
 import { formatPrice } from "@/lib/currency";
 import { Minus, Plus, Trash2, MessageCircle, ShoppingCart } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-import { buildShareUrl } from "@/lib/shareUrl";
 
 interface CartDrawerProps {
   currency: string;
