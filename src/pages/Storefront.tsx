@@ -77,31 +77,10 @@ function ShareButton({ storeName, storeSlug }: { storeName: string; storeSlug: s
 
 function getAttributeChips(product: Product): string[] {
   const attrs = (product as any).attributes as Record<string, any> | null;
-  if (!attrs || !attrs.product_type) return [];
-  const chips: string[] = [];
-  // Sizes (fashion, shoes)
-  if (Array.isArray(attrs.sizes) && attrs.sizes.length > 0) {
-    chips.push(attrs.sizes.length <= 3 ? attrs.sizes.join(", ") : `${attrs.sizes[0]}–${attrs.sizes[attrs.sizes.length - 1]}`);
-  }
-  // Condition
-  if (attrs.condition && typeof attrs.condition === "string") chips.push(attrs.condition);
-  // Gender
-  if (attrs.gender) chips.push(attrs.gender);
-  // Material (pills value)
-  if (attrs.material && typeof attrs.material === "string" && attrs.material.length < 20) chips.push(attrs.material);
-  // Storage (phones)
-  if (Array.isArray(attrs.storage) && attrs.storage.length > 0) {
-    chips.push(attrs.storage.join(" · "));
-  }
-  // Texture (wigs)
-  if (attrs.texture) chips.push(attrs.texture);
-  // Length (wigs)
-  if (attrs.length) chips.push(attrs.length);
-  // Cake size
-  if (attrs.cake_size) chips.push(attrs.cake_size);
-  // Hair type
-  if (attrs.hair_type) chips.push(attrs.hair_type);
-  return chips.slice(0, 3); // max 3 chips
+  if (!attrs) return [];
+  if (attrs.chat_only) return ["💬 Chat to order"];
+  const summary = getAttributeSummary(attrs);
+  return summary ? summary.split("  •  ").slice(0, 3) : [];
 }
 
 function ProductCard({
