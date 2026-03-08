@@ -1,4 +1,4 @@
-import { LayoutDashboard, Package, User, ClipboardList, BarChart3 } from "lucide-react";
+import { Home, Package, User, ClipboardList, BarChart3 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useLocation } from "react-router-dom";
 import { useBusinessTerms } from "@/hooks/useBusinessTerms";
@@ -28,7 +28,7 @@ export function MobileBottomNav() {
   });
 
   const navItems = [
-    { title: "Home", url: "/dashboard", icon: LayoutDashboard },
+    { title: "Home", url: "/dashboard", icon: Home },
     { title: terms.plural, url: "/dashboard/products", icon: Package },
     { title: "Orders", url: "/dashboard/orders", icon: ClipboardList },
     { title: "Analytics", url: "/dashboard/analytics", icon: BarChart3 },
