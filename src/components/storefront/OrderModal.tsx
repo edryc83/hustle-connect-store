@@ -88,7 +88,13 @@ export function OrderModal({ product, whatsappNumber, storeName, storeSlug, sell
 
     const cleanNumber = whatsappNumber.replace(/[^0-9+]/g, "");
     const waUrl = `https://wa.me/${cleanNumber.replace("+", "")}?text=${encodeURIComponent(message)}`;
-    window.open(waUrl, "_blank");
+    const a = document.createElement("a");
+    a.href = waUrl;
+    a.target = "_blank";
+    a.rel = "noopener noreferrer";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
     onOpenChange(false);
   };
 
