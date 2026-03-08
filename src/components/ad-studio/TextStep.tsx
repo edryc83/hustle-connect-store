@@ -30,8 +30,6 @@ interface TextStepProps {
   setTagline: (v: string) => void;
   subtitle: string;
   setSubtitle: (v: string) => void;
-  storeLogo: string | null;
-  setStoreLogo: (v: string | null) => void;
   imagePreview: string | null;
   removeBg: boolean;
   onRemoveBgChange: (v: boolean) => void;
