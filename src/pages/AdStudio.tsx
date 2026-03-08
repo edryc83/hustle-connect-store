@@ -38,6 +38,8 @@ export default function AdStudio() {
   const [productName, setProductName] = useState("");
   const [price, setPrice] = useState("");
   const [tagline, setTagline] = useState("");
+  const [subtitle, setSubtitle] = useState("");
+  const [storeLogo, setStoreLogo] = useState<string | null>(null);
   const [processedImageUrl, setProcessedImageUrl] = useState<string | null>(null);
   const [bgImageUrl, setBgImageUrl] = useState<string | null>(null);
   const [bgColor, setBgColor] = useState("#000000");
