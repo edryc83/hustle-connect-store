@@ -36,7 +36,7 @@ type Profile = Tables<"profiles">;
 
 function ShareButton({ storeName, storeSlug }: { storeName: string; storeSlug: string }) {
   const [copied, setCopied] = useState(false);
-  const storeUrl = `${window.location.origin}/${storeSlug}`;
+  const storeUrl = buildShareUrl(storeSlug);
   const shareText = `🛍️ Check out ${storeName} on Afristall — order directly on WhatsApp!`;
 
   const copyLink = async () => {
