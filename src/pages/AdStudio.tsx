@@ -40,6 +40,8 @@ export default function AdStudio() {
   const [tagline, setTagline] = useState("");
   const [processedImageUrl, setProcessedImageUrl] = useState<string | null>(null);
   const [bgImageUrl, setBgImageUrl] = useState<string | null>(null);
+  const [bgColor, setBgColor] = useState("#000000");
+  const [bgType, setBgType] = useState<"color" | "image">("color");
 
   // Generation
   const [generating, setGenerating] = useState(false);
