@@ -1,4 +1,4 @@
-import { ATTRIBUTE_TYPES, getSelectableKeys } from "@/lib/productAttributes";
+import { ATTRIBUTE_TYPES, COLOUR_HEX, getSelectableKeys } from "@/lib/productAttributes";
 import { Check } from "lucide-react";
 
 interface BuyerAttributePickerProps {
