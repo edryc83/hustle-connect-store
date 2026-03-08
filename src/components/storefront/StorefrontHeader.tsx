@@ -54,17 +54,19 @@ export function StorefrontHeader({ profile, visitorName }: StorefrontHeaderProps
 
       <div className="mx-auto max-w-5xl px-4 -mt-10 pb-5 flex flex-col items-start gap-1.5">
         {/* Profile Picture */}
-        {profile.profile_picture_url ? (
-          <img
-            src={profile.profile_picture_url}
-            alt={profile.store_name ?? "Store"}
-            className="h-20 w-20 rounded-full object-cover border-4 border-background shadow-lg"
-          />
-        ) : (
-          <div className="flex h-20 w-20 items-center justify-center rounded-full bg-primary/10 border-4 border-background shadow-lg">
-            <AfristallLogo className="h-8 w-8" />
-          </div>
-        )}
+        <div className="ig-ring shadow-lg">
+          {profile.profile_picture_url ? (
+            <img
+              src={profile.profile_picture_url}
+              alt={profile.store_name ?? "Store"}
+              className="h-20 w-20 rounded-full object-cover border-2 border-background"
+            />
+          ) : (
+            <div className="flex h-20 w-20 items-center justify-center rounded-full bg-primary/10 border-2 border-background">
+              <AfristallLogo className="h-8 w-8" />
+            </div>
+          )}
+        </div>
 
         {/* Store Name */}
         <h1 className="text-xl font-extrabold tracking-tight leading-tight mt-1">{profile.store_name}</h1>

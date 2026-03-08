@@ -48,11 +48,13 @@ export function MobileBottomNav() {
           >
             {item.title === "Profile" ? (
               profilePic ? (
-                <img
-                  src={profilePic}
-                  alt="Profile"
-                  className={`h-5 w-5 rounded-full object-cover ring-2 ${isProfileActive ? "ring-primary" : "ring-border"}`}
-                />
+                <div className={`ig-ring ig-ring-sm ${isProfileActive ? "" : "opacity-70"}`}>
+                  <img
+                    src={profilePic}
+                    alt="Profile"
+                    className="h-5 w-5 rounded-full object-cover border-[1.5px] border-background"
+                  />
+                </div>
               ) : (
                 <User className="h-5 w-5" />
               )

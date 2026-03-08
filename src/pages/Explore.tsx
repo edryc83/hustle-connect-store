@@ -324,12 +324,12 @@ const Explore = () => {
                         ) : (
                           <div className="h-full w-full bg-gradient-to-br from-primary/10 to-secondary" />
                         )}
-                        <div className="absolute -bottom-6 left-4">
+                        <div className="absolute -bottom-6 left-4 ig-ring ig-ring-sm">
                           {store.profile_picture_url ? (
-                            <img src={store.profile_picture_url} alt={store.store_name ?? "Store"} className="h-14 w-14 rounded-full object-cover border-2 border-card shadow-sm" loading="lazy" />
+                            <img src={store.profile_picture_url} alt={store.store_name ?? "Store"} className="h-12 w-12 rounded-full object-cover border-2 border-card" loading="lazy" />
                           ) : (
-                            <div className="flex h-14 w-14 items-center justify-center rounded-full bg-card border-2 border-card shadow-sm">
-                              <AfristallLogo className="h-6 w-6" />
+                            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-card border-2 border-card">
+                              <AfristallLogo className="h-5 w-5" />
                             </div>
                           )}
                         </div>

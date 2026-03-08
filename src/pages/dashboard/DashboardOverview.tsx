@@ -105,11 +105,11 @@ const DashboardOverview = () => {
       {/* Greeting */}
       <div className="flex items-center gap-3.5">
         <div className="shrink-0">
-          <div className="rounded-full p-[2px] bg-gradient-to-br from-primary/40 to-primary/10">
+          <div className="ig-ring">
             {profilePicUrl ? (
-              <img src={profilePicUrl} alt="Profile" className="h-14 w-14 rounded-full object-cover border-2 border-background/50" />
+              <img src={profilePicUrl} alt="Profile" className="h-14 w-14 rounded-full object-cover border-2 border-background" />
             ) : (
-              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-card/80 border-2 border-background/50">
+              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-card/80 border-2 border-background">
                 <AfristallLogo className="h-7 w-7" />
               </div>
             )}
