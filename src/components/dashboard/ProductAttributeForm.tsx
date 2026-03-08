@@ -186,8 +186,11 @@ export function ProductAttributeForm({ attributes, onChange }: ProductAttributeF
                   {values.map((v) => (
                     <span
                       key={v}
-                      className="rounded-full bg-primary/10 border border-primary/20 px-2.5 py-0.5 text-xs font-medium text-primary"
+                      className="rounded-full bg-primary/10 border border-primary/20 px-2.5 py-0.5 text-xs font-medium text-primary flex items-center gap-1.5"
                     >
+                      {key === "colour" && COLOUR_HEX[v] && (
+                        <span className="inline-block h-3 w-3 rounded-full border border-border/60 shrink-0" style={{ backgroundColor: COLOUR_HEX[v] }} />
+                      )}
                       {v}
                     </span>
                   ))}
