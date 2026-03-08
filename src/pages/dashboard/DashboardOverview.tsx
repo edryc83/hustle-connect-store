@@ -3,9 +3,10 @@ import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useBusinessTerms } from "@/hooks/useBusinessTerms";
+import { usePushNotifications } from "@/hooks/usePushNotifications";
 import { Button } from "@/components/ui/button";
 import {
-  Package, Copy, Share2, X, Plus, Download, Eye, ShoppingCart, TrendingUp,
+  Package, Copy, Share2, X, Plus, Download, Eye, ShoppingCart, TrendingUp, Bell,
 } from "lucide-react";
 import AfristallLogo from "@/components/AfristallLogo";
 import { toast } from "sonner";
