@@ -24,6 +24,7 @@ import Storefront from "./pages/Storefront";
 import Explore from "./pages/Explore";
 import ResetPassword from "./pages/ResetPassword";
 import SuperAdminLogin from "./pages/SuperAdminLogin";
+import AdStudio from "./pages/AdStudio";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
