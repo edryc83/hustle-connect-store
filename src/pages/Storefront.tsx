@@ -457,20 +457,9 @@ function ProductDetailView({
               className="gap-2 text-base"
               onClick={() => {
                 // Validate required attribute selections
-                if (hasAttributes && attrs) {
-                  const selectableFields = getSelectableFields();
-                  for (const field of selectableFields) {
-                    const sel = attrSelections[field.key];
-                    const txt = attrTextInputs[field.key];
-                    if (!sel && !txt) {
-                      toast.error(`Please select a ${field.label.toLowerCase()} before ordering`);
-                      return;
-                    }
-                    if (typeof sel === "string" && !sel.trim()) {
-                      toast.error(`Please select a ${field.label.toLowerCase()} before ordering`);
-                      return;
-                    }
-                  }
+                if (!validateSelections()) {
+                  toast.error("Please select all required options before ordering");
+                  return;
                 }
 
                 const cleanNumber = (profile.whatsapp_number ?? "").replace(/[^0-9+]/g, "");
