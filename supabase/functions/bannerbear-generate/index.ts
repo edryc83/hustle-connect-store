@@ -28,6 +28,20 @@ Deno.serve(async (req) => {
     const url = new URL(req.url);
     const action = url.searchParams.get("action"); // "create" or "poll"
 
+    if (action === "template") {
+      const uid = url.searchParams.get("uid");
+      if (!uid) {
+        return new Response(JSON.stringify({ error: "Missing uid parameter" }), {
+          status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      const res = await fetch(`${BB_BASE}/templates/${uid}`, { headers: { "Authorization": `Bearer ${BANNERBEAR_API_KEY}` } });
+      const data = await res.json();
+      return new Response(JSON.stringify(data), {
+        status: res.ok ? 200 : res.status, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     if (action === "poll") {
       const uid = url.searchParams.get("uid");
       if (!uid) {
