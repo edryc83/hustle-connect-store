@@ -276,7 +276,7 @@ function ProductDetailView({
 
   const buildWhatsAppMessage = () => {
     const dp = Number(displayPrice);
-    const productUrl = buildShareUrl(storeSlug, product.id);
+    const productUrl = `https://afristall.com/${storeSlug}/${product.id}`;
     const lines: string[] = [
       `Hello, I would like to order:`,
       ``,

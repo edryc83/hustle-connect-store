@@ -60,7 +60,7 @@ export function OrderModal({ product, whatsappNumber, storeName, storeSlug, sell
       // Don't block the WhatsApp redirect if logging fails
     }
 
-    const productUrl = buildShareUrl(storeSlug, product.id);
+    const productUrl = `https://afristall.com/${storeSlug}/${product.id}`;
     const message = [
       `Hello, I would like to order:`,
       ``,
