@@ -262,6 +262,10 @@ export default function AdStudio() {
             onProcessedImage={setProcessedImageUrl}
             bgImageUrl={bgImageUrl}
             setBgImageUrl={setBgImageUrl}
+            bgColor={bgColor}
+            setBgColor={setBgColor}
+            bgType={bgType}
+            setBgType={setBgType}
           />
         )}
 
