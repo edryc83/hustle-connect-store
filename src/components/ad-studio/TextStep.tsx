@@ -2,7 +2,8 @@ import { useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Sparkles, Loader2 } from "lucide-react";
+import { Switch } from "@/components/ui/switch";
+import { Sparkles, Loader2, ImageIcon } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 
 interface TextStepProps {
@@ -12,6 +13,9 @@ interface TextStepProps {
   setPrice: (v: string) => void;
   tagline: string;
   setTagline: (v: string) => void;
+  imagePreview: string | null;
+  removeBg: boolean;
+  onRemoveBgChange: (v: boolean) => void;
 }
 
 export default function TextStep({
