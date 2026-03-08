@@ -62,6 +62,7 @@ const DashboardProducts = () => {
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
   const [discountPrice, setDiscountPrice] = useState("");
+  const [discountPercent, setDiscountPercent] = useState("");
   const [description, setDescription] = useState("");
   const [variantsText, setVariantsText] = useState("");
   const [imageFiles, setImageFiles] = useState<File[]>([]);
