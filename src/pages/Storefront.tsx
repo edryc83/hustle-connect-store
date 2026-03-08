@@ -16,7 +16,6 @@ import { BuyerAttributePicker, BuyerCakeMessageInput, BuyerPersonalisationInput 
 import { getCategoryByValue, buildAttributeLines, parseTextToOptions } from "@/lib/productAttributes";
 import { StorefrontFilters, applyFilters, type FilterState } from "@/components/storefront/StorefrontFilters";
 import { StoreAssistantButton } from "@/components/storefront/StoreAssistant";
-import { buildShareUrl } from "@/lib/shareUrl";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -36,7 +35,7 @@ type Profile = Tables<"profiles">;
 
 function ShareButton({ storeName, storeSlug }: { storeName: string; storeSlug: string }) {
   const [copied, setCopied] = useState(false);
-  const storeUrl = buildShareUrl(storeSlug);
+  const storeUrl = `https://afristall.com/${storeSlug}`;
   const shareText = `🛍️ Check out ${storeName} on Afristall — order directly on WhatsApp!`;
 
   const copyLink = async () => {
@@ -277,7 +276,7 @@ function ProductDetailView({
 
   const buildWhatsAppMessage = () => {
     const dp = Number(displayPrice);
-    const productUrl = buildShareUrl(storeSlug, product.id);
+    const productUrl = `https://afristall.com/${storeSlug}/${product.id}`;
     const lines: string[] = [
       `Hello, I would like to order:`,
       ``,

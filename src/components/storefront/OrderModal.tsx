@@ -8,7 +8,6 @@ import { MessageCircle } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { formatPrice } from "@/lib/currency";
-import { buildShareUrl } from "@/lib/shareUrl";
 import type { Tables } from "@/integrations/supabase/types";
 
 type Product = Tables<"products">;
@@ -61,7 +60,7 @@ export function OrderModal({ product, whatsappNumber, storeName, storeSlug, sell
       // Don't block the WhatsApp redirect if logging fails
     }
 
-    const productUrl = buildShareUrl(storeSlug, product.id);
+    const productUrl = `https://afristall.com/${storeSlug}/${product.id}`;
     const message = [
       `Hello, I would like to order:`,
       ``,
