@@ -237,7 +237,6 @@ function ProductDetailView({
     let valid = true;
     for (const key of selectableKeys) {
       if (!attrSelections[key]) {
-        const type = (await import("@/lib/productAttributes")).ATTRIBUTE_TYPES.find((t: any) => t.key === key);
         errors[key] = true;
         valid = false;
       }
