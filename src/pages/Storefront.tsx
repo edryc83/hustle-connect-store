@@ -388,25 +388,17 @@ function ProductDetailView({
         )}
 
         {/* Dynamic Attribute Selectors */}
-        {hasAttributes && attrs && (
+        {isChatOnly && (
+          <ChatOnlyBanner />
+        )}
+        {hasAttributes && attrs && !isChatOnly && (
           <div className="rounded-2xl border border-border/60 bg-card p-4 space-y-4">
             <p className="text-sm font-semibold">Customize your order</p>
             <BuyerAttributePicker
               attributes={attrs}
               selections={attrSelections}
-              textInputs={attrTextInputs}
-              onSelectionChange={handleAttrSelect}
-              onTextInputChange={handleAttrText}
-            />
-            <BuyerCakeMessageInput
-              attributes={attrs}
-              value={cakeMessage}
-              onChange={setCakeMessage}
-            />
-            <BuyerPersonalisationInput
-              attributes={attrs}
-              value={personalisation}
-              onChange={setPersonalisation}
+              onSelect={handleAttrSelect}
+              validationErrors={validationErrors}
             />
           </div>
         )}
