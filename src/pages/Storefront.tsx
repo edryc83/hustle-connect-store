@@ -16,6 +16,7 @@ import { BuyerAttributePicker, BuyerCakeMessageInput, BuyerPersonalisationInput 
 import { getCategoryByValue, buildAttributeLines, parseTextToOptions } from "@/lib/productAttributes";
 import { StorefrontFilters, applyFilters, type FilterState } from "@/components/storefront/StorefrontFilters";
 import { StoreAssistantButton } from "@/components/storefront/StoreAssistant";
+import { buildShareUrl } from "@/lib/shareUrl";
 import {
   DropdownMenu,
   DropdownMenuContent,
