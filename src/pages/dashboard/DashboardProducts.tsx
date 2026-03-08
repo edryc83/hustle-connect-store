@@ -62,6 +62,7 @@ const DashboardProducts = () => {
   const [name, setName] = useState("");
   const [price, setPrice] = useState("");
   const [discountPrice, setDiscountPrice] = useState("");
+  const [discountPercent, setDiscountPercent] = useState("");
   const [description, setDescription] = useState("");
   const [variantsText, setVariantsText] = useState("");
   const [imageFiles, setImageFiles] = useState<File[]>([]);
@@ -104,7 +105,7 @@ const DashboardProducts = () => {
   useEffect(() => { fetchProducts(); }, [user]);
 
   const resetForm = () => {
-    setName(""); setPrice(""); setDiscountPrice(""); setDescription(""); setVariantsText("");
+    setName(""); setPrice(""); setDiscountPrice(""); setDiscountPercent(""); setDescription(""); setVariantsText("");
     setImageFiles([]); setImagePreviews([]); setExistingImages([]);
     setEditingProduct(null); setListingType("product"); setCondition(""); setAttributes({});
     setAiFilledFields(new Set());
@@ -117,6 +118,9 @@ const DashboardProducts = () => {
     setName(product.name + " (copy)");
     setPrice(formatCommaInput(String(product.price)));
     setDiscountPrice((product as any).discount_price ? formatCommaInput(String((product as any).discount_price)) : "");
+    if ((product as any).discount_price && product.price > 0) {
+      setDiscountPercent(String(Math.round(((product.price - Number((product as any).discount_price)) / product.price) * 100)));
+    } else { setDiscountPercent(""); }
     setDescription(product.description ?? "");
     setVariantsText(product.variants_text ?? "");
     setExistingImages(productImages[product.id] ?? (product.image_url ? [product.image_url] : []));
@@ -132,6 +136,9 @@ const DashboardProducts = () => {
     setName(product.name);
     setPrice(formatCommaInput(String(product.price)));
     setDiscountPrice((product as any).discount_price ? formatCommaInput(String((product as any).discount_price)) : "");
+    if ((product as any).discount_price && product.price > 0) {
+      setDiscountPercent(String(Math.round(((product.price - Number((product as any).discount_price)) / product.price) * 100)));
+    } else { setDiscountPercent(""); }
     setDescription(product.description ?? "");
     setVariantsText(product.variants_text ?? "");
     setExistingImages(productImages[product.id] ?? (product.image_url ? [product.image_url] : []));
@@ -390,10 +397,40 @@ const DashboardProducts = () => {
                 <Input id="productPrice" placeholder="5,000" value={price} onChange={(e) => setPrice(formatCommaInput(e.target.value))} inputMode="numeric" />
               </div>
               <div className="space-y-1.5">
-                <Label htmlFor="discountPrice">Discount Price ({currency}) <span className="text-muted-foreground font-normal">(optional)</span></Label>
-                <Input id="discountPrice" placeholder="e.g. 3,500" value={discountPrice} onChange={(e) => setDiscountPrice(formatCommaInput(e.target.value))} inputMode="numeric" />
-                {discountPrice && Number(discountPrice.replace(/,/g, "")) >= Number(price.replace(/,/g, "")) && (
-                  <p className="text-xs text-destructive">Discount must be less than the price</p>
+                <Label htmlFor="discountPercent">Discount % <span className="text-muted-foreground font-normal">(optional)</span></Label>
+                <div className="flex items-center gap-2">
+                  <div className="relative flex-1">
+                    <Input
+                      id="discountPercent"
+                      placeholder="e.g. 20"
+                      value={discountPercent}
+                      onChange={(e) => {
+                        const raw = e.target.value.replace(/[^0-9]/g, "");
+                        const pct = raw ? Math.min(99, Number(raw)) : 0;
+                        setDiscountPercent(raw ? String(pct) : "");
+                        const numPrice = Number(price.replace(/,/g, ""));
+                        if (pct > 0 && numPrice > 0) {
+                          setDiscountPrice(formatCommaInput(String(Math.round(numPrice * (1 - pct / 100)))));
+                        } else {
+                          setDiscountPrice("");
+                        }
+                      }}
+                      inputMode="numeric"
+                      maxLength={2}
+                      className="pr-8"
+                    />
+                    <span className="absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground font-medium">%</span>
+                  </div>
+                </div>
+                {discountPercent && price && (
+                  <p className="text-xs text-muted-foreground">
+                    Buyers pay{" "}
+                    <span className="font-semibold text-primary">
+                      {formatPrice(Number(discountPrice.replace(/,/g, "")), currency)}
+                    </span>{" "}
+                    <span className="line-through">{formatPrice(Number(price.replace(/,/g, "")), currency)}</span>
+                    {" "}— {discountPercent}% off
+                  </p>
                 )}
               </div>
               {listingType === "product" && (
