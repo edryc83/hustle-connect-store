@@ -10,6 +10,7 @@ export function MobileBottomNav() {
   const terms = useBusinessTerms();
   const { pathname } = useLocation();
   const isProfileActive = pathname === "/dashboard/profile";
+  const { user } = useAuth();
 
   const { data: profilePic } = useQuery({
     queryKey: ["profile-pic", user?.id],
