@@ -274,6 +274,7 @@ const Explore = () => {
               )}
             </div>
           ) : (
+            <>
             <div className="space-y-3 sm:hidden">
               {filtered.map((store) => {
                 const businessLabel = getBusinessLabel(store);
@@ -351,6 +352,7 @@ const Explore = () => {
                 );
               })}
             </div>
+            </>
           )}
         </section>
       </main>
