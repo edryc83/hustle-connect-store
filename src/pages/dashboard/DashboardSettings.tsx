@@ -303,7 +303,7 @@ const DashboardSettings = () => {
         instagram_url: normalizeSocialUrl(instagramUrl, "instagram"),
         tiktok_url: normalizeSocialUrl(tiktokUrl, "tiktok"),
         facebook_url: normalizeSocialUrl(facebookUrl, "facebook"),
-        ai_assistant_enabled: aiAssistantEnabled,
+        
       } as any)
       .eq("id", user.id);
     if (error) toast.error("Failed to save");
