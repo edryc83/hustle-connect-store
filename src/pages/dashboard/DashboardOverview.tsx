@@ -6,12 +6,11 @@ import whatsappIcon from "@/assets/whatsapp-icon.png";
 import { useBusinessTerms } from "@/hooks/useBusinessTerms";
 import { Button } from "@/components/ui/button";
 import {
-  Package, Copy, Share2, X, Plus, Download, Eye, ShoppingCart, TrendingUp,
+  Package, Copy, Share2, X, Plus, Eye, ShoppingCart, TrendingUp,
 } from "lucide-react";
 import AfristallLogo from "@/components/AfristallLogo";
 import { toast } from "sonner";
 import CaptionGenerator from "@/components/dashboard/CaptionGenerator";
-import { useInstallPrompt } from "@/hooks/useInstallPrompt";
 
 function getGreeting(): { text: string; emoji: string } {
   const hour = new Date().getHours();
@@ -24,7 +23,6 @@ function getGreeting(): { text: string; emoji: string } {
 const DashboardOverview = () => {
   const { user } = useAuth();
   const terms = useBusinessTerms();
-  const { canInstall, isInstalled, promptInstall } = useInstallPrompt();
   const [productCount, setProductCount] = useState(0);
   const [viewCount, setViewCount] = useState(0);
   const [orderCount, setOrderCount] = useState(0);
@@ -44,7 +42,7 @@ const DashboardOverview = () => {
     const fetchData = async () => {
       const [{ count }, { data: profile }, { count: orders }] = await Promise.all([
         supabase.from("products").select("*", { count: "exact", head: true }).eq("user_id", user.id),
-        supabase.from("profiles").select("store_name, store_slug, first_name, profile_picture_url, category, view_count").eq("id", user.id).single(),
+        supabase.from("profiles").select("store_name, store_slug, first_name, profile_picture_url, category, view_count, welcome_message, city").eq("id", user.id).single(),
         supabase.from("orders").select("*", { count: "exact", head: true }).eq("seller_id", user.id).eq("status", "confirmed"),
       ]);
       setProductCount(count ?? 0);
@@ -57,6 +55,17 @@ const DashboardOverview = () => {
       setProfilePicUrl(p?.profile_picture_url ?? "");
       setCategory(p?.category ?? "");
       setViewCount(p?.view_count ?? 0);
+
+      // Auto-generate bio for existing stores that don't have one
+      if (!p?.welcome_message && p?.store_name) {
+        supabase.functions.invoke("generate-bio", {
+          body: { storeName: p.store_name, category: p.category || "", city: p.city || "" },
+        }).then(({ data }) => {
+          if (data?.bio) {
+            supabase.from("profiles").update({ welcome_message: data.bio } as any).eq("id", user.id);
+          }
+        }).catch(() => {});
+      }
     };
 
     fetchData();
@@ -183,30 +192,7 @@ const DashboardOverview = () => {
         </div>
       )}
 
-      {/* Install app banner */}
-      {!isInstalled && (
-        <button
-          onClick={async () => {
-            if (canInstall) {
-              await promptInstall();
-            } else {
-              window.location.href = "/dashboard/settings#install-app";
-            }
-          }}
-          className="flex w-full items-center gap-3 rounded-2xl border-2 border-primary bg-primary/5 backdrop-blur-xl p-4 shadow-sm hover:bg-primary/10 transition-colors text-left animate-[pulse_2s_cubic-bezier(0.4,0,0.6,1)_infinite] ring-2 ring-primary/30"
-        >
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
-            <Download className="h-5 w-5 text-primary" />
-          </div>
-          <div className="flex-1">
-            <p className="text-sm font-semibold">Install App</p>
-            <p className="text-xs text-muted-foreground">
-              {canInstall ? "Tap to install now" : "Add to home screen"}
-            </p>
-          </div>
-          <span className="text-xs text-primary font-medium">{canInstall ? "Install" : "How →"}</span>
-        </button>
-      )}
+
 
 
 
