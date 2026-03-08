@@ -21,7 +21,7 @@ export function MobileBottomNav() {
             key={item.title}
             to={item.url}
             end
-            className="flex flex-col items-center gap-0.5 px-3 py-1 text-xs text-muted-foreground transition-colors"
+            className="flex flex-col items-center gap-0.5 px-3 py-1 text-xs text-foreground/60 transition-colors"
             activeClassName="text-primary font-medium"
           >
             <item.icon className="h-5 w-5" />
