@@ -76,9 +76,10 @@ export function BuyerAttributePicker({
  */
 export function ChatOnlyBanner() {
   return (
-    <div className="rounded-xl border border-border/60 bg-muted/30 p-4 text-center">
-      <p className="text-sm text-muted-foreground">
-        💬 Tap below to discuss details with the seller on WhatsApp
+    <div className="rounded-xl border border-[#25D366]/30 bg-[#25D366]/10 p-4 text-center flex items-center justify-center gap-2">
+      <img src={whatsappIcon} alt="WhatsApp" className="h-5 w-5" />
+      <p className="text-sm font-medium text-[#25D366]">
+        Tap below to discuss details with the seller on WhatsApp
       </p>
     </div>
   );
