@@ -145,14 +145,6 @@ export default function ProductStep({
         </>
       ) : null}
 
-      {/* Remove BG toggle */}
-      <div className="flex items-center justify-between rounded-xl border border-border p-3 bg-card">
-        <div>
-          <Label className="text-sm font-medium">Remove Background</Label>
-          <p className="text-xs text-muted-foreground">Auto-strip product background</p>
-        </div>
-        <Switch checked={removeBg} onCheckedChange={onRemoveBgChange} />
-      </div>
     </div>
   );
 }
