@@ -105,7 +105,7 @@ const DashboardProducts = () => {
   useEffect(() => { fetchProducts(); }, [user]);
 
   const resetForm = () => {
-    setName(""); setPrice(""); setDiscountPrice(""); setDescription(""); setVariantsText("");
+    setName(""); setPrice(""); setDiscountPrice(""); setDiscountPercent(""); setDescription(""); setVariantsText("");
     setImageFiles([]); setImagePreviews([]); setExistingImages([]);
     setEditingProduct(null); setListingType("product"); setCondition(""); setAttributes({});
     setAiFilledFields(new Set());
