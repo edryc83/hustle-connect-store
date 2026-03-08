@@ -174,9 +174,12 @@ const DashboardOverview = () => {
               <Share2 className="h-4 w-4" />
             </button>
           </div>
-          <p className="text-[11px] text-muted-foreground leading-relaxed px-1">
-            📌 Post this link to your <strong className="text-foreground">TikTok Shop bio</strong>, <strong className="text-foreground">Facebook bio</strong>, <strong className="text-foreground">Instagram bio</strong> & <strong className="text-foreground">WhatsApp</strong> — always add it to your status caption when posting products!
-          </p>
+          <div className="flex items-start gap-2.5 rounded-xl bg-[#DCF8C6] dark:bg-[#005C4B] px-3 py-2.5 border border-[#25D366]/30 shadow-sm">
+            <img src={whatsappIcon} alt="" className="h-4 w-4 mt-0.5 shrink-0" />
+            <p className="text-[11px] text-[#111B21] dark:text-[#E9EDEF] leading-relaxed">
+              Post this link to your <strong>TikTok Shop bio</strong>, <strong>Facebook bio</strong>, <strong>Instagram bio</strong> & <strong>WhatsApp</strong> — always add it to your status caption when posting products!
+            </p>
+          </div>
         </div>
       )}
 
