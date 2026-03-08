@@ -1,26 +1,45 @@
 import { useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
-import { Navigate } from "react-router-dom";
+import { Navigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Switch } from "@/components/ui/switch";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Upload, Sparkles, Download, ArrowLeft, AlertCircle, Loader2 } from "lucide-react";
+import { ArrowLeft, AlertCircle, Loader2, Sparkles, Download } from "lucide-react";
 import { useQuery } from "@tanstack/react-query";
-import { Link } from "react-router-dom";
+import { formatPrice } from "@/lib/currency";
+
+import ProductStep from "@/components/ad-studio/ProductStep";
+import TemplateStep from "@/components/ad-studio/TemplateStep";
+import TextStep from "@/components/ad-studio/TextStep";
+import StepNav from "@/components/ad-studio/StepNav";
 
 const TEMPLATE_ID = "lzw71BD6Ek6350eYkn";
 
 export default function AdStudio() {
   const { user, loading: authLoading } = useAuth();
+
+  // Wizard state
+  const [step, setStep] = useState(1);
+  const [completedSteps, setCompletedSteps] = useState<number[]>([]);
+
+  // Step 1 — Product
+  const [selectedProductId, setSelectedProductId] = useState<string | null>(null);
+  const [selectedProductData, setSelectedProductData] = useState<{
+    name: string; price: number; imageUrl: string; currency?: string;
+  } | null>(null);
   const [imageFile, setImageFile] = useState<File | null>(null);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [removeBg, setRemoveBg] = useState(true);
+
+  // Step 2 — Template
+  const [selectedTemplate, setSelectedTemplate] = useState(TEMPLATE_ID);
+
+  // Step 3 — Text
   const [productName, setProductName] = useState("");
   const [price, setPrice] = useState("");
   const [tagline, setTagline] = useState("");
+
+  // Generation
   const [generating, setGenerating] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [resultUrl, setResultUrl] = useState<string | null>(null);
@@ -31,7 +50,7 @@ export default function AdStudio() {
     queryFn: async () => {
       const { data } = await supabase
         .from("profiles")
-        .select("store_slug, store_name")
+        .select("store_slug, store_name, currency")
         .eq("id", user!.id)
         .single();
       return data;
@@ -41,14 +60,39 @@ export default function AdStudio() {
   if (authLoading) return null;
   if (!user) return <Navigate to="/login" replace />;
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setImageFile(file);
-    setImagePreview(URL.createObjectURL(file));
-    setResultUrl(null);
+  const handleSelectProduct = (product: {
+    id: string; name: string; price: number; imageUrl: string; currency?: string;
+  }) => {
+    setSelectedProductId(product.id);
+    setSelectedProductData(product);
+    setImageFile(null);
+    setImagePreview(product.imageUrl);
+    // Pre-fill text
+    setProductName(product.name);
+    setPrice(formatPrice(product.price, product.currency || profile?.currency || "UGX"));
   };
 
+  const handleUploadImage = (file: File, preview: string) => {
+    setImageFile(file);
+    setImagePreview(preview);
+    setSelectedProductId(null);
+    setSelectedProductData(null);
+  };
+
+  const markComplete = (s: number) => {
+    setCompletedSteps((prev) => (prev.includes(s) ? prev : [...prev, s]));
+  };
+
+  const goNext = () => {
+    markComplete(step);
+    setStep((s) => Math.min(s + 1, 3));
+  };
+
+  const canProceedStep1 = !!imagePreview;
+  const canProceedStep2 = !!selectedTemplate;
+  const canGenerate = !!imagePreview && !!productName.trim() && !!price.trim();
+
+  // Upload & generate logic (same as before)
   const uploadImage = async (file: File): Promise<string> => {
     const ext = file.name.split(".").pop() || "jpg";
     const path = `ad-studio/${user!.id}/${Date.now()}.${ext}`;
@@ -61,14 +105,9 @@ export default function AdStudio() {
   const poll = async (uid: string): Promise<string> => {
     for (let i = 0; i < 30; i++) {
       await new Promise((r) => setTimeout(r, 2000));
-      const { data, error } = await supabase.functions.invoke("bannerbear-generate", {
-        body: null,
-        method: "GET",
-      });
-      // supabase.functions.invoke doesn't support query params well, use fetch directly
       const res = await fetch(
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/bannerbear-generate?action=poll&uid=${uid}`,
-        { headers: { "Authorization": `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}` } }
+        { headers: { Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}` } }
       );
       const json = await res.json();
       if (!res.ok) throw new Error(json.error || `Poll error ${res.status}`);
@@ -79,14 +118,17 @@ export default function AdStudio() {
 
   const handleGenerate = async () => {
     setError(null);
-    if (!imageFile) { setError("Please upload a product image"); return; }
-    if (!productName.trim()) { setError("Please enter a product name"); return; }
-    if (!price.trim()) { setError("Please enter a price"); return; }
-
     setGenerating(true);
     setResultUrl(null);
     try {
-      const imageUrl = await uploadImage(imageFile);
+      let imageUrl: string;
+      if (imageFile) {
+        imageUrl = await uploadImage(imageFile);
+      } else if (selectedProductData?.imageUrl) {
+        imageUrl = selectedProductData.imageUrl;
+      } else {
+        throw new Error("No image selected");
+      }
 
       const modifications = [
         { name: "product", image_url: imageUrl, ...(removeBg ? { remove_background: true } : {}) },
@@ -101,17 +143,17 @@ export default function AdStudio() {
         {
           method: "POST",
           headers: {
-            "Authorization": `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+            Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({ template: TEMPLATE_ID, modifications }),
+          body: JSON.stringify({ template: selectedTemplate, modifications }),
         }
       );
       const createData = await createRes.json();
-      if (!createRes.ok) throw new Error(createData.error || JSON.stringify(createData.details) || `Create error ${createRes.status}`);
+      if (!createRes.ok) throw new Error(createData.error || JSON.stringify(createData.details) || `Error ${createRes.status}`);
 
       const uid = createData.uid;
-      if (!uid) throw new Error("No uid returned from Bannerbear");
+      if (!uid) throw new Error("No uid returned");
 
       const finalUrl = await poll(uid);
       setResultUrl(finalUrl);
@@ -132,7 +174,7 @@ export default function AdStudio() {
     a.click();
   };
 
-  // Full-screen result view
+  // Result screen
   if (resultUrl) {
     return (
       <div className="min-h-screen bg-background flex flex-col items-center justify-center p-4 gap-6">
@@ -141,7 +183,7 @@ export default function AdStudio() {
           <Button onClick={handleDownload} size="lg" className="gap-2 shadow-lg">
             <Download className="h-5 w-5" /> Download
           </Button>
-          <Button variant="outline" size="lg" onClick={() => setResultUrl(null)}>
+          <Button variant="outline" size="lg" onClick={() => { setResultUrl(null); setStep(1); setCompletedSteps([]); }}>
             <ArrowLeft className="h-4 w-4 mr-2" /> Make Another
           </Button>
         </div>
@@ -149,8 +191,19 @@ export default function AdStudio() {
     );
   }
 
+  // Generating screen
+  if (generating) {
+    return (
+      <div className="min-h-screen bg-background flex flex-col items-center justify-center gap-4">
+        <Loader2 className="h-10 w-10 animate-spin text-primary" />
+        <p className="text-muted-foreground font-medium">Generating your ad…</p>
+      </div>
+    );
+  }
+
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background flex flex-col">
+      {/* Header */}
       <header className="sticky top-0 z-40 flex h-14 items-center gap-3 border-b bg-background/80 px-4 backdrop-blur-xl">
         <Link to="/dashboard" className="text-muted-foreground hover:text-foreground transition-colors">
           <ArrowLeft className="h-5 w-5" />
@@ -159,73 +212,63 @@ export default function AdStudio() {
         <Sparkles className="h-4 w-4 text-primary" />
       </header>
 
-      <main className="max-w-md mx-auto p-4 space-y-6 pb-12">
-        {/* Image upload */}
-        <div className="space-y-2">
-          <Label>Product Photo</Label>
-          <label className="flex flex-col items-center justify-center gap-2 border-2 border-dashed border-border rounded-xl p-6 cursor-pointer hover:border-primary/50 transition-colors bg-muted/30">
-            {imagePreview ? (
-              <img src={imagePreview} alt="Preview" className="max-h-48 rounded-lg object-contain" />
-            ) : (
-              <>
-                <Upload className="h-8 w-8 text-muted-foreground" />
-                <span className="text-sm text-muted-foreground">Tap to upload a photo</span>
-              </>
-            )}
-            <input type="file" accept="image/*" className="hidden" onChange={handleFileChange} />
-          </label>
-        </div>
-
-        {/* Remove BG toggle */}
-        <div className="flex items-center justify-between rounded-xl border border-border p-4 bg-card">
-          <div>
-            <Label className="text-sm font-medium">Remove Background</Label>
-            <p className="text-xs text-muted-foreground">Auto-strip product background</p>
-          </div>
-          <Switch checked={removeBg} onCheckedChange={setRemoveBg} />
-        </div>
-
-        {/* Text inputs */}
-        <div className="space-y-4">
-          <div className="space-y-1.5">
-            <Label htmlFor="product-name">Product Name</Label>
-            <Input id="product-name" placeholder="e.g. Silk Bonnet" value={productName} onChange={(e) => setProductName(e.target.value)} />
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="price">Price</Label>
-            <Input id="price" placeholder="e.g. KES 1,500" value={price} onChange={(e) => setPrice(e.target.value)} />
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="tagline">Tagline</Label>
-            <Input id="tagline" placeholder="e.g. Sleep in luxury ✨" value={tagline} onChange={(e) => setTagline(e.target.value)} />
-          </div>
-        </div>
+      {/* Content */}
+      <main className="flex-1 max-w-md mx-auto w-full p-4 overflow-y-auto">
+        {step === 1 && (
+          <ProductStep
+            selectedProductId={selectedProductId}
+            onSelectProduct={handleSelectProduct}
+            imageFile={imageFile}
+            imagePreview={imagePreview}
+            onUploadImage={handleUploadImage}
+            removeBg={removeBg}
+            onRemoveBgChange={setRemoveBg}
+          />
+        )}
+        {step === 2 && (
+          <TemplateStep selectedTemplate={selectedTemplate} onSelect={setSelectedTemplate} />
+        )}
+        {step === 3 && (
+          <TextStep
+            productName={productName}
+            setProductName={setProductName}
+            price={price}
+            setPrice={setPrice}
+            tagline={tagline}
+            setTagline={setTagline}
+          />
+        )}
 
         {error && (
-          <Alert variant="destructive">
+          <Alert variant="destructive" className="mt-4">
             <AlertCircle className="h-4 w-4" />
             <AlertTitle>Error</AlertTitle>
             <AlertDescription className="text-xs break-all">{error}</AlertDescription>
           </Alert>
         )}
-
-        <Button
-          onClick={handleGenerate}
-          disabled={generating}
-          className="w-full h-12 text-base gap-2 shadow-lg shadow-primary/20"
-          size="lg"
-        >
-          {generating ? (
-            <>
-              <Loader2 className="h-5 w-5 animate-spin" /> Generating your ad…
-            </>
-          ) : (
-            <>
-              <Sparkles className="h-5 w-5" /> Generate Ad
-            </>
-          )}
-        </Button>
       </main>
+
+      {/* Bottom action */}
+      <div className="sticky bottom-0 border-t border-border bg-background px-4 pb-2">
+        {step < 3 ? (
+          <Button
+            className="w-full h-11 mt-2"
+            disabled={step === 1 ? !canProceedStep1 : !canProceedStep2}
+            onClick={goNext}
+          >
+            Next
+          </Button>
+        ) : (
+          <Button
+            className="w-full h-11 mt-2 gap-2 shadow-lg shadow-primary/20"
+            disabled={!canGenerate}
+            onClick={handleGenerate}
+          >
+            <Sparkles className="h-5 w-5" /> Generate Ad
+          </Button>
+        )}
+        <StepNav current={step} completed={completedSteps} onStep={setStep} />
+      </div>
     </div>
   );
 }
