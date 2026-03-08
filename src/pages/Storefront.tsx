@@ -843,16 +843,31 @@ const StorefrontInner = () => {
                   <span className="text-sm text-muted-foreground">{featured.length}</span>
                 </div>
                 <div className="flex gap-3 overflow-x-auto pb-2 snap-x snap-mandatory scrollbar-none">
-                  {featured.map((product) => (
-                    <div key={product.id} className="w-40 sm:w-44 shrink-0 snap-start">
-                      <ProductCard
-                        product={product}
-                        images={productImagesMap[product.id] ?? (product.image_url ? [product.image_url] : [])}
-                        currency={currency}
+                  {featured.map((product) => {
+                    const imgs = productImagesMap[product.id] ?? (product.image_url ? [product.image_url] : []);
+                    const dp = product.discount_price ?? product.price;
+                    return (
+                      <div
+                        key={product.id}
+                        className="w-36 sm:w-40 shrink-0 snap-start cursor-pointer rounded-2xl border border-border/60 bg-card p-1.5 shadow-sm hover:shadow-md transition-shadow"
                         onClick={() => navigate(`/${storeSlug}/${product.id}`)}
-                      />
-                    </div>
-                  ))}
+                      >
+                        <div className="aspect-square rounded-xl overflow-hidden bg-muted/30 border border-border/40">
+                          {imgs[0] ? (
+                            <img src={imgs[0]} alt={product.name} className="h-full w-full object-cover" />
+                          ) : (
+                            <div className="flex h-full w-full items-center justify-center">
+                              <ShoppingBag className="h-8 w-8 text-muted-foreground/30" />
+                            </div>
+                          )}
+                        </div>
+                        <div className="pt-2 px-0.5">
+                          <p className="font-semibold text-sm leading-tight truncate">{product.name}</p>
+                          <p className="font-extrabold text-sm mt-0.5">{formatPrice(Number(dp), currency)}</p>
+                        </div>
+                      </div>
+                    );
+                  })}
                 </div>
               </section>
             )}
