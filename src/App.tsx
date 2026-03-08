@@ -56,6 +56,7 @@ const App = () => (
 
               <Route path="/superadmin" element={<SuperAdminLogin />} />
               <Route path="/explore" element={<Explore />} />
+              <Route path="/ad-studio" element={<AdStudio />} />
               <Route path="/:storeSlug" element={<Storefront />} />
               <Route path="/:storeSlug/:productId" element={<Storefront />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
