@@ -239,6 +239,9 @@ export default function AdStudio() {
             setPrice={setPrice}
             tagline={tagline}
             setTagline={setTagline}
+            imagePreview={imagePreview}
+            removeBg={removeBg}
+            onRemoveBgChange={setRemoveBg}
           />
         )}
 
