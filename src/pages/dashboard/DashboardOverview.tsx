@@ -24,7 +24,6 @@ const DashboardOverview = () => {
   const { user } = useAuth();
   const terms = useBusinessTerms();
   const { canInstall, isInstalled, promptInstall } = useInstallPrompt();
-  const { isSubscribed, supported: pushSupported, loading: pushLoading, subscribe: subscribePush } = usePushNotifications();
   const [productCount, setProductCount] = useState(0);
   const [viewCount, setViewCount] = useState(0);
   const [orderCount, setOrderCount] = useState(0);
