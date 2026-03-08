@@ -279,8 +279,8 @@ const DashboardProfile = () => {
         )}
       </div>
 
-      {/* Product Grid — Instagram 3-column */}
-      <div className="mt-5 px-0.5">
+      {/* Product Grid */}
+      <div className="mt-5 px-3">
         {products.length === 0 ? (
           <div className="text-center py-16 space-y-3">
             <span className="text-4xl">{terms.emoji}</span>
@@ -290,27 +290,52 @@ const DashboardProfile = () => {
             </Button>
           </div>
         ) : (
-          <div className="grid grid-cols-3 gap-0.5">
+          <div className="grid grid-cols-2 gap-3">
             {products.map((product) => {
               const imgUrl = productImages[product.id] || product.image_url;
+              const displayPrice = product.discount_price ?? product.price;
+              const hasDiscount = !!product.discount_price;
+              const discountPercent = hasDiscount
+                ? Math.round((1 - Number(product.discount_price) / Number(product.price)) * 100)
+                : 0;
               return (
                 <button
                   key={product.id}
                   onClick={() => setSelectedProduct(product)}
-                  className="relative aspect-square overflow-hidden bg-muted/30 group"
+                  className="group cursor-pointer rounded-2xl border border-border/60 bg-card p-1.5 shadow-sm hover:shadow-md transition-shadow text-left"
                 >
-                  {imgUrl ? (
-                    <img src={imgUrl} alt={product.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-200" />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center text-muted-foreground/40">
-                      <AfristallLogo className="h-8 w-8" />
+                  {/* Image */}
+                  <div className="relative aspect-[4/5] rounded-xl overflow-hidden bg-muted/30 border border-border/40">
+                    {imgUrl ? (
+                      <img src={imgUrl} alt={product.name} className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center text-muted-foreground/40">
+                        <AfristallLogo className="h-8 w-8" />
+                      </div>
+                    )}
+                    {/* Badges */}
+                    <div className="absolute top-2 left-2 flex flex-col gap-1">
+                      {product.is_featured && (
+                        <span className="text-[10px] px-2 py-0.5 bg-foreground text-background shadow-sm rounded-full font-medium inline-flex items-center gap-0.5">
+                          ⭐ Featured
+                        </span>
+                      )}
+                      {hasDiscount && (
+                        <span className="text-[10px] px-2 py-0.5 bg-destructive text-destructive-foreground shadow-sm rounded-full font-medium">
+                          {discountPercent}% OFF
+                        </span>
+                      )}
                     </div>
-                  )}
-                  {/* Hover overlay with price */}
-                  <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                    <span className="text-white text-sm font-bold">
-                      {formatPrice(product.discount_price ?? product.price, currency)}
-                    </span>
+                  </div>
+                  {/* Info */}
+                  <div className="pt-2 px-0.5 space-y-0.5">
+                    <p className="font-semibold text-sm leading-tight truncate">{product.name}</p>
+                    <div className="flex flex-col">
+                      <p className="font-extrabold text-sm truncate">{formatPrice(Number(displayPrice), currency)}</p>
+                      {hasDiscount && (
+                        <p className="text-[10px] text-muted-foreground line-through">{formatPrice(Number(product.price), currency)}</p>
+                      )}
+                    </div>
                   </div>
                 </button>
               );
