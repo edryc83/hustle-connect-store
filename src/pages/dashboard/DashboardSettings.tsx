@@ -624,21 +624,6 @@ const DashboardSettings = () => {
         </CardContent>
       </div>
 
-      {/* AI Store Assistant Toggle */}
-      <Card className="border-border/50 bg-card/60 backdrop-blur-xl">
-        <CardContent className="flex items-center justify-between py-5 px-5">
-          <div className="flex items-center gap-3">
-            <div className="h-10 w-10 rounded-xl flex items-center justify-center" style={{ backgroundColor: "#FF6B35" }}>
-              <Bot className="h-5 w-5 text-white" />
-            </div>
-            <div>
-              <p className="text-sm font-semibold">AI Store Assistant</p>
-              <p className="text-xs text-muted-foreground">Let AI answer buyer questions 24/7 and hand orders to your WhatsApp</p>
-            </div>
-          </div>
-          <Switch checked={aiAssistantEnabled} onCheckedChange={setAiAssistantEnabled} />
-        </CardContent>
-      </Card>
 
       {/* Push Notifications */}
       <NotificationSettings />
