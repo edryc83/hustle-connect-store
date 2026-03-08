@@ -29,6 +29,41 @@ const COUNTRIES = [
   "Uganda", "Kenya", "Nigeria", "Ghana", "Tanzania", "Rwanda",
   "South Africa", "Ethiopia", "Cameroon", "Senegal", "Other",
 ];
+function NotificationSettings() {
+  const { isSubscribed, supported, loading, subscribe, unsubscribe } = usePushNotifications();
+
+  if (!supported) return null;
+
+  return (
+    <Card className="border-border/50 bg-card/60 backdrop-blur-xl">
+      <CardContent className="flex items-center justify-between gap-4 pt-6">
+        <div className="flex items-center gap-3">
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10">
+            <Bell className="h-5 w-5 text-primary" />
+          </div>
+          <div>
+            <p className="text-sm font-semibold">Push Notifications</p>
+            <p className="text-xs text-muted-foreground">Get alerted when customers place orders</p>
+          </div>
+        </div>
+        <Switch
+          checked={isSubscribed}
+          disabled={loading}
+          onCheckedChange={async (checked) => {
+            if (checked) {
+              const ok = await subscribe();
+              if (ok) toast("Notifications enabled!");
+              else if (Notification.permission === "denied") toast.error("Notifications blocked in browser settings.");
+            } else {
+              await unsubscribe();
+              toast("Notifications disabled.");
+            }
+          }}
+        />
+      </CardContent>
+    </Card>
+  );
+}
 
 const DashboardSettings = () => {
   const { user } = useAuth();
