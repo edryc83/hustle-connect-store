@@ -140,13 +140,16 @@ export default function TextStep({
     }
   };
 
-  const handleLogoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const url = URL.createObjectURL(file);
-    setStoreLogo(url);
-    // Store file ref for later upload
-    (window as any).__adStudioLogoFile = file;
+  const handleAiSubtitle = async () => {
+    if (!productName.trim()) return;
+    setSubtitleAiLoading(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("generate-tagline", {
+        body: { productName, price, type: "subtitle" },
+      });
+      if (error) throw error;
+      if (data?.tagline) setSubtitle(data.tagline);
+    } catch { /* silent */ } finally { setSubtitleAiLoading(false); }
   };
 
   return (
