@@ -1,5 +1,6 @@
 import { LayoutDashboard, Package, User, ClipboardList, BarChart3 } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
+import { useLocation } from "react-router-dom";
 import { useBusinessTerms } from "@/hooks/useBusinessTerms";
 import { useAuth } from "@/hooks/useAuth";
 import { useQuery } from "@tanstack/react-query";
@@ -7,6 +8,8 @@ import { supabase } from "@/integrations/supabase/client";
 
 export function MobileBottomNav() {
   const terms = useBusinessTerms();
+  const { pathname } = useLocation();
+  const isProfileActive = pathname === "/dashboard/profile";
   const { user } = useAuth();
 
   const { data: profilePic } = useQuery({
@@ -48,7 +51,7 @@ export function MobileBottomNav() {
                 <img
                   src={profilePic}
                   alt="Profile"
-                  className="h-5 w-5 rounded-full object-cover ring-1 ring-border"
+                  className={`h-5 w-5 rounded-full object-cover ring-2 ${isProfileActive ? "ring-primary" : "ring-border"}`}
                 />
               ) : (
                 <User className="h-5 w-5" />
