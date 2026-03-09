@@ -781,7 +781,7 @@ const StorefrontInner = () => {
       )}
 
       {/* Header with profile pic, name, greeting */}
-      <StorefrontHeader profile={profile} visitorName={visitorName} />
+      <StorefrontHeader profile={profile} visitorName={visitorName} onBack={() => navigate("/explore")} />
 
       {/* Products */}
       <main className="mx-auto max-w-5xl px-4 py-6 space-y-8">
