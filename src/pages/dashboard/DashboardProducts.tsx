@@ -228,7 +228,7 @@ const DashboardProducts = () => {
     // Auto-analyze the first image if no name has been entered yet
     const isFirstImage = existingImages.length === 0 && imagePreviews.length === 0;
     if (isFirstImage && rawFiles.length > 0 && !name.trim()) {
-      analyzeImage(rawFiles[0]);
+      analyzeProduct(rawFiles[0]);
     }
   };
 
