@@ -98,14 +98,13 @@ export default function CanvasEditor({
       // Helper to load image into fabric
       const loadImage = (url: string): Promise<fabric.FabricImage> => {
         return new Promise((resolve, reject) => {
-          const imgEl = new Image();
+          const imgEl = document.createElement("img");
           imgEl.crossOrigin = "anonymous";
           imgEl.onload = () => {
             const fImg = new fabric.FabricImage(imgEl);
             resolve(fImg);
           };
           imgEl.onerror = reject;
-          // Handle relative URLs
           imgEl.src = url.startsWith("/") ? window.location.origin + url : url;
         });
       };
