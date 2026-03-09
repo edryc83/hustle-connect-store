@@ -93,6 +93,35 @@ export const ATTRIBUTE_TYPES: AttributeType[] = [
   },
 ];
 
+/** Map detected product categories to recommended attribute keys */
+export const CATEGORY_ATTRIBUTES: Record<string, string[]> = {
+  fashion: ["size", "colour", "brand", "condition", "style"],
+  beauty: ["scent", "brand", "weight", "condition"],
+  food: ["weight", "stock"],
+  phones: ["brand", "condition", "colour", "stock"],
+  wigs: ["colour", "style", "brand", "stock"],
+  shoes: ["size", "colour", "brand", "condition"],
+  home: ["colour", "brand", "weight", "condition"],
+  jewellery: ["colour", "brand", "condition", "style"],
+  cakes: ["weight", "stock"],
+  plants: ["stock", "weight"],
+  other: ["condition", "brand", "stock"],
+};
+
+/**
+ * Get recommended attribute types for a product category.
+ * Returns all types, with recommended ones first.
+ */
+export function getRecommendedAttributes(category?: string): { recommended: AttributeType[]; others: AttributeType[] } {
+  const recKeys = category ? (CATEGORY_ATTRIBUTES[category] ?? []) : [];
+  const recommended = recKeys
+    .map((k) => ATTRIBUTE_TYPES.find((t) => t.key === k))
+    .filter(Boolean) as AttributeType[];
+  const recKeySet = new Set(recKeys);
+  const others = ATTRIBUTE_TYPES.filter((t) => !recKeySet.has(t.key));
+  return { recommended, others };
+}
+
 export function getAttributeType(key: string): AttributeType | undefined {
   return ATTRIBUTE_TYPES.find((t) => t.key === key);
 }

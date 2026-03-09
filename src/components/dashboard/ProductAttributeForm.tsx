@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { X, Pencil, Plus, Check } from "lucide-react";
 import whatsappIcon from "@/assets/whatsapp-icon.png";
-import { ATTRIBUTE_TYPES, COLOUR_HEX, type AttributeType } from "@/lib/productAttributes";
+import { ATTRIBUTE_TYPES, COLOUR_HEX, getRecommendedAttributes, type AttributeType } from "@/lib/productAttributes";
 import {
   Sheet,
   SheetContent,
@@ -15,9 +15,10 @@ import {
 interface ProductAttributeFormProps {
   attributes: Record<string, any>;
   onChange: (attrs: Record<string, any>) => void;
+  productCategory?: string;
 }
 
-export function ProductAttributeForm({ attributes, onChange }: ProductAttributeFormProps) {
+export function ProductAttributeForm({ attributes, onChange, productCategory }: ProductAttributeFormProps) {
   const [typePickerOpen, setTypePickerOpen] = useState(false);
   const [activeType, setActiveType] = useState<AttributeType | null>(null);
   const [detailSheetOpen, setDetailSheetOpen] = useState(false);
@@ -230,38 +231,61 @@ export function ProductAttributeForm({ attributes, onChange }: ProductAttributeF
           <SheetHeader>
             <SheetTitle className="text-base">What detail do you want to add?</SheetTitle>
           </SheetHeader>
-          <div className="grid grid-cols-3 gap-2 pt-4 pb-6">
-            {ATTRIBUTE_TYPES.map((type) => {
+          {(() => {
+            const { recommended, others } = getRecommendedAttributes(productCategory);
+            const hasRecs = recommended.length > 0;
+            const renderTypeButton = (type: AttributeType, isRecommended = false) => {
               const alreadyAdded = !!attributes[type.key];
               return (
                 <button
                   key={type.key}
                   type="button"
                   onClick={() => selectType(type)}
-                  className={`flex flex-col items-center gap-1.5 rounded-xl border-2 p-3 text-center transition-all ${
+                  className={`flex flex-col items-center gap-1.5 rounded-xl border-2 p-3 text-center transition-all relative ${
                     alreadyAdded
                       ? "border-primary/30 bg-primary/5"
+                      : isRecommended
+                      ? "border-primary/40 bg-primary/5 hover:bg-primary/10"
                       : "border-border hover:border-primary/40 hover:bg-muted/30"
                   }`}
                 >
                   <span className="text-xl">{type.emoji}</span>
                   <span className="text-xs font-medium">{type.label}</span>
-                  {alreadyAdded && (
+                  {alreadyAdded ? (
                     <span className="text-[10px] text-primary font-medium">✓ Added</span>
-                  )}
+                  ) : isRecommended ? (
+                    <span className="text-[10px] text-primary/70 font-medium">Suggested</span>
+                  ) : null}
                 </button>
               );
-            })}
-            {/* Other */}
-            <button
-              type="button"
-              onClick={openOtherSheet}
-              className="flex flex-col items-center gap-1.5 rounded-xl border-2 border-border p-3 text-center transition-all hover:border-primary/40 hover:bg-muted/30"
-            >
-              <span className="text-xl">➕</span>
-              <span className="text-xs font-medium">Other</span>
-            </button>
-          </div>
+            };
+            return (
+              <div className="pt-4 pb-6 space-y-3">
+                {hasRecs && (
+                  <>
+                    <p className="text-xs font-medium text-muted-foreground px-1">✨ Recommended for this product</p>
+                    <div className="grid grid-cols-3 gap-2">
+                      {recommended.map((t) => renderTypeButton(t, true))}
+                    </div>
+                    {others.length > 0 && (
+                      <p className="text-xs font-medium text-muted-foreground px-1 pt-1">Other details</p>
+                    )}
+                  </>
+                )}
+                <div className="grid grid-cols-3 gap-2">
+                  {(hasRecs ? others : ATTRIBUTE_TYPES).map((t) => renderTypeButton(t))}
+                  <button
+                    type="button"
+                    onClick={openOtherSheet}
+                    className="flex flex-col items-center gap-1.5 rounded-xl border-2 border-border p-3 text-center transition-all hover:border-primary/40 hover:bg-muted/30"
+                  >
+                    <span className="text-xl">➕</span>
+                    <span className="text-xs font-medium">Other</span>
+                  </button>
+                </div>
+              </div>
+            );
+          })()}
         </SheetContent>
       </Sheet>
 

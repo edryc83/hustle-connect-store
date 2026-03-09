@@ -452,7 +452,7 @@ const DashboardProducts = () => {
                   📋 Product Details <span className="text-muted-foreground font-normal text-xs">(optional)</span>
                   {aiFilledFields.has("category") && <span className="text-[10px] text-primary font-medium flex items-center gap-0.5"><Sparkles className="h-2.5 w-2.5" />AI filled</span>}
                 </Label>
-                <ProductAttributeForm attributes={attributes} onChange={(attrs) => { setAttributes(attrs); setAiFilledFields((prev) => { const n = new Set(prev); n.delete("category"); return n; }); }} />
+                <ProductAttributeForm attributes={attributes} onChange={(attrs) => { setAttributes(attrs); setAiFilledFields((prev) => { const n = new Set(prev); n.delete("category"); return n; }); }} productCategory={attributes.product_type} />
               </div>
               <Button className="w-full" onClick={handleSave} disabled={saving}>
                 {saving ? "Saving…" : editingProduct ? `Update ${terms.singular}` : `Add ${terms.singular}`}
