@@ -15,6 +15,19 @@ interface Props {
   onSelect: (t: Template) => void;
 }
 
+// Local reference thumbnails per template ID
+const TEMPLATE_THUMBNAILS: Record<string, string> = {
+  dark_fire: "/templates/dark_fire.jpeg",
+  split_panel: "/templates/split_panel.jpg",
+  full_bleed: "/templates/full_bleed.jpeg",
+  editorial_left: "/templates/editorial_left.jpeg",
+  warm_glow: "/templates/warm_glow.jpeg",
+  dark_overlay: "/templates/dark_overlay.jpeg",
+  minimal_center: "/templates/minimal_center.jpeg",
+  clean_white: "/templates/clean_white.jpeg",
+  bold_orange: "/templates/bold_orange.jpeg",
+};
+
 export default function TemplatePicker({ selected, onSelect }: Props) {
   const [templates, setTemplates] = useState<Template[]>([]);
   const [loading, setLoading] = useState(true);
@@ -30,10 +43,11 @@ export default function TemplatePicker({ selected, onSelect }: Props) {
         if (!res.ok) throw new Error("Failed to load templates");
         const data = await res.json();
         const raw = Array.isArray(data) ? data : data.templates || [];
-        // Map API field "images" to our "image_slots"
+        // Map API field "images" to our "image_slots" and attach local thumbnails
         setTemplates(raw.map((t: any) => ({
           ...t,
           image_slots: t.image_slots ?? t.images ?? 1,
+          thumbnail: TEMPLATE_THUMBNAILS[t.id] || t.thumbnail || t.preview_url || null,
         })));
       } catch (e: any) {
         setError(e.message);
