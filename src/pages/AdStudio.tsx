@@ -44,7 +44,7 @@ export default function AdStudio() {
     queryFn: async () => {
       const { data } = await supabase
         .from("profiles")
-        .select("store_slug, store_name, currency")
+        .select("store_slug, store_name, currency, profile_picture_url")
         .eq("id", user!.id)
         .single();
       return data;
