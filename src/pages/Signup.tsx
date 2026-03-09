@@ -498,35 +498,50 @@ const Signup = () => {
             <div className="text-center">
               <div className="text-3xl mb-1">🎉</div>
               <h2 className="text-xl font-bold">Your store is live!</h2>
-              <p className="text-sm text-muted-foreground mt-1">Add your photos & bio</p>
+              <p className="text-sm text-muted-foreground mt-1">Make it yours — add your photos</p>
             </div>
             <div className="space-y-4">
-              {/* Profile pic & cover photo */}
-              <div className="space-y-2">
-                <Label>Profile picture & Cover photo</Label>
-                <div className="flex items-start gap-4">
-                  <label className="cursor-pointer text-center shrink-0">
+              {/* Instagram-style stacked cover + profile */}
+              <div className="relative rounded-2xl overflow-hidden border border-border/60 shadow-sm">
+                {/* Cover photo */}
+                <label className="cursor-pointer block group">
+                  {coverPhotoPreview ? (
+                    <img src={coverPhotoPreview} alt="Cover" className="w-full h-28 object-cover" />
+                  ) : (
+                    <div className="w-full h-28 bg-gradient-to-br from-primary/20 via-muted/40 to-accent/20 flex items-center justify-center group-hover:from-primary/30 transition-all">
+                      <div className="flex flex-col items-center gap-1 text-muted-foreground/60 group-hover:text-primary/60 transition-colors">
+                        <Camera className="h-5 w-5" />
+                        <span className="text-[10px] font-medium">Add cover photo</span>
+                      </div>
+                    </div>
+                  )}
+                  {coverPhotoPreview && (
+                    <div className="absolute top-2 right-2 h-7 w-7 rounded-full bg-black/50 backdrop-blur-sm flex items-center justify-center text-white opacity-0 group-hover:opacity-100 transition-opacity">
+                      <Camera className="h-3.5 w-3.5" />
+                    </div>
+                  )}
+                  <input type="file" accept="image/*" className="hidden" onChange={handleCoverPhoto} />
+                </label>
+
+                {/* Profile picture — overlapping */}
+                <div className="px-4 -mt-8 relative z-10 pb-3">
+                  <label className="cursor-pointer block w-fit group/pic">
                     {profilePicturePreview ? (
-                      <img src={profilePicturePreview} alt="Profile" className="h-18 w-18 rounded-full object-cover border-2 border-border shadow-md mx-auto" />
+                      <div className="relative">
+                        <img src={profilePicturePreview} alt="Profile" className="h-16 w-16 rounded-full object-cover border-[3px] border-background shadow-lg" />
+                        <div className="absolute inset-0 rounded-full bg-black/40 flex items-center justify-center opacity-0 group-hover/pic:opacity-100 transition-opacity">
+                          <Camera className="h-4 w-4 text-white" />
+                        </div>
+                      </div>
                     ) : (
-                      <div className="flex h-18 w-18 items-center justify-center rounded-full bg-muted/60 border-2 border-dashed border-border/60 mx-auto hover:border-primary/40 transition-colors">
-                        <Camera className="h-6 w-6 text-muted-foreground/60" />
+                      <div className="h-16 w-16 rounded-full border-[3px] border-background bg-muted/80 shadow-lg flex items-center justify-center group-hover/pic:bg-primary/10 transition-colors">
+                        <Camera className="h-5 w-5 text-muted-foreground/60 group-hover/pic:text-primary/60 transition-colors" />
                       </div>
                     )}
-                    <span className="text-[10px] text-muted-foreground mt-1 block">Profile pic</span>
                     <input type="file" accept="image/*" className="hidden" onChange={handleProfilePicture} />
                   </label>
-                  <label className="cursor-pointer flex-1 text-center">
-                    {coverPhotoPreview ? (
-                      <img src={coverPhotoPreview} alt="Cover" className="h-18 w-full rounded-xl object-cover border-2 border-border shadow-md" />
-                    ) : (
-                      <div className="flex h-18 w-full items-center justify-center rounded-xl bg-muted/60 border-2 border-dashed border-border/60 hover:border-primary/40 transition-colors">
-                        <Camera className="h-6 w-6 text-muted-foreground/60" />
-                      </div>
-                    )}
-                    <span className="text-[10px] text-muted-foreground mt-1 block">Cover photo</span>
-                    <input type="file" accept="image/*" className="hidden" onChange={handleCoverPhoto} />
-                  </label>
+                  <p className="text-xs font-semibold mt-1.5">{storeName || "Your Store"}</p>
+                  <p className="text-[10px] text-muted-foreground">@{storeSlug || "your-store"}</p>
                 </div>
               </div>
 
