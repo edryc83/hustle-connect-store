@@ -42,51 +42,61 @@ const DashboardProfile = () => {
 
   useEffect(() => {
     if (!user) return;
+
     const load = async () => {
-      const [{ data: prof }, { data: prods }, { count: orders }] = await Promise.all([
-        supabase.from("profiles").select("*").eq("id", user.id).single(),
-        supabase.from("products").select("*").eq("user_id", user.id).order("created_at", { ascending: false }),
-        supabase.from("orders").select("*", { count: "exact", head: true }).eq("seller_id", user.id).eq("status", "confirmed"),
-      ]);
-      const p = prof as any;
-      setProfile(p);
-      setBioText(p?.store_bio || p?.welcome_message || "");
-      setViewCount(p?.view_count ?? 0);
-      setOrderCount(orders ?? 0);
-      setProducts(prods ?? []);
+      try {
+        const [{ data: prof }, { data: prods }, { count: orders }] = await Promise.all([
+          supabase.from("profiles").select("*").eq("id", user.id).single(),
+          supabase.from("products").select("*").eq("user_id", user.id).order("created_at", { ascending: false }),
+          supabase.from("orders").select("*", { count: "exact", head: true }).eq("seller_id", user.id).eq("status", "confirmed"),
+        ]);
 
-      // Fetch first image for each product
-      if (prods && prods.length > 0) {
-        const ids = prods.map((pr) => pr.id);
-        const { data: imgs } = await supabase
-          .from("product_images")
-          .select("product_id, image_url")
-          .in("product_id", ids)
-          .order("position", { ascending: true });
-        const map: Record<string, string> = {};
-        imgs?.forEach((img) => {
-          if (!map[img.product_id]) map[img.product_id] = img.image_url;
-        });
-        setProductImages(map);
-      }
+        const p = prof as any;
+        setProfile(p);
+        setBioText(p?.store_bio || p?.welcome_message || "");
+        setViewCount(p?.view_count ?? 0);
+        setOrderCount(orders ?? 0);
+        setProducts(prods ?? []);
 
-      // Auto-generate bio if missing
-      if (p && !p.store_bio && !p.welcome_message) {
-        try {
-          const res = await supabase.functions.invoke("generate-bio", {
-            body: { storeName: p.store_name, category: p.category || "", city: p.city || "" },
+        // Fetch first image for each product
+        if (prods && prods.length > 0) {
+          const ids = prods.map((pr) => pr.id);
+          const { data: imgs } = await supabase
+            .from("product_images")
+            .select("product_id, image_url")
+            .in("product_id", ids)
+            .order("position", { ascending: true });
+
+          const map: Record<string, string> = {};
+          imgs?.forEach((img) => {
+            if (!map[img.product_id]) map[img.product_id] = img.image_url;
           });
-          if (res.data?.bio) {
-            const bio = res.data.bio;
-            setBioText(bio);
-            await supabase.from("profiles").update({ store_bio: bio, welcome_message: bio } as any).eq("id", user.id);
-            setProfile((prev: any) => ({ ...prev, store_bio: bio, welcome_message: bio }));
-          }
-        } catch { /* silent */ }
-      }
+          setProductImages(map);
+        }
 
-      setLoading(false);
+        // Auto-generate bio if missing
+        if (p && !p.store_bio && !p.welcome_message) {
+          try {
+            const res = await supabase.functions.invoke("generate-bio", {
+              body: { storeName: p.store_name, category: p.category || "", city: p.city || "" },
+            });
+            if (res.data?.bio) {
+              const bio = res.data.bio;
+              setBioText(bio);
+              await supabase.from("profiles").update({ store_bio: bio, welcome_message: bio } as any).eq("id", user.id);
+              setProfile((prev: any) => ({ ...prev, store_bio: bio, welcome_message: bio }));
+            }
+          } catch {
+            // silent
+          }
+        }
+      } catch {
+        toast.error("Failed to load profile");
+      } finally {
+        setLoading(false);
+      }
     };
+
     load();
   }, [user]);
 
