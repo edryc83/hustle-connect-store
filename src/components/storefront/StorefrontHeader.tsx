@@ -26,6 +26,7 @@ function mainCategory(raw: string | null | undefined): string | null {
 interface StorefrontHeaderProps {
   profile: Profile;
   visitorName: string | null;
+  onBack?: () => void;
 }
 
 export function StorefrontHeader({ profile, visitorName }: StorefrontHeaderProps) {
