@@ -20,6 +20,19 @@ interface CanvasEditorProps {
 const CANVAS_W = 400;
 const CANVAS_H = 500;
 
+function loadImage(url: string): Promise<fabric.FabricImage> {
+  return new Promise((resolve, reject) => {
+    const imgEl = document.createElement("img");
+    imgEl.crossOrigin = "anonymous";
+    imgEl.onload = () => {
+      const fImg = new fabric.FabricImage(imgEl);
+      resolve(fImg);
+    };
+    imgEl.onerror = reject;
+    imgEl.src = url.startsWith("/") ? window.location.origin + url : url;
+  });
+}
+
 export default function CanvasEditor({
   templateThumbnail,
   productImage,
@@ -31,7 +44,6 @@ export default function CanvasEditor({
   profilePicture,
   onPositionChange,
 }: CanvasEditorProps) {
-  // Use a container div ref — fabric.js will manage all DOM inside it
   const containerRef = useRef<HTMLDivElement>(null);
   const fabricRef = useRef<fabric.Canvas | null>(null);
   const objectsRef = useRef<Record<string, fabric.Object>>({});
@@ -41,7 +53,7 @@ export default function CanvasEditor({
   const reportPositions = useCallback(() => {
     if (!onPositionChange) return;
     const objs = objectsRef.current;
-    const imgObj = objs["productImage"] as fabric.Image | undefined;
+    const imgObj = objs["productImage"] as fabric.FabricImage | undefined;
     const imagePos = imgObj
       ? { left: imgObj.left ?? 0, top: imgObj.top ?? 0, scaleX: imgObj.scaleX ?? 1, scaleY: imgObj.scaleY ?? 1 }
       : { left: 0, top: 0, scaleX: 1, scaleY: 1 };
@@ -56,7 +68,7 @@ export default function CanvasEditor({
     onPositionChange({ imagePos, textPositions });
   }, [onPositionChange]);
 
-  // Initialize canvas once via imperative DOM
+  // Initialize canvas once
   useEffect(() => {
     if (!containerRef.current || initializedRef.current) return;
     initializedRef.current = true;
@@ -95,26 +107,12 @@ export default function CanvasEditor({
       canvas.clear();
       objectsRef.current = {};
 
-      // Helper to load image into fabric
-      const loadImage = (url: string): Promise<fabric.FabricImage> => {
-        return new Promise((resolve, reject) => {
-          const imgEl = document.createElement("img");
-          imgEl.crossOrigin = "anonymous";
-          imgEl.onload = () => {
-            const fImg = new fabric.FabricImage(imgEl);
-            resolve(fImg);
-          };
-          imgEl.onerror = reject;
-          imgEl.src = url.startsWith("/") ? window.location.origin + url : url;
-        });
-      };
-
       // 1. Background template
       try {
         const bgImg = await loadImage(templateThumbnail);
         bgImg.scaleToWidth(CANVAS_W);
         bgImg.scaleToHeight(CANVAS_H);
-        bgImg.set({ selectable: false, evented: false, lockMovementX: true, lockMovementY: true });
+        bgImg.set({ selectable: false, evented: false });
         canvas.add(bgImg);
         canvas.sendObjectToBack(bgImg);
       } catch {
@@ -147,7 +145,9 @@ export default function CanvasEditor({
       // 3. Product image
       if (productImage) {
         try {
-          const img = await loadImage(productImage     const maxH = CANVAS_H * 0.5;
+          const img = await loadImage(productImage);
+          const maxW = CANVAS_W * 0.6;
+          const maxH = CANVAS_H * 0.5;
           const imgScale = Math.min(maxW / (img.width || 1), maxH / (img.height || 1));
           img.set({
             scaleX: imgScale,
@@ -172,13 +172,18 @@ export default function CanvasEditor({
       // 4. Profile picture + store name
       if (profilePicture) {
         try {
-          const pfp = await fabric.FabricImage.fromURL(profilePicture, { crloadImage(profilePicturep.scaleToHeight(28);
+          const pfp = await loadImage(profilePicture);
+          pfp.scaleToWidth(28);
+          pfp.scaleToHeight(28);
           pfp.set({ left: 14, top: 14, selectable: false, evented: false });
-          pfp.set("clipPath", new fabric.Circle({
-            radius: (pfp.width || 28) / 2,
-            originX: "center",
-            originY: "center",
-          }));
+          pfp.set(
+            "clipPath",
+            new fabric.Circle({
+              radius: (pfp.width || 28) / 2,
+              originX: "center",
+              originY: "center",
+            })
+          );
           canvas.add(pfp);
         } catch {
           // skip
@@ -206,7 +211,7 @@ export default function CanvasEditor({
         objectsRef.current["storeName"] = storeText;
       }
 
-      // 5. Text elements
+      // 5. Text elements (bottom area — draggable)
       const textConfig = {
         cornerColor: "#a855f7",
         cornerStyle: "circle" as const,
@@ -292,7 +297,6 @@ export default function CanvasEditor({
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
           </div>
         )}
-        {/* Container div — fabric.js manages all DOM inside */}
         <div
           ref={containerRef}
           className="w-full"
