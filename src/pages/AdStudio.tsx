@@ -99,18 +99,20 @@ export default function AdStudio() {
     setError(null);
     setGenerating(true);
     try {
-      const body: Record<string, string> = {
+      const body: Record<string, any> = {
         template: selectedTemplate!.id,
         product_name: productName,
         subtitle: subtitle || " ",
         tagline: tagline || " ",
         price,
         store_name: profile?.store_name || profile?.store_slug || "My Store",
+        profile_picture: profile?.profile_picture_url || "",
       };
 
       imageSlots.forEach((slot, i) => {
         const imgUrl = slot.processedUrl || slot.url;
         if (imgUrl) body[`image${i + 1}`] = imgUrl;
+        if (slot.cropData) body[`image${i + 1}_crop`] = slot.cropData;
       });
 
       const res = await fetch(
