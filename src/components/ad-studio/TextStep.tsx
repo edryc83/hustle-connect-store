@@ -2,11 +2,16 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Loader2, Sparkles, Image } from "lucide-react";
+import { Loader2, Sparkles, Image, Check } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import type { Template } from "@/components/ad-studio/TemplatePicker";
 import type { ImageSlotData } from "@/components/ad-studio/ImageSourceStep";
+
+interface CopyVariation {
+  subtitle: string;
+  tagline: string;
+}
 
 interface TextStepProps {
   productName: string;
@@ -20,6 +25,7 @@ interface TextStepProps {
   template: Template | null;
   imageSlots: ImageSlotData[];
   storeName: string;
+  autoSuggest?: boolean;
 }
 
 export default function TextStep({
@@ -30,17 +36,27 @@ export default function TextStep({
   template,
   imageSlots,
   storeName,
+  autoSuggest,
 }: TextStepProps) {
   const [suggesting, setSuggesting] = useState(false);
+  const [variations, setVariations] = useState<CopyVariation[]>([]);
+  const [selectedVariation, setSelectedVariation] = useState<number | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [previewLoading, setPreviewLoading] = useState(false);
   const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const autoSuggestDone = useRef(false);
 
-  // Determine which fields this template supports (from Railway API)
+  // Template fields (from Railway API)
   const fields = template?.fields || ["product_name", "price", "subtitle", "tagline"];
   const hasField = (f: string) => fields.includes(f);
 
-  // Build the render body
+  // Character limits from template (Railway can define these)
+  const charLimits = {
+    subtitle: (template as any)?.char_limits?.subtitle || 50,
+    tagline: (template as any)?.char_limits?.tagline || 35,
+  };
+
+  // Build render body
   const buildBody = useCallback(() => {
     if (!template) return null;
     const body: Record<string, string> = {
@@ -89,55 +105,60 @@ export default function TextStep({
       } finally {
         setPreviewLoading(false);
       }
-    }, 1200); // 1.2s debounce to avoid hammering the API
+    }, 1200);
 
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current);
     };
   }, [template, productName, subtitle, tagline, price, buildBody]);
 
-  // Initial preview on mount
+  // Auto-suggest copy when entering step 3 with a product name
   useEffect(() => {
-    if (template && !previewUrl) {
-      const body = buildBody();
-      if (!body) return;
-      setPreviewLoading(true);
-      fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ad-render`, {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(body),
-      })
-        .then((r) => r.json())
-        .then((data) => {
-          const url = data.url || data.image_url;
-          if (url) setPreviewUrl(url);
-        })
-        .catch(console.error)
-        .finally(() => setPreviewLoading(false));
+    if (autoSuggest && productName.trim() && !autoSuggestDone.current) {
+      autoSuggestDone.current = true;
+      handleAiSuggest();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [autoSuggest, productName]);
 
   const handleAiSuggest = async () => {
     if (!productName.trim()) return;
     setSuggesting(true);
+    setVariations([]);
+    setSelectedVariation(null);
     try {
       const { data, error } = await supabase.functions.invoke("ad-suggest-text", {
-        body: { productName, price, templateStyle: template?.name || "modern" },
+        body: {
+          productName,
+          price,
+          templateStyle: template?.name || "modern",
+          charLimits,
+        },
       });
       if (error) throw error;
-      if (data?.subtitle && hasField("subtitle")) setSubtitle(data.subtitle);
-      if (data?.tagline && hasField("tagline")) setTagline(data.tagline);
-      toast({ title: "✨ AI copy generated!", description: "Feel free to edit the suggestions." });
+
+      if (data?.variations && data.variations.length > 0) {
+        setVariations(data.variations);
+        // Auto-select the first one
+        applyVariation(data.variations[0], 0);
+      } else if (data?.subtitle || data?.tagline) {
+        // Legacy single response
+        const v = { subtitle: data.subtitle || "", tagline: data.tagline || "" };
+        setVariations([v]);
+        applyVariation(v, 0);
+      }
     } catch (err: any) {
       console.error("AI suggest error:", err);
       toast({ title: "AI suggestion failed", description: err?.message || "Try again", variant: "destructive" });
     } finally {
       setSuggesting(false);
     }
+  };
+
+  const applyVariation = (v: CopyVariation, index: number) => {
+    setSelectedVariation(index);
+    if (hasField("subtitle") && v.subtitle) setSubtitle(v.subtitle);
+    if (hasField("tagline") && v.tagline) setTagline(v.tagline);
   };
 
   return (
@@ -149,7 +170,7 @@ export default function TextStep({
             <img
               src={previewUrl}
               alt="Ad preview"
-              className={`w-full h-full object-contain transition-opacity ${previewLoading ? "opacity-50" : "opacity-100"}`}
+              className={`w-full h-full object-cover transition-opacity ${previewLoading ? "opacity-50" : "opacity-100"}`}
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
@@ -197,47 +218,77 @@ export default function TextStep({
         )}
         {hasField("subtitle") && (
           <div>
-            <Label className="text-xs text-muted-foreground mb-1 block">Subtitle</Label>
+            <Label className="text-xs text-muted-foreground mb-1 block">
+              Subtitle <span className="text-muted-foreground/50">({charLimits.subtitle} chars max)</span>
+            </Label>
             <Input
               value={subtitle}
               onChange={(e) => setSubtitle(e.target.value)}
               placeholder="Short benefit line"
-              maxLength={60}
+              maxLength={charLimits.subtitle}
             />
           </div>
         )}
         {hasField("tagline") && (
           <div>
-            <Label className="text-xs text-muted-foreground mb-1 block">Tagline</Label>
+            <Label className="text-xs text-muted-foreground mb-1 block">
+              Tagline <span className="text-muted-foreground/50">({charLimits.tagline} chars max)</span>
+            </Label>
             <Input
               value={tagline}
               onChange={(e) => setTagline(e.target.value)}
               placeholder="Catchy tagline"
-              maxLength={40}
+              maxLength={charLimits.tagline}
             />
           </div>
         )}
       </div>
 
+      {/* Copy variations */}
+      {variations.length > 0 && (
+        <div className="space-y-2">
+          <Label className="text-xs text-muted-foreground">Pick a copy style</Label>
+          <div className="grid gap-2">
+            {variations.map((v, i) => (
+              <button
+                key={i}
+                onClick={() => applyVariation(v, i)}
+                className={`text-left p-3 rounded-xl border transition-all ${
+                  selectedVariation === i
+                    ? "border-primary bg-primary/5 ring-1 ring-primary/20"
+                    : "border-border hover:border-primary/30 bg-card"
+                }`}
+              >
+                <div className="flex items-start justify-between gap-2">
+                  <div className="space-y-0.5 min-w-0">
+                    <p className="text-sm font-medium truncate">{v.subtitle}</p>
+                    <p className="text-xs text-muted-foreground italic truncate">{v.tagline}</p>
+                  </div>
+                  {selectedVariation === i && (
+                    <Check className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
+                  )}
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* AI Suggest button */}
       {(hasField("subtitle") || hasField("tagline")) && (
-        <>
-          <Button
-            variant="outline"
-            className="w-full gap-2 border-primary/30 text-primary hover:bg-primary/5"
-            onClick={handleAiSuggest}
-            disabled={suggesting || !productName.trim()}
-          >
-            {suggesting ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <Sparkles className="h-4 w-4" />
-            )}
-            AI Suggest Copy
-          </Button>
-          <p className="text-[10px] text-muted-foreground text-center">
-            AI will generate copy based on your product
-          </p>
-        </>
+        <Button
+          variant="outline"
+          className="w-full gap-2 border-primary/30 text-primary hover:bg-primary/5"
+          onClick={handleAiSuggest}
+          disabled={suggesting || !productName.trim()}
+        >
+          {suggesting ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <Sparkles className="h-4 w-4" />
+          )}
+          {variations.length > 0 ? "Regenerate Copy" : "AI Smart Copy"}
+        </Button>
       )}
     </div>
   );

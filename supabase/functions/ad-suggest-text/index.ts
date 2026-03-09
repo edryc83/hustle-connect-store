@@ -9,9 +9,12 @@ serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { productName, price, templateStyle } = await req.json();
+    const { productName, price, templateStyle, charLimits } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
+
+    const subtitleLimit = charLimits?.subtitle || 50;
+    const taglineLimit = charLimits?.tagline || 35;
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -24,46 +27,54 @@ serve(async (req) => {
         messages: [
           {
             role: "system",
-            content: "You are an expert ad copywriter for African businesses. Generate punchy, compelling ad copy for product advertisements. Keep subtitle under 10 words and tagline under 8 words. Be creative, sales-driven, and culturally relevant.",
+            content: `You are a punchy ad copywriter for African businesses. Generate 3 variations of ad copy. Each subtitle must be under ${subtitleLimit} characters. Each tagline must be under ${taglineLimit} characters. Be creative, sales-driven. Never repeat the product name in the copy. Keep it short and impactful.`,
           },
           {
             role: "user",
-            content: `Product: ${productName}\nPrice: ${price}\nTemplate style: ${templateStyle || "modern"}\n\nGenerate a catchy subtitle and tagline for this product ad.`,
+            content: `Product: ${productName}\nPrice: ${price}\nTemplate style: ${templateStyle || "modern"}\n\nGenerate 3 copy variations.`,
           },
         ],
         tools: [
           {
             type: "function",
             function: {
-              name: "suggest_copy",
-              description: "Return ad copy suggestions with subtitle and tagline",
+              name: "suggest_copy_variations",
+              description: "Return 3 ad copy variations with subtitle and tagline",
               parameters: {
                 type: "object",
                 properties: {
-                  subtitle: { type: "string", description: "A compelling subtitle, under 10 words" },
-                  tagline: { type: "string", description: "A punchy tagline, under 8 words" },
+                  variations: {
+                    type: "array",
+                    items: {
+                      type: "object",
+                      properties: {
+                        subtitle: { type: "string", description: `Compelling subtitle, under ${subtitleLimit} chars` },
+                        tagline: { type: "string", description: `Punchy tagline, under ${taglineLimit} chars` },
+                      },
+                      required: ["subtitle", "tagline"],
+                      additionalProperties: false,
+                    },
+                  },
                 },
-                required: ["subtitle", "tagline"],
+                required: ["variations"],
                 additionalProperties: false,
               },
             },
           },
         ],
-        tool_choice: { type: "function", function: { name: "suggest_copy" } },
+        tool_choice: { type: "function", function: { name: "suggest_copy_variations" } },
       }),
     });
 
     if (!response.ok) {
       if (response.status === 429) {
         return new Response(JSON.stringify({ error: "Rate limit exceeded, please try again shortly." }), {
-          status: 429,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 429, headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
       if (response.status === 402) {
-        return new Response(JSON.stringify({ error: "AI credits exhausted. Please add funds." }), {
-          status: 402,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        return new Response(JSON.stringify({ error: "AI credits exhausted." }), {
+          status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
       const t = await response.text();
@@ -81,15 +92,20 @@ serve(async (req) => {
       });
     }
 
-    // Fallback
-    return new Response(JSON.stringify({ subtitle: "Premium Quality You Deserve", tagline: "Get Yours Today" }), {
+    // Fallback single variation
+    return new Response(JSON.stringify({
+      variations: [
+        { subtitle: "Premium Quality You Deserve", tagline: "Get Yours Today" },
+        { subtitle: "Upgrade Your Everyday Style", tagline: "Shop Now" },
+        { subtitle: "Built Different, Made Better", tagline: "Level Up" },
+      ],
+    }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
     console.error("ad-suggest-text error:", e);
     return new Response(JSON.stringify({ error: e instanceof Error ? e.message : "Unknown error" }), {
-      status: 500,
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
+      status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
 });
