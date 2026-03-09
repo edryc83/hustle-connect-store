@@ -200,6 +200,6 @@ const ImageSfunction ImageSourceStep({ slots, onUpdateSlot, userId }: Props[acti
       )}
     </div>
   );
-});
+}
 
 export default ImageSourceStep;
