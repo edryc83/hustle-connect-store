@@ -199,6 +199,7 @@ export default function AdStudio() {
             storeName={profile?.store_name || profile?.store_slug || ""}
             profilePicture={profile?.profile_picture_url || ""}
             autoSuggest
+            onUpdateSlot={updateSlot}
           />
         )}
 
