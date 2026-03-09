@@ -37,6 +37,7 @@ export default function TextStep({
   template,
   imageSlots,
   storeName,
+  profilePicture,
   autoSuggest,
 }: TextStepProps) {
   const [suggesting, setSuggesting] = useState(false);
