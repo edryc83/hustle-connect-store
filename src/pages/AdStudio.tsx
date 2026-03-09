@@ -197,6 +197,7 @@ export default function AdStudio() {
             template={selectedTemplate}
             imageSlots={imageSlots}
             storeName={profile?.store_name || profile?.store_slug || ""}
+            profilePicture={profile?.profile_picture_url || ""}
             autoSuggest
           />
         )}
