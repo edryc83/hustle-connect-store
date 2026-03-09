@@ -1,9 +1,9 @@
-import { Camera, Palette, Type } from "lucide-react";
+import { LayoutGrid, ImagePlus, Type } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 const STEPS = [
-  { num: 1, label: "Product", icon: Camera },
-  { num: 2, label: "Template", icon: Palette },
+  { num: 1, label: "Template", icon: LayoutGrid },
+  { num: 2, label: "Images", icon: ImagePlus },
   { num: 3, label: "Text", icon: Type },
 ] as const;
 
@@ -15,8 +15,8 @@ interface StepNavProps {
 
 export default function StepNav({ current, completed, onStep }: StepNavProps) {
   return (
-    <div className="flex items-center justify-around py-2 px-4 border-t border-border bg-background">
-      {STEPS.map((s, i) => {
+    <div className="flex items-center justify-center gap-6 py-1">
+      {STEPS.map((s) => {
         const isActive = current === s.num;
         const isDone = completed.includes(s.num);
         const canTap = isDone || s.num <= Math.max(...completed, current);
@@ -27,14 +27,14 @@ export default function StepNav({ current, completed, onStep }: StepNavProps) {
             disabled={!canTap}
             onClick={() => canTap && onStep(s.num)}
             className={cn(
-              "flex flex-col items-center gap-0.5 text-[10px] font-medium transition-colors min-w-[60px]",
+              "flex items-center gap-1.5 text-[11px] font-medium transition-colors",
               isActive ? "text-primary" : isDone ? "text-foreground" : "text-muted-foreground",
               !canTap && "opacity-40"
             )}
           >
             <div
               className={cn(
-                "w-8 h-8 rounded-full flex items-center justify-center transition-all",
+                "w-6 h-6 rounded-full flex items-center justify-center transition-all",
                 isActive
                   ? "bg-primary text-primary-foreground"
                   : isDone
@@ -42,9 +42,9 @@ export default function StepNav({ current, completed, onStep }: StepNavProps) {
                   : "bg-muted text-muted-foreground"
               )}
             >
-              <s.icon className="h-4 w-4" />
+              <s.icon className="h-3 w-3" />
             </div>
-            {s.label}
+            <span className="hidden sm:inline">{s.label}</span>
           </button>
         );
       })}
