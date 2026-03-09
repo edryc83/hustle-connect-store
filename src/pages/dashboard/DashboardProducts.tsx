@@ -152,42 +152,57 @@ const DashboardProducts = () => {
     setDialogOpen(true);
   };
 
-  const analyzeImage = async (file: File) => {
+  const analyzeProduct = async (file?: File) => {
     setAnalyzing(true);
     try {
-      const reader = new FileReader();
-      const base64 = await new Promise<string>((resolve) => {
-        reader.onload = () => {
-          const result = reader.result as string;
-          resolve(result.split(",")[1]);
-        };
-        reader.readAsDataURL(file);
-      });
+      const body: any = {};
+      
+      if (file) {
+        const reader = new FileReader();
+        const base64 = await new Promise<string>((resolve) => {
+          reader.onload = () => {
+            const result = reader.result as string;
+            resolve(result.split(",")[1]);
+          };
+          reader.readAsDataURL(file);
+        });
+        body.imageBase64 = base64;
+        body.mimeType = file.type;
+      }
+      
+      // Also send title and description for text-based detection
+      if (name.trim()) body.productName = name.trim();
+      if (description.trim()) body.productDescription = description.trim();
 
-      const { data, error } = await supabase.functions.invoke("analyze-product-image", {
-        body: { imageBase64: base64, mimeType: file.type },
-      });
+      if (!body.imageBase64 && !body.productName && !body.productDescription) {
+        setAnalyzing(false);
+        return;
+      }
+
+      const { data, error } = await supabase.functions.invoke("analyze-product-image", { body });
 
       if (error) throw error;
       if (data) {
         const filled = new Set<string>();
         if (data.name && !name.trim()) { setName(data.name); filled.add("name"); }
         if (data.description && !description.trim()) { setDescription(data.description); filled.add("description"); }
-        if (data.condition && !condition) { setCondition(data.condition); filled.add("condition"); }
         if (data.listing_type) { setListingType(data.listing_type); filled.add("type"); }
+        
         if (data.category) {
-          // Map AI category to our product_type values
-          const categoryMap: Record<string, string> = {
-            fashion: "fashion", beauty: "beauty", food: "food", phones: "phones",
-            wigs: "wigs", shoes: "shoes", home: "home", jewellery: "jewellery",
-            cakes: "cakes", plants: "plants", other: "other",
-          };
-          const mapped = categoryMap[data.category.toLowerCase()] || "other";
-          setAttributes((prev) => ({ ...prev, product_type: mapped }));
+          setAttributes((prev) => ({ ...prev, product_type: data.category }));
           filled.add("category");
         }
+        if (data.subcategory) {
+          setDetectedSubcategory(data.subcategory);
+        }
+        if (data.suggestions && Array.isArray(data.suggestions)) {
+          setAiSuggestions(data.suggestions);
+        }
+        
         setAiFilledFields(filled);
-        if (filled.size > 0) toast.success("✨ AI auto-filled product details from your photo!");
+        if (filled.size > 0 || (data.suggestions && data.suggestions.length > 0)) {
+          toast.success("✨ AI analyzed your product and suggested details!");
+        }
       }
     } catch {
       // Silent fail — user can still fill manually
