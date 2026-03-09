@@ -1,5 +1,6 @@
 import { MapPin } from "lucide-react";
 import AfristallLogo from "@/components/AfristallLogo";
+import whatsappIcon from "@/assets/whatsapp-icon.png";
 import type { Tables } from "@/integrations/supabase/types";
 
 type Profile = Tables<"profiles">;
@@ -25,9 +26,10 @@ function mainCategory(raw: string | null | undefined): string | null {
 interface StorefrontHeaderProps {
   profile: Profile;
   visitorName: string | null;
+  onBack?: () => void;
 }
 
-export function StorefrontHeader({ profile, visitorName }: StorefrontHeaderProps) {
+export function StorefrontHeader({ profile, visitorName, onBack }: StorefrontHeaderProps) {
   const coverUrl = (profile as any).cover_photo_url;
   const ig = (profile as any).instagram_url;
   const tt = (profile as any).tiktok_url;
@@ -113,8 +115,19 @@ export function StorefrontHeader({ profile, visitorName }: StorefrontHeaderProps
           </div>
         )}
 
-        {/* Social Icons */}
-        <div className="flex items-center gap-2 pt-1">
+        {/* WhatsApp pill + Social Icons */}
+        <div className="flex items-center gap-2 pt-1.5">
+          {profile.whatsapp_number && (
+            <a
+              href={`https://wa.me/${profile.whatsapp_number.replace(/[^0-9]/g, "")}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1.5 rounded-full bg-[#25D366] hover:bg-[#128C7E] text-white px-4 py-1.5 text-xs font-semibold transition-colors shadow-sm"
+            >
+              <img src={whatsappIcon} alt="" className="h-3.5 w-3.5" />
+              WhatsApp
+            </a>
+          )}
 
           {ig && (
             <a
