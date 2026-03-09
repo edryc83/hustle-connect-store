@@ -468,9 +468,17 @@ const DashboardProducts = () => {
               <div className="space-y-1.5">
                 <Label className="text-sm font-semibold flex items-center gap-1.5">
                   📋 Product Details <span className="text-muted-foreground font-normal text-xs">(optional)</span>
-                  {aiFilledFields.has("category") && <span className="text-[10px] text-primary font-medium flex items-center gap-0.5"><Sparkles className="h-2.5 w-2.5" />AI filled</span>}
+                  {aiFilledFields.has("category") && <span className="text-[10px] text-primary font-medium flex items-center gap-0.5"><Sparkles className="h-2.5 w-2.5" />AI detected</span>}
                 </Label>
-                <ProductAttributeForm attributes={attributes} onChange={(attrs) => { setAttributes(attrs); setAiFilledFields((prev) => { const n = new Set(prev); n.delete("category"); return n; }); }} productCategory={attributes.product_type} />
+                <ProductAttributeForm 
+                  attributes={attributes} 
+                  onChange={(attrs) => { setAttributes(attrs); setAiFilledFields((prev) => { const n = new Set(prev); n.delete("category"); return n; }); }} 
+                  productCategory={attributes.product_type} 
+                  productSubcategory={detectedSubcategory}
+                  aiSuggestions={aiSuggestions}
+                  onAcceptSuggestion={(slug) => setAiSuggestions((prev) => prev.filter((s) => s.slug !== slug))}
+                  onDismissSuggestion={(slug) => setAiSuggestions((prev) => prev.filter((s) => s.slug !== slug))}
+                />
               </div>
               <Button className="w-full" onClick={handleSave} disabled={saving}>
                 {saving ? "Saving…" : editingProduct ? `Update ${terms.singular}` : `Add ${terms.singular}`}
