@@ -25,6 +25,7 @@ interface TextStepProps {
   template: Template | null;
   imageSlots: ImageSlotData[];
   storeName: string;
+  profilePicture?: string;
   autoSuggest?: boolean;
 }
 
@@ -36,6 +37,7 @@ export default function TextStep({
   template,
   imageSlots,
   storeName,
+  profilePicture,
   autoSuggest,
 }: TextStepProps) {
   const [suggesting, setSuggesting] = useState(false);
@@ -59,20 +61,22 @@ export default function TextStep({
   // Build render body
   const buildBody = useCallback(() => {
     if (!template) return null;
-    const body: Record<string, string> = {
+    const body: Record<string, any> = {
       template: template.id,
       product_name: productName || "Product Name",
       subtitle: subtitle || " ",
       tagline: tagline || " ",
       price: price || " ",
       store_name: storeName || "My Store",
+      profile_picture: profilePicture || "",
     };
     imageSlots.forEach((slot, i) => {
       const imgUrl = slot.processedUrl || slot.url;
       if (imgUrl) body[`image${i + 1}`] = imgUrl;
+      if (slot.cropData) body[`image${i + 1}_crop`] = slot.cropData;
     });
     return body;
-  }, [template, productName, subtitle, tagline, price, storeName, imageSlots]);
+  }, [template, productName, subtitle, tagline, price, storeName, profilePicture, imageSlots]);
 
   // Debounced live preview from Railway
   useEffect(() => {

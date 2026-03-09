@@ -6,8 +6,9 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Upload, Package, X, Loader2, Wand2, ImagePlus, RefreshCw } from "lucide-react";
+import { Upload, Package, Loader2, Wand2, ImagePlus, RefreshCw } from "lucide-react";
 import { removeBackground } from "@imgly/background-removal";
+import ImagePositioner from "./ImagePositioner";
 
 export interface ImageSlotData {
   url: string | null;
@@ -16,6 +17,7 @@ export interface ImageSlotData {
   processedUrl: string | null;
   productName?: string;
   productPrice?: number;
+  cropData?: { scale: number; offsetX: number; offsetY: number };
 }
 
 interface Props {
@@ -114,13 +116,10 @@ function ImageSourceStep({ slots, onUpdateSlot, userId }: Props) {
       {/* Selected image display */}
       {hasImage ? (
         <div className="space-y-3">
-          <div className="relative rounded-xl overflow-hidden border border-border bg-muted aspect-square max-w-[240px] mx-auto">
-            <img
-              src={slot.processedUrl || slot.url!}
-              alt="Selected"
-              className="w-full h-full object-contain"
-            />
-          </div>
+          <ImagePositioner
+            src={slot.processedUrl || slot.url!}
+            onCropData={(cropData) => onUpdateSlot(0, { cropData })}
+          />
 
           <Button
             variant="outline"
