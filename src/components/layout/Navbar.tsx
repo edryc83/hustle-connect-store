@@ -69,11 +69,6 @@ const Navbar = () => {
             <Link to="/signup" onClick={() => setMobileOpen(false)}>
               <Button className="w-full">Create Your Store</Button>
             </Link>
-            <Link to="/ad-studio" onClick={() => setMobileOpen(false)}>
-              <Button className="w-full gap-1.5 border-0 bg-gradient-to-r from-violet-600 to-fuchsia-500 text-white">
-                <Sparkles className="h-3.5 w-3.5" /> AI Design
-              </Button>
-            </Link>
           </div>
         </div>
       )}
