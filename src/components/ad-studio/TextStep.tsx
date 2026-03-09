@@ -7,6 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import type { Template } from "@/components/ad-studio/TemplatePicker";
 import type { ImageSlotData } from "@/components/ad-studio/ImageSourceStep";
+import ImagePositioner from "./ImagePositioner";
 
 interface CopyVariation {
   subtitle: string;
@@ -27,6 +28,7 @@ interface TextStepProps {
   storeName: string;
   profilePicture?: string;
   autoSuggest?: boolean;
+  onUpdateSlot?: (index: number, data: Partial<ImageSlotData>) => void;
 }
 
 export default function TextStep({
@@ -39,6 +41,7 @@ export default function TextStep({
   storeName,
   profilePicture,
   autoSuggest,
+  onUpdateSlot,
 }: TextStepProps) {
   const [suggesting, setSuggesting] = useState(false);
   const [variations, setVariations] = useState<CopyVariation[]>([]);
@@ -51,6 +54,8 @@ export default function TextStep({
   // Template fields (from Railway API)
   const fields = template?.fields || ["product_name", "price", "subtitle", "tagline"];
   const hasField = (f: string) => fields.includes(f);
+
+  const mainImage = imageSlots[0]?.processedUrl || imageSlots[0]?.url;
 
   // Character limits from template (Railway can define these)
   const charLimits = {
@@ -195,6 +200,14 @@ export default function TextStep({
           Live preview — rendered from template
         </p>
       </div>
+
+      {/* Image positioner */}
+      {mainImage && onUpdateSlot && (
+        <ImagePositioner
+          src={mainImage}
+          onCropData={(cropData) => onUpdateSlot(0, { cropData })}
+        />
+      )}
 
       <h2 className="text-base font-semibold">Edit text</h2>
 

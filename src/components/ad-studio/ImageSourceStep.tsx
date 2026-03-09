@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Upload, Package, Loader2, Wand2, ImagePlus, RefreshCw } from "lucide-react";
 import { removeBackground } from "@imgly/background-removal";
-import ImagePositioner from "./ImagePositioner";
+
 
 export interface ImageSlotData {
   url: string | null;
@@ -116,10 +116,13 @@ function ImageSourceStep({ slots, onUpdateSlot, userId }: Props) {
       {/* Selected image display */}
       {hasImage ? (
         <div className="space-y-3">
-          <ImagePositioner
-            src={slot.processedUrl || slot.url!}
-            onCropData={(cropData) => onUpdateSlot(0, { cropData })}
-          />
+          <div className="relative rounded-xl overflow-hidden border border-border bg-muted aspect-square max-w-[240px] mx-auto">
+            <img
+              src={slot.processedUrl || slot.url!}
+              alt="Selected"
+              className="w-full h-full object-contain"
+            />
+          </div>
 
           <Button
             variant="outline"
