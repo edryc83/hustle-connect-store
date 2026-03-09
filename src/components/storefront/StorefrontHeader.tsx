@@ -55,17 +55,11 @@ export function StorefrontHeader({ profile, visitorName, onBack }: StorefrontHea
       <div className="mx-auto max-w-5xl px-4 -mt-10 pb-5 flex flex-col items-start gap-1.5">
         {/* Profile Picture */}
         <div className="ig-ring shadow-lg">
-          {profile.profile_picture_url ? (
-            <img
-              src={profile.profile_picture_url}
-              alt={profile.store_name ?? "Store"}
-              className="h-20 w-20 rounded-full object-cover border-2 border-background"
-            />
-          ) : (
-            <div className="flex h-20 w-20 items-center justify-center rounded-full bg-primary/10 border-2 border-background">
-              <AfristallLogo className="h-8 w-8" />
-            </div>
-          )}
+          <img
+            src={profile.profile_picture_url || "/logo-glow.png"}
+            alt={profile.store_name ?? "Store"}
+            className="h-20 w-20 rounded-full object-cover border-2 border-background"
+          />
         </div>
 
         {/* Store Name */}
