@@ -4,7 +4,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Eye, EyeOff, ArrowRight, ArrowLeft, Upload, Check, MapPin, MessageCircle, ExternalLink } from "lucide-react";
+import { Textarea } from "@/components/ui/textarea";
+import { Eye, EyeOff, ArrowRight, ArrowLeft, Upload, Check, MapPin, MessageCircle, ExternalLink, Camera, Sparkles, Loader2, Rocket } from "lucide-react";
 import EmojiGrid from "@/components/landing/EmojiGrid";
 import AfristallLogo from "@/components/AfristallLogo";
 import { toast } from "sonner";
@@ -32,10 +33,13 @@ const slugify = (text: string) =>
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "");
 
+const TOTAL_STEPS = 4;
+
 const Signup = () => {
   const navigate = useNavigate();
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
+  const [createdUserId, setCreatedUserId] = useState<string | null>(null);
 
   // Step 1
   const [email, setEmail] = useState("");
@@ -56,10 +60,16 @@ const Signup = () => {
   const [businessType, setBusinessType] = useState<"product" | "service" | "both">("product");
   const [profilePicture, setProfilePicture] = useState<File | null>(null);
   const [profilePicturePreview, setProfilePicturePreview] = useState("");
+  const [coverPhoto, setCoverPhoto] = useState<File | null>(null);
+  const [coverPhotoPreview, setCoverPhotoPreview] = useState("");
 
   // Step 3
   const [whatsappCountryCode, setWhatsappCountryCode] = useState("+256");
   const [whatsappNumber, setWhatsappNumber] = useState("");
+
+  // Step 4 — Profile completion
+  const [bioText, setBioText] = useState("");
+  const [generatingBio, setGeneratingBio] = useState(false);
 
   const checkSlugAvailability = (slug: string) => {
     if (slugCheckTimer.current) clearTimeout(slugCheckTimer.current);
@@ -107,6 +117,20 @@ const Signup = () => {
       file = await compressImage(file);
       setProfilePicture(file);
       setProfilePicturePreview(URL.createObjectURL(file));
+    }
+  };
+
+  const handleCoverPhoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    let file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error("Image must be under 5MB");
+        return;
+      }
+      const { compressImage } = await import("@/lib/imageCompression");
+      file = await compressImage(file);
+      setCoverPhoto(file);
+      setCoverPhotoPreview(URL.createObjectURL(file));
     }
   };
 
@@ -161,7 +185,7 @@ const Signup = () => {
     window.open(`https://wa.me/${cleanNumber}?text=${testMessage}`, "_blank");
   };
 
-  const handleSubmit = async () => {
+  const handleCreateAccount = async () => {
     if (!validateStep3()) return;
     setLoading(true);
     try {
@@ -185,7 +209,6 @@ const Signup = () => {
       }
       if (!authData.user) throw new Error("Signup failed");
 
-      // Check for fake signup (email exists but identities empty = already registered)
       if (authData.user.identities && authData.user.identities.length === 0) {
         toast.error("This email already has a store. Try signing in instead.");
         setStep(1);
@@ -205,6 +228,19 @@ const Signup = () => {
         }
       }
 
+      let coverPhotoUrl = null;
+      if (coverPhoto) {
+        const fileExt = coverPhoto.name.split(".").pop();
+        const filePath = `${authData.user.id}/cover.${fileExt}`;
+        const { error: uploadError } = await supabase.storage
+          .from("store-images")
+          .upload(filePath, coverPhoto, { upsert: true });
+        if (!uploadError) {
+          const { data: urlData } = supabase.storage.from("store-images").getPublicUrl(filePath);
+          coverPhotoUrl = urlData.publicUrl;
+        }
+      }
+
       const { error: profileError } = await supabase
         .from("profiles")
         .update({
@@ -216,28 +252,59 @@ const Signup = () => {
           business_type: businessType,
           whatsapp_number: fullWhatsapp,
           profile_picture_url: profilePictureUrl,
+          cover_photo_url: coverPhotoUrl,
         } as any)
         .eq("id", authData.user.id);
 
       if (profileError) throw profileError;
 
-      // Auto-generate bio if none provided (fire-and-forget)
-      const catString = serializeCategories(categorySelection);
-      supabase.functions.invoke("generate-bio", {
-        body: { storeName: storeName.trim(), category: catString, city: city || "" },
-      }).then(({ data }) => {
-        if (data?.bio) {
-          supabase.from("profiles").update({ welcome_message: data.bio } as any).eq("id", authData.user.id);
-        }
-      }).catch(() => {});
+      setCreatedUserId(authData.user.id);
 
-      toast.success("Welcome to Afristall! 🎉");
-      navigate("/dashboard");
+      // Auto-generate bio
+      const catString = serializeCategories(categorySelection);
+      try {
+        const { data } = await supabase.functions.invoke("generate-bio", {
+          body: { storeName: storeName.trim(), category: catString, city: city || "" },
+        });
+        if (data?.bio) {
+          setBioText(data.bio);
+          await supabase.from("profiles").update({ store_bio: data.bio, welcome_message: data.bio } as any).eq("id", authData.user.id);
+        }
+      } catch {}
+
+      toast.success("Account created! 🎉 Let's finish setting up.");
+      setStep(4);
     } catch (error: any) {
       toast.error(error.message || "Something went wrong");
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleGenerateBio = async () => {
+    setGeneratingBio(true);
+    try {
+      const catString = serializeCategories(categorySelection);
+      const { data } = await supabase.functions.invoke("generate-bio", {
+        body: { storeName: storeName.trim(), category: catString, city: city || "" },
+      });
+      if (data?.bio) {
+        setBioText(data.bio);
+        toast.success("Bio generated!");
+      }
+    } catch { toast.error("Failed to generate"); }
+    setGeneratingBio(false);
+  };
+
+  const handleFinish = async () => {
+    if (createdUserId && bioText.trim()) {
+      await supabase.from("profiles").update({
+        store_bio: bioText.trim(),
+        welcome_message: bioText.trim(),
+      } as any).eq("id", createdUserId);
+    }
+    toast.success("Welcome to Afristall! 🚀");
+    navigate("/dashboard");
   };
 
   const categoryFilter = businessType === "service" ? "services"
@@ -259,14 +326,14 @@ const Signup = () => {
 
       {/* Progress indicator */}
       <div className="relative z-10 mb-6 flex items-center gap-2">
-        {[1, 2, 3].map((s) => (
+        {Array.from({ length: TOTAL_STEPS }, (_, i) => i + 1).map((s) => (
           <div key={s} className="flex items-center gap-2">
             <div className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold transition-colors ${
               step >= s ? "bg-primary text-primary-foreground" : "bg-muted/60 backdrop-blur-sm text-muted-foreground"
             }`}>
               {step > s ? <Check className="h-4 w-4" /> : s}
             </div>
-            {s < 3 && <div className={`h-0.5 w-8 sm:w-12 ${step > s ? "bg-primary" : "bg-muted/60"}`} />}
+            {s < TOTAL_STEPS && <div className={`h-0.5 w-6 sm:w-10 ${step > s ? "bg-primary" : "bg-muted/60"}`} />}
           </div>
         ))}
       </div>
@@ -415,22 +482,36 @@ const Signup = () => {
                 </Select>
               </div>
 
+              {/* Profile Picture & Cover Photo */}
               <div className="space-y-1.5">
-                <Label>Profile picture</Label>
-                <div className="flex items-center gap-3">
-                  {profilePicturePreview ? (
-                    <img src={profilePicturePreview} alt="Store profile" className="h-14 w-14 rounded-full object-cover border" />
-                  ) : (
-                    <div className="flex h-14 w-14 items-center justify-center rounded-full bg-muted">
-                      <Upload className="h-5 w-5 text-muted-foreground" />
-                    </div>
-                  )}
-                  <label className="cursor-pointer">
-                    <span className="text-sm font-medium text-primary hover:underline">
-                      {profilePicture ? "Change photo" : "Upload photo"}
-                    </span>
-                    <input type="file" accept="image/*" className="hidden" onChange={handleProfilePicture} />
-                  </label>
+                <Label>Profile picture & Cover photo</Label>
+                <div className="flex items-start gap-4">
+                  <div className="text-center">
+                    <label className="cursor-pointer block">
+                      {profilePicturePreview ? (
+                        <img src={profilePicturePreview} alt="Profile" className="h-16 w-16 rounded-full object-cover border-2 border-border mx-auto" />
+                      ) : (
+                        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-muted border-2 border-dashed border-border mx-auto">
+                          <Camera className="h-5 w-5 text-muted-foreground" />
+                        </div>
+                      )}
+                      <span className="text-[10px] text-muted-foreground mt-1 block">Profile pic</span>
+                      <input type="file" accept="image/*" className="hidden" onChange={handleProfilePicture} />
+                    </label>
+                  </div>
+                  <div className="flex-1 text-center">
+                    <label className="cursor-pointer block">
+                      {coverPhotoPreview ? (
+                        <img src={coverPhotoPreview} alt="Cover" className="h-16 w-full rounded-lg object-cover border-2 border-border" />
+                      ) : (
+                        <div className="flex h-16 w-full items-center justify-center rounded-lg bg-muted border-2 border-dashed border-border">
+                          <Camera className="h-5 w-5 text-muted-foreground" />
+                        </div>
+                      )}
+                      <span className="text-[10px] text-muted-foreground mt-1 block">Cover photo</span>
+                      <input type="file" accept="image/*" className="hidden" onChange={handleCoverPhoto} />
+                    </label>
+                  </div>
                 </div>
               </div>
 
@@ -546,10 +627,73 @@ const Signup = () => {
                 <Button variant="outline" onClick={() => setStep(2)} className="gap-1">
                   <ArrowLeft className="h-4 w-4" /> Back
                 </Button>
-                <Button className="flex-1 gap-2" onClick={handleSubmit} disabled={loading}>
+                <Button className="flex-1 gap-2" onClick={handleCreateAccount} disabled={loading}>
                   {loading ? "Creating your store..." : "Create My Store 🎉"}
                 </Button>
               </div>
+            </div>
+          </>
+        )}
+
+        {/* STEP 4 — Complete Profile & How It Works */}
+        {step === 4 && (
+          <>
+            <div className="text-center mb-5">
+              <div className="text-4xl mb-2">🎉</div>
+              <h2 className="text-xl font-bold text-foreground">Your store is live!</h2>
+              <p className="text-sm text-muted-foreground mt-1">Add a bio so buyers know what you're about</p>
+            </div>
+            <div className="space-y-4">
+              {/* Bio */}
+              <div className="space-y-1.5">
+                <Label>Store bio</Label>
+                <Textarea
+                  value={bioText}
+                  onChange={(e) => setBioText(e.target.value)}
+                  rows={3}
+                  maxLength={300}
+                  placeholder="Tell buyers what makes your store special..."
+                  className="text-sm"
+                />
+                <div className="flex items-center justify-between">
+                  <span className="text-[10px] text-muted-foreground">{bioText.length}/300</span>
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    onClick={handleGenerateBio}
+                    disabled={generatingBio}
+                    className="gap-1 text-xs text-primary h-7"
+                  >
+                    {generatingBio ? <Loader2 className="h-3 w-3 animate-spin" /> : <Sparkles className="h-3 w-3" />}
+                    AI Generate
+                  </Button>
+                </div>
+              </div>
+
+              {/* How It Works */}
+              <div className="rounded-xl border border-primary/20 bg-primary/5 p-4 space-y-3">
+                <h3 className="text-sm font-bold flex items-center gap-1.5">
+                  <Rocket className="h-4 w-4 text-primary" /> How Afristall works for you
+                </h3>
+                <ul className="space-y-2 text-xs text-muted-foreground leading-relaxed">
+                  <li className="flex gap-2">
+                    <span className="text-base">📸</span>
+                    <span>Add your first 2 products now — photos + price. Takes 30 seconds each.</span>
+                  </li>
+                  <li className="flex gap-2">
+                    <span className="text-base">📲</span>
+                    <span><strong className="text-foreground">Every day we give you 3 ready-made statuses</strong> that link directly to your shop. Copy and post straight to your WhatsApp status, TikTok comments, Instagram stories — anywhere!</span>
+                  </li>
+                  <li className="flex gap-2">
+                    <span className="text-base">💰</span>
+                    <span>When someone taps your link, they land on your store and order via WhatsApp. Simple.</span>
+                  </li>
+                </ul>
+              </div>
+
+              <Button className="w-full gap-2" onClick={handleFinish}>
+                Go to Dashboard <ArrowRight className="h-4 w-4" />
+              </Button>
             </div>
           </>
         )}
