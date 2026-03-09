@@ -15,6 +15,7 @@ import {
 interface ProductAttributeFormProps {
   attributes: Record<string, any>;
   onChange: (attrs: Record<string, any>) => void;
+  productCategory?: string;
 }
 
 export function ProductAttributeForm({ attributes, onChange }: ProductAttributeFormProps) {
