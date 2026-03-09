@@ -18,7 +18,7 @@ interface ProductAttributeFormProps {
   productCategory?: string;
 }
 
-export function ProductAttributeForm({ attributes, onChange }: ProductAttributeFormProps) {
+export function ProductAttributeForm({ attributes, onChange, productCategory }: ProductAttributeFormProps) {
   const [typePickerOpen, setTypePickerOpen] = useState(false);
   const [activeType, setActiveType] = useState<AttributeType | null>(null);
   const [detailSheetOpen, setDetailSheetOpen] = useState(false);
