@@ -20,6 +20,7 @@ type StoreProfile = {
   district: string | null;
   city: string | null;
   business_type: string | null;
+  first_product_image?: string | null;
 };
 
 type TabType = "stores" | "services";
@@ -71,7 +72,57 @@ const Explore = () => {
         .not("store_name", "is", null)
         .not("store_slug", "is", null)
         .order("last_active_at", { ascending: false });
-      setStores((data as any) ?? []);
+
+      const storeList = (data as StoreProfile[]) ?? [];
+
+      // For stores missing profile pic or cover, fetch their first product image
+      const needsImage = storeList.filter((s) => !s.profile_picture_url || !s.cover_photo_url);
+      if (needsImage.length > 0) {
+        const ids = needsImage.map((s) => s.id);
+        const { data: products } = await supabase
+          .from("products")
+          .select("user_id, image_url")
+          .in("user_id", ids)
+          .order("created_at", { ascending: false });
+
+        if (products) {
+          const firstImg: Record<string, string> = {};
+          products.forEach((p: any) => {
+            if (!firstImg[p.user_id] && p.image_url) firstImg[p.user_id] = p.image_url;
+          });
+
+          // Also check product_images table
+          const stillMissing = ids.filter((id) => !firstImg[id]);
+          if (stillMissing.length > 0) {
+            const { data: prodImgs } = await supabase
+              .from("products")
+              .select("user_id, id")
+              .in("user_id", stillMissing);
+            if (prodImgs && prodImgs.length > 0) {
+              const prodIds = prodImgs.map((p: any) => p.id);
+              const { data: imgs } = await supabase
+                .from("product_images")
+                .select("product_id, image_url")
+                .in("product_id", prodIds)
+                .order("position", { ascending: true });
+              if (imgs) {
+                const prodToUser: Record<string, string> = {};
+                prodImgs.forEach((p: any) => { prodToUser[p.id] = p.user_id; });
+                imgs.forEach((img: any) => {
+                  const userId = prodToUser[img.product_id];
+                  if (userId && !firstImg[userId]) firstImg[userId] = img.image_url;
+                });
+              }
+            }
+          }
+
+          storeList.forEach((s) => {
+            if (firstImg[s.id]) s.first_product_image = firstImg[s.id];
+          });
+        }
+      }
+
+      setStores(storeList);
       setLoading(false);
     };
     fetchStores();
@@ -279,15 +330,16 @@ const Explore = () => {
               {filtered.map((store) => {
                 const businessLabel = getBusinessLabel(store);
                 const location = getLocationLabel(store);
+                const avatarUrl = store.profile_picture_url || store.first_product_image;
                 return (
                   <Link key={store.id} to={`/${store.store_slug}`} className="block">
                     <div className="flex items-center gap-3 rounded-2xl bg-card p-3.5 border border-border/50 hover:border-primary/20 hover:shadow-sm transition-all">
                       <div className="ig-ring ig-ring-sm shrink-0">
-                        {store.profile_picture_url ? (
-                          <img src={store.profile_picture_url} alt={store.store_name ?? "Store"} className="h-12 w-12 rounded-full object-cover border-2 border-background" loading="lazy" />
+                        {avatarUrl ? (
+                          <img src={avatarUrl} alt={store.store_name ?? "Store"} className="h-12 w-12 rounded-full object-cover border-2 border-background" loading="lazy" />
                         ) : (
                           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-secondary border-2 border-background">
-                            <AfristallLogo className="h-5 w-5" />
+                            <img src="/logo-glow.png" alt="Afristall" className="h-8 w-8 rounded-full object-cover" />
                           </div>
                         )}
                       </div>
@@ -314,22 +366,20 @@ const Explore = () => {
               {filtered.map((store) => {
                 const businessLabel = getBusinessLabel(store);
                 const location = getLocationLabel(store);
+                const avatarUrl = store.profile_picture_url || store.first_product_image;
+                const coverUrl = store.cover_photo_url || store.first_product_image || "/default-cover.png";
                 return (
                   <Link key={store.id} to={`/${store.store_slug}`} className="block group">
                     <div className="rounded-2xl bg-card border border-border/50 hover:border-primary/20 hover:shadow-md transition-all overflow-hidden h-full">
                       {/* Cover / avatar area */}
                       <div className="relative h-28 bg-secondary/50">
-                        {store.cover_photo_url ? (
-                          <img src={store.cover_photo_url} alt="" className="h-full w-full object-cover" loading="lazy" />
-                        ) : (
-                          <div className="h-full w-full bg-gradient-to-br from-primary/10 to-secondary" />
-                        )}
+                        <img src={coverUrl} alt="" className="h-full w-full object-cover" loading="lazy" />
                         <div className="absolute -bottom-6 left-4 ig-ring ig-ring-sm">
-                          {store.profile_picture_url ? (
-                            <img src={store.profile_picture_url} alt={store.store_name ?? "Store"} className="h-12 w-12 rounded-full object-cover border-2 border-card" loading="lazy" />
+                          {avatarUrl ? (
+                            <img src={avatarUrl} alt={store.store_name ?? "Store"} className="h-12 w-12 rounded-full object-cover border-2 border-card" loading="lazy" />
                           ) : (
                             <div className="flex h-12 w-12 items-center justify-center rounded-full bg-card border-2 border-card">
-                              <AfristallLogo className="h-5 w-5" />
+                              <img src="/logo-glow.png" alt="Afristall" className="h-8 w-8 rounded-full object-cover" />
                             </div>
                           )}
                         </div>

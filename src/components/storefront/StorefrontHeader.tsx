@@ -27,10 +27,12 @@ interface StorefrontHeaderProps {
   profile: Profile;
   visitorName: string | null;
   onBack?: () => void;
+  firstProductImage?: string | null;
 }
 
-export function StorefrontHeader({ profile, visitorName, onBack }: StorefrontHeaderProps) {
-  const coverUrl = (profile as any).cover_photo_url;
+export function StorefrontHeader({ profile, visitorName, onBack, firstProductImage }: StorefrontHeaderProps) {
+  const coverUrl = (profile as any).cover_photo_url || firstProductImage || "/default-cover.png";
+  const avatarUrl = profile.profile_picture_url || firstProductImage || "/logo-glow.png";
   const ig = (profile as any).instagram_url;
   const tt = (profile as any).tiktok_url;
   const fb = (profile as any).facebook_url;
@@ -49,14 +51,14 @@ export function StorefrontHeader({ profile, visitorName, onBack }: StorefrontHea
 
       {/* Cover Photo */}
       <div className="h-36 sm:h-48 bg-gradient-to-br from-primary/15 via-primary/5 to-accent/10 overflow-hidden">
-        <img src={coverUrl || "/default-cover.png"} alt="" className="w-full h-full object-cover" />
+        <img src={coverUrl} alt="" className="w-full h-full object-cover" />
       </div>
 
       <div className="mx-auto max-w-5xl px-4 -mt-10 pb-5 flex flex-col items-start gap-1.5">
         {/* Profile Picture */}
         <div className="ig-ring shadow-lg">
           <img
-            src={profile.profile_picture_url || "/logo-glow.png"}
+            src={avatarUrl}
             alt={profile.store_name ?? "Store"}
             className="h-20 w-20 rounded-full object-cover border-2 border-background"
           />
