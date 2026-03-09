@@ -171,42 +171,28 @@ export default function TextStep({
 
   return (
     <div className="space-y-4 pb-4">
-      {/* Live preview from Railway */}
-      <div className="w-full max-w-sm mx-auto">
-        <div className="relative aspect-[4/5] rounded-2xl overflow-hidden border border-border bg-muted shadow-lg">
-          {previewUrl ? (
-            <img
-              src={previewUrl}
-              alt="Ad preview"
-              className={`w-full h-full object-cover transition-opacity ${previewLoading ? "opacity-50" : "opacity-100"}`}
-            />
-          ) : (
-            <div className="w-full h-full flex items-center justify-center">
-              {previewLoading ? (
-                <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
-              ) : (
-                <Image className="h-10 w-10 text-muted-foreground/30" />
-              )}
-            </div>
-          )}
-          {previewLoading && previewUrl && (
-            <div className="absolute top-2 right-2 bg-background/80 backdrop-blur-sm rounded-full p-1.5">
-              <Loader2 className="h-3.5 w-3.5 animate-spin text-primary" />
-            </div>
-          )}
-        </div>
-        <p className="text-[10px] text-muted-foreground text-center mt-2">
-          Live preview — rendered from template
-        </p>
-      </div>
-
-      {/* Image positioner */}
-      {mainImage && onUpdateSlot && (
-        <ImagePositioner
-          src={mainImage}
-          onCropData={(cropData) => onUpdateSlot(0, { cropData })}
-        />
-      )}
+      {/* Interactive canvas editor */}
+      <CanvasEditor
+        templateThumbnail={templateThumbnail}
+        productImage={mainImage || null}
+        productName={productName}
+        subtitle={subtitle}
+        tagline={tagline}
+        price={price}
+        storeName={storeName}
+        profilePicture={profilePicture}
+        onPositionChange={(posData) => {
+          if (onUpdateSlot) {
+            onUpdateSlot(0, {
+              cropData: {
+                scale: posData.imagePos.scaleX,
+                offsetX: posData.imagePos.left,
+                offsetY: posData.imagePos.top,
+              },
+            });
+          }
+        }}
+      />
 
       <h2 className="text-base font-semibold">Edit text</h2>
 
