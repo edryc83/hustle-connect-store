@@ -58,7 +58,7 @@ export function StorefrontHeader({ profile, visitorName, onBack, firstProductIma
         {/* Profile Picture */}
         <div className="ig-ring shadow-lg">
           <img
-            src={profile.profile_picture_url || "/logo-glow.png"}
+            src={avatarUrl}
             alt={profile.store_name ?? "Store"}
             className="h-20 w-20 rounded-full object-cover border-2 border-background"
           />
