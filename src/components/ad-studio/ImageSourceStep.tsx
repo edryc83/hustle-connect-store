@@ -22,7 +22,8 @@ interface Props {
   userId: string;
 }
 
-const ImageSfunction ImageSourceStep({ slots, onUpdateSlot, userId }: Props[activeSlot, setActiveSlot] = useState(0);
+function ImageSourceStep({ slots, onUpdateSlot, userId }: Props) {
+  const [activeSlot, setActiveSlot] = useState(0);
   const [processingBg, setProcessingBg] = useState<number | null>(null);
   const [uploading, setUploading] = useState(false);
 
