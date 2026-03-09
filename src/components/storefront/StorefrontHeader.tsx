@@ -49,9 +49,9 @@ export function StorefrontHeader({ profile, visitorName, onBack, firstProductIma
   return (
     <header className="bg-background relative">
 
-      {/* Cover Photo */}
       <div className="h-36 sm:h-48 bg-gradient-to-br from-primary/15 via-primary/5 to-accent/10 overflow-hidden">
-        <img src={coverUrl || "/default-cover.png"} alt="" className="w-full h-full object-cover" />
+        <img src={coverUrl} alt="" className="w-full h-full object-cover" />
+      </div>
       </div>
 
       <div className="mx-auto max-w-5xl px-4 -mt-10 pb-5 flex flex-col items-start gap-1.5">
