@@ -25,6 +25,7 @@ interface TextStepProps {
   template: Template | null;
   imageSlots: ImageSlotData[];
   storeName: string;
+  profilePicture?: string;
   autoSuggest?: boolean;
 }
 
