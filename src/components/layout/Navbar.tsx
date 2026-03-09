@@ -30,11 +30,6 @@ const Navbar = () => {
           <Link to="/signup">
             <Button size="sm" className="shadow-sm shadow-primary/20">Create Your Store</Button>
           </Link>
-          <Link to="/ad-studio">
-            <Button size="sm" className="border-0 bg-gradient-to-r from-violet-600 to-fuchsia-500 text-white shadow-md shadow-violet-500/25 hover:shadow-violet-500/40 transition-shadow gap-1.5">
-              <Sparkles className="h-3.5 w-3.5" /> AI Design
-            </Button>
-          </Link>
           <button
             onClick={toggleTheme}
             className="h-9 w-9 rounded-xl border border-border/50 bg-card/40 backdrop-blur-sm flex items-center justify-center hover:bg-muted transition-colors"
