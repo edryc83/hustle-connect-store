@@ -366,22 +366,20 @@ const Explore = () => {
               {filtered.map((store) => {
                 const businessLabel = getBusinessLabel(store);
                 const location = getLocationLabel(store);
+                const avatarUrl = store.profile_picture_url || store.first_product_image;
+                const coverUrl = store.cover_photo_url || store.first_product_image || "/default-cover.png";
                 return (
                   <Link key={store.id} to={`/${store.store_slug}`} className="block group">
                     <div className="rounded-2xl bg-card border border-border/50 hover:border-primary/20 hover:shadow-md transition-all overflow-hidden h-full">
                       {/* Cover / avatar area */}
                       <div className="relative h-28 bg-secondary/50">
-                        {store.cover_photo_url ? (
-                          <img src={store.cover_photo_url} alt="" className="h-full w-full object-cover" loading="lazy" />
-                        ) : (
-                          <div className="h-full w-full bg-gradient-to-br from-primary/10 to-secondary" />
-                        )}
+                        <img src={coverUrl} alt="" className="h-full w-full object-cover" loading="lazy" />
                         <div className="absolute -bottom-6 left-4 ig-ring ig-ring-sm">
-                          {store.profile_picture_url ? (
-                            <img src={store.profile_picture_url} alt={store.store_name ?? "Store"} className="h-12 w-12 rounded-full object-cover border-2 border-card" loading="lazy" />
+                          {avatarUrl ? (
+                            <img src={avatarUrl} alt={store.store_name ?? "Store"} className="h-12 w-12 rounded-full object-cover border-2 border-card" loading="lazy" />
                           ) : (
                             <div className="flex h-12 w-12 items-center justify-center rounded-full bg-card border-2 border-card">
-                              <AfristallLogo className="h-5 w-5" />
+                              <img src="/logo-glow.png" alt="Afristall" className="h-8 w-8 rounded-full object-cover" />
                             </div>
                           )}
                         </div>
