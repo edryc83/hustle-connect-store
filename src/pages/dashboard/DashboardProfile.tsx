@@ -188,13 +188,7 @@ const DashboardProfile = () => {
     <div className="max-w-lg mx-auto -mx-4 md:mx-auto -mt-4 md:mt-0">
       {/* Cover Photo */}
       <div className="relative h-36 sm:h-44 bg-gradient-to-br from-primary/15 via-primary/5 to-accent/10 overflow-hidden group">
-        {profile.cover_photo_url ? (
-          <img src={profile.cover_photo_url} alt="" className="w-full h-full object-cover" />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center text-muted-foreground/30">
-            <Camera className="h-10 w-10" />
-          </div>
-        )}
+        <img src={profile.cover_photo_url || "/default-cover.png"} alt="" className="w-full h-full object-cover" />
         <label className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
           {uploadingCover ? <Loader2 className="h-6 w-6 text-white animate-spin" /> : (
             <div className="text-white text-center">
