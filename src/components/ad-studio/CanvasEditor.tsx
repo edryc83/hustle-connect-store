@@ -68,8 +68,8 @@ export default function CanvasEditor({
     fabricRef.current = canvas;
 
     canvas.on("object:modified", reportPositions);
-    canvas.on("object:moved", reportPositions);
-    canvas.on("object:scaled", reportPositions);
+    canvas.on("object:moving", reportPositions);
+    canvas.on("object:scaling", reportPositions);
 
     return () => {
       canvas.dispose();
