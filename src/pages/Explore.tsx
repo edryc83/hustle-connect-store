@@ -20,6 +20,7 @@ type StoreProfile = {
   district: string | null;
   city: string | null;
   business_type: string | null;
+  first_product_image?: string | null;
 };
 
 type TabType = "stores" | "services";
