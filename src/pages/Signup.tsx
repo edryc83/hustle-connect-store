@@ -1,37 +1,27 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useRef } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Eye, EyeOff, ArrowRight, ArrowLeft, Upload, Check, MapPin, MessageCircle, ExternalLink, Camera, Sparkles, Loader2, Rocket } from "lucide-react";
+import {
+  Eye, EyeOff, ArrowRight, ArrowLeft, Check, MapPin, MessageCircle,
+  ExternalLink, Camera, Sparkles, Loader2, Rocket,
+} from "lucide-react";
 import EmojiGrid from "@/components/landing/EmojiGrid";
 import AfristallLogo from "@/components/AfristallLogo";
 import { toast } from "sonner";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { CategoryPicker, type CategorySelection, serializeCategories } from "@/components/CategoryPicker";
-
-const CITIES = ["Kampala", "Nairobi", "Lagos", "Accra", "Dar es Salaam", "Kigali", "Other"];
-
-const COUNTRY_CODES = [
-  { code: "+256", country: "🇺🇬 Uganda" },
-  { code: "+254", country: "🇰🇪 Kenya" },
-  { code: "+234", country: "🇳🇬 Nigeria" },
-  { code: "+233", country: "🇬🇭 Ghana" },
-  { code: "+255", country: "🇹🇿 Tanzania" },
-  { code: "+250", country: "🇷🇼 Rwanda" },
-  { code: "+27", country: "🇿🇦 South Africa" },
-  { code: "+1", country: "🇺🇸 USA" },
-  { code: "+44", country: "🇬🇧 UK" },
-];
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue,
+} from "@/components/ui/select";
+import {
+  CategoryPicker, type CategorySelection, serializeCategories,
+} from "@/components/CategoryPicker";
+import { COUNTRIES } from "@/lib/countries";
 
 const slugify = (text: string) =>
-  text
-    .toLowerCase()
-    .trim()
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "");
+  text.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-+|-+$/g, "");
 
 const TOTAL_STEPS = 4;
 
@@ -41,13 +31,13 @@ const Signup = () => {
   const [loading, setLoading] = useState(false);
   const [createdUserId, setCreatedUserId] = useState<string | null>(null);
 
-  // Step 1
+  // Step 1 — Account
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  // Step 2
+  // Step 2 — Store info
   const [firstName, setFirstName] = useState("");
   const [storeName, setStoreName] = useState("");
   const [storeSlug, setStoreSlug] = useState("");
@@ -55,32 +45,35 @@ const Signup = () => {
   const [slugAvailable, setSlugAvailable] = useState<boolean | null>(null);
   const [checkingSlug, setCheckingSlug] = useState(false);
   const slugCheckTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [selectedCountry, setSelectedCountry] = useState("UG");
   const [city, setCity] = useState("");
   const [categorySelection, setCategorySelection] = useState<CategorySelection>({});
   const [businessType, setBusinessType] = useState<"product" | "service" | "both">("product");
+
+  // Step 3 — WhatsApp
+  const [whatsappNumber, setWhatsappNumber] = useState("");
+
+  // Step 4 — Profile pics & bio
   const [profilePicture, setProfilePicture] = useState<File | null>(null);
   const [profilePicturePreview, setProfilePicturePreview] = useState("");
   const [coverPhoto, setCoverPhoto] = useState<File | null>(null);
   const [coverPhotoPreview, setCoverPhotoPreview] = useState("");
-
-  // Step 3
-  const [whatsappCountryCode, setWhatsappCountryCode] = useState("+256");
-  const [whatsappNumber, setWhatsappNumber] = useState("");
-
-  // Step 4 — Profile completion
   const [bioText, setBioText] = useState("");
   const [generatingBio, setGeneratingBio] = useState(false);
 
+  // Derived
+  const country = COUNTRIES.find((c) => c.code === selectedCountry);
+  const phoneCodes = country ? [country.phone] : ["+256"];
+  const whatsappCountryCode = country?.phone || "+256";
+  const cityOptions = country?.cities || [];
+
+  // Slug helpers
   const checkSlugAvailability = (slug: string) => {
     if (slugCheckTimer.current) clearTimeout(slugCheckTimer.current);
     if (!slug || slug.length < 2) { setSlugAvailable(null); return; }
     setCheckingSlug(true);
     slugCheckTimer.current = setTimeout(async () => {
-      const { data } = await supabase
-        .from("profiles")
-        .select("id")
-        .eq("store_slug", slug)
-        .maybeSingle();
+      const { data } = await supabase.from("profiles").select("id").eq("store_slug", slug).maybeSingle();
       setSlugAvailable(data === null);
       setCheckingSlug(false);
     }, 500);
@@ -95,10 +88,6 @@ const Signup = () => {
     }
   };
 
-  const handleStoreNameChange = (value: string) => {
-    setStoreName(value);
-  };
-
   const handleSlugChange = (value: string) => {
     setSlugEdited(true);
     const newSlug = slugify(value);
@@ -108,37 +97,25 @@ const Signup = () => {
 
   const handleProfilePicture = async (e: React.ChangeEvent<HTMLInputElement>) => {
     let file = e.target.files?.[0];
-    if (file) {
-      if (file.size > 2 * 1024 * 1024) {
-        toast.error("Image must be under 2MB");
-        return;
-      }
-      const { compressImage } = await import("@/lib/imageCompression");
-      file = await compressImage(file);
-      setProfilePicture(file);
-      setProfilePicturePreview(URL.createObjectURL(file));
-    }
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) { toast.error("Image must be under 5MB"); return; }
+    const { compressImage } = await import("@/lib/imageCompression");
+    file = await compressImage(file);
+    setProfilePicture(file);
+    setProfilePicturePreview(URL.createObjectURL(file));
   };
 
   const handleCoverPhoto = async (e: React.ChangeEvent<HTMLInputElement>) => {
     let file = e.target.files?.[0];
-    if (file) {
-      if (file.size > 5 * 1024 * 1024) {
-        toast.error("Image must be under 5MB");
-        return;
-      }
-      const { compressImage } = await import("@/lib/imageCompression");
-      file = await compressImage(file);
-      setCoverPhoto(file);
-      setCoverPhotoPreview(URL.createObjectURL(file));
-    }
+    if (!file) return;
+    if (file.size > 5 * 1024 * 1024) { toast.error("Image must be under 5MB"); return; }
+    const { compressImage } = await import("@/lib/imageCompression");
+    file = await compressImage(file);
+    setCoverPhoto(file);
+    setCoverPhotoPreview(URL.createObjectURL(file));
   };
 
-  const handleBusinessTypeChange = (type: "product" | "service" | "both") => {
-    setBusinessType(type);
-    setCategorySelection({});
-  };
-
+  // Validation
   const validateStep1 = () => {
     if (!email.trim()) { toast.error("Email is required"); return false; }
     if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { toast.error("Enter a valid email"); return false; }
@@ -150,47 +127,34 @@ const Signup = () => {
   const validateStep2 = () => {
     if (!firstName.trim()) { toast.error("First name is required"); return false; }
     if (!storeName.trim()) { toast.error("Store name is required"); return false; }
-    if (!storeSlug.trim()) { toast.error("Store slug is required"); return false; }
-    if (!/^[a-z0-9-]+$/.test(storeSlug)) { toast.error("Slug can only contain lowercase letters, numbers, and hyphens"); return false; }
-    if (slugAvailable === false) { toast.error("This URL is already taken — try another"); return false; }
+    if (!storeSlug.trim()) { toast.error("Store URL is required"); return false; }
+    if (!/^[a-z0-9-]+$/.test(storeSlug)) { toast.error("URL can only contain lowercase letters, numbers, and hyphens"); return false; }
+    if (slugAvailable === false) { toast.error("This URL is already taken"); return false; }
     if (Object.keys(categorySelection).length === 0) { toast.error("Please select at least one category"); return false; }
     return true;
   };
 
   const validateStep3 = () => {
-    if (!whatsappNumber.trim()) {
-      toast.error("WhatsApp number is required — buyers will contact you here");
-      return false;
-    }
-    if (whatsappNumber.replace(/\D/g, "").length < 6) {
-      toast.error("Enter a valid phone number");
-      return false;
-    }
+    if (!whatsappNumber.trim()) { toast.error("WhatsApp number is required"); return false; }
+    if (whatsappNumber.replace(/\D/g, "").length < 6) { toast.error("Enter a valid phone number"); return false; }
     return true;
   };
 
-  const getFullWhatsApp = () => {
-    return whatsappCountryCode + whatsappNumber.replace(/^0+/, "").replace(/\D/g, "");
-  };
+  const getFullWhatsApp = () =>
+    whatsappCountryCode + whatsappNumber.replace(/^0+/, "").replace(/\D/g, "");
 
   const testWhatsApp = () => {
-    if (!whatsappNumber.trim()) {
-      toast.error("Enter your WhatsApp number first");
-      return;
-    }
+    if (!whatsappNumber.trim()) { toast.error("Enter your number first"); return; }
     const cleanNumber = getFullWhatsApp().replace(/^\+/, "");
-    const testMessage = encodeURIComponent(
-      `Hi! I'm interested in ordering from ${storeName || "your store"} on Afristall 🛒`
-    );
-    window.open(`https://wa.me/${cleanNumber}?text=${testMessage}`, "_blank");
+    window.open(`https://wa.me/${cleanNumber}?text=${encodeURIComponent(`Hi! I'm interested in ordering from ${storeName || "your store"} on Afristall 🛒`)}`, "_blank");
   };
 
+  // Create account (after step 3)
   const handleCreateAccount = async () => {
     if (!validateStep3()) return;
     setLoading(true);
     try {
       const fullWhatsapp = getFullWhatsApp();
-
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: email.trim(),
         password,
@@ -202,62 +166,28 @@ const Signup = () => {
         if (msg.includes("already registered") || msg.includes("already been registered") || msg.includes("duplicate")) {
           toast.error("This email already has a store. Try signing in instead.");
           setStep(1);
-        } else {
-          toast.error(authError.message);
-        }
+        } else { toast.error(authError.message); }
         return;
       }
       if (!authData.user) throw new Error("Signup failed");
-
       if (authData.user.identities && authData.user.identities.length === 0) {
         toast.error("This email already has a store. Try signing in instead.");
         setStep(1);
         return;
       }
 
-      let profilePictureUrl = null;
-      if (profilePicture) {
-        const fileExt = profilePicture.name.split(".").pop();
-        const filePath = `${authData.user.id}/avatar.${fileExt}`;
-        const { error: uploadError } = await supabase.storage
-          .from("store-images")
-          .upload(filePath, profilePicture, { upsert: true });
-        if (!uploadError) {
-          const { data: urlData } = supabase.storage.from("store-images").getPublicUrl(filePath);
-          profilePictureUrl = urlData.publicUrl;
-        }
-      }
-
-      let coverPhotoUrl = null;
-      if (coverPhoto) {
-        const fileExt = coverPhoto.name.split(".").pop();
-        const filePath = `${authData.user.id}/cover.${fileExt}`;
-        const { error: uploadError } = await supabase.storage
-          .from("store-images")
-          .upload(filePath, coverPhoto, { upsert: true });
-        if (!uploadError) {
-          const { data: urlData } = supabase.storage.from("store-images").getPublicUrl(filePath);
-          coverPhotoUrl = urlData.publicUrl;
-        }
-      }
-
-      const { error: profileError } = await supabase
-        .from("profiles")
-        .update({
-          first_name: firstName.trim(),
-          store_name: storeName.trim(),
-          store_slug: storeSlug.trim(),
-          city: city || null,
-          category: serializeCategories(categorySelection),
-          business_type: businessType,
-          whatsapp_number: fullWhatsapp,
-          profile_picture_url: profilePictureUrl,
-          cover_photo_url: coverPhotoUrl,
-        } as any)
-        .eq("id", authData.user.id);
+      const { error: profileError } = await supabase.from("profiles").update({
+        first_name: firstName.trim(),
+        store_name: storeName.trim(),
+        store_slug: storeSlug.trim(),
+        country: country?.name || null,
+        city: city || null,
+        category: serializeCategories(categorySelection),
+        business_type: businessType,
+        whatsapp_number: fullWhatsapp,
+      } as any).eq("id", authData.user.id);
 
       if (profileError) throw profileError;
-
       setCreatedUserId(authData.user.id);
 
       // Auto-generate bio
@@ -272,7 +202,7 @@ const Signup = () => {
         }
       } catch {}
 
-      toast.success("Account created! 🎉 Let's finish setting up.");
+      toast.success("Account created! 🎉");
       setStep(4);
     } catch (error: any) {
       toast.error(error.message || "Something went wrong");
@@ -284,32 +214,62 @@ const Signup = () => {
   const handleGenerateBio = async () => {
     setGeneratingBio(true);
     try {
-      const catString = serializeCategories(categorySelection);
       const { data } = await supabase.functions.invoke("generate-bio", {
-        body: { storeName: storeName.trim(), category: catString, city: city || "" },
+        body: { storeName: storeName.trim(), category: serializeCategories(categorySelection), city: city || "" },
       });
-      if (data?.bio) {
-        setBioText(data.bio);
-        toast.success("Bio generated!");
-      }
+      if (data?.bio) { setBioText(data.bio); toast.success("Bio generated!"); }
     } catch { toast.error("Failed to generate"); }
     setGeneratingBio(false);
   };
 
   const handleFinish = async () => {
-    if (createdUserId && bioText.trim()) {
-      await supabase.from("profiles").update({
-        store_bio: bioText.trim(),
-        welcome_message: bioText.trim(),
-      } as any).eq("id", createdUserId);
+    setLoading(true);
+    try {
+      const userId = createdUserId;
+      if (!userId) { navigate("/dashboard"); return; }
+
+      // Upload profile pic
+      if (profilePicture) {
+        const ext = profilePicture.name.split(".").pop();
+        const path = `${userId}/avatar.${ext}`;
+        const { error } = await supabase.storage.from("store-images").upload(path, profilePicture, { upsert: true });
+        if (!error) {
+          const { data: urlData } = supabase.storage.from("store-images").getPublicUrl(path);
+          await supabase.from("profiles").update({ profile_picture_url: urlData.publicUrl } as any).eq("id", userId);
+        }
+      }
+
+      // Upload cover photo
+      if (coverPhoto) {
+        const ext = coverPhoto.name.split(".").pop();
+        const path = `${userId}/cover.${ext}`;
+        const { error } = await supabase.storage.from("store-images").upload(path, coverPhoto, { upsert: true });
+        if (!error) {
+          const { data: urlData } = supabase.storage.from("store-images").getPublicUrl(path);
+          await supabase.from("profiles").update({ cover_photo_url: urlData.publicUrl } as any).eq("id", userId);
+        }
+      }
+
+      // Save bio
+      if (bioText.trim()) {
+        await supabase.from("profiles").update({
+          store_bio: bioText.trim(),
+          welcome_message: bioText.trim(),
+        } as any).eq("id", userId);
+      }
+
+      toast.success("Welcome to Afristall! 🚀");
+      navigate("/dashboard");
+    } catch {
+      toast.error("Something went wrong");
+    } finally {
+      setLoading(false);
     }
-    toast.success("Welcome to Afristall! 🚀");
-    navigate("/dashboard");
   };
 
-  const categoryFilter = businessType === "service" ? "services"
-    : businessType === "product" ? "products"
-    : "all";
+  const categoryFilter = businessType === "service" ? "services" : businessType === "product" ? "products" : "all";
+
+  const stepLabels = ["Account", "Store", "WhatsApp", "Profile"];
 
   return (
     <div className="relative flex min-h-screen flex-col items-center justify-center px-4 py-8 overflow-hidden">
@@ -317,385 +277,298 @@ const Signup = () => {
       <div className="pointer-events-none absolute -top-32 -left-20 h-[400px] w-[400px] rounded-full bg-primary/8 blur-[100px]" />
       <div className="pointer-events-none absolute -bottom-32 right-0 h-[350px] w-[350px] rounded-full bg-primary/6 blur-[80px]" />
 
-      <Link to="/" className="relative z-10 mb-8 flex items-center gap-2">
+      <Link to="/" className="relative z-10 mb-6 flex items-center gap-2">
         <AfristallLogo />
         <span className="text-xl font-extrabold tracking-tight">
           Afri<span className="text-primary">stall</span>
         </span>
       </Link>
 
-      {/* Progress indicator */}
-      <div className="relative z-10 mb-6 flex items-center gap-2">
+      {/* Progress */}
+      <div className="relative z-10 mb-5 flex items-center gap-1.5">
         {Array.from({ length: TOTAL_STEPS }, (_, i) => i + 1).map((s) => (
-          <div key={s} className="flex items-center gap-2">
-            <div className={`flex h-8 w-8 items-center justify-center rounded-full text-sm font-bold transition-colors ${
-              step >= s ? "bg-primary text-primary-foreground" : "bg-muted/60 backdrop-blur-sm text-muted-foreground"
-            }`}>
-              {step > s ? <Check className="h-4 w-4" /> : s}
+          <div key={s} className="flex items-center gap-1.5">
+            <div className="flex flex-col items-center gap-1">
+              <div className={`flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold transition-all ${
+                step >= s ? "bg-primary text-primary-foreground shadow-md shadow-primary/30" : "bg-muted/60 backdrop-blur-sm text-muted-foreground"
+              }`}>
+                {step > s ? <Check className="h-3.5 w-3.5" /> : s}
+              </div>
+              <span className={`text-[10px] font-medium ${step >= s ? "text-primary" : "text-muted-foreground/60"}`}>
+                {stepLabels[s - 1]}
+              </span>
             </div>
-            {s < TOTAL_STEPS && <div className={`h-0.5 w-6 sm:w-10 ${step > s ? "bg-primary" : "bg-muted/60"}`} />}
+            {s < TOTAL_STEPS && (
+              <div className={`h-0.5 w-6 sm:w-8 mb-4 rounded-full transition-colors ${step > s ? "bg-primary" : "bg-muted/40"}`} />
+            )}
           </div>
         ))}
       </div>
 
-      <div className="relative z-10 w-full max-w-md rounded-2xl border border-border/50 bg-card/60 backdrop-blur-xl p-6 shadow-sm">
-        {/* STEP 1 — Email */}
+      <div className="relative z-10 w-full max-w-md rounded-2xl border border-border/50 bg-card/80 backdrop-blur-xl p-6 shadow-lg">
+        {/* STEP 1 — Account */}
         {step === 1 && (
-          <>
-            <div className="text-center mb-6">
-              <h2 className="text-xl font-bold text-foreground">Create your account</h2>
-              <p className="text-sm text-muted-foreground mt-1">Sign up with your email</p>
+          <div className="space-y-5 animate-in fade-in-50 duration-300">
+            <div className="text-center">
+              <h2 className="text-xl font-bold">Create your account</h2>
+              <p className="text-sm text-muted-foreground mt-1">Start selling in minutes</p>
             </div>
-            <div className="space-y-4">
+            <div className="space-y-3">
               <div className="space-y-1.5">
                 <Label htmlFor="email">Email address</Label>
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="you@example.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  autoComplete="email"
-                />
+                <Input id="email" type="email" placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} autoComplete="email" className="h-11" />
               </div>
-
               <div className="space-y-1.5">
                 <Label htmlFor="password">Password</Label>
                 <div className="relative">
-                  <Input
-                    id="password"
-                    type={showPassword ? "text" : "password"}
-                    placeholder="At least 6 characters"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    autoComplete="new-password"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground"
-                  >
+                  <Input id="password" type={showPassword ? "text" : "password"} placeholder="At least 6 characters" value={password} onChange={(e) => setPassword(e.target.value)} autoComplete="new-password" className="h-11" />
+                  <button type="button" onClick={() => setShowPassword(!showPassword)} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
                     {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                   </button>
                 </div>
               </div>
-
               <div className="space-y-1.5">
                 <Label htmlFor="confirmPassword">Confirm password</Label>
-                <Input
-                  id="confirmPassword"
-                  type={showPassword ? "text" : "password"}
-                  placeholder="Repeat your password"
-                  value={confirmPassword}
-                  onChange={(e) => setConfirmPassword(e.target.value)}
-                  autoComplete="new-password"
-                />
+                <Input id="confirmPassword" type={showPassword ? "text" : "password"} placeholder="Repeat password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} autoComplete="new-password" className="h-11" />
               </div>
-
-              <Button className="w-full gap-2" onClick={() => validateStep1() && setStep(2)}>
-                Next <ArrowRight className="h-4 w-4" />
+              <Button className="w-full h-11 gap-2 text-sm font-semibold" onClick={() => validateStep1() && setStep(2)}>
+                Continue <ArrowRight className="h-4 w-4" />
               </Button>
-
-              <p className="text-center text-sm text-muted-foreground">
+              <p className="text-center text-xs text-muted-foreground">
                 Already have an account?{" "}
                 <Link to="/login" className="font-medium text-primary hover:underline">Sign in</Link>
               </p>
             </div>
-          </>
+          </div>
         )}
 
         {/* STEP 2 — Store Setup */}
         {step === 2 && (
-          <>
-            <div className="text-center mb-6">
-              <h2 className="text-xl font-bold text-foreground">Set up your store</h2>
-              <p className="text-sm text-muted-foreground mt-1">Tell us about what you sell</p>
+          <div className="space-y-4 animate-in fade-in-50 slide-in-from-right-4 duration-300">
+            <div className="text-center">
+              <h2 className="text-xl font-bold">Set up your store</h2>
+              <p className="text-sm text-muted-foreground mt-1">Tell us about your business</p>
             </div>
-            <div className="space-y-4">
-              <div className="space-y-1.5">
-                <Label htmlFor="firstName">First name</Label>
-                <Input
-                  id="firstName"
-                  placeholder="e.g. Aisha"
-                  value={firstName}
-                  onChange={(e) => handleFirstNameChange(e.target.value)}
-                  maxLength={30}
-                />
-                <p className="text-xs text-muted-foreground">Used for your store URL</p>
-              </div>
-
-              <div className="space-y-1.5">
-                <Label htmlFor="storeName">Store name</Label>
-                <Input
-                  id="storeName"
-                  placeholder="e.g. Mama Aisha's Kitchen"
-                  value={storeName}
-                  onChange={(e) => handleStoreNameChange(e.target.value)}
-                  maxLength={60}
-                />
+            <div className="space-y-3">
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <Label htmlFor="firstName">First name</Label>
+                  <Input id="firstName" placeholder="e.g. Aisha" value={firstName} onChange={(e) => handleFirstNameChange(e.target.value)} maxLength={30} className="h-10" />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor="storeName">Store name</Label>
+                  <Input id="storeName" placeholder="e.g. Aisha's Shop" value={storeName} onChange={(e) => setStoreName(e.target.value)} maxLength={60} className="h-10" />
+                </div>
               </div>
 
               <div className="space-y-1.5">
                 <Label htmlFor="storeSlug">Store URL</Label>
                 <div className="flex items-center gap-1.5">
-                  <span className="text-sm text-muted-foreground whitespace-nowrap">afristall.com/</span>
-                  <Input
-                    id="storeSlug"
-                    placeholder="my-store"
-                    value={storeSlug}
-                    onChange={(e) => handleSlugChange(e.target.value)}
-                    maxLength={40}
-                    className={slugAvailable === false ? "border-destructive" : slugAvailable === true ? "border-primary" : ""}
-                  />
+                  <span className="text-xs text-muted-foreground whitespace-nowrap">afristall.com/</span>
+                  <Input id="storeSlug" placeholder="my-store" value={storeSlug} onChange={(e) => handleSlugChange(e.target.value)} maxLength={40} className={`h-10 ${slugAvailable === false ? "border-destructive" : slugAvailable === true ? "border-primary" : ""}`} />
                 </div>
-                {checkingSlug && (
-                  <p className="text-xs text-muted-foreground">Checking availability...</p>
-                )}
-                {!checkingSlug && slugAvailable === false && (
-                  <p className="text-xs text-destructive font-medium">❌ Username unavailable — try another</p>
-                )}
-                {!checkingSlug && slugAvailable === true && (
-                  <p className="text-xs text-primary font-medium">✅ Available!</p>
-                )}
-                {slugAvailable === null && !checkingSlug && (
-                  <p className="text-xs text-muted-foreground">
-                    ✏️ You can edit this — use your name or shop name
-                  </p>
-                )}
+                {checkingSlug && <p className="text-[10px] text-muted-foreground">Checking…</p>}
+                {!checkingSlug && slugAvailable === false && <p className="text-[10px] text-destructive font-medium">❌ Taken — try another</p>}
+                {!checkingSlug && slugAvailable === true && <p className="text-[10px] text-primary font-medium">✅ Available!</p>}
               </div>
 
-              <div className="space-y-1.5">
-                <Label>City <span className="text-muted-foreground font-normal">(optional)</span></Label>
-                <Select value={city} onValueChange={setCity}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select your city" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {CITIES.map((c) => (
-                      <SelectItem key={c} value={c}>
-                        <span className="flex items-center gap-1.5">
-                          <MapPin className="h-3.5 w-3.5" /> {c}
-                        </span>
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              {/* Profile Picture & Cover Photo */}
-              <div className="space-y-1.5">
-                <Label>Profile picture & Cover photo</Label>
-                <div className="flex items-start gap-4">
-                  <div className="text-center">
-                    <label className="cursor-pointer block">
-                      {profilePicturePreview ? (
-                        <img src={profilePicturePreview} alt="Profile" className="h-16 w-16 rounded-full object-cover border-2 border-border mx-auto" />
-                      ) : (
-                        <div className="flex h-16 w-16 items-center justify-center rounded-full bg-muted border-2 border-dashed border-border mx-auto">
-                          <Camera className="h-5 w-5 text-muted-foreground" />
-                        </div>
-                      )}
-                      <span className="text-[10px] text-muted-foreground mt-1 block">Profile pic</span>
-                      <input type="file" accept="image/*" className="hidden" onChange={handleProfilePicture} />
-                    </label>
-                  </div>
-                  <div className="flex-1 text-center">
-                    <label className="cursor-pointer block">
-                      {coverPhotoPreview ? (
-                        <img src={coverPhotoPreview} alt="Cover" className="h-16 w-full rounded-lg object-cover border-2 border-border" />
-                      ) : (
-                        <div className="flex h-16 w-full items-center justify-center rounded-lg bg-muted border-2 border-dashed border-border">
-                          <Camera className="h-5 w-5 text-muted-foreground" />
-                        </div>
-                      )}
-                      <span className="text-[10px] text-muted-foreground mt-1 block">Cover photo</span>
-                      <input type="file" accept="image/*" className="hidden" onChange={handleCoverPhoto} />
-                    </label>
-                  </div>
+              {/* Country & City */}
+              <div className="grid grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <Label>Country</Label>
+                  <Select value={selectedCountry} onValueChange={(v) => { setSelectedCountry(v); setCity(""); }}>
+                    <SelectTrigger className="h-10">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent className="max-h-64">
+                      {COUNTRIES.map((c) => (
+                        <SelectItem key={c.code} value={c.code}>
+                          <span className="flex items-center gap-1.5">
+                            <span>{c.flag}</span> {c.name}
+                          </span>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-1.5">
+                  <Label>City</Label>
+                  {cityOptions.length > 0 ? (
+                    <Select value={city} onValueChange={setCity}>
+                      <SelectTrigger className="h-10">
+                        <SelectValue placeholder="Select city" />
+                      </SelectTrigger>
+                      <SelectContent className="max-h-64">
+                        {cityOptions.map((c) => (
+                          <SelectItem key={c} value={c}>
+                            <span className="flex items-center gap-1">
+                              <MapPin className="h-3 w-3 text-muted-foreground" /> {c}
+                            </span>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  ) : (
+                    <Input placeholder="Your city" value={city} onChange={(e) => setCity(e.target.value)} className="h-10" />
+                  )}
                 </div>
               </div>
 
+              {/* Business type */}
               <div className="space-y-1.5">
-                <Label>What type of business?</Label>
+                <Label>Type</Label>
                 <div className="grid grid-cols-3 gap-2">
                   {([
                     { value: "product" as const, label: "Products", emoji: "📦" },
                     { value: "service" as const, label: "Services", emoji: "🔧" },
                     { value: "both" as const, label: "Both", emoji: "📦🔧" },
                   ]).map((t) => (
-                    <button
-                      key={t.value}
-                      type="button"
-                      onClick={() => handleBusinessTypeChange(t.value)}
-                      className={`flex flex-col items-center gap-1 rounded-lg border-2 p-3 text-center transition-colors ${
-                        businessType === t.value
-                          ? "border-primary bg-primary/5"
-                          : "border-border hover:border-primary/30"
-                      }`}
-                    >
-                      <span className="text-xl">{t.emoji}</span>
-                      <span className="text-xs font-medium">{t.label}</span>
+                    <button key={t.value} type="button" onClick={() => { setBusinessType(t.value); setCategorySelection({}); }}
+                      className={`flex flex-col items-center gap-0.5 rounded-xl border-2 p-2.5 text-center transition-all ${
+                        businessType === t.value ? "border-primary bg-primary/5 shadow-sm" : "border-border hover:border-primary/30"
+                      }`}>
+                      <span className="text-lg">{t.emoji}</span>
+                      <span className="text-[11px] font-medium">{t.label}</span>
                     </button>
                   ))}
                 </div>
               </div>
 
+              {/* Categories */}
               <div className="space-y-1.5">
-                <Label>
-                  {businessType === "service" ? "What services do you offer?" 
-                    : businessType === "both" ? "What do you sell or offer?" 
-                    : "What do you sell?"}
-                </Label>
-                <p className="text-xs text-muted-foreground mb-1">
-                  Select one or more categories. Expand to pick subcategories.
-                </p>
-                <CategoryPicker
-                  value={categorySelection}
-                  onChange={setCategorySelection}
-                  filter={categoryFilter}
-                />
+                <Label>{businessType === "service" ? "Services" : businessType === "both" ? "What do you sell/offer?" : "What do you sell?"}</Label>
+                <CategoryPicker value={categorySelection} onChange={setCategorySelection} filter={categoryFilter} />
               </div>
 
-              <div className="flex gap-2">
-                <Button variant="outline" onClick={() => setStep(1)} className="gap-1">
-                  <ArrowLeft className="h-4 w-4" /> Back
+              <div className="flex gap-2 pt-1">
+                <Button variant="outline" size="sm" onClick={() => setStep(1)} className="gap-1">
+                  <ArrowLeft className="h-3.5 w-3.5" /> Back
                 </Button>
-                <Button className="flex-1 gap-2" onClick={() => validateStep2() && setStep(3)}>
-                  Next <ArrowRight className="h-4 w-4" />
+                <Button className="flex-1 h-10 gap-2 text-sm font-semibold" onClick={() => validateStep2() && setStep(3)}>
+                  Continue <ArrowRight className="h-4 w-4" />
                 </Button>
               </div>
             </div>
-          </>
+          </div>
         )}
 
         {/* STEP 3 — WhatsApp */}
         {step === 3 && (
-          <>
-            <div className="text-center mb-6">
-              <h2 className="text-xl font-bold text-foreground flex items-center justify-center gap-2">
+          <div className="space-y-5 animate-in fade-in-50 slide-in-from-right-4 duration-300">
+            <div className="text-center">
+              <h2 className="text-xl font-bold flex items-center justify-center gap-2">
                 <MessageCircle className="h-5 w-5 text-primary" />
                 Connect WhatsApp
               </h2>
-              <p className="text-sm text-muted-foreground mt-1">
-                This is where your orders will be sent
-              </p>
+              <p className="text-sm text-muted-foreground mt-1">Buyers will message you here</p>
+            </div>
+            <div className="space-y-3">
+              <div className="rounded-xl bg-primary/5 border border-primary/10 p-3 text-xs text-muted-foreground">
+                💡 Orders arrive as WhatsApp messages — no app to manage.
+              </div>
+              <div className="space-y-1.5">
+                <Label>WhatsApp number</Label>
+                <div className="flex gap-2">
+                  <div className="h-10 px-3 rounded-md border border-input bg-muted/50 flex items-center text-sm text-muted-foreground font-medium min-w-[80px]">
+                    {country?.flag} {whatsappCountryCode}
+                  </div>
+                  <Input type="tel" placeholder="7XX XXX XXX" value={whatsappNumber} onChange={(e) => setWhatsappNumber(e.target.value)} className="flex-1 h-10" />
+                </div>
+              </div>
+              {whatsappNumber.trim() && (
+                <Button type="button" variant="outline" className="w-full rounded-xl gap-2 h-10 border-primary/30" onClick={testWhatsApp}>
+                  <ExternalLink className="h-4 w-4" /> Test — see what buyers see
+                </Button>
+              )}
+              <div className="flex gap-2 pt-1">
+                <Button variant="outline" size="sm" onClick={() => setStep(2)} className="gap-1">
+                  <ArrowLeft className="h-3.5 w-3.5" /> Back
+                </Button>
+                <Button className="flex-1 h-10 gap-2 text-sm font-semibold" onClick={handleCreateAccount} disabled={loading}>
+                  {loading ? <><Loader2 className="h-4 w-4 animate-spin" /> Creating…</> : <>Create Store 🎉</>}
+                </Button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* STEP 4 — Profile & How It Works */}
+        {step === 4 && (
+          <div className="space-y-5 animate-in fade-in-50 slide-in-from-right-4 duration-300">
+            <div className="text-center">
+              <div className="text-3xl mb-1">🎉</div>
+              <h2 className="text-xl font-bold">Your store is live!</h2>
+              <p className="text-sm text-muted-foreground mt-1">Add your photos & bio</p>
             </div>
             <div className="space-y-4">
-              <div className="rounded-lg bg-primary/5 border border-primary/10 p-3 text-sm text-muted-foreground">
-                💡 Buyers will message you on this number when they order.
-              </div>
-
-              <div className="space-y-1.5">
-                <Label htmlFor="whatsapp">WhatsApp number</Label>
-                <div className="flex gap-2">
-                  <Select value={whatsappCountryCode} onValueChange={setWhatsappCountryCode}>
-                    <SelectTrigger className="w-[130px]">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {COUNTRY_CODES.map((c) => (
-                        <SelectItem key={c.code} value={c.code}>
-                          {c.country} {c.code}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <Input
-                    id="whatsapp"
-                    type="tel"
-                    placeholder="7XX XXX XXX"
-                    value={whatsappNumber}
-                    onChange={(e) => setWhatsappNumber(e.target.value)}
-                    className="flex-1"
-                  />
+              {/* Profile pic & cover photo */}
+              <div className="space-y-2">
+                <Label>Profile picture & Cover photo</Label>
+                <div className="flex items-start gap-4">
+                  <label className="cursor-pointer text-center shrink-0">
+                    {profilePicturePreview ? (
+                      <img src={profilePicturePreview} alt="Profile" className="h-18 w-18 rounded-full object-cover border-2 border-border shadow-md mx-auto" />
+                    ) : (
+                      <div className="flex h-18 w-18 items-center justify-center rounded-full bg-muted/60 border-2 border-dashed border-border/60 mx-auto hover:border-primary/40 transition-colors">
+                        <Camera className="h-6 w-6 text-muted-foreground/60" />
+                      </div>
+                    )}
+                    <span className="text-[10px] text-muted-foreground mt-1 block">Profile pic</span>
+                    <input type="file" accept="image/*" className="hidden" onChange={handleProfilePicture} />
+                  </label>
+                  <label className="cursor-pointer flex-1 text-center">
+                    {coverPhotoPreview ? (
+                      <img src={coverPhotoPreview} alt="Cover" className="h-18 w-full rounded-xl object-cover border-2 border-border shadow-md" />
+                    ) : (
+                      <div className="flex h-18 w-full items-center justify-center rounded-xl bg-muted/60 border-2 border-dashed border-border/60 hover:border-primary/40 transition-colors">
+                        <Camera className="h-6 w-6 text-muted-foreground/60" />
+                      </div>
+                    )}
+                    <span className="text-[10px] text-muted-foreground mt-1 block">Cover photo</span>
+                    <input type="file" accept="image/*" className="hidden" onChange={handleCoverPhoto} />
+                  </label>
                 </div>
               </div>
 
-              {whatsappNumber.trim() && (
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="w-full rounded-xl gap-2 border-primary/30 hover:bg-primary/5"
-                  onClick={testWhatsApp}
-                >
-                  <ExternalLink className="h-4 w-4" />
-                  Test WhatsApp — see what buyers see
-                </Button>
-              )}
-
-              <div className="flex gap-2">
-                <Button variant="outline" onClick={() => setStep(2)} className="gap-1">
-                  <ArrowLeft className="h-4 w-4" /> Back
-                </Button>
-                <Button className="flex-1 gap-2" onClick={handleCreateAccount} disabled={loading}>
-                  {loading ? "Creating your store..." : "Create My Store 🎉"}
-                </Button>
-              </div>
-            </div>
-          </>
-        )}
-
-        {/* STEP 4 — Complete Profile & How It Works */}
-        {step === 4 && (
-          <>
-            <div className="text-center mb-5">
-              <div className="text-4xl mb-2">🎉</div>
-              <h2 className="text-xl font-bold text-foreground">Your store is live!</h2>
-              <p className="text-sm text-muted-foreground mt-1">Add a bio so buyers know what you're about</p>
-            </div>
-            <div className="space-y-4">
               {/* Bio */}
               <div className="space-y-1.5">
                 <Label>Store bio</Label>
-                <Textarea
-                  value={bioText}
-                  onChange={(e) => setBioText(e.target.value)}
-                  rows={3}
-                  maxLength={300}
-                  placeholder="Tell buyers what makes your store special..."
-                  className="text-sm"
-                />
+                <Textarea value={bioText} onChange={(e) => setBioText(e.target.value)} rows={2} maxLength={300} placeholder="What makes your store special?" className="text-sm resize-none" />
                 <div className="flex items-center justify-between">
                   <span className="text-[10px] text-muted-foreground">{bioText.length}/300</span>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={handleGenerateBio}
-                    disabled={generatingBio}
-                    className="gap-1 text-xs text-primary h-7"
-                  >
+                  <Button size="sm" variant="ghost" onClick={handleGenerateBio} disabled={generatingBio} className="gap-1 text-xs text-primary h-6 px-2">
                     {generatingBio ? <Loader2 className="h-3 w-3 animate-spin" /> : <Sparkles className="h-3 w-3" />}
-                    AI Generate
+                    AI Write
                   </Button>
                 </div>
               </div>
 
               {/* How It Works */}
-              <div className="rounded-xl border border-primary/20 bg-primary/5 p-4 space-y-3">
-                <h3 className="text-sm font-bold flex items-center gap-1.5">
-                  <Rocket className="h-4 w-4 text-primary" /> How Afristall works for you
+              <div className="rounded-xl border border-primary/15 bg-primary/5 p-3.5 space-y-2.5">
+                <h3 className="text-xs font-bold flex items-center gap-1.5">
+                  <Rocket className="h-3.5 w-3.5 text-primary" /> How Afristall works for you
                 </h3>
-                <ul className="space-y-2 text-xs text-muted-foreground leading-relaxed">
+                <ul className="space-y-2 text-[11px] text-muted-foreground leading-relaxed">
                   <li className="flex gap-2">
-                    <span className="text-base">📸</span>
-                    <span>Add your first 2 products now — photos + price. Takes 30 seconds each.</span>
+                    <span className="text-sm">📸</span>
+                    <span>Add your first 2 products — photo + price. Takes 30 seconds each.</span>
                   </li>
                   <li className="flex gap-2">
-                    <span className="text-base">📲</span>
-                    <span><strong className="text-foreground">Every day we give you 3 ready-made statuses</strong> that link directly to your shop. Copy and post straight to your WhatsApp status, TikTok comments, Instagram stories — anywhere!</span>
+                    <span className="text-sm">📲</span>
+                    <span><strong className="text-foreground">Every day we give you 3 ready-made statuses</strong> that link to your shop. Copy & post straight to your WhatsApp status, TikTok comments, Instagram stories — anywhere!</span>
                   </li>
                   <li className="flex gap-2">
-                    <span className="text-base">💰</span>
-                    <span>When someone taps your link, they land on your store and order via WhatsApp. Simple.</span>
+                    <span className="text-sm">💰</span>
+                    <span>When someone taps your link, they see your store and order via WhatsApp. That simple.</span>
                   </li>
                 </ul>
               </div>
 
-              <Button className="w-full gap-2" onClick={handleFinish}>
-                Go to Dashboard <ArrowRight className="h-4 w-4" />
+              <Button className="w-full h-11 gap-2 text-sm font-semibold" onClick={handleFinish} disabled={loading}>
+                {loading ? <><Loader2 className="h-4 w-4 animate-spin" /> Saving…</> : <>Go to Dashboard <ArrowRight className="h-4 w-4" /></>}
               </Button>
             </div>
-          </>
+          </div>
         )}
       </div>
     </div>
