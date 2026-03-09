@@ -748,15 +748,16 @@ const StorefrontInner = () => {
   return (
     <div className="min-h-screen bg-background">
 
-      {/* Floating top-left: Dashboard / Sign In + Create Store for non-owners */}
+      {/* Floating top-left: Back to Explore / Dashboard */}
       <div className="fixed top-4 left-4 z-30 flex items-center gap-2">
-        {user && profile && user.id === profile.id ? (
+        <Button variant="outline" size="icon" className="shrink-0 rounded-full backdrop-blur-sm bg-background/80" asChild>
+          <Link to="/explore">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+          </Link>
+        </Button>
+        {user && profile && user.id === profile.id && (
           <Button variant="outline" size="icon" className="shrink-0 rounded-full" asChild>
             <Link to="/dashboard"><LayoutDashboard className="h-4 w-4" /></Link>
-          </Button>
-        ) : (
-          <Button size="sm" className="rounded-full text-xs gap-1.5 bg-primary text-primary-foreground hover:bg-primary/90 backdrop-blur-sm" asChild>
-            <Link to="/"><Store className="h-3.5 w-3.5" /> Create Your Store</Link>
           </Button>
         )}
       </div>
