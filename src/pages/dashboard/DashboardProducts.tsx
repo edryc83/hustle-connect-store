@@ -111,7 +111,7 @@ const DashboardProducts = () => {
     setName(""); setPrice(""); setDiscountPrice(""); setDiscountPercent(""); setDescription(""); setVariantsText("");
     setImageFiles([]); setImagePreviews([]); setExistingImages([]);
     setEditingProduct(null); setListingType("product"); setCondition(""); setAttributes({});
-    setAiFilledFields(new Set());
+    setAiFilledFields(new Set()); setAiSuggestions([]); setDetectedSubcategory("");
   };
 
   const openAdd = () => { resetForm(); setDialogOpen(true); };
