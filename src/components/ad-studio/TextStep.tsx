@@ -56,8 +56,7 @@ export default function TextStep({
   const hasField = (f: string) => fields.includes(f);
 
   const mainImage = imageSlots[0]?.processedUrl || imageSlots[0]?.url;
-
-  // Character limits from template (Railway can define these)
+  const templateThumbnail = template?.thumbnail || "";
   const charLimits = {
     subtitle: (template as any)?.char_limits?.subtitle || 50,
     tagline: (template as any)?.char_limits?.tagline || 35,
