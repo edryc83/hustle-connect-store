@@ -31,12 +31,13 @@ export default function CanvasEditor({
   profilePicture,
   onPositionChange,
 }: CanvasEditorProps) {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  // Use a container div ref — fabric.js will manage all DOM inside it
+  const containerRef = useRef<HTMLDivElement>(null);
   const fabricRef = useRef<fabric.Canvas | null>(null);
   const objectsRef = useRef<Record<string, fabric.Object>>({});
   const [loading, setLoading] = useState(true);
+  const initializedRef = useRef(false);
 
-  // Report position changes
   const reportPositions = useCallback(() => {
     if (!onPositionChange) return;
     const objs = objectsRef.current;
@@ -55,11 +56,17 @@ export default function CanvasEditor({
     onPositionChange({ imagePos, textPositions });
   }, [onPositionChange]);
 
-  // Initialize canvas
+  // Initialize canvas once via imperative DOM
   useEffect(() => {
-    if (!canvasRef.current) return;
+    if (!containerRef.current || initializedRef.current) return;
+    initializedRef.current = true;
 
-    const canvas = new fabric.Canvas(canvasRef.current, {
+    const canvasEl = document.createElement("canvas");
+    canvasEl.width = CANVAS_W;
+    canvasEl.height = CANVAS_H;
+    containerRef.current.appendChild(canvasEl);
+
+    const canvas = new fabric.Canvas(canvasEl, {
       width: CANVAS_W,
       height: CANVAS_H,
       backgroundColor: "#1a1a1a",
@@ -74,6 +81,7 @@ export default function CanvasEditor({
     return () => {
       canvas.dispose();
       fabricRef.current = null;
+      initializedRef.current = false;
     };
   }, [reportPositions]);
 
@@ -96,7 +104,6 @@ export default function CanvasEditor({
         canvas.add(bgImg);
         canvas.sendObjectToBack(bgImg);
       } catch {
-        // If template image fails, use solid bg
         canvas.backgroundColor = "#1a1a1a";
       }
 
@@ -137,11 +144,11 @@ export default function CanvasEditor({
             top: CANVAS_H * 0.35,
             originX: "center",
             originY: "center",
-            cornerColor: "hsl(var(--primary))",
+            cornerColor: "#a855f7",
             cornerStyle: "circle",
             cornerSize: 10,
             transparentCorners: false,
-            borderColor: "hsl(var(--primary))",
+            borderColor: "#a855f7",
           });
           canvas.add(img);
           objectsRef.current["productImage"] = img;
@@ -150,19 +157,13 @@ export default function CanvasEditor({
         }
       }
 
-      // 4. Profile picture + store name (top area)
+      // 4. Profile picture + store name
       if (profilePicture) {
         try {
           const pfp = await fabric.FabricImage.fromURL(profilePicture, { crossOrigin: "anonymous" });
           pfp.scaleToWidth(28);
           pfp.scaleToHeight(28);
-          pfp.set({
-            left: 14,
-            top: 14,
-            selectable: false,
-            evented: false,
-          });
-          // Clip to circle
+          pfp.set({ left: 14, top: 14, selectable: false, evented: false });
           pfp.set("clipPath", new fabric.Circle({
             radius: (pfp.width || 28) / 2,
             originX: "center",
@@ -170,7 +171,7 @@ export default function CanvasEditor({
           }));
           canvas.add(pfp);
         } catch {
-          // Skip if profile pic fails
+          // skip
         }
       }
 
@@ -182,12 +183,11 @@ export default function CanvasEditor({
           fill: "rgba(255,255,255,0.7)",
           fontFamily: "sans-serif",
           fontWeight: "600",
-          letterSpacing: 80,
           width: CANVAS_W - 80,
           selectable: true,
           editable: false,
-          cornerColor: "hsl(var(--primary))",
-          borderColor: "hsl(var(--primary))",
+          cornerColor: "#a855f7",
+          borderColor: "#a855f7",
           cornerSize: 8,
           cornerStyle: "circle",
           transparentCorners: false,
@@ -196,20 +196,19 @@ export default function CanvasEditor({
         objectsRef.current["storeName"] = storeText;
       }
 
-      // 5. Text elements (bottom area — draggable)
+      // 5. Text elements
       const textConfig = {
-        cornerColor: "hsl(var(--primary))",
+        cornerColor: "#a855f7",
         cornerStyle: "circle" as const,
         cornerSize: 8,
         transparentCorners: false,
-        borderColor: "hsl(var(--primary))",
+        borderColor: "#a855f7",
         editable: false,
         fontFamily: "sans-serif",
       };
 
       let bottomY = CANVAS_H - 20;
 
-      // Price
       if (price) {
         const priceText = new fabric.Textbox(price, {
           ...textConfig,
@@ -225,7 +224,6 @@ export default function CanvasEditor({
         bottomY -= 40;
       }
 
-      // Tagline
       if (tagline && tagline.trim() !== " ") {
         const taglineText = new fabric.Textbox(tagline, {
           ...textConfig,
@@ -241,7 +239,6 @@ export default function CanvasEditor({
         bottomY -= 24;
       }
 
-      // Subtitle
       if (subtitle && subtitle.trim() !== " ") {
         const subtitleText = new fabric.Textbox(subtitle, {
           ...textConfig,
@@ -256,7 +253,6 @@ export default function CanvasEditor({
         bottomY -= 24;
       }
 
-      // Product name (headline)
       const nameText = new fabric.Textbox(productName || "Product Name", {
         ...textConfig,
         left: 16,
@@ -286,7 +282,12 @@ export default function CanvasEditor({
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
           </div>
         )}
-        <canvas ref={canvasRef} className="w-full h-auto" style={{ aspectRatio: `${CANVAS_W}/${CANVAS_H}` }} />
+        {/* Container div — fabric.js manages all DOM inside */}
+        <div
+          ref={containerRef}
+          className="w-full"
+          style={{ aspectRatio: `${CANVAS_W}/${CANVAS_H}` }}
+        />
       </div>
       <p className="text-[10px] text-muted-foreground text-center mt-2">
         Drag &amp; resize image and text directly on the canvas
