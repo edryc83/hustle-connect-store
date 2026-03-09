@@ -1,4 +1,4 @@
-import { Package, LayoutDashboard, User, Settings, LogOut, ClipboardList, BarChart3, Moon, Sun } from "lucide-react";
+import { Package, LayoutDashboard, User, Settings, LogOut, ClipboardList, BarChart3, Moon, Sun, Sparkles } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useAuth } from "@/hooks/useAuth";
 import { useTheme } from "@/hooks/useTheme";
@@ -34,6 +34,7 @@ export function DashboardSidebar() {
     { title: "Analytics", url: "/dashboard/analytics", icon: BarChart3 },
     { title: "Profile", url: "/dashboard/profile", icon: User },
     { title: "Settings", url: "/dashboard/settings", icon: Settings },
+    { title: "AI Design", url: "/ad-studio", icon: Sparkles },
   ];
 
   const handleSignOut = async () => {

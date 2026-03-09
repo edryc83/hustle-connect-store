@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Sun, Moon, Sparkles } from "lucide-react";
+import { Menu, X, Sun, Moon } from "lucide-react";
 import { useState } from "react";
 import AfristallLogo from "@/components/AfristallLogo";
 import { useTheme } from "@/hooks/useTheme";
@@ -29,11 +29,6 @@ const Navbar = () => {
           </Link>
           <Link to="/signup">
             <Button size="sm" className="shadow-sm shadow-primary/20">Create Your Store</Button>
-          </Link>
-          <Link to="/ad-studio">
-            <Button size="sm" className="border-0 bg-gradient-to-r from-violet-600 to-fuchsia-500 text-white shadow-md shadow-violet-500/25 hover:shadow-violet-500/40 transition-shadow gap-1.5">
-              <Sparkles className="h-3.5 w-3.5" /> AI Design
-            </Button>
           </Link>
           <button
             onClick={toggleTheme}
@@ -73,11 +68,6 @@ const Navbar = () => {
             </Link>
             <Link to="/signup" onClick={() => setMobileOpen(false)}>
               <Button className="w-full">Create Your Store</Button>
-            </Link>
-            <Link to="/ad-studio" onClick={() => setMobileOpen(false)}>
-              <Button className="w-full gap-1.5 border-0 bg-gradient-to-r from-violet-600 to-fuchsia-500 text-white">
-                <Sparkles className="h-3.5 w-3.5" /> AI Design
-              </Button>
             </Link>
           </div>
         </div>
