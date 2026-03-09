@@ -22,6 +22,7 @@ import { formatPrice } from "@/lib/currency";
 import { Badge } from "@/components/ui/badge";
 import type { Tables } from "@/integrations/supabase/types";
 import { ProductAttributeForm } from "@/components/dashboard/ProductAttributeForm";
+import type { AiAttributeSuggestion } from "@/lib/attributeLibrary";
 
 type Product = Tables<"products">;
 

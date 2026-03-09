@@ -14,7 +14,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { CartProvider, useCart } from "@/hooks/useCart";
 import { WishlistProvider, useWishlist } from "@/hooks/useWishlist";
 import { BuyerAttributePicker, ChatOnlyBanner } from "@/components/storefront/BuyerAttributePicker";
-import { getAttributeSummary, getSelectableKeys, buildAttributeLines } from "@/lib/productAttributes";
+import { getAttributeSummary, getSelectableKeys, buildAttributeLines } from "@/lib/attributeLibrary";
 import { StorefrontFilters, applyFilters, type FilterState } from "@/components/storefront/StorefrontFilters";
 import { StoreAssistantButton } from "@/components/storefront/StoreAssistant";
 import {

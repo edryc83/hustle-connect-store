@@ -1,4 +1,4 @@
-import { ATTRIBUTE_TYPES, COLOUR_HEX, getSelectableKeys } from "@/lib/productAttributes";
+import { ATTRIBUTE_LIBRARY as ATTRIBUTE_TYPES, COLOUR_HEX, getSelectableKeys } from "@/lib/attributeLibrary";
 import { Check } from "lucide-react";
 import whatsappIcon from "@/assets/whatsapp-icon.png";
 
