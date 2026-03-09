@@ -29,8 +29,12 @@ export default function TemplatePicker({ selected, onSelect }: Props) {
         );
         if (!res.ok) throw new Error("Failed to load templates");
         const data = await res.json();
-        const list = Array.isArray(data) ? data : data.templates || [];
-        setTemplates(list);
+        const raw = Array.isArray(data) ? data : data.templates || [];
+        // Map API field "images" to our "image_slots"
+        setTemplates(raw.map((t: any) => ({
+          ...t,
+          image_slots: t.image_slots ?? t.images ?? 1,
+        })));
       } catch (e: any) {
         setError(e.message);
       } finally {
