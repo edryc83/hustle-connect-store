@@ -116,10 +116,13 @@ function ImageSourceStep({ slots, onUpdateSlot, userId }: Props) {
       {/* Selected image display */}
       {hasImage ? (
         <div className="space-y-3">
-          <ImagePositioner
-            src={slot.processedUrl || slot.url!}
-            onCropData={(cropData) => onUpdateSlot(0, { cropData })}
-          />
+          <div className="relative rounded-xl overflow-hidden border border-border bg-muted aspect-square max-w-[240px] mx-auto">
+            <img
+              src={slot.processedUrl || slot.url!}
+              alt="Selected"
+              className="w-full h-full object-contain"
+            />
+          </div>
 
           <Button
             variant="outline"
