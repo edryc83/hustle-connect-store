@@ -28,6 +28,7 @@ interface TextStepProps {
   storeName: string;
   profilePicture?: string;
   autoSuggest?: boolean;
+  onUpdateSlot?: (index: number, data: Partial<ImageSlotData>) => void;
 }
 
 export default function TextStep({
