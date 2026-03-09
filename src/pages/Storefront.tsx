@@ -781,7 +781,20 @@ const StorefrontInner = () => {
       )}
 
       {/* Header with profile pic, name, greeting */}
-      <StorefrontHeader profile={profile} visitorName={visitorName} onBack={() => navigate("/explore")} />
+      <StorefrontHeader
+        profile={profile}
+        visitorName={visitorName}
+        onBack={() => navigate("/explore")}
+        firstProductImage={(() => {
+          // Find first available product image as fallback
+          for (const p of products) {
+            const imgs = productImagesMap[p.id];
+            if (imgs && imgs.length > 0) return imgs[0];
+            if (p.image_url) return p.image_url;
+          }
+          return null;
+        })()}
+      />
 
       {/* Products */}
       <main className="mx-auto max-w-5xl px-4 py-6 space-y-8">
