@@ -41,6 +41,7 @@ export default function TextStep({
   storeName,
   profilePicture,
   autoSuggest,
+  onUpdateSlot,
 }: TextStepProps) {
   const [suggesting, setSuggesting] = useState(false);
   const [variations, setVariations] = useState<CopyVariation[]>([]);
