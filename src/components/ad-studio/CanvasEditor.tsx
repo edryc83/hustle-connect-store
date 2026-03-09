@@ -254,8 +254,7 @@ export default function CanvasEditor({
     textObjsRef.current["productName"] = nameText;
 
     canvas.renderAll();
-    reportPositions();
-  }, [productName, subtitle, tagline, price, storeName, profilePicture, reportPositions]);
+  }, [productName, subtitle, tagline, price, storeName, profilePicture]);
 
   return (
     <div className="w-full max-w-sm mx-auto">
