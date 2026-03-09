@@ -60,6 +60,8 @@
     --sidebar-accent-foreground: 210 15% 15%;
     --sidebar-border: 210 11% 80%;
     --sidebar-ring: 18 100% 60%;
+
+    --radius: 0.5rem;
   }
 
   .dark {
