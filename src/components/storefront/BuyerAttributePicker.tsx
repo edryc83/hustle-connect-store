@@ -26,9 +26,9 @@ export function BuyerAttributePicker({
   return (
     <div className="space-y-4">
       {keys.map((key) => {
-        const type = ATTRIBUTE_TYPES.find((t) => t.key === key);
+        const type = ATTRIBUTE_TYPES.find((t) => t.slug === key);
         const emoji = type?.emoji ?? "➕";
-        const label = type?.label ?? key.replace("other_", "").replace(/_/g, " ");
+        const label = type?.name ?? key.replace("other_", "").replace(/_/g, " ");
         const options: string[] = attributes[key];
         const selected = selections[key] ?? "";
         const hasError = validationErrors?.[key];
