@@ -1,4 +1,4 @@
-import { useState, forwardRef } from "react";
+import { useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useQuery } from "@tanstack/react-query";
 import { Switch } from "@/components/ui/switch";
@@ -22,7 +22,7 @@ interface Props {
   userId: string;
 }
 
-const ImageSourceStep = forwardRef<HTMLDivElement, Props>(function ImageSourceStep({ slots, onUpdateSlot, userId }, ref) {
+function ImageSourceStep({ slots, onUpdateSlot, userId }: Props) {
   const [activeSlot, setActiveSlot] = useState(0);
   const [processingBg, setProcessingBg] = useState<number | null>(null);
   const [uploading, setUploading] = useState(false);
@@ -201,6 +201,6 @@ const ImageSourceStep = forwardRef<HTMLDivElement, Props>(function ImageSourceSt
       )}
     </div>
   );
-});
+}
 
 export default ImageSourceStep;
