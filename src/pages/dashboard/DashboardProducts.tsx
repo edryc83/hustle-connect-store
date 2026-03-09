@@ -22,6 +22,7 @@ import { formatPrice } from "@/lib/currency";
 import { Badge } from "@/components/ui/badge";
 import type { Tables } from "@/integrations/supabase/types";
 import { ProductAttributeForm } from "@/components/dashboard/ProductAttributeForm";
+import type { AiAttributeSuggestion } from "@/lib/attributeLibrary";
 
 type Product = Tables<"products">;
 
@@ -57,6 +58,8 @@ const DashboardProducts = () => {
   const [generatingDesc, setGeneratingDesc] = useState(false);
   const [analyzing, setAnalyzing] = useState(false);
   const [aiFilledFields, setAiFilledFields] = useState<Set<string>>(new Set());
+  const [aiSuggestions, setAiSuggestions] = useState<AiAttributeSuggestion[]>([]);
+  const [detectedSubcategory, setDetectedSubcategory] = useState("");
 
   // Form state
   const [name, setName] = useState("");
@@ -108,7 +111,7 @@ const DashboardProducts = () => {
     setName(""); setPrice(""); setDiscountPrice(""); setDiscountPercent(""); setDescription(""); setVariantsText("");
     setImageFiles([]); setImagePreviews([]); setExistingImages([]);
     setEditingProduct(null); setListingType("product"); setCondition(""); setAttributes({});
-    setAiFilledFields(new Set());
+    setAiFilledFields(new Set()); setAiSuggestions([]); setDetectedSubcategory("");
   };
 
   const openAdd = () => { resetForm(); setDialogOpen(true); };
@@ -149,42 +152,57 @@ const DashboardProducts = () => {
     setDialogOpen(true);
   };
 
-  const analyzeImage = async (file: File) => {
+  const analyzeProduct = async (file?: File) => {
     setAnalyzing(true);
     try {
-      const reader = new FileReader();
-      const base64 = await new Promise<string>((resolve) => {
-        reader.onload = () => {
-          const result = reader.result as string;
-          resolve(result.split(",")[1]);
-        };
-        reader.readAsDataURL(file);
-      });
+      const body: any = {};
+      
+      if (file) {
+        const reader = new FileReader();
+        const base64 = await new Promise<string>((resolve) => {
+          reader.onload = () => {
+            const result = reader.result as string;
+            resolve(result.split(",")[1]);
+          };
+          reader.readAsDataURL(file);
+        });
+        body.imageBase64 = base64;
+        body.mimeType = file.type;
+      }
+      
+      // Also send title and description for text-based detection
+      if (name.trim()) body.productName = name.trim();
+      if (description.trim()) body.productDescription = description.trim();
 
-      const { data, error } = await supabase.functions.invoke("analyze-product-image", {
-        body: { imageBase64: base64, mimeType: file.type },
-      });
+      if (!body.imageBase64 && !body.productName && !body.productDescription) {
+        setAnalyzing(false);
+        return;
+      }
+
+      const { data, error } = await supabase.functions.invoke("analyze-product-image", { body });
 
       if (error) throw error;
       if (data) {
         const filled = new Set<string>();
         if (data.name && !name.trim()) { setName(data.name); filled.add("name"); }
         if (data.description && !description.trim()) { setDescription(data.description); filled.add("description"); }
-        if (data.condition && !condition) { setCondition(data.condition); filled.add("condition"); }
         if (data.listing_type) { setListingType(data.listing_type); filled.add("type"); }
+        
         if (data.category) {
-          // Map AI category to our product_type values
-          const categoryMap: Record<string, string> = {
-            fashion: "fashion", beauty: "beauty", food: "food", phones: "phones",
-            wigs: "wigs", shoes: "shoes", home: "home", jewellery: "jewellery",
-            cakes: "cakes", plants: "plants", other: "other",
-          };
-          const mapped = categoryMap[data.category.toLowerCase()] || "other";
-          setAttributes((prev) => ({ ...prev, product_type: mapped }));
+          setAttributes((prev) => ({ ...prev, product_type: data.category }));
           filled.add("category");
         }
+        if (data.subcategory) {
+          setDetectedSubcategory(data.subcategory);
+        }
+        if (data.suggestions && Array.isArray(data.suggestions)) {
+          setAiSuggestions(data.suggestions);
+        }
+        
         setAiFilledFields(filled);
-        if (filled.size > 0) toast.success("✨ AI auto-filled product details from your photo!");
+        if (filled.size > 0 || (data.suggestions && data.suggestions.length > 0)) {
+          toast.success("✨ AI analyzed your product and suggested details!");
+        }
       }
     } catch {
       // Silent fail — user can still fill manually
@@ -210,7 +228,7 @@ const DashboardProducts = () => {
     // Auto-analyze the first image if no name has been entered yet
     const isFirstImage = existingImages.length === 0 && imagePreviews.length === 0;
     if (isFirstImage && rawFiles.length > 0 && !name.trim()) {
-      analyzeImage(rawFiles[0]);
+      analyzeProduct(rawFiles[0]);
     }
   };
 
@@ -378,12 +396,21 @@ const DashboardProducts = () => {
                     <input type="file" accept="image/*" multiple className="hidden" onChange={handleImageChange} />
                   </label>
                 )}
-                {analyzing && (
+                {analyzing ? (
                   <div className="flex items-center gap-2 rounded-lg bg-primary/5 border border-primary/20 px-3 py-2">
                     <Loader2 className="h-3.5 w-3.5 animate-spin text-primary" />
-                    <span className="text-xs text-primary font-medium">Analyzing image & auto-filling details…</span>
+                    <span className="text-xs text-primary font-medium">Analyzing product & suggesting details…</span>
                   </div>
-                )}
+                ) : (name.trim() || description.trim()) && aiSuggestions.length === 0 && !aiFilledFields.has("category") ? (
+                  <button
+                    type="button"
+                    onClick={() => analyzeProduct(imageFiles[0])}
+                    className="flex items-center gap-2 rounded-lg bg-primary/5 border border-primary/20 px-3 py-2 hover:bg-primary/10 transition-colors w-full"
+                  >
+                    <Sparkles className="h-3.5 w-3.5 text-primary" />
+                    <span className="text-xs text-primary font-medium">Tap to auto-detect product details with AI</span>
+                  </button>
+                ) : null}
               </div>
               <div className="space-y-1.5">
                 <div className="flex items-center gap-2">
@@ -450,9 +477,17 @@ const DashboardProducts = () => {
               <div className="space-y-1.5">
                 <Label className="text-sm font-semibold flex items-center gap-1.5">
                   📋 Product Details <span className="text-muted-foreground font-normal text-xs">(optional)</span>
-                  {aiFilledFields.has("category") && <span className="text-[10px] text-primary font-medium flex items-center gap-0.5"><Sparkles className="h-2.5 w-2.5" />AI filled</span>}
+                  {aiFilledFields.has("category") && <span className="text-[10px] text-primary font-medium flex items-center gap-0.5"><Sparkles className="h-2.5 w-2.5" />AI detected</span>}
                 </Label>
-                <ProductAttributeForm attributes={attributes} onChange={(attrs) => { setAttributes(attrs); setAiFilledFields((prev) => { const n = new Set(prev); n.delete("category"); return n; }); }} productCategory={attributes.product_type} />
+                <ProductAttributeForm 
+                  attributes={attributes} 
+                  onChange={(attrs) => { setAttributes(attrs); setAiFilledFields((prev) => { const n = new Set(prev); n.delete("category"); return n; }); }} 
+                  productCategory={attributes.product_type} 
+                  productSubcategory={detectedSubcategory}
+                  aiSuggestions={aiSuggestions}
+                  onAcceptSuggestion={(slug) => setAiSuggestions((prev) => prev.filter((s) => s.slug !== slug))}
+                  onDismissSuggestion={(slug) => setAiSuggestions((prev) => prev.filter((s) => s.slug !== slug))}
+                />
               </div>
               <Button className="w-full" onClick={handleSave} disabled={saving}>
                 {saving ? "Saving…" : editingProduct ? `Update ${terms.singular}` : `Add ${terms.singular}`}
