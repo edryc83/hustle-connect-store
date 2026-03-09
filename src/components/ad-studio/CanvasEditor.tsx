@@ -20,12 +20,16 @@ interface CanvasEditorProps {
 const CANVAS_W = 400;
 const CANVAS_H = 500;
 
-function loadImg(url: string): Promise<HTMLImageElement> {
+function loadImg(url: string, timeoutMs = 10000): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
     const el = document.createElement("img");
     el.crossOrigin = "anonymous";
-    el.onload = () => resolve(el);
-    el.onerror = reject;
+    const timer = setTimeout(() => {
+      el.src = "";
+      reject(new Error("Image load timeout"));
+    }, timeoutMs);
+    el.onload = () => { clearTimeout(timer); resolve(el); };
+    el.onerror = () => { clearTimeout(timer); reject(new Error("Image load failed: " + url)); };
     el.src = url.startsWith("/") ? window.location.origin + url : url;
   });
 }
