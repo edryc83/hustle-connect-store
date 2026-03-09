@@ -20,16 +20,13 @@ interface CanvasEditorProps {
 const CANVAS_W = 400;
 const CANVAS_H = 500;
 
-function loadImage(url: string): Promise<fabric.FabricImage> {
+function loadImg(url: string): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
-    const imgEl = document.createElement("img");
-    imgEl.crossOrigin = "anonymous";
-    imgEl.onload = () => {
-      const fImg = new fabric.FabricImage(imgEl);
-      resolve(fImg);
-    };
-    imgEl.onerror = reject;
-    imgEl.src = url.startsWith("/") ? window.location.origin + url : url;
+    const el = document.createElement("img");
+    el.crossOrigin = "anonymous";
+    el.onload = () => resolve(el);
+    el.onerror = reject;
+    el.src = url.startsWith("/") ? window.location.origin + url : url;
   });
 }
 
@@ -46,37 +43,34 @@ export default function CanvasEditor({
 }: CanvasEditorProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const fabricRef = useRef<fabric.Canvas | null>(null);
-  const objectsRef = useRef<Record<string, fabric.Object>>({});
+  const objectsRef = useRef<Record<string, fabric.FabricObject>>({});
   const [loading, setLoading] = useState(true);
-  const initializedRef = useRef(false);
 
   const reportPositions = useCallback(() => {
     if (!onPositionChange) return;
     const objs = objectsRef.current;
-    const imgObj = objs["productImage"] as fabric.FabricImage | undefined;
+    const imgObj = objs["productImage"];
     const imagePos = imgObj
       ? { left: imgObj.left ?? 0, top: imgObj.top ?? 0, scaleX: imgObj.scaleX ?? 1, scaleY: imgObj.scaleY ?? 1 }
       : { left: 0, top: 0, scaleX: 1, scaleY: 1 };
-
     const textPositions: Record<string, { left: number; top: number; fontSize: number }> = {};
-    ["productName", "subtitle", "tagline", "price", "storeName"].forEach((key) => {
+    for (const key of ["productName", "subtitle", "tagline", "price", "storeName"]) {
       const obj = objs[key] as fabric.Textbox | undefined;
-      if (obj) {
-        textPositions[key] = { left: obj.left ?? 0, top: obj.top ?? 0, fontSize: obj.fontSize ?? 16 };
-      }
-    });
+      if (obj) textPositions[key] = { left: obj.left ?? 0, top: obj.top ?? 0, fontSize: obj.fontSize ?? 16 };
+    }
     onPositionChange({ imagePos, textPositions });
   }, [onPositionChange]);
 
   // Initialize canvas once
   useEffect(() => {
-    if (!containerRef.current || initializedRef.current) return;
-    initializedRef.current = true;
+    const container = containerRef.current;
+    if (!container) return;
+
+    // Clean up any previous canvas
+    container.innerHTML = "";
 
     const canvasEl = document.createElement("canvas");
-    canvasEl.width = CANVAS_W;
-    canvasEl.height = CANVAS_H;
-    containerRef.current.appendChild(canvasEl);
+    container.appendChild(canvasEl);
 
     const canvas = new fabric.Canvas(canvasEl, {
       width: CANVAS_W,
@@ -86,6 +80,20 @@ export default function CanvasEditor({
     });
     fabricRef.current = canvas;
 
+    // Scale the wrapper to fit container width
+    const wrapper = container.querySelector(".canvas-container") as HTMLElement;
+    if (wrapper) {
+      wrapper.style.width = "100%";
+      wrapper.style.height = "auto";
+      wrapper.style.aspectRatio = `${CANVAS_W}/${CANVAS_H}`;
+    }
+    // Scale canvases via CSS
+    const allCanvases = container.querySelectorAll("canvas");
+    allCanvases.forEach((c) => {
+      c.style.width = "100%";
+      c.style.height = "100%";
+    });
+
     canvas.on("object:modified", reportPositions);
     canvas.on("object:moving", reportPositions);
     canvas.on("object:scaling", reportPositions);
@@ -93,23 +101,27 @@ export default function CanvasEditor({
     return () => {
       canvas.dispose();
       fabricRef.current = null;
-      initializedRef.current = false;
     };
-  }, [reportPositions]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Build canvas objects when inputs change
   useEffect(() => {
     const canvas = fabricRef.current;
     if (!canvas) return;
 
-    const buildCanvas = async () => {
+    let cancelled = false;
+
+    const build = async () => {
       setLoading(true);
       canvas.clear();
       objectsRef.current = {};
 
-      // 1. Background template
+      // 1. Background
       try {
-        const bgImg = await loadImage(templateThumbnail);
+        const el = await loadImg(templateThumbnail);
+        if (cancelled) return;
+        const bgImg = new fabric.FabricImage(el);
         bgImg.scaleToWidth(CANVAS_W);
         bgImg.scaleToHeight(CANVAS_H);
         bgImg.set({ selectable: false, evented: false });
@@ -121,162 +133,111 @@ export default function CanvasEditor({
 
       // 2. Gradient overlay
       const overlay = new fabric.Rect({
-        width: CANVAS_W,
-        height: CANVAS_H,
-        left: 0,
-        top: 0,
-        selectable: false,
-        evented: false,
+        width: CANVAS_W, height: CANVAS_H, left: 0, top: 0,
+        selectable: false, evented: false,
       });
-      overlay.set(
-        "fill",
-        new fabric.Gradient({
-          type: "linear",
-          coords: { x1: 0, y1: 0, x2: 0, y2: CANVAS_H },
-          colorStops: [
-            { offset: 0, color: "rgba(0,0,0,0)" },
-            { offset: 0.5, color: "rgba(0,0,0,0.15)" },
-            { offset: 1, color: "rgba(0,0,0,0.75)" },
-          ],
-        })
-      );
+      overlay.set("fill", new fabric.Gradient({
+        type: "linear",
+        coords: { x1: 0, y1: 0, x2: 0, y2: CANVAS_H },
+        colorStops: [
+          { offset: 0, color: "rgba(0,0,0,0)" },
+          { offset: 0.5, color: "rgba(0,0,0,0.15)" },
+          { offset: 1, color: "rgba(0,0,0,0.75)" },
+        ],
+      }));
       canvas.add(overlay);
 
       // 3. Product image
       if (productImage) {
         try {
-          const img = await loadImage(productImage);
+          const el = await loadImg(productImage);
+          if (cancelled) return;
+          const img = new fabric.FabricImage(el);
           const maxW = CANVAS_W * 0.6;
           const maxH = CANVAS_H * 0.5;
-          const imgScale = Math.min(maxW / (img.width || 1), maxH / (img.height || 1));
+          const s = Math.min(maxW / (img.width || 1), maxH / (img.height || 1));
           img.set({
-            scaleX: imgScale,
-            scaleY: imgScale,
-            left: CANVAS_W / 2,
-            top: CANVAS_H * 0.35,
-            originX: "center",
-            originY: "center",
-            cornerColor: "#a855f7",
-            cornerStyle: "circle",
-            cornerSize: 10,
-            transparentCorners: false,
-            borderColor: "#a855f7",
+            scaleX: s, scaleY: s,
+            left: CANVAS_W / 2, top: CANVAS_H * 0.35,
+            originX: "center", originY: "center",
+            cornerColor: "#a855f7", cornerStyle: "circle", cornerSize: 10,
+            transparentCorners: false, borderColor: "#a855f7",
           });
           canvas.add(img);
           objectsRef.current["productImage"] = img;
         } catch (e) {
-          console.error("Failed to load product image:", e);
+          console.error("Product image load error:", e);
         }
       }
 
-      // 4. Profile picture + store name
+      // 4. Profile picture
       if (profilePicture) {
         try {
-          const pfp = await loadImage(profilePicture);
+          const el = await loadImg(profilePicture);
+          if (cancelled) return;
+          const pfp = new fabric.FabricImage(el);
           pfp.scaleToWidth(28);
           pfp.scaleToHeight(28);
           pfp.set({ left: 14, top: 14, selectable: false, evented: false });
-          pfp.set(
-            "clipPath",
-            new fabric.Circle({
-              radius: (pfp.width || 28) / 2,
-              originX: "center",
-              originY: "center",
-            })
-          );
+          pfp.set("clipPath", new fabric.Circle({
+            radius: (pfp.width || 28) / 2, originX: "center", originY: "center",
+          }));
           canvas.add(pfp);
-        } catch {
-          // skip
-        }
+        } catch { /* skip */ }
       }
 
+      // Store name
       if (storeName) {
-        const storeText = new fabric.Textbox(storeName, {
-          left: profilePicture ? 50 : 14,
-          top: 18,
-          fontSize: 12,
-          fill: "rgba(255,255,255,0.7)",
-          fontFamily: "sans-serif",
-          fontWeight: "600",
-          width: CANVAS_W - 80,
-          selectable: true,
-          editable: false,
-          cornerColor: "#a855f7",
-          borderColor: "#a855f7",
-          cornerSize: 8,
-          cornerStyle: "circle",
-          transparentCorners: false,
+        const t = new fabric.Textbox(storeName, {
+          left: profilePicture ? 50 : 14, top: 18, fontSize: 12,
+          fill: "rgba(255,255,255,0.7)", fontFamily: "sans-serif", fontWeight: "600",
+          width: CANVAS_W - 80, selectable: true, editable: false,
+          cornerColor: "#a855f7", borderColor: "#a855f7", cornerSize: 8,
+          cornerStyle: "circle", transparentCorners: false,
         });
-        canvas.add(storeText);
-        objectsRef.current["storeName"] = storeText;
+        canvas.add(t);
+        objectsRef.current["storeName"] = t;
       }
 
-      // 5. Text elements (bottom area — draggable)
-      const textConfig = {
-        cornerColor: "#a855f7",
-        cornerStyle: "circle" as const,
-        cornerSize: 8,
-        transparentCorners: false,
-        borderColor: "#a855f7",
-        editable: false,
-        fontFamily: "sans-serif",
+      // 5. Text elements
+      const cfg = {
+        cornerColor: "#a855f7", cornerStyle: "circle" as const, cornerSize: 8,
+        transparentCorners: false, borderColor: "#a855f7",
+        editable: false, fontFamily: "sans-serif",
       };
-
-      let bottomY = CANVAS_H - 20;
+      let y = CANVAS_H - 20;
 
       if (price) {
-        const priceText = new fabric.Textbox(price, {
-          ...textConfig,
-          left: 16,
-          top: bottomY - 30,
-          fontSize: 20,
-          fill: "#ffffff",
-          fontWeight: "800",
-          width: CANVAS_W - 32,
+        const t = new fabric.Textbox(price, {
+          ...cfg, left: 16, top: y - 30, fontSize: 20, fill: "#ffffff",
+          fontWeight: "800", width: CANVAS_W - 32,
         });
-        canvas.add(priceText);
-        objectsRef.current["price"] = priceText;
-        bottomY -= 40;
+        canvas.add(t);
+        objectsRef.current["price"] = t;
+        y -= 40;
       }
-
       if (tagline && tagline.trim() !== " ") {
-        const taglineText = new fabric.Textbox(tagline, {
-          ...textConfig,
-          left: 16,
-          top: bottomY - 18,
-          fontSize: 10,
-          fill: "rgba(255,255,255,0.6)",
-          fontStyle: "italic",
-          width: CANVAS_W - 32,
+        const t = new fabric.Textbox(tagline, {
+          ...cfg, left: 16, top: y - 18, fontSize: 10,
+          fill: "rgba(255,255,255,0.6)", fontStyle: "italic", width: CANVAS_W - 32,
         });
-        canvas.add(taglineText);
-        objectsRef.current["tagline"] = taglineText;
-        bottomY -= 24;
+        canvas.add(t);
+        objectsRef.current["tagline"] = t;
+        y -= 24;
       }
-
       if (subtitle && subtitle.trim() !== " ") {
-        const subtitleText = new fabric.Textbox(subtitle, {
-          ...textConfig,
-          left: 16,
-          top: bottomY - 16,
-          fontSize: 12,
-          fill: "rgba(255,255,255,0.85)",
-          width: CANVAS_W - 32,
+        const t = new fabric.Textbox(subtitle, {
+          ...cfg, left: 16, top: y - 16, fontSize: 12,
+          fill: "rgba(255,255,255,0.85)", width: CANVAS_W - 32,
         });
-        canvas.add(subtitleText);
-        objectsRef.current["subtitle"] = subtitleText;
-        bottomY -= 24;
+        canvas.add(t);
+        objectsRef.current["subtitle"] = t;
+        y -= 24;
       }
 
       const nameText = new fabric.Textbox(productName || "Product Name", {
-        ...textConfig,
-        left: 16,
-        top: bottomY - 26,
-        fontSize: 22,
-        fill: "#ffffff",
-        fontWeight: "700",
-        width: CANVAS_W - 32,
-        lineHeight: 1.15,
+        ...cfg, left: 16, top: y - 26, fontSize: 22, fill: "#ffffff",
+        fontWeight: "700", width: CANVAS_W - 32, lineHeight: 1.15,
       });
       canvas.add(nameText);
       objectsRef.current["productName"] = nameText;
@@ -286,7 +247,8 @@ export default function CanvasEditor({
       reportPositions();
     };
 
-    buildCanvas();
+    build();
+    return () => { cancelled = true; };
   }, [templateThumbnail, productImage, productName, subtitle, tagline, price, storeName, profilePicture, reportPositions]);
 
   return (
@@ -297,11 +259,7 @@ export default function CanvasEditor({
             <Loader2 className="h-8 w-8 animate-spin text-primary" />
           </div>
         )}
-        <div
-          ref={containerRef}
-          className="w-full"
-          style={{ aspectRatio: `${CANVAS_W}/${CANVAS_H}` }}
-        />
+        <div ref={containerRef} className="w-full" style={{ aspectRatio: `${CANVAS_W}/${CANVAS_H}` }} />
       </div>
       <p className="text-[10px] text-muted-foreground text-center mt-2">
         Drag &amp; resize image and text directly on the canvas
