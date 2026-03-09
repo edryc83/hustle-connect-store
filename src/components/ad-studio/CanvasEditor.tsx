@@ -95,9 +95,24 @@ export default function CanvasEditor({
       canvas.clear();
       objectsRef.current = {};
 
+      // Helper to load image into fabric
+      const loadImage = (url: string): Promise<fabric.FabricImage> => {
+        return new Promise((resolve, reject) => {
+          const imgEl = new Image();
+          imgEl.crossOrigin = "anonymous";
+          imgEl.onload = () => {
+            const fImg = new fabric.FabricImage(imgEl);
+            resolve(fImg);
+          };
+          imgEl.onerror = reject;
+          // Handle relative URLs
+          imgEl.src = url.startsWith("/") ? window.location.origin + url : url;
+        });
+      };
+
       // 1. Background template
       try {
-        const bgImg = await fabric.FabricImage.fromURL(templateThumbnail, { crossOrigin: "anonymous" });
+        const bgImg = await loadImage(templateThumbnail);
         bgImg.scaleToWidth(CANVAS_W);
         bgImg.scaleToHeight(CANVAS_H);
         bgImg.set({ selectable: false, evented: false, lockMovementX: true, lockMovementY: true });
