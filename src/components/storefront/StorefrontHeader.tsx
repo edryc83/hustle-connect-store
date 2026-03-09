@@ -29,7 +29,7 @@ interface StorefrontHeaderProps {
   onBack?: () => void;
 }
 
-export function StorefrontHeader({ profile, visitorName }: StorefrontHeaderProps) {
+export function StorefrontHeader({ profile, visitorName, onBack }: StorefrontHeaderProps) {
   const coverUrl = (profile as any).cover_photo_url;
   const ig = (profile as any).instagram_url;
   const tt = (profile as any).tiktok_url;
