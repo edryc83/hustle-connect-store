@@ -180,6 +180,8 @@ const DashboardProfile = () => {
         </Button>
       </div>
     );
+  }
+
   const currency = profile.currency || "UGX";
 
   return (
