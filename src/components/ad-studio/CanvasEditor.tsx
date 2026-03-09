@@ -148,7 +148,7 @@ export default function CanvasEditor({
       // 3. Product image
       if (productImage) {
         try {
-          const img = await fabric.FabricImage.fromURL(productImage, { crossOrigin: "anonymous" });
+          const img = await loadImage(productImage);
           const maxW = CANVAS_W * 0.6;
           const maxH = CANVAS_H * 0.5;
           const imgScale = Math.min(maxW / (img.width || 1), maxH / (img.height || 1));
