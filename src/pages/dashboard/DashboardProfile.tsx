@@ -188,13 +188,7 @@ const DashboardProfile = () => {
     <div className="max-w-lg mx-auto -mx-4 md:mx-auto -mt-4 md:mt-0">
       {/* Cover Photo */}
       <div className="relative h-36 sm:h-44 bg-gradient-to-br from-primary/15 via-primary/5 to-accent/10 overflow-hidden group">
-        {profile.cover_photo_url ? (
-          <img src={profile.cover_photo_url} alt="" className="w-full h-full object-cover" />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center text-muted-foreground/30">
-            <Camera className="h-10 w-10" />
-          </div>
-        )}
+        <img src={profile.cover_photo_url || "/default-cover.png"} alt="" className="w-full h-full object-cover" />
         <label className="absolute inset-0 flex items-center justify-center bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
           {uploadingCover ? <Loader2 className="h-6 w-6 text-white animate-spin" /> : (
             <div className="text-white text-center">
@@ -218,17 +212,11 @@ const DashboardProfile = () => {
       <div className="px-4 -mt-10 relative z-10">
         {/* Profile Picture */}
         <div className="relative group w-fit ig-ring">
-          {profile.profile_picture_url ? (
-            <img
-              src={profile.profile_picture_url}
-              alt={profile.store_name ?? "Store"}
-              className="h-20 w-20 rounded-full object-cover border-2 border-background shadow-lg"
-            />
-          ) : (
-            <div className="flex h-20 w-20 items-center justify-center rounded-full bg-primary/10 border-2 border-background shadow-lg">
-              <AfristallLogo className="h-8 w-8" />
-            </div>
-          )}
+          <img
+            src={profile.profile_picture_url || "/logo-glow.png"}
+            alt={profile.store_name ?? "Store"}
+            className="h-20 w-20 rounded-full object-cover border-2 border-background shadow-lg"
+          />
           <label className="absolute inset-0 flex items-center justify-center rounded-full bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
             {uploadingPic ? <Loader2 className="h-5 w-5 text-white animate-spin" /> : <Camera className="h-5 w-5 text-white" />}
             <input type="file" accept="image/*" className="hidden" onChange={handleProfilePicChange} disabled={uploadingPic} />
