@@ -201,4 +201,6 @@ const ImageSourceStep = forwardRef<HTMLDivElement, Props>(function ImageSourceSt
       )}
     </div>
   );
-}
+});
+
+export default ImageSourceStep;
