@@ -170,9 +170,17 @@ const DashboardProfile = () => {
   };
 
   if (loading) return <div className="animate-pulse text-muted-foreground py-12 text-center">Loading…</div>;
-  if (!profile) return null;
 
-  const currency = profile.currency || "UGX";
+  if (!profile) {
+    return (
+      <div className="max-w-lg mx-auto py-10 text-center space-y-3">
+        <p className="text-sm text-muted-foreground">We couldn’t load your profile yet.</p>
+        <Button asChild variant="outline" size="sm" className="rounded-xl">
+          <Link to="/dashboard/settings">Open Settings</Link>
+        </Button>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-lg mx-auto -mx-4 md:mx-auto -mt-4 md:mt-0">
