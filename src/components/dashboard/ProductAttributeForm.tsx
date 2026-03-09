@@ -4,7 +4,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { X, Pencil, Plus, Check } from "lucide-react";
 import whatsappIcon from "@/assets/whatsapp-icon.png";
-import { ATTRIBUTE_TYPES, COLOUR_HEX, type AttributeType } from "@/lib/productAttributes";
+import { ATTRIBUTE_TYPES, COLOUR_HEX, getRecommendedAttributes, type AttributeType } from "@/lib/productAttributes";
 import {
   Sheet,
   SheetContent,
