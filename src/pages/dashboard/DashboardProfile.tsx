@@ -212,17 +212,11 @@ const DashboardProfile = () => {
       <div className="px-4 -mt-10 relative z-10">
         {/* Profile Picture */}
         <div className="relative group w-fit ig-ring">
-          {profile.profile_picture_url ? (
-            <img
-              src={profile.profile_picture_url}
-              alt={profile.store_name ?? "Store"}
-              className="h-20 w-20 rounded-full object-cover border-2 border-background shadow-lg"
-            />
-          ) : (
-            <div className="flex h-20 w-20 items-center justify-center rounded-full bg-primary/10 border-2 border-background shadow-lg">
-              <AfristallLogo className="h-8 w-8" />
-            </div>
-          )}
+          <img
+            src={profile.profile_picture_url || "/logo-glow.png"}
+            alt={profile.store_name ?? "Store"}
+            className="h-20 w-20 rounded-full object-cover border-2 border-background shadow-lg"
+          />
           <label className="absolute inset-0 flex items-center justify-center rounded-full bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer">
             {uploadingPic ? <Loader2 className="h-5 w-5 text-white animate-spin" /> : <Camera className="h-5 w-5 text-white" />}
             <input type="file" accept="image/*" className="hidden" onChange={handleProfilePicChange} disabled={uploadingPic} />
