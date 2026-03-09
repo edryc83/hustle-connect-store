@@ -88,8 +88,14 @@ function ImageSourceStep({ slots, onUpdateSlot, userId }: Props) {
       setProcessingBg(true);
       try {
         const blob = await removeBackground(slot.url);
-        const processedUrl = URL.createObjectURL(blob);
-        onUpdateSlot(0, { processedUrl });
+        // Upload the processed image to storage so Railway can access it
+        const path = `${userId}/bg-removed-${Date.now()}.png`;
+        const { error: uploadErr } = await supabase.storage
+          .from("ad-images")
+          .upload(path, blob, { contentType: "image/png", upsert: true });
+        if (uploadErr) throw uploadErr;
+        const { data: urlData } = supabase.storage.from("ad-images").getPublicUrl(path);
+        onUpdateSlot(0, { processedUrl: urlData.publicUrl });
       } catch (err) {
         console.error("BG removal error:", err);
         onUpdateSlot(0, { removeBg: false });
