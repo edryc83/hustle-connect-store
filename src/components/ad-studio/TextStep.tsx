@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
-import { Loader2, Sparkles } from "lucide-react";
+import { Loader2, Sparkles, Image } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "@/hooks/use-toast";
 import type { Template } from "@/components/ad-studio/TemplatePicker";
@@ -32,12 +32,94 @@ export default function TextStep({
   storeName,
 }: TextStepProps) {
   const [suggesting, setSuggesting] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [previewLoading, setPreviewLoading] = useState(false);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  // Determine which fields this template supports
+  // Determine which fields this template supports (from Railway API)
   const fields = template?.fields || ["product_name", "price", "subtitle", "tagline"];
   const hasField = (f: string) => fields.includes(f);
 
-  const mainImage = imageSlots[0]?.processedUrl || imageSlots[0]?.url;
+  // Build the render body
+  const buildBody = useCallback(() => {
+    if (!template) return null;
+    const body: Record<string, string> = {
+      template: template.id,
+      product_name: productName || "Product Name",
+      subtitle: subtitle || " ",
+      tagline: tagline || " ",
+      price: price || " ",
+      store_name: storeName || "My Store",
+    };
+    imageSlots.forEach((slot, i) => {
+      const imgUrl = slot.processedUrl || slot.url;
+      if (imgUrl) body[`image${i + 1}`] = imgUrl;
+    });
+    return body;
+  }, [template, productName, subtitle, tagline, price, storeName, imageSlots]);
+
+  // Debounced live preview from Railway
+  useEffect(() => {
+    if (!template) return;
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+
+    debounceRef.current = setTimeout(async () => {
+      const body = buildBody();
+      if (!body) return;
+      setPreviewLoading(true);
+      try {
+        const res = await fetch(
+          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ad-render`,
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify(body),
+          }
+        );
+        if (res.ok) {
+          const data = await res.json();
+          const url = data.url || data.image_url;
+          if (url) setPreviewUrl(url);
+        }
+      } catch (err) {
+        console.error("Preview render error:", err);
+      } finally {
+        setPreviewLoading(false);
+      }
+    }, 1200); // 1.2s debounce to avoid hammering the API
+
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
+  }, [template, productName, subtitle, tagline, price, buildBody]);
+
+  // Initial preview on mount
+  useEffect(() => {
+    if (template && !previewUrl) {
+      const body = buildBody();
+      if (!body) return;
+      setPreviewLoading(true);
+      fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ad-render`, {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
+      })
+        .then((r) => r.json())
+        .then((data) => {
+          const url = data.url || data.image_url;
+          if (url) setPreviewUrl(url);
+        })
+        .catch(console.error)
+        .finally(() => setPreviewLoading(false));
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const handleAiSuggest = async () => {
     if (!productName.trim()) return;
@@ -60,46 +142,34 @@ export default function TextStep({
 
   return (
     <div className="space-y-4 pb-4">
-      {/* Live preview of chosen template at top */}
-      {template && (
-        <div className="w-full max-w-sm mx-auto">
-          <div className="relative aspect-[4/5] rounded-2xl overflow-hidden border border-border bg-card shadow-lg">
-            {/* Use template thumbnail as background reference */}
-            {template.thumbnail ? (
-              <img src={template.thumbnail} alt={template.name} className="absolute inset-0 w-full h-full object-cover opacity-40" />
-            ) : null}
-
-            {/* Product image overlay */}
-            {mainImage && (
-              <img src={mainImage} alt="Product" className="absolute inset-0 w-full h-full object-contain z-10" />
-            )}
-
-            {/* Overlay gradient */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent z-20" />
-
-            {/* Text overlay - updates in real time */}
-            <div className="absolute bottom-0 inset-x-0 p-4 space-y-1 z-30">
-              {storeName && (
-                <p className="text-[10px] font-medium text-white/60 uppercase tracking-wider">{storeName}</p>
-              )}
-              <h3 className="text-lg font-bold text-white leading-tight">
-                {productName || "Product Name"}
-              </h3>
-              {hasField("subtitle") && subtitle && (
-                <p className="text-xs text-white/80">{subtitle}</p>
-              )}
-              {hasField("tagline") && tagline && (
-                <p className="text-[10px] text-white/60 italic">{tagline}</p>
-              )}
-              {price && (
-                <div className="inline-block mt-1 bg-white/20 backdrop-blur-sm rounded-md px-2 py-0.5">
-                  <span className="text-sm font-bold text-white">{price}</span>
-                </div>
+      {/* Live preview from Railway */}
+      <div className="w-full max-w-sm mx-auto">
+        <div className="relative aspect-[4/5] rounded-2xl overflow-hidden border border-border bg-muted shadow-lg">
+          {previewUrl ? (
+            <img
+              src={previewUrl}
+              alt="Ad preview"
+              className={`w-full h-full object-contain transition-opacity ${previewLoading ? "opacity-50" : "opacity-100"}`}
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center">
+              {previewLoading ? (
+                <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+              ) : (
+                <Image className="h-10 w-10 text-muted-foreground/30" />
               )}
             </div>
-          </div>
+          )}
+          {previewLoading && previewUrl && (
+            <div className="absolute top-2 right-2 bg-background/80 backdrop-blur-sm rounded-full p-1.5">
+              <Loader2 className="h-3.5 w-3.5 animate-spin text-primary" />
+            </div>
+          )}
         </div>
-      )}
+        <p className="text-[10px] text-muted-foreground text-center mt-2">
+          Live preview — rendered from template
+        </p>
+      </div>
 
       <h2 className="text-base font-semibold">Edit text</h2>
 
