@@ -330,15 +330,16 @@ const Explore = () => {
               {filtered.map((store) => {
                 const businessLabel = getBusinessLabel(store);
                 const location = getLocationLabel(store);
+                const avatarUrl = store.profile_picture_url || store.first_product_image;
                 return (
                   <Link key={store.id} to={`/${store.store_slug}`} className="block">
                     <div className="flex items-center gap-3 rounded-2xl bg-card p-3.5 border border-border/50 hover:border-primary/20 hover:shadow-sm transition-all">
                       <div className="ig-ring ig-ring-sm shrink-0">
-                        {store.profile_picture_url ? (
-                          <img src={store.profile_picture_url} alt={store.store_name ?? "Store"} className="h-12 w-12 rounded-full object-cover border-2 border-background" loading="lazy" />
+                        {avatarUrl ? (
+                          <img src={avatarUrl} alt={store.store_name ?? "Store"} className="h-12 w-12 rounded-full object-cover border-2 border-background" loading="lazy" />
                         ) : (
                           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-secondary border-2 border-background">
-                            <AfristallLogo className="h-5 w-5" />
+                            <img src="/logo-glow.png" alt="Afristall" className="h-8 w-8 rounded-full object-cover" />
                           </div>
                         )}
                       </div>
