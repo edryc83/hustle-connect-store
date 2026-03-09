@@ -49,6 +49,7 @@ export default function TemplatePicker({ selected, onSelect }: Props) {
           ...t,
           image_slots: t.image_slots ?? t.images ?? 1,
           thumbnail: TEMPLATE_THUMBNAILS[t.id] || t.thumbnail || t.preview_url || null,
+          fields: t.fields || ["product_name", "price", "subtitle", "tagline"],
         })));
       } catch (e: any) {
         setError(e.message);
