@@ -72,7 +72,57 @@ const Explore = () => {
         .not("store_name", "is", null)
         .not("store_slug", "is", null)
         .order("last_active_at", { ascending: false });
-      setStores((data as any) ?? []);
+
+      const storeList = (data as StoreProfile[]) ?? [];
+
+      // For stores missing profile pic or cover, fetch their first product image
+      const needsImage = storeList.filter((s) => !s.profile_picture_url || !s.cover_photo_url);
+      if (needsImage.length > 0) {
+        const ids = needsImage.map((s) => s.id);
+        const { data: products } = await supabase
+          .from("products")
+          .select("user_id, image_url")
+          .in("user_id", ids)
+          .order("created_at", { ascending: false });
+
+        if (products) {
+          const firstImg: Record<string, string> = {};
+          products.forEach((p: any) => {
+            if (!firstImg[p.user_id] && p.image_url) firstImg[p.user_id] = p.image_url;
+          });
+
+          // Also check product_images table
+          const stillMissing = ids.filter((id) => !firstImg[id]);
+          if (stillMissing.length > 0) {
+            const { data: prodImgs } = await supabase
+              .from("products")
+              .select("user_id, id")
+              .in("user_id", stillMissing);
+            if (prodImgs && prodImgs.length > 0) {
+              const prodIds = prodImgs.map((p: any) => p.id);
+              const { data: imgs } = await supabase
+                .from("product_images")
+                .select("product_id, image_url")
+                .in("product_id", prodIds)
+                .order("position", { ascending: true });
+              if (imgs) {
+                const prodToUser: Record<string, string> = {};
+                prodImgs.forEach((p: any) => { prodToUser[p.id] = p.user_id; });
+                imgs.forEach((img: any) => {
+                  const userId = prodToUser[img.product_id];
+                  if (userId && !firstImg[userId]) firstImg[userId] = img.image_url;
+                });
+              }
+            }
+          }
+
+          storeList.forEach((s) => {
+            if (firstImg[s.id]) s.first_product_image = firstImg[s.id];
+          });
+        }
+      }
+
+      setStores(storeList);
       setLoading(false);
     };
     fetchStores();
