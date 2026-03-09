@@ -922,12 +922,6 @@ const StorefrontInner = () => {
         visitorName={visitorName}
       />
 
-      {/* WhatsApp Button */}
-      {profile.whatsapp_number && (
-        <StoreAssistantButton
-          whatsappNumber={profile.whatsapp_number}
-        />
-      )}
     </div>
   );
 };
