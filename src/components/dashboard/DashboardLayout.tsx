@@ -42,6 +42,12 @@ export function DashboardLayout({ children }: { children: ReactNode }) {
               </div>
             </div>
             <div className="flex items-center gap-2">
+              <Link
+                to="/ad-studio"
+                className="flex h-9 items-center gap-1.5 rounded-full border-0 bg-gradient-to-r from-violet-600 to-fuchsia-500 px-3 text-xs font-medium text-white shadow-md shadow-violet-500/25 hover:shadow-violet-500/40 transition-shadow md:hidden"
+              >
+                <Sparkles className="h-3.5 w-3.5" /> AI Design
+              </Link>
               <button
                 onClick={toggleTheme}
                 className="flex h-9 w-9 items-center justify-center rounded-full border bg-card/60 backdrop-blur-sm text-muted-foreground hover:text-foreground transition-colors"
