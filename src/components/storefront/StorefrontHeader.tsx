@@ -27,10 +27,12 @@ interface StorefrontHeaderProps {
   profile: Profile;
   visitorName: string | null;
   onBack?: () => void;
+  firstProductImage?: string | null;
 }
 
-export function StorefrontHeader({ profile, visitorName, onBack }: StorefrontHeaderProps) {
-  const coverUrl = (profile as any).cover_photo_url;
+export function StorefrontHeader({ profile, visitorName, onBack, firstProductImage }: StorefrontHeaderProps) {
+  const coverUrl = (profile as any).cover_photo_url || firstProductImage || "/default-cover.png";
+  const avatarUrl = profile.profile_picture_url || firstProductImage || "/logo-glow.png";
   const ig = (profile as any).instagram_url;
   const tt = (profile as any).tiktok_url;
   const fb = (profile as any).facebook_url;
