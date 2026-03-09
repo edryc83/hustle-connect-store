@@ -46,9 +46,6 @@ export default function TextStep({
   const [suggesting, setSuggesting] = useState(false);
   const [variations, setVariations] = useState<CopyVariation[]>([]);
   const [selectedVariation, setSelectedVariation] = useState<number | null>(null);
-  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
-  const [previewLoading, setPreviewLoading] = useState(false);
-  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const autoSuggestDone = useRef(false);
 
   // Template fields (from Railway API)
@@ -57,30 +54,12 @@ export default function TextStep({
 
   const mainImage = imageSlots[0]?.processedUrl || imageSlots[0]?.url;
   const templateThumbnail = template?.thumbnail || "";
+
+  // Character limits from template (Railway can define these)
   const charLimits = {
     subtitle: (template as any)?.char_limits?.subtitle || 50,
     tagline: (template as any)?.char_limits?.tagline || 35,
   };
-
-  // Build render body
-  const buildBody = useCallback(() => {
-    if (!template) return null;
-    const body: Record<string, any> = {
-      template: template.id,
-      product_name: productName || "Product Name",
-      subtitle: subtitle || " ",
-      tagline: tagline || " ",
-      price: price || " ",
-      store_name: storeName || "My Store",
-      profile_picture: profilePicture || "",
-    };
-    imageSlots.forEach((slot, i) => {
-      const imgUrl = slot.processedUrl || slot.url;
-      if (imgUrl) body[`image${i + 1}`] = imgUrl;
-      if (slot.cropData) body[`image${i + 1}_crop`] = slot.cropData;
-    });
-    return body;
-  }, [template, productName, subtitle, tagline, price, storeName, profilePicture, imageSlots]);
 
   // Debounced live preview from Railway
   useEffect(() => {
