@@ -12,7 +12,6 @@ import type { Template } from "@/components/ad-studio/TemplatePicker";
 import ImageSourceStep from "@/components/ad-studio/ImageSourceStep";
 import type { ImageSlotData } from "@/components/ad-studio/ImageSourceStep";
 import TextStep from "@/components/ad-studio/TextStep";
-import LivePreview from "@/components/ad-studio/LivePreview";
 import ResultScreen from "@/components/ad-studio/ResultScreen";
 import StepNav from "@/components/ad-studio/StepNav";
 
@@ -60,6 +59,11 @@ export default function AdStudio() {
           url: null, file: null, removeBg: false, processedUrl: null,
         }))
       );
+      // Clear text when template changes
+      setProductName("");
+      setSubtitle("");
+      setTagline("");
+      setPrice("");
     }
   }, [selectedTemplate]);
 
@@ -72,11 +76,11 @@ export default function AdStudio() {
 
   const goNext = () => {
     markComplete(step);
-    // Pre-fill text from first product slot when entering step 3
+    // Pre-fill text from product when entering step 3
     if (step === 2) {
       const firstSlot = imageSlots[0];
-      if (firstSlot?.productName && !productName) setProductName(firstSlot.productName);
-      if (firstSlot?.productPrice && !price) {
+      if (firstSlot?.productName) setProductName(firstSlot.productName);
+      if (firstSlot?.productPrice) {
         setPrice(formatPrice(firstSlot.productPrice, profile?.currency || "UGX"));
       }
     }
@@ -170,53 +174,39 @@ export default function AdStudio() {
         </div>
       </header>
 
-      {/* Main: steps + live preview */}
-      <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">
-        {/* Steps panel */}
-        <main className="flex-1 overflow-y-auto p-4 lg:max-w-lg lg:border-r border-border/50">
-          {step === 1 && (
-            <TemplatePicker selected={selectedTemplate} onSelect={setSelectedTemplate} />
-          )}
-          {step === 2 && (
-            <ImageSourceStep slots={imageSlots} onUpdateSlot={updateSlot} userId={user.id} />
-          )}
-          {step === 3 && (
-            <TextStep
-              productName={productName}
-              setProductName={setProductName}
-              subtitle={subtitle}
-              setSubtitle={setSubtitle}
-              tagline={tagline}
-              setTagline={setTagline}
-              price={price}
-              setPrice={setPrice}
-              templateStyle={selectedTemplate?.name || "modern"}
-            />
-          )}
-
-          {error && (
-            <div className="mt-4 p-3 rounded-xl bg-destructive/10 border border-destructive/20 text-destructive text-sm">
-              {error}
-            </div>
-          )}
-        </main>
-
-        {/* Live preview panel */}
-        <aside className="lg:flex-1 border-t lg:border-t-0 border-border/50 bg-muted/30 p-4 flex items-center justify-center overflow-y-auto min-h-[300px]">
-          <LivePreview
+      {/* Main content — single column, no side panel */}
+      <main className="flex-1 overflow-y-auto p-4 max-w-lg mx-auto w-full">
+        {step === 1 && (
+          <TemplatePicker selected={selectedTemplate} onSelect={setSelectedTemplate} />
+        )}
+        {step === 2 && (
+          <ImageSourceStep slots={imageSlots} onUpdateSlot={updateSlot} userId={user.id} />
+        )}
+        {step === 3 && (
+          <TextStep
+            productName={productName}
+            setProductName={setProductName}
+            subtitle={subtitle}
+            setSubtitle={setSubtitle}
+            tagline={tagline}
+            setTagline={setTagline}
+            price={price}
+            setPrice={setPrice}
             template={selectedTemplate}
             imageSlots={imageSlots}
-            productName={productName}
-            subtitle={subtitle}
-            tagline={tagline}
-            price={price}
             storeName={profile?.store_name || profile?.store_slug || ""}
           />
-        </aside>
-      </div>
+        )}
+
+        {error && (
+          <div className="mt-4 p-3 rounded-xl bg-destructive/10 border border-destructive/20 text-destructive text-sm">
+            {error}
+          </div>
+        )}
+      </main>
 
       {/* Bottom action bar */}
-      <div className="sticky bottom-0 border-t border-border/50 bg-background/95 backdrop-blur-xl px-4 py-3 flex gap-3">
+      <div className="sticky bottom-0 border-t border-border/50 bg-background/95 backdrop-blur-xl px-4 py-3 flex gap-3 max-w-lg mx-auto w-full">
         {step > 1 && (
           <Button variant="outline" onClick={() => setStep((s) => s - 1)} className="flex-shrink-0">
             Back
