@@ -50,11 +50,13 @@ export default function CanvasEditor({
   const textObjsRef = useRef<Record<string, fabric.Textbox>>({});
   const [loading, setLoading] = useState(true);
 
+  const onPositionChangeRef = useRef(onPositionChange);
+  onPositionChangeRef.current = onPositionChange;
+
   const reportPositions = useCallback(() => {
-    if (!onPositionChange) return;
+    if (!onPositionChangeRef.current) return;
     const canvas = fabricRef.current;
     if (!canvas) return;
-    // Find product image object
     const allObjs = canvas.getObjects();
     const imgObj = allObjs.find((o) => (o as any).__role === "productImage");
     const imagePos = imgObj
@@ -64,8 +66,8 @@ export default function CanvasEditor({
     for (const [key, obj] of Object.entries(textObjsRef.current)) {
       textPositions[key] = { left: obj.left ?? 0, top: obj.top ?? 0, fontSize: obj.fontSize ?? 16 };
     }
-    onPositionChange({ imagePos, textPositions });
-  }, [onPositionChange]);
+    onPositionChangeRef.current({ imagePos, textPositions });
+  }, []);
 
   // Initialize canvas + load images (only when image/template changes)
   useEffect(() => {
