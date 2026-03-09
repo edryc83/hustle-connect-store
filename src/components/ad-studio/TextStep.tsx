@@ -61,43 +61,6 @@ export default function TextStep({
     tagline: (template as any)?.char_limits?.tagline || 35,
   };
 
-  // Debounced live preview from Railway
-  useEffect(() => {
-    if (!template) return;
-    if (debounceRef.current) clearTimeout(debounceRef.current);
-
-    debounceRef.current = setTimeout(async () => {
-      const body = buildBody();
-      if (!body) return;
-      setPreviewLoading(true);
-      try {
-        const res = await fetch(
-          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ad-render`,
-          {
-            method: "POST",
-            headers: {
-              Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify(body),
-          }
-        );
-        if (res.ok) {
-          const data = await res.json();
-          const url = data.url || data.image_url;
-          if (url) setPreviewUrl(url);
-        }
-      } catch (err) {
-        console.error("Preview render error:", err);
-      } finally {
-        setPreviewLoading(false);
-      }
-    }, 1200);
-
-    return () => {
-      if (debounceRef.current) clearTimeout(debounceRef.current);
-    };
-  }, [template, productName, subtitle, tagline, price, buildBody]);
 
   // Auto-suggest copy when entering step 3 with a product name
   useEffect(() => {
