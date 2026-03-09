@@ -58,6 +58,8 @@ const DashboardProducts = () => {
   const [generatingDesc, setGeneratingDesc] = useState(false);
   const [analyzing, setAnalyzing] = useState(false);
   const [aiFilledFields, setAiFilledFields] = useState<Set<string>>(new Set());
+  const [aiSuggestions, setAiSuggestions] = useState<AiAttributeSuggestion[]>([]);
+  const [detectedSubcategory, setDetectedSubcategory] = useState("");
 
   // Form state
   const [name, setName] = useState("");
