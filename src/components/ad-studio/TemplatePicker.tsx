@@ -8,6 +8,7 @@ export interface Template {
   image_slots: number;
   thumbnail?: string;
   preview_url?: string;
+  fields?: string[];
 }
 
 interface Props {
