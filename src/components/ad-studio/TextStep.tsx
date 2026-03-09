@@ -199,6 +199,14 @@ export default function TextStep({
         </p>
       </div>
 
+      {/* Image positioner */}
+      {mainImage && onUpdateSlot && (
+        <ImagePositioner
+          src={mainImage}
+          onCropData={(cropData) => onUpdateSlot(0, { cropData })}
+        />
+      )}
+
       <h2 className="text-base font-semibold">Edit text</h2>
 
       <div className="space-y-3">
