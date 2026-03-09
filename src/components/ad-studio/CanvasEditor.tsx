@@ -148,9 +148,7 @@ export default function CanvasEditor({
       // 3. Product image
       if (productImage) {
         try {
-          const img = await loadImage(productImage);
-          const maxW = CANVAS_W * 0.6;
-          const maxH = CANVAS_H * 0.5;
+          const img = await loadImage(productImage     const maxH = CANVAS_H * 0.5;
           const imgScale = Math.min(maxW / (img.width || 1), maxH / (img.height || 1));
           img.set({
             scaleX: imgScale,
@@ -175,9 +173,7 @@ export default function CanvasEditor({
       // 4. Profile picture + store name
       if (profilePicture) {
         try {
-          const pfp = await fabric.FabricImage.fromURL(profilePicture, { crossOrigin: "anonymous" });
-          pfp.scaleToWidth(28);
-          pfp.scaleToHeight(28);
+          const pfp = await fabric.FabricImage.fromURL(profilePicture, { crloadImage(profilePicturep.scaleToHeight(28);
           pfp.set({ left: 14, top: 14, selectable: false, evented: false });
           pfp.set("clipPath", new fabric.Circle({
             radius: (pfp.width || 28) / 2,
