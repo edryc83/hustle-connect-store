@@ -396,12 +396,21 @@ const DashboardProducts = () => {
                     <input type="file" accept="image/*" multiple className="hidden" onChange={handleImageChange} />
                   </label>
                 )}
-                {analyzing && (
+                {analyzing ? (
                   <div className="flex items-center gap-2 rounded-lg bg-primary/5 border border-primary/20 px-3 py-2">
                     <Loader2 className="h-3.5 w-3.5 animate-spin text-primary" />
-                    <span className="text-xs text-primary font-medium">Analyzing image & auto-filling details…</span>
+                    <span className="text-xs text-primary font-medium">Analyzing product & suggesting details…</span>
                   </div>
-                )}
+                ) : (name.trim() || description.trim()) && aiSuggestions.length === 0 && !aiFilledFields.has("category") ? (
+                  <button
+                    type="button"
+                    onClick={() => analyzeProduct(imageFiles[0])}
+                    className="flex items-center gap-2 rounded-lg bg-primary/5 border border-primary/20 px-3 py-2 hover:bg-primary/10 transition-colors w-full"
+                  >
+                    <Sparkles className="h-3.5 w-3.5 text-primary" />
+                    <span className="text-xs text-primary font-medium">Tap to auto-detect product details with AI</span>
+                  </button>
+                ) : null}
               </div>
               <div className="space-y-1.5">
                 <div className="flex items-center gap-2">
