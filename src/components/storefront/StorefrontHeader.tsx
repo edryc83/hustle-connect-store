@@ -62,7 +62,7 @@ export function StorefrontHeader({ profile, visitorName, onBack, firstProductIma
             src={avatarUrl}
             alt={profile.store_name ?? "Store"}
             wrapperClassName="h-20 w-20 rounded-full"
-            className="h-20 w-20 rounded-full object-cover border-2 border-background"
+            className="w-full h-full rounded-full object-cover"
           />
         </div>
 
