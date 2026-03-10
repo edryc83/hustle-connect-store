@@ -23,12 +23,7 @@ import {
   serializeCategories,
   deserializeCategories,
 } from "@/components/CategoryPicker";
-import { DISTRICTS, getTowns } from "@/lib/locations";
-
-const COUNTRIES = [
-  "Uganda", "Kenya", "Nigeria", "Ghana", "Tanzania", "Rwanda",
-  "South Africa", "Ethiopia", "Cameroon", "Senegal", "Other",
-];
+import { getDistricts, SUPPORTED_COUNTRIES } from "@/lib/locations";
 function NotificationSettings() {
   const { isSubscribed, supported, loading, subscribe, unsubscribe } = usePushNotifications();
 
@@ -121,7 +116,22 @@ const DashboardSettings = () => {
           setCoverPhotoUrl(d.cover_photo_url ?? "");
           setStoreName(d.store_name ?? "");
           setWhatsappNumber(d.whatsapp_number ?? "");
-          setCountry(d.country ?? "");
+          const savedCountry = d.country ?? "";
+          setCountry(savedCountry);
+          // Auto-detect country if not set
+          if (!savedCountry) {
+            fetch("https://ipapi.co/json/")
+              .then((r) => r.json())
+              .then((geo) => {
+                if (geo?.country_name) {
+                  const match = SUPPORTED_COUNTRIES.find(
+                    (c) => c.toLowerCase() === geo.country_name.toLowerCase()
+                  );
+                  if (match) setCountry(match);
+                }
+              })
+              .catch(() => {});
+          }
           setDistrict(d.district ?? "");
           setCity(d.city ?? "");
           setStreet(d.street ?? "");
@@ -490,42 +500,27 @@ const DashboardSettings = () => {
           {/* Location */}
           <div className="space-y-1.5">
             <Label>Country</Label>
-            <Input
-              value={country}
-              onChange={(e) => setCountry(e.target.value)}
-              placeholder="e.g. Uganda"
-              list="country-options"
-            />
-            <datalist id="country-options">
-              {COUNTRIES.map((c) => (
-                <option key={c} value={c} />
-              ))}
-            </datalist>
-          </div>
-
-          <div className="space-y-1.5">
-            <Label>District</Label>
-            <Select value={district} onValueChange={(val) => { setDistrict(val); setCity(""); }}>
+            <Select value={country} onValueChange={(val) => { setCountry(val); setDistrict(""); setCity(""); }}>
               <SelectTrigger>
-                <SelectValue placeholder="Select district" />
+                <SelectValue placeholder="Select country" />
               </SelectTrigger>
               <SelectContent>
-                {DISTRICTS.map((d) => (
-                  <SelectItem key={d} value={d}>{d}</SelectItem>
+                {SUPPORTED_COUNTRIES.map((c) => (
+                  <SelectItem key={c} value={c}>{c}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
 
           <div className="space-y-1.5">
-            <Label>City / Town {district && <span className="text-muted-foreground font-normal">(optional)</span>}</Label>
-            <Select value={city} onValueChange={setCity} disabled={!district}>
+            <Label>District / Region</Label>
+            <Select value={district} onValueChange={setDistrict} disabled={!country}>
               <SelectTrigger>
-                <SelectValue placeholder={district ? "Select town" : "Select a district first"} />
+                <SelectValue placeholder={country ? "Select district" : "Select a country first"} />
               </SelectTrigger>
               <SelectContent>
-                {getTowns(district).map((t) => (
-                  <SelectItem key={t} value={t}>{t}</SelectItem>
+                {getDistricts(country).map((d) => (
+                  <SelectItem key={d} value={d}>{d}</SelectItem>
                 ))}
               </SelectContent>
             </Select>

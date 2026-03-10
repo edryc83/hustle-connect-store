@@ -1,66 +1,73 @@
-// Uganda districts and their towns/areas
-export const LOCATION_DATA: Record<string, string[]> = {
-  Kampala: [
-    "Kampala Central", "Nakawa", "Makindye", "Rubaga", "Kawempe",
-    "Kololo", "Ntinda", "Bukoto", "Naguru", "Bugolobi",
-    "Wandegeya", "Makerere", "Kibuye", "Ndeeba", "Kabalagala",
-    "Kisementi", "Muyenga", "Buziga", "Bunga", "Namuwongo",
+// Districts/regions per country — no towns
+export const COUNTRY_DISTRICTS: Record<string, string[]> = {
+  Uganda: [
+    "Kampala", "Wakiso", "Mukono", "Jinja", "Mbarara", "Gulu", "Lira",
+    "Mbale", "Fort Portal", "Masaka", "Soroti", "Hoima", "Arua", "Kabale",
+    "Iganga", "Mityana", "Tororo", "Entebbe", "Kasese", "Bushenyi",
+    "Ntungamo", "Rukungiri", "Kabarole", "Luwero", "Mpigi",
   ],
-  Wakiso: [
-    "Entebbe", "Nansana", "Kira", "Wakiso Town", "Kasangati",
-    "Bweyogerere", "Namugongo", "Mukono Road", "Gayaza", "Abayita Ababiri",
-    "Kajjansi", "Buloba", "Matugga", "Kakiri", "Nsangi",
+  Kenya: [
+    "Nairobi", "Mombasa", "Kisumu", "Nakuru", "Eldoret", "Thika",
+    "Malindi", "Kitale", "Garissa", "Nyeri", "Machakos", "Nanyuki",
+    "Kiambu", "Kajiado", "Meru", "Embu", "Naivasha",
   ],
-  Mukono: [
-    "Mukono Town", "Seeta", "Namanve", "Goma", "Lugazi",
-    "Njeru", "Katosi", "Nagojje",
+  Nigeria: [
+    "Lagos", "Abuja", "Kano", "Ibadan", "Port Harcourt", "Benin City",
+    "Kaduna", "Enugu", "Calabar", "Warri", "Owerri", "Abeokuta",
+    "Jos", "Ilorin", "Uyo", "Onitsha", "Aba", "Akure", "Osogbo",
   ],
-  Jinja: [
-    "Jinja Town", "Bugembe", "Kakira", "Buwenge", "Magamaga",
+  Ghana: [
+    "Accra", "Kumasi", "Tamale", "Takoradi", "Cape Coast", "Tema",
+    "Sunyani", "Ho", "Koforidua", "Techiman", "Wa", "Bolgatanga",
   ],
-  Mbarara: [
-    "Mbarara City", "Kakoba", "Kamukuzi", "Nyamitanga", "Ruti",
+  Tanzania: [
+    "Dar es Salaam", "Dodoma", "Mwanza", "Arusha", "Mbeya", "Morogoro",
+    "Zanzibar", "Tanga", "Iringa", "Kigoma", "Songea",
   ],
-  Gulu: [
-    "Gulu City", "Laroo", "Layibi", "Pece", "Bardege",
+  Rwanda: [
+    "Kigali", "Butare", "Gisenyi", "Ruhengeri", "Gitarama", "Byumba",
+    "Kibungo", "Cyangugu",
   ],
-  Lira: [
-    "Lira City", "Adyel", "Ojwina", "Railway",
+  "South Africa": [
+    "Johannesburg", "Cape Town", "Durban", "Pretoria", "Port Elizabeth",
+    "Bloemfontein", "Polokwane", "Nelspruit", "Kimberley", "East London",
+    "Soweto", "Pietermaritzburg", "Rustenburg",
   ],
-  Mbale: [
-    "Mbale City", "Nakaloke", "Malukhu", "Wanale",
+  Ethiopia: [
+    "Addis Ababa", "Dire Dawa", "Mekelle", "Gondar", "Hawassa",
+    "Bahir Dar", "Jimma", "Adama", "Dessie",
   ],
-  "Fort Portal": [
-    "Fort Portal City", "Kabarole", "Rwimi", "Kijura",
+  Cameroon: [
+    "Douala", "Yaoundé", "Bamenda", "Garoua", "Maroua", "Bafoussam",
+    "Kumba", "Buea", "Limbe",
   ],
-  Masaka: [
-    "Masaka City", "Nyendo", "Kimanya", "Katwe",
+  Senegal: [
+    "Dakar", "Thiès", "Saint-Louis", "Kaolack", "Ziguinchor", "Touba",
+    "Mbour", "Rufisque",
   ],
-  Soroti: [
-    "Soroti City", "Gweri", "Arapai",
+  "DR Congo": [
+    "Kinshasa", "Lubumbashi", "Mbuji-Mayi", "Kisangani", "Kananga",
+    "Goma", "Bukavu", "Likasi",
   ],
-  Hoima: [
-    "Hoima City", "Bujumbura", "Kigorobya",
+  "Ivory Coast": [
+    "Abidjan", "Bouaké", "Daloa", "Yamoussoukro", "San-Pédro", "Korhogo",
   ],
-  Arua: [
-    "Arua City", "Manibe", "Oli", "Pangisa",
+  Zambia: [
+    "Lusaka", "Kitwe", "Ndola", "Livingstone", "Kabwe", "Chipata",
   ],
-  Kabale: [
-    "Kabale Town", "Kikungiri", "Makanga",
+  Zimbabwe: [
+    "Harare", "Bulawayo", "Mutare", "Gweru", "Masvingo", "Kwekwe",
   ],
-  Iganga: [
-    "Iganga Town", "Nakavule", "Busesa",
-  ],
-  Mityana: [
-    "Mityana Town", "Ttamu", "Busimbi",
-  ],
-  Tororo: [
-    "Tororo Town", "Nagongera", "Malaba",
+  Mozambique: [
+    "Maputo", "Matola", "Beira", "Nampula", "Chimoio", "Quelimane",
   ],
 };
 
-export const DISTRICTS = Object.keys(LOCATION_DATA);
+export const SUPPORTED_COUNTRIES = Object.keys(COUNTRY_DISTRICTS);
 
-export const getTowns = (district: string): string[] => {
-  return LOCATION_DATA[district] || [];
+export const getDistricts = (country: string): string[] => {
+  return COUNTRY_DISTRICTS[country] || [];
 };
+
+// Legacy exports for backward compatibility
+export const DISTRICTS = COUNTRY_DISTRICTS["Uganda"] || [];
