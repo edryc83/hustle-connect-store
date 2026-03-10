@@ -58,9 +58,10 @@ export function StorefrontHeader({ profile, visitorName, onBack, firstProductIma
       <div className="mx-auto max-w-5xl px-4 -mt-10 pb-5 flex flex-col items-start gap-1.5">
         {/* Profile Picture */}
         <div className="ig-ring shadow-lg">
-          <img
+          <LazyImage
             src={avatarUrl}
             alt={profile.store_name ?? "Store"}
+            wrapperClassName="h-20 w-20 rounded-full"
             className="h-20 w-20 rounded-full object-cover border-2 border-background"
           />
         </div>
