@@ -161,16 +161,6 @@ function ProductCard({
         {product.description && (
           <p className="text-[11px] text-muted-foreground line-clamp-1">{product.description}</p>
         )}
-        {/* Attribute chips */}
-        {attrChips.length > 0 && (
-          <div className="flex flex-wrap gap-1">
-            {attrChips.map((chip) => (
-              <span key={chip} className="rounded-full bg-muted/80 border border-border/40 px-2 py-0.5 text-[10px] font-medium text-muted-foreground">
-                {chip}
-              </span>
-            ))}
-          </div>
-        )}
         <div className="flex items-center justify-between gap-1 pt-0.5">
           <div className="flex flex-col min-w-0">
             <p className="font-extrabold text-sm truncate">{formatPrice(Number(displayPrice), currency)}</p>
