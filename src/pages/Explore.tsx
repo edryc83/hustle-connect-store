@@ -367,7 +367,7 @@ const Explore = () => {
                     <div className="flex items-center gap-3 rounded-2xl bg-card p-3.5 border border-border/50 hover:border-primary/20 hover:shadow-sm transition-all">
                       <div className="ig-ring ig-ring-sm shrink-0">
                         {avatarUrl ? (
-                          <LazyImage src={avatarUrl} alt={store.store_name ?? "Store"} wrapperClassName="h-12 w-12 rounded-full" className="h-12 w-12 rounded-full object-cover border-2 border-background" />
+                          <LazyImage src={avatarUrl} alt={store.store_name ?? "Store"} wrapperClassName="h-12 w-12 rounded-full" className="w-full h-full rounded-full object-cover" />
                         ) : (
                           <div className="flex h-12 w-12 items-center justify-center rounded-full bg-secondary border-2 border-background">
                             <img src="/logo-glow.png" alt="Afristall" className="h-8 w-8 rounded-full object-cover" />
@@ -407,7 +407,7 @@ const Explore = () => {
                         <LazyImage src={coverUrl} alt="" wrapperClassName="h-full w-full" className="h-full w-full object-cover" />
                         <div className="absolute -bottom-6 left-4 ig-ring ig-ring-sm">
                           {avatarUrl ? (
-                            <LazyImage src={avatarUrl} alt={store.store_name ?? "Store"} wrapperClassName="h-12 w-12 rounded-full" className="h-12 w-12 rounded-full object-cover border-2 border-card" />
+                            <LazyImage src={avatarUrl} alt={store.store_name ?? "Store"} wrapperClassName="h-12 w-12 rounded-full" className="w-full h-full rounded-full object-cover" />
                           ) : (
                             <div className="flex h-12 w-12 items-center justify-center rounded-full bg-card border-2 border-card">
                               <img src="/logo-glow.png" alt="Afristall" className="h-8 w-8 rounded-full object-cover" />
