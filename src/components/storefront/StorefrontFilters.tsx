@@ -66,8 +66,8 @@ export function StorefrontFilters({ filters, onChange, totalCount, filteredCount
   const storeConditions = new Set(
     products
       .map((p) => p.condition || (p.attributes as Record<string, any> | null)?.condition)
-      .filter(Boolean)
-      .map((c: string) => c.toLowerCase())
+      .filter((c): c is string => typeof c === "string")
+      .map((c) => c.toLowerCase())
   );
   const availableConditions = CONDITIONS.filter((c) => !c.value || storeConditions.has(c.value));
 
