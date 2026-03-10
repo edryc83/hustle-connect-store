@@ -6,6 +6,7 @@ import { formatPrice } from "@/lib/currency";
 import AfristallLogo from "@/components/AfristallLogo";
 import whatsappIcon from "@/assets/whatsapp-icon.png";
 import { ProductImageCarousel } from "@/components/storefront/ProductImageCarousel";
+import { LazyImage } from "@/components/ui/lazy-image";
 import { StorefrontHeader } from "@/components/storefront/StorefrontHeader";
 
 import { CartDrawer } from "@/components/storefront/CartDrawer";
