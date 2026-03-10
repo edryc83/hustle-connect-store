@@ -116,7 +116,22 @@ const DashboardSettings = () => {
           setCoverPhotoUrl(d.cover_photo_url ?? "");
           setStoreName(d.store_name ?? "");
           setWhatsappNumber(d.whatsapp_number ?? "");
-          setCountry(d.country ?? "");
+          const savedCountry = d.country ?? "";
+          setCountry(savedCountry);
+          // Auto-detect country if not set
+          if (!savedCountry) {
+            fetch("https://ipapi.co/json/")
+              .then((r) => r.json())
+              .then((geo) => {
+                if (geo?.country_name) {
+                  const match = SUPPORTED_COUNTRIES.find(
+                    (c) => c.toLowerCase() === geo.country_name.toLowerCase()
+                  );
+                  if (match) setCountry(match);
+                }
+              })
+              .catch(() => {});
+          }
           setDistrict(d.district ?? "");
           setCity(d.city ?? "");
           setStreet(d.street ?? "");
