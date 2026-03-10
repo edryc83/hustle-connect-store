@@ -1,4 +1,5 @@
 import { useEffect, useState, useMemo } from "react";
+import whatsappIcon from "@/assets/whatsapp-icon.png";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/layout/Navbar";
@@ -21,6 +22,7 @@ type StoreProfile = {
   country: string | null;
   district: string | null;
   city: string | null;
+  whatsapp_number: string | null;
   business_type: string | null;
   first_product_image?: string | null;
 };
@@ -70,7 +72,7 @@ const Explore = () => {
     const fetchStores = async () => {
       const { data } = await supabase
         .from("profiles")
-        .select("id, store_name, store_slug, profile_picture_url, cover_photo_url, category, country, district, city, business_type")
+        .select("id, store_name, store_slug, profile_picture_url, cover_photo_url, category, country, district, city, business_type, whatsapp_number")
         .not("store_name", "is", null)
         .not("store_slug", "is", null)
         .order("last_active_at", { ascending: false });
@@ -357,38 +359,43 @@ const Explore = () => {
             </div>
           ) : (
             <>
-            <div className="grid grid-cols-3 gap-0.5 sm:hidden">
+            <div className="flex flex-col divide-y divide-border/50 sm:hidden">
               {filtered.map((store) => {
                 const businessLabel = getBusinessLabel(store);
                 const avatarUrl = store.profile_picture_url || store.first_product_image;
-                const coverUrl = store.cover_photo_url || store.first_product_image || "/default-cover.png";
+                const cleanNumber = store.whatsapp_number?.replace(/[^0-9+]/g, "").replace(/^\+/, "") || "";
                 return (
-                  <Link key={store.id} to={`/${store.store_slug}`} className="block">
-                    <div className="relative aspect-square overflow-hidden bg-secondary">
-                      <LazyImage src={coverUrl} alt="" wrapperClassName="h-full w-full" className="h-full w-full object-cover" />
-                      {/* Dark overlay */}
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                  <div key={store.id} className="flex items-center gap-3 px-4 py-3">
+                    <Link to={`/${store.store_slug}`} className="flex items-center gap-3 flex-1 min-w-0">
                       {/* Profile pic */}
-                      <div className="absolute top-2 left-1/2 -translate-x-1/2">
-                        <div className="ig-ring ig-ring-sm">
-                          {avatarUrl ? (
-                            <LazyImage src={avatarUrl} alt={store.store_name ?? "Store"} wrapperClassName="h-10 w-10 rounded-full" className="w-full h-full rounded-full object-cover" />
-                          ) : (
-                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-secondary">
-                              <img src="/logo-glow.png" alt="Afristall" className="h-7 w-7 rounded-full object-cover" />
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                      {/* Bottom info */}
-                      <div className="absolute bottom-0 left-0 right-0 p-1.5 text-center">
-                        {businessLabel && (
-                          <span className="inline-block rounded bg-primary/80 px-1 py-0.5 text-[8px] font-bold text-primary-foreground uppercase tracking-wide mb-0.5">{businessLabel}</span>
+                      <div className="ig-ring ig-ring-sm shrink-0">
+                        {avatarUrl ? (
+                          <LazyImage src={avatarUrl} alt={store.store_name ?? "Store"} wrapperClassName="h-12 w-12 rounded-full" className="w-full h-full rounded-full object-cover" />
+                        ) : (
+                          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-secondary">
+                            <img src="/logo-glow.png" alt="Afristall" className="h-8 w-8 rounded-full object-cover" />
+                          </div>
                         )}
-                        <h3 className="font-semibold text-[11px] text-white truncate leading-tight">{store.store_name}</h3>
                       </div>
-                    </div>
-                  </Link>
+                      {/* Name & category */}
+                      <div className="flex-1 min-w-0">
+                        <h3 className="font-semibold text-sm text-foreground truncate">{store.store_name}</h3>
+                        {businessLabel && (
+                          <p className="text-xs text-muted-foreground truncate mt-0.5">{businessLabel}</p>
+                        )}
+                      </div>
+                    </Link>
+                    {/* WhatsApp icon */}
+                    <a
+                      href={cleanNumber ? `https://wa.me/${cleanNumber}` : `/${store.store_slug}`}
+                      target={cleanNumber ? "_blank" : undefined}
+                      rel="noopener noreferrer"
+                      className="shrink-0 flex items-center justify-center h-9 w-9 rounded-full bg-[#25D366]/10 hover:bg-[#25D366]/20 transition-colors"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <img src={whatsappIcon} alt="WhatsApp" className="h-5 w-5" />
+                    </a>
+                  </div>
                 );
               })}
             </div>
