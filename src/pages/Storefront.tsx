@@ -323,7 +323,7 @@ function ProductDetailView({
                   i === selectedImg ? "border-primary ring-1 ring-primary/30" : "border-border hover:border-muted-foreground/40"
                 }`}
               >
-                <img src={url} alt="" className="h-full w-full object-cover" />
+                <LazyImage src={url} alt="" wrapperClassName="h-full w-full" className="h-full w-full object-cover" />
               </button>
             ))}
           </div>
