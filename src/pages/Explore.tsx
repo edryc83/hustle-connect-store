@@ -22,6 +22,7 @@ type StoreProfile = {
   country: string | null;
   district: string | null;
   city: string | null;
+  whatsapp_number: string | null;
   business_type: string | null;
   first_product_image?: string | null;
 };
