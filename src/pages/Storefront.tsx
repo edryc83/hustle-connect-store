@@ -748,26 +748,32 @@ const StorefrontInner = () => {
   return (
     <div className="min-h-screen bg-background">
 
-      {/* Floating top-left: Back to Explore / Dashboard */}
-      <div className="fixed top-4 left-4 z-30 flex items-center gap-2">
-        <Button variant="outline" size="icon" className="shrink-0 rounded-full backdrop-blur-sm bg-background/80" asChild>
-          <Link to="/explore">
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
-          </Link>
-        </Button>
-        {user && profile && user.id === profile.id && (
-          <Button variant="outline" size="icon" className="shrink-0 rounded-full" asChild>
-            <Link to="/dashboard"><LayoutDashboard className="h-4 w-4" /></Link>
+      {/* Clean top bar like Facebook */}
+      <div className="sticky top-0 z-50 flex h-12 items-center justify-between px-3 border-b border-border/50 bg-background/90 backdrop-blur-xl">
+        <div className="flex items-center gap-2.5">
+          <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0 rounded-full" asChild>
+            <Link to="/explore">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+            </Link>
           </Button>
-        )}
-      </div>
-
-      {/* Theme toggle + Share button floating top-right */}
-      <div className="fixed top-4 right-4 z-30 flex items-center gap-2">
-        <Button variant="outline" size="icon" className="shrink-0 rounded-full" onClick={toggleTheme}>
-          {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-        </Button>
-        <ShareButton storeName={profile.store_name ?? "Store"} storeSlug={storeSlug ?? ""} />
+          <div className="flex items-center gap-1.5">
+            <AfristallLogo className="h-5 w-5" />
+            <span className="text-sm font-bold tracking-tight">
+              Afri<span className="text-primary">stall</span>
+            </span>
+          </div>
+        </div>
+        <div className="flex items-center gap-1">
+          {user && profile && user.id === profile.id && (
+            <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0 rounded-full" asChild>
+              <Link to="/dashboard"><LayoutDashboard className="h-4 w-4" /></Link>
+            </Button>
+          )}
+          <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0 rounded-full" onClick={toggleTheme}>
+            {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+          </Button>
+          <ShareButton storeName={profile.store_name ?? "Store"} storeSlug={storeSlug ?? ""} />
+        </div>
       </div>
 
       {/* Owner banner */}
