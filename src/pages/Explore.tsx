@@ -318,22 +318,23 @@ const Explore = () => {
             </button>
           </div>
 
-          {/* Category chips */}
-          <div className="flex gap-2 overflow-x-auto pb-5 scrollbar-hide -mx-4 px-4">
-            {categories.map((cat) => (
-              <button
-                key={cat.label}
-                onClick={() => setSelectedCategory(cat.label)}
-                className={`whitespace-nowrap rounded-full border px-3.5 py-1.5 text-xs font-medium transition-colors ${
-                  selectedCategory === cat.label
-                    ? "border-primary bg-primary/10 text-primary"
-                    : "border-border text-muted-foreground hover:border-primary/30"
-                }`}
-              >
-                {cat.icon ? `${cat.icon} ` : ""}{cat.label}
-              </button>
-            ))}
-          </div>
+          {/* Active filter summary */}
+          {hasFilters && !showFilters && (
+            <div className="flex flex-wrap gap-2 mb-4">
+              {selectedCategory !== "All" && (
+                <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
+                  {selectedCategory}
+                  <button onClick={() => setSelectedCategory("All")}><X className="h-3 w-3" /></button>
+                </span>
+              )}
+              {selectedLocation !== "All" && (
+                <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
+                  <MapPin className="h-3 w-3" /> {selectedLocation}
+                  <button onClick={() => setSelectedLocation("All")}><X className="h-3 w-3" /></button>
+                </span>
+              )}
+            </div>
+          )}
 
           {/* Results */}
           {loading ? (
