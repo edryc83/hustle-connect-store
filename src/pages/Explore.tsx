@@ -381,7 +381,7 @@ const Explore = () => {
                       <div className="flex-1 min-w-0">
                         <h3 className="font-semibold text-sm text-foreground truncate">{store.store_name}</h3>
                         {businessLabel && (
-                          <p className="text-xs text-muted-foreground truncate mt-0.5">{businessLabel}</p>
+                          <p className="text-xs text-primary truncate mt-0.5">{businessLabel}</p>
                         )}
                       </div>
                     </Link>
