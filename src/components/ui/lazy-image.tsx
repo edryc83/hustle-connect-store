@@ -38,10 +38,12 @@ export function LazyImage({
     return () => observer.disconnect();
   }, []);
 
+  const isRounded = wrapperClassName?.includes("rounded-full");
+
   return (
     <div ref={ref} className={cn("relative overflow-hidden", wrapperClassName)}>
       {!loaded && (
-        <Skeleton className="absolute inset-0 h-full w-full rounded-none" />
+        <Skeleton className={cn("absolute inset-0 h-full w-full", isRounded ? "rounded-full" : "rounded-none")} />
       )}
       {inView && src && (
         <img
