@@ -377,7 +377,7 @@ const Explore = () => {
                         <LazyImage src={coverUrl} alt="" wrapperClassName="h-full w-full" className="h-full w-full object-cover" />
                         <div className="absolute -bottom-6 left-4 ig-ring ig-ring-sm">
                           {avatarUrl ? (
-                            <img src={avatarUrl} alt={store.store_name ?? "Store"} className="h-12 w-12 rounded-full object-cover border-2 border-card" loading="lazy" />
+                            <LazyImage src={avatarUrl} alt={store.store_name ?? "Store"} wrapperClassName="h-12 w-12 rounded-full" className="h-12 w-12 rounded-full object-cover border-2 border-card" />
                           ) : (
                             <div className="flex h-12 w-12 items-center justify-center rounded-full bg-card border-2 border-card">
                               <img src="/logo-glow.png" alt="Afristall" className="h-8 w-8 rounded-full object-cover" />
