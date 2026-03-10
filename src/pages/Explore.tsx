@@ -374,7 +374,7 @@ const Explore = () => {
                     <div className="rounded-2xl bg-card border border-border/50 hover:border-primary/20 hover:shadow-md transition-all overflow-hidden h-full">
                       {/* Cover / avatar area */}
                       <div className="relative h-28 bg-secondary/50">
-                        <img src={coverUrl} alt="" className="h-full w-full object-cover" loading="lazy" />
+                        <LazyImage src={coverUrl} alt="" wrapperClassName="h-full w-full" className="h-full w-full object-cover" />
                         <div className="absolute -bottom-6 left-4 ig-ring ig-ring-sm">
                           {avatarUrl ? (
                             <img src={avatarUrl} alt={store.store_name ?? "Store"} className="h-12 w-12 rounded-full object-cover border-2 border-card" loading="lazy" />
