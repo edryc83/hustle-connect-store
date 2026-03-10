@@ -1,6 +1,7 @@
 import { MapPin } from "lucide-react";
 import AfristallLogo from "@/components/AfristallLogo";
 import whatsappIcon from "@/assets/whatsapp-icon.png";
+import { LazyImage } from "@/components/ui/lazy-image";
 import type { Tables } from "@/integrations/supabase/types";
 
 type Profile = Tables<"profiles">;
