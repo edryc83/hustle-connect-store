@@ -232,23 +232,51 @@ const Explore = () => {
         {/* Filters - collapsible */}
         {showFilters && (
           <section className="border-b animate-in slide-in-from-top-2 duration-200">
-            <div className="mx-auto max-w-2xl px-4 py-3 space-y-3">
-              {locationOptions.length > 1 && (
-                <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
-                  {locationOptions.map((loc) => (
+            <div className="mx-auto max-w-2xl px-4 py-4 space-y-4">
+              {/* District dropdown */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-muted-foreground">District / Region</label>
+                <Select value={selectedLocation} onValueChange={setSelectedLocation}>
+                  <SelectTrigger className="h-10 rounded-xl">
+                    <SelectValue placeholder="All districts" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="All">All districts</SelectItem>
+                    {districtOptions.map((d) => (
+                      <SelectItem key={d} value={d}>{d}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Category chips */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-muted-foreground">Category</label>
+                <div className="flex flex-wrap gap-2">
+                  {categories.map((cat) => (
                     <button
-                      key={loc}
-                      onClick={() => setSelectedLocation(loc)}
-                      className={`flex items-center gap-1 whitespace-nowrap rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
-                        selectedLocation === loc
+                      key={cat.label}
+                      onClick={() => setSelectedCategory(cat.label)}
+                      className={`whitespace-nowrap rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
+                        selectedCategory === cat.label
                           ? "border-primary bg-primary/10 text-primary"
                           : "border-border text-muted-foreground hover:border-primary/30"
                       }`}
                     >
-                      {loc !== "All" && <MapPin className="h-2.5 w-2.5" />} {loc}
+                      {cat.icon ? `${cat.icon} ` : ""}{cat.label}
                     </button>
                   ))}
                 </div>
+              </div>
+
+              {/* Clear filters */}
+              {hasFilters && (
+                <button
+                  onClick={() => { setSelectedCategory("All"); setSelectedLocation("All"); setSearch(""); }}
+                  className="text-xs text-primary font-medium hover:underline"
+                >
+                  Clear all filters
+                </button>
               )}
             </div>
           </section>
