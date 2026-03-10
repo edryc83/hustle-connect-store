@@ -870,7 +870,7 @@ const StorefrontInner = () => {
                       >
                         <div className="aspect-square rounded-xl overflow-hidden bg-muted/30 border border-border/40">
                           {imgs[0] ? (
-                            <img src={imgs[0]} alt={product.name} className="h-full w-full object-cover" />
+                            <LazyImage src={imgs[0]} alt={product.name} wrapperClassName="h-full w-full" className="h-full w-full object-cover" />
                           ) : (
                             <div className="flex h-full w-full items-center justify-center">
                               <ShoppingBag className="h-8 w-8 text-muted-foreground/30" />
