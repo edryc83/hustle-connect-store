@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Search, MapPin, X, SlidersHorizontal, Store, Bookmark } from "lucide-react";
 import AfristallLogo from "@/components/AfristallLogo";
 import { LazyImage } from "@/components/ui/lazy-image";
