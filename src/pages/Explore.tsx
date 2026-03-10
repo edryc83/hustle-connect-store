@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { Input } from "@/components/ui/input";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Search, MapPin, X, SlidersHorizontal, Store, Bookmark } from "lucide-react";
 import AfristallLogo from "@/components/AfristallLogo";
 import { LazyImage } from "@/components/ui/lazy-image";
@@ -151,13 +152,13 @@ const Explore = () => {
 
   const categories = activeTab === "services" ? SERVICE_CATEGORIES : STORE_CATEGORIES;
 
-  const locationOptions = useMemo(() => {
-    const locs = new Set<string>();
+  const districtOptions = useMemo(() => {
+    const dists = new Set<string>();
     tabStores.forEach((s) => {
-      if (s.city) locs.add(s.city);
-      if (s.district) locs.add(s.district);
+      if (s.district) dists.add(s.district);
+      else if (s.city) dists.add(s.city);
     });
-    return ["All", ...Array.from(locs).sort()];
+    return Array.from(dists).sort();
   }, [tabStores]);
 
   const filtered = useMemo(() => {
@@ -232,23 +233,51 @@ const Explore = () => {
         {/* Filters - collapsible */}
         {showFilters && (
           <section className="border-b animate-in slide-in-from-top-2 duration-200">
-            <div className="mx-auto max-w-2xl px-4 py-3 space-y-3">
-              {locationOptions.length > 1 && (
-                <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
-                  {locationOptions.map((loc) => (
+            <div className="mx-auto max-w-2xl px-4 py-4 space-y-4">
+              {/* District dropdown */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-muted-foreground">District / Region</label>
+                <Select value={selectedLocation} onValueChange={setSelectedLocation}>
+                  <SelectTrigger className="h-10 rounded-xl">
+                    <SelectValue placeholder="All districts" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="All">All districts</SelectItem>
+                    {districtOptions.map((d) => (
+                      <SelectItem key={d} value={d}>{d}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Category chips */}
+              <div className="space-y-1.5">
+                <label className="text-xs font-medium text-muted-foreground">Category</label>
+                <div className="flex flex-wrap gap-2">
+                  {categories.map((cat) => (
                     <button
-                      key={loc}
-                      onClick={() => setSelectedLocation(loc)}
-                      className={`flex items-center gap-1 whitespace-nowrap rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
-                        selectedLocation === loc
+                      key={cat.label}
+                      onClick={() => setSelectedCategory(cat.label)}
+                      className={`whitespace-nowrap rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
+                        selectedCategory === cat.label
                           ? "border-primary bg-primary/10 text-primary"
                           : "border-border text-muted-foreground hover:border-primary/30"
                       }`}
                     >
-                      {loc !== "All" && <MapPin className="h-2.5 w-2.5" />} {loc}
+                      {cat.icon ? `${cat.icon} ` : ""}{cat.label}
                     </button>
                   ))}
                 </div>
+              </div>
+
+              {/* Clear filters */}
+              {hasFilters && (
+                <button
+                  onClick={() => { setSelectedCategory("All"); setSelectedLocation("All"); setSearch(""); }}
+                  className="text-xs text-primary font-medium hover:underline"
+                >
+                  Clear all filters
+                </button>
               )}
             </div>
           </section>
@@ -289,22 +318,23 @@ const Explore = () => {
             </button>
           </div>
 
-          {/* Category chips */}
-          <div className="flex gap-2 overflow-x-auto pb-5 scrollbar-hide -mx-4 px-4">
-            {categories.map((cat) => (
-              <button
-                key={cat.label}
-                onClick={() => setSelectedCategory(cat.label)}
-                className={`whitespace-nowrap rounded-full border px-3.5 py-1.5 text-xs font-medium transition-colors ${
-                  selectedCategory === cat.label
-                    ? "border-primary bg-primary/10 text-primary"
-                    : "border-border text-muted-foreground hover:border-primary/30"
-                }`}
-              >
-                {cat.icon ? `${cat.icon} ` : ""}{cat.label}
-              </button>
-            ))}
-          </div>
+          {/* Active filter summary */}
+          {hasFilters && !showFilters && (
+            <div className="flex flex-wrap gap-2 mb-4">
+              {selectedCategory !== "All" && (
+                <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
+                  {selectedCategory}
+                  <button onClick={() => setSelectedCategory("All")}><X className="h-3 w-3" /></button>
+                </span>
+              )}
+              {selectedLocation !== "All" && (
+                <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
+                  <MapPin className="h-3 w-3" /> {selectedLocation}
+                  <button onClick={() => setSelectedLocation("All")}><X className="h-3 w-3" /></button>
+                </span>
+              )}
+            </div>
+          )}
 
           {/* Results */}
           {loading ? (
