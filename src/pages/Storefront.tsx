@@ -118,7 +118,7 @@ function ProductCard({
       onClick={onClick}
     >
       {/* Framed Image */}
-      <div className="relative aspect-[4/5] rounded-xl overflow-hidden bg-muted/30 border border-border/40">
+      <div className="relative aspect-square rounded-xl overflow-hidden bg-muted/30 border border-border/40">
         <ProductImageCarousel
           images={images}
           alt={product.name}
