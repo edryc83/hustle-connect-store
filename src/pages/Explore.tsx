@@ -365,7 +365,7 @@ const Explore = () => {
                 const avatarUrl = store.profile_picture_url || store.first_product_image;
                 const cleanNumber = store.whatsapp_number?.replace(/[^0-9+]/g, "").replace(/^\+/, "") || "";
                 return (
-                  <div key={store.id} className="flex items-center gap-3 px-4 py-3 rounded-2xl backdrop-blur-xl bg-white/[0.06] border border-white/[0.08] shadow-[inset_0_1px_0_0_rgba(255,255,255,0.05)]">
+                  <div key={store.id} className="flex items-center gap-3 px-4 py-3 rounded-2xl backdrop-blur-2xl bg-white/[0.04] border border-white/[0.06] shadow-[inset_0_0.5px_0_0_rgba(255,255,255,0.04),0_2px_12px_-4px_rgba(0,0,0,0.3)]">
                     <Link to={`/${store.store_slug}`} className="flex items-center gap-3 flex-1 min-w-0">
                       {/* Profile pic */}
                       <div className="ig-ring ig-ring-sm shrink-0">
