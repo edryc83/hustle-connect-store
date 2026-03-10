@@ -893,7 +893,7 @@ const StorefrontInner = () => {
                 {featured.length > 0 ? "All Products" : `${filteredProducts.length} product${filteredProducts.length !== 1 ? "s" : ""}`}
               </h2>
               <div className="grid gap-3 sm:gap-4 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
-                {(featured.length > 0 ? nonFeatured : products).map((product) => (
+                {(featured.length > 0 ? nonFeatured : filteredProducts).map((product) => (
                   <ProductCard
                     key={product.id}
                     product={product}
