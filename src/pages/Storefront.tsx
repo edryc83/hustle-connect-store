@@ -426,7 +426,7 @@ function ProductDetailView({
             <Label htmlFor="deliveryAddr" className="text-sm font-medium">Delivery address (optional)</Label>
             <Textarea
               id="deliveryAddr"
-              placeholder="Where should we deliver? e.g. Plot 12, Kampala Road"
+              placeholder="Enter your delivery address"
               rows={2}
               value={deliveryAddress}
               onChange={(e) => setDeliveryAddress(e.target.value)}

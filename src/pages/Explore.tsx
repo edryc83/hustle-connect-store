@@ -37,7 +37,7 @@ const SERVICE_CATEGORIES = [
 ];
 
 function getLocationLabel(store: StoreProfile) {
-  const parts = [store.city, store.district].filter(Boolean);
+  const parts = [store.district, store.city].filter(Boolean);
   return parts.length > 0 ? parts.join(", ") : null;
 }
 

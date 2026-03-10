@@ -94,12 +94,12 @@ export function StorefrontHeader({ profile, visitorName, onBack, firstProductIma
         )}
         {hasPhysicalAddress && (
           <p className="text-xs text-muted-foreground">
-            📍 {addressParts.join(", ")}{profile.city ? `, ${profile.city}` : ""}
+            📍 {addressParts.join(", ")}{(profile.district || profile.city) ? `, ${profile.district || profile.city}` : ""}
           </p>
         )}
-        {!hasPhysicalAddress && !((profile as any).is_online_only) && profile.city && (
+        {!hasPhysicalAddress && !((profile as any).is_online_only) && (profile.district || profile.city) && (
           <span className="flex items-center gap-1 text-muted-foreground text-xs">
-            <MapPin className="h-3 w-3" /> {profile.city}
+            <MapPin className="h-3 w-3" /> {profile.district || profile.city}
           </span>
         )}
 
