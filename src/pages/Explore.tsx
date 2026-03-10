@@ -6,6 +6,7 @@ import Footer from "@/components/layout/Footer";
 import { Input } from "@/components/ui/input";
 import { Search, MapPin, X, SlidersHorizontal, Store, Bookmark } from "lucide-react";
 import AfristallLogo from "@/components/AfristallLogo";
+import { LazyImage } from "@/components/ui/lazy-image";
 import { categoriesToDisplay } from "@/components/CategoryPicker";
 import { PRODUCT_CATEGORY_DATA, SERVICE_CATEGORY_DATA } from "@/components/CategoryPicker";
 
