@@ -426,7 +426,7 @@ function ProductDetailView({
             <Label htmlFor="deliveryAddr" className="text-sm font-medium">Delivery address (optional)</Label>
             <Textarea
               id="deliveryAddr"
-              placeholder="Where should we deliver? e.g. Plot 12, Kampala Road"
+              placeholder="Enter your delivery address"
               rows={2}
               value={deliveryAddress}
               onChange={(e) => setDeliveryAddress(e.target.value)}
@@ -639,7 +639,7 @@ const StorefrontInner = () => {
     if (!profile) return;
     const title = `${profile.store_name || storeSlug} — Shop on Afristall`;
     const description = profile.store_bio ||
-      `Check out ${profile.store_name || storeSlug}${profile.category ? ` for ${profile.category}` : ""}${profile.city ? ` in ${profile.city}` : ""}. Order directly on WhatsApp! 🛒`;
+      `Check out ${profile.store_name || storeSlug}${profile.category ? ` for ${profile.category}` : ""}${(profile.district || profile.city) ? ` in ${profile.district || profile.city}` : ""}. Order directly on WhatsApp! 🛒`;
     const image = profile.profile_picture_url || "/logo-glow.png";
 
     document.title = title;
@@ -893,7 +893,7 @@ const StorefrontInner = () => {
                 {featured.length > 0 ? "All Products" : `${filteredProducts.length} product${filteredProducts.length !== 1 ? "s" : ""}`}
               </h2>
               <div className="grid gap-3 sm:gap-4 grid-cols-2 sm:grid-cols-3 lg:grid-cols-4">
-                {(featured.length > 0 ? nonFeatured : products).map((product) => (
+                {(featured.length > 0 ? nonFeatured : filteredProducts).map((product) => (
                   <ProductCard
                     key={product.id}
                     product={product}
