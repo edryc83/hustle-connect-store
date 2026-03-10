@@ -6,6 +6,7 @@ import { formatPrice } from "@/lib/currency";
 import AfristallLogo from "@/components/AfristallLogo";
 import whatsappIcon from "@/assets/whatsapp-icon.png";
 import { ProductImageCarousel } from "@/components/storefront/ProductImageCarousel";
+import { LazyImage } from "@/components/ui/lazy-image";
 import { StorefrontHeader } from "@/components/storefront/StorefrontHeader";
 
 import { CartDrawer } from "@/components/storefront/CartDrawer";
@@ -322,7 +323,7 @@ function ProductDetailView({
                   i === selectedImg ? "border-primary ring-1 ring-primary/30" : "border-border hover:border-muted-foreground/40"
                 }`}
               >
-                <img src={url} alt="" className="h-full w-full object-cover" />
+                <LazyImage src={url} alt="" wrapperClassName="h-full w-full" className="h-full w-full object-cover" />
               </button>
             ))}
           </div>
@@ -869,7 +870,7 @@ const StorefrontInner = () => {
                       >
                         <div className="aspect-square rounded-xl overflow-hidden bg-muted/30 border border-border/40">
                           {imgs[0] ? (
-                            <img src={imgs[0]} alt={product.name} className="h-full w-full object-cover" />
+                            <LazyImage src={imgs[0]} alt={product.name} wrapperClassName="h-full w-full" className="h-full w-full object-cover" />
                           ) : (
                             <div className="flex h-full w-full items-center justify-center">
                               <ShoppingBag className="h-8 w-8 text-muted-foreground/30" />
