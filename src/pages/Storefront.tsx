@@ -748,29 +748,26 @@ const StorefrontInner = () => {
   return (
     <div className="min-h-screen bg-background">
 
-      {/* Clean top bar like Facebook */}
-      <div className="sticky top-0 z-50 flex h-12 items-center justify-between px-3 border-b border-border/50 bg-background/90 backdrop-blur-xl">
-        <div className="flex items-center gap-2.5">
-          <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0 rounded-full" asChild>
+      {/* Clean top bar */}
+      <div className="sticky top-0 z-50 flex h-14 items-center justify-between px-3 border-b border-border/50 bg-background/90 backdrop-blur-xl">
+        <div className="flex items-center gap-2">
+          <Button variant="ghost" size="icon" className="h-9 w-9 shrink-0 rounded-full" asChild>
             <Link to="/explore">
-              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+              <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m15 18-6-6 6-6"/></svg>
             </Link>
           </Button>
-          <div className="flex items-center gap-1.5">
-            <AfristallLogo className="h-5 w-5" />
-            <span className="text-sm font-bold tracking-tight">
-              Afri<span className="text-primary">stall</span>
-            </span>
-          </div>
+          <span className="text-base font-bold tracking-tight truncate max-w-[200px]">
+            {profile.store_name || "Store"}
+          </span>
         </div>
         <div className="flex items-center gap-1">
           {user && profile && user.id === profile.id && (
-            <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0 rounded-full" asChild>
-              <Link to="/dashboard"><LayoutDashboard className="h-4 w-4" /></Link>
+            <Button variant="ghost" size="icon" className="h-9 w-9 shrink-0 rounded-full" asChild>
+              <Link to="/dashboard"><LayoutDashboard className="h-[18px] w-[18px]" /></Link>
             </Button>
           )}
-          <Button variant="ghost" size="icon" className="h-8 w-8 shrink-0 rounded-full" onClick={toggleTheme}>
-            {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+          <Button variant="ghost" size="icon" className="h-9 w-9 shrink-0 rounded-full" onClick={toggleTheme}>
+            {theme === "dark" ? <Sun className="h-[18px] w-[18px]" /> : <Moon className="h-[18px] w-[18px]" />}
           </Button>
           <ShareButton storeName={profile.store_name ?? "Store"} storeSlug={storeSlug ?? ""} />
         </div>
