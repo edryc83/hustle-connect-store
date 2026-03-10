@@ -672,12 +672,12 @@ const StorefrontInner = () => {
     return () => { document.title = "Afristall — Your Shop, Your WhatsApp, Your Hustle"; };
   }, [profile, storeSlug]);
 
-  // Default to light mode on storefront
+  // Default to dark mode on storefront
   useEffect(() => {
     const root = document.documentElement;
     if (!localStorage.getItem(`storefront_theme_${storeSlug}`)) {
-      root.classList.remove("dark");
-      root.classList.add("light");
+      root.classList.remove("light");
+      root.classList.add("dark");
     }
   }, []);
 
