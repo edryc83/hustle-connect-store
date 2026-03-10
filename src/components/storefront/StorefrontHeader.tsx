@@ -65,7 +65,7 @@ export function StorefrontHeader({ profile, visitorName, onBack, firstProductIma
         </div>
 
         {/* Store Name */}
-        <h1 className="text-xl font-extrabold tracking-tight leading-tight mt-1">{profile.store_name}</h1>
+        <h1 className="text-2xl font-extrabold tracking-tight leading-tight mt-1">{profile.store_name}</h1>
 
         {/* Username */}
         {profile.store_slug && (
