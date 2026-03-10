@@ -357,35 +357,36 @@ const Explore = () => {
             </div>
           ) : (
             <>
-            <div className="space-y-3 sm:hidden">
+            <div className="grid grid-cols-3 gap-0.5 sm:hidden">
               {filtered.map((store) => {
                 const businessLabel = getBusinessLabel(store);
-                const location = getLocationLabel(store);
                 const avatarUrl = store.profile_picture_url || store.first_product_image;
+                const coverUrl = store.cover_photo_url || store.first_product_image || "/default-cover.png";
                 return (
                   <Link key={store.id} to={`/${store.store_slug}`} className="block">
-                    <div className="flex items-center gap-3 rounded-2xl bg-card p-3.5 border border-border/50 hover:border-primary/20 hover:shadow-sm transition-all">
-                      <div className="ig-ring ig-ring-sm shrink-0">
-                        {avatarUrl ? (
-                          <LazyImage src={avatarUrl} alt={store.store_name ?? "Store"} wrapperClassName="h-12 w-12 rounded-full" className="w-full h-full rounded-full object-cover" />
-                        ) : (
-                          <div className="flex h-12 w-12 items-center justify-center rounded-full bg-secondary border-2 border-background">
-                            <img src="/logo-glow.png" alt="Afristall" className="h-8 w-8 rounded-full object-cover" />
-                          </div>
-                        )}
+                    <div className="relative aspect-square overflow-hidden bg-secondary">
+                      <LazyImage src={coverUrl} alt="" wrapperClassName="h-full w-full" className="h-full w-full object-cover" />
+                      {/* Dark overlay */}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent" />
+                      {/* Profile pic */}
+                      <div className="absolute top-2 left-1/2 -translate-x-1/2">
+                        <div className="ig-ring ig-ring-sm">
+                          {avatarUrl ? (
+                            <LazyImage src={avatarUrl} alt={store.store_name ?? "Store"} wrapperClassName="h-10 w-10 rounded-full" className="w-full h-full rounded-full object-cover" />
+                          ) : (
+                            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-secondary">
+                              <img src="/logo-glow.png" alt="Afristall" className="h-7 w-7 rounded-full object-cover" />
+                            </div>
+                          )}
+                        </div>
                       </div>
-                      <div className="flex-1 min-w-0">
+                      {/* Bottom info */}
+                      <div className="absolute bottom-0 left-0 right-0 p-1.5 text-center">
                         {businessLabel && (
-                          <span className="inline-block rounded bg-primary/10 px-1.5 py-0.5 text-[10px] font-semibold text-primary uppercase tracking-wide mb-0.5">{businessLabel}</span>
+                          <span className="inline-block rounded bg-primary/80 px-1 py-0.5 text-[8px] font-bold text-primary-foreground uppercase tracking-wide mb-0.5">{businessLabel}</span>
                         )}
-                        <h3 className="font-semibold text-sm text-foreground truncate">{store.store_name}</h3>
-                        {location && (
-                          <p className="flex items-center gap-1 text-xs text-muted-foreground mt-0.5 truncate">
-                            <MapPin className="h-3 w-3 shrink-0" /> {location}
-                          </p>
-                        )}
+                        <h3 className="font-semibold text-[11px] text-white truncate leading-tight">{store.store_name}</h3>
                       </div>
-                      <Bookmark className="h-5 w-5 text-muted-foreground/40 shrink-0" />
                     </div>
                   </Link>
                 );
