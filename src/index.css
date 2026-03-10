@@ -153,4 +153,5 @@
 .ig-ring > img,
 .ig-ring > div {
   border: 2px solid hsl(var(--background));
+  border-radius: 9999px;
 }
