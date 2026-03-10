@@ -639,7 +639,7 @@ const StorefrontInner = () => {
     if (!profile) return;
     const title = `${profile.store_name || storeSlug} — Shop on Afristall`;
     const description = profile.store_bio ||
-      `Check out ${profile.store_name || storeSlug}${profile.category ? ` for ${profile.category}` : ""}${profile.city ? ` in ${profile.city}` : ""}. Order directly on WhatsApp! 🛒`;
+      `Check out ${profile.store_name || storeSlug}${profile.category ? ` for ${profile.category}` : ""}${(profile.district || profile.city) ? ` in ${profile.district || profile.city}` : ""}. Order directly on WhatsApp! 🛒`;
     const image = profile.profile_picture_url || "/logo-glow.png";
 
     document.title = title;
