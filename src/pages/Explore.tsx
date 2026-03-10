@@ -363,7 +363,7 @@ const Explore = () => {
               {filtered.map((store) => {
                 const businessLabel = getBusinessLabel(store);
                 const avatarUrl = store.profile_picture_url || store.first_product_image;
-                const cleanNumber = (store as any).whatsapp_number?.replace(/[^0-9+]/g, "").replace(/^\+/, "") || "";
+                const cleanNumber = store.whatsapp_number?.replace(/[^0-9+]/g, "").replace(/^\+/, "") || "";
                 return (
                   <div key={store.id} className="flex items-center gap-3 px-4 py-3">
                     <Link to={`/${store.store_slug}`} className="flex items-center gap-3 flex-1 min-w-0">
