@@ -151,13 +151,13 @@ const Explore = () => {
 
   const categories = activeTab === "services" ? SERVICE_CATEGORIES : STORE_CATEGORIES;
 
-  const locationOptions = useMemo(() => {
-    const locs = new Set<string>();
+  const districtOptions = useMemo(() => {
+    const dists = new Set<string>();
     tabStores.forEach((s) => {
-      if (s.city) locs.add(s.city);
-      if (s.district) locs.add(s.district);
+      if (s.district) dists.add(s.district);
+      else if (s.city) dists.add(s.city);
     });
-    return ["All", ...Array.from(locs).sort()];
+    return Array.from(dists).sort();
   }, [tabStores]);
 
   const filtered = useMemo(() => {
