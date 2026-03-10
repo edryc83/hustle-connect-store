@@ -485,42 +485,27 @@ const DashboardSettings = () => {
           {/* Location */}
           <div className="space-y-1.5">
             <Label>Country</Label>
-            <Input
-              value={country}
-              onChange={(e) => setCountry(e.target.value)}
-              placeholder="e.g. Uganda"
-              list="country-options"
-            />
-            <datalist id="country-options">
-              {COUNTRIES.map((c) => (
-                <option key={c} value={c} />
-              ))}
-            </datalist>
-          </div>
-
-          <div className="space-y-1.5">
-            <Label>District</Label>
-            <Select value={district} onValueChange={(val) => { setDistrict(val); setCity(""); }}>
+            <Select value={country} onValueChange={(val) => { setCountry(val); setDistrict(""); setCity(""); }}>
               <SelectTrigger>
-                <SelectValue placeholder="Select district" />
+                <SelectValue placeholder="Select country" />
               </SelectTrigger>
               <SelectContent>
-                {DISTRICTS.map((d) => (
-                  <SelectItem key={d} value={d}>{d}</SelectItem>
+                {SUPPORTED_COUNTRIES.map((c) => (
+                  <SelectItem key={c} value={c}>{c}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
           </div>
 
           <div className="space-y-1.5">
-            <Label>City / Town {district && <span className="text-muted-foreground font-normal">(optional)</span>}</Label>
-            <Select value={city} onValueChange={setCity} disabled={!district}>
+            <Label>District / Region</Label>
+            <Select value={district} onValueChange={setDistrict} disabled={!country}>
               <SelectTrigger>
-                <SelectValue placeholder={district ? "Select town" : "Select a district first"} />
+                <SelectValue placeholder={country ? "Select district" : "Select a country first"} />
               </SelectTrigger>
               <SelectContent>
-                {getTowns(district).map((t) => (
-                  <SelectItem key={t} value={t}>{t}</SelectItem>
+                {getDistricts(country).map((d) => (
+                  <SelectItem key={d} value={d}>{d}</SelectItem>
                 ))}
               </SelectContent>
             </Select>
