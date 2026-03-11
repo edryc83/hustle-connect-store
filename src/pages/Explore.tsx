@@ -537,40 +537,47 @@ const Explore = () => {
                 </div>
               ) : (
                 <>
-                  {/* Mobile list */}
-                  <div className="flex flex-col gap-2 px-3 sm:hidden">
+                  {/* Mobile cards */}
+                  <div className="grid grid-cols-2 gap-3 sm:hidden">
                     {filtered.map((store) => {
                       const businessLabel = getBusinessLabel(store);
                       const avatarUrl = store.profile_picture_url || store.first_product_image;
+                      const coverUrl = store.cover_photo_url || store.first_product_image || "/default-cover.png";
                       const cleanNumber = store.whatsapp_number?.replace(/[^0-9+]/g, "").replace(/^\+/, "") || "";
+                      const displayNumber = store.whatsapp_number || "";
                       return (
-                        <div key={store.id} className="flex items-center gap-3 px-4 py-3 rounded-2xl backdrop-blur-2xl bg-white/[0.04] border border-white/[0.06] shadow-[inset_0_0.5px_0_0_rgba(255,255,255,0.04),0_2px_12px_-4px_rgba(0,0,0,0.3)]">
-                          <Link to={`/${store.store_slug}`} className="flex items-center gap-3 flex-1 min-w-0">
-                            <div className="ig-ring ig-ring-sm shrink-0">
-                              {avatarUrl ? (
-                                <LazyImage src={avatarUrl} alt={store.store_name ?? "Store"} wrapperClassName="h-12 w-12 rounded-full" className="w-full h-full rounded-full object-cover" />
-                              ) : (
-                                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-secondary">
-                                  <img src="/logo-glow.png" alt="Afristall" className="h-8 w-8 rounded-full object-cover" />
-                                </div>
-                              )}
+                        <div key={store.id} className="rounded-2xl bg-card border border-border/50 overflow-hidden shadow-sm">
+                          <Link to={`/${store.store_slug}`}>
+                            <div className="relative h-20 bg-secondary/50">
+                              <LazyImage src={coverUrl} alt="" wrapperClassName="h-full w-full" className="h-full w-full object-cover" />
+                              <div className="absolute -bottom-5 left-3 ig-ring ig-ring-sm">
+                                {avatarUrl ? (
+                                  <LazyImage src={avatarUrl} alt={store.store_name ?? "Store"} wrapperClassName="h-10 w-10 rounded-full" className="w-full h-full rounded-full object-cover" />
+                                ) : (
+                                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-card border-2 border-card">
+                                    <img src="/logo-glow.png" alt="Afristall" className="h-6 w-6 rounded-full object-cover" />
+                                  </div>
+                                )}
+                              </div>
                             </div>
-                            <div className="flex-1 min-w-0">
-                              <h3 className="font-semibold text-sm text-foreground truncate">{store.store_name}</h3>
+                            <div className="pt-7 px-3 pb-2">
+                              <h3 className="font-semibold text-xs text-foreground truncate">{store.store_name}</h3>
                               {businessLabel && (
-                                <p className="text-xs text-primary truncate mt-0.5">{businessLabel}</p>
+                                <p className="text-[10px] text-primary truncate mt-0.5">{businessLabel}</p>
                               )}
                             </div>
                           </Link>
-                          <a
-                            href={cleanNumber ? `https://wa.me/${cleanNumber}` : `/${store.store_slug}`}
-                            target={cleanNumber ? "_blank" : undefined}
-                            rel="noopener noreferrer"
-                            className="shrink-0 flex items-center justify-center h-9 w-9 rounded-full bg-[#25D366]/10 hover:bg-[#25D366]/20 transition-colors"
-                            onClick={(e) => e.stopPropagation()}
-                          >
-                            <img src={whatsappIcon} alt="WhatsApp" className="h-5 w-5" />
-                          </a>
+                          {displayNumber && (
+                            <a
+                              href={`https://wa.me/${cleanNumber}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="flex items-center gap-1.5 mx-3 mb-3 px-2.5 py-1.5 rounded-xl bg-[#25D366]/10 hover:bg-[#25D366]/20 transition-colors"
+                            >
+                              <img src={whatsappIcon} alt="WhatsApp" className="h-3.5 w-3.5" />
+                              <span className="text-[10px] font-medium text-foreground/70 truncate">{displayNumber}</span>
+                            </a>
+                          )}
                         </div>
                       );
                     })}
