@@ -32,6 +32,9 @@ type StoreProfile = {
   city: string | null;
   whatsapp_number: string | null;
   business_type: string | null;
+  instagram_url: string | null;
+  tiktok_url: string | null;
+  facebook_url: string | null;
   first_product_image?: string | null;
 };
 
