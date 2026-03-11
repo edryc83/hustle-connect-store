@@ -117,6 +117,7 @@ const Explore = () => {
   const [detectedCountry, setDetectedCountry] = useState<string | null>(null);
   const [selectedLocation, setSelectedLocation] = useState("All");
   const [showFilters, setShowFilters] = useState(false);
+  const [exploreCategoryFilter, setExploreCategoryFilter] = useState<string | null>(null);
 
   // Drill-down state
   const [activeTab, setActiveTab] = useState<TabType | null>(null);
