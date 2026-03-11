@@ -19,6 +19,7 @@ import {
 import { LazyImage } from "@/components/ui/lazy-image";
 import { categoriesToDisplay } from "@/components/CategoryPicker";
 import { PRODUCT_CATEGORY_DATA, SERVICE_CATEGORY_DATA, EXPERIENCE_CATEGORY_DATA } from "@/components/CategoryPicker";
+import { CATEGORY_EMOJI } from "@/lib/categoryMapping";
 
 type StoreProfile = {
   id: string;
