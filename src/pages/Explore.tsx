@@ -57,7 +57,7 @@ const Explore = () => {
   const [detectedCountry, setDetectedCountry] = useState<string | null>(null);
   const [selectedLocation, setSelectedLocation] = useState("All");
   const [showFilters, setShowFilters] = useState(false);
-  const [activeTab, setActiveTab] = useState<TabType>("products");
+  const [activeTab, setActiveTab] = useState<TabType | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedSubcategory, setSelectedSubcategory] = useState<string | null>(null);
 
