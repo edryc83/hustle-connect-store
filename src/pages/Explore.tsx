@@ -516,6 +516,39 @@ const Explore = () => {
               </section>
             )}
 
+            {/* Category filter pills */}
+            {exploreCategoryPills.length > 1 && (
+              <section className="border-b border-border/50">
+                <div className="mx-auto max-w-2xl sm:max-w-5xl px-4 py-3">
+                  <div className="flex gap-2 overflow-x-auto no-scrollbar">
+                    <button
+                      onClick={() => setExploreCategoryFilter(null)}
+                      className={`shrink-0 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
+                        !exploreCategoryFilter
+                          ? "border-primary bg-primary/10 text-primary"
+                          : "border-border/60 text-muted-foreground hover:border-primary/40"
+                      }`}
+                    >
+                      All
+                    </button>
+                    {exploreCategoryPills.map(({ cat, count, emoji }) => (
+                      <button
+                        key={cat}
+                        onClick={() => setExploreCategoryFilter(exploreCategoryFilter === cat ? null : cat)}
+                        className={`shrink-0 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
+                          exploreCategoryFilter === cat
+                            ? "border-primary bg-primary/10 text-primary"
+                            : "border-border/60 text-muted-foreground hover:border-primary/40"
+                        }`}
+                      >
+                        {emoji} {cat} ({count})
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </section>
+            )}
+
             {/* Results */}
             <section className="mx-auto max-w-2xl sm:max-w-5xl px-4 py-6">
               <div className="flex items-center justify-between mb-4">
