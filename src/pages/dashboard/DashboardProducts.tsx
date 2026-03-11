@@ -151,6 +151,7 @@ const DashboardProducts = () => {
     setListingType((product as any).listing_type ?? "product");
     setCondition((product as any).condition ?? "");
     setAttributes((product as any).attributes ?? {});
+    setDetectedCategory((product as any).category ?? "");
     setDialogOpen(true);
   };
 
