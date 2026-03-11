@@ -42,9 +42,24 @@ export const SERVICE_CATEGORY_DATA: Record<string, string[]> = {
   "Other": [],
 };
 
+export const EXPERIENCE_CATEGORY_DATA: Record<string, string[]> = {
+  "Trips & Travel": ["Local Trips", "Weekend Getaways", "Road Trips", "Guided Tours", "Safari", "Beach Trips", "Camping"],
+  "Birthday Experiences": ["Surprise Packages", "Party Planning", "Themed Birthdays", "Outdoor Birthdays", "Kids' Parties"],
+  "Dining Experiences": ["Private Chef", "Food Tasting", "Rooftop Dining", "Picnic Setups", "Suya Nights", "Brunch"],
+  "Adventure & Outdoor": ["Hiking", "Zip-lining", "Paintball", "Go-Karting", "Horse Riding", "Boat Cruises", "Skydiving"],
+  "Wellness & Spa": ["Spa Days", "Couples' Retreat", "Yoga Retreat", "Meditation", "Hot Springs"],
+  "Cultural Experiences": ["Art Exhibitions", "Museum Tours", "Live Music", "Theatre", "Cultural Festivals", "Poetry Nights"],
+  "Workshops & Classes": ["Cooking Classes", "Art Workshops", "Dance Classes", "Pottery", "Photography Walks", "DIY Crafts"],
+  "Nightlife & Entertainment": ["Club Events", "Karaoke Nights", "Comedy Shows", "Game Nights", "Pool Parties", "Concerts"],
+  "Romantic Experiences": ["Date Night Packages", "Couples' Picnic", "Sunset Cruises", "Proposal Planning", "Anniversary Specials"],
+  "Kids & Family": ["Theme Parks", "Kids' Playgrounds", "Family Game Day", "Zoo Visits", "Science Fairs"],
+  "Other": [],
+};
+
 export const ALL_CATEGORY_DATA: Record<string, string[]> = {
   ...PRODUCT_CATEGORY_DATA,
   ...SERVICE_CATEGORY_DATA,
+  ...EXPERIENCE_CATEGORY_DATA,
 };
 
 export const CATEGORY_DATA = ALL_CATEGORY_DATA;
@@ -54,7 +69,7 @@ export type CategorySelection = Record<string, string[]>;
 interface CategoryPickerProps {
   value: CategorySelection;
   onChange: (val: CategorySelection) => void;
-  filter?: "products" | "services" | "all";
+  filter?: "products" | "services" | "experiences" | "all";
 }
 
 export function CategoryPicker({ value, onChange, filter = "all" }: CategoryPickerProps) {
@@ -62,6 +77,7 @@ export function CategoryPicker({ value, onChange, filter = "all" }: CategoryPick
 
   const categorySource = filter === "products" ? PRODUCT_CATEGORY_DATA
     : filter === "services" ? SERVICE_CATEGORY_DATA
+    : filter === "experiences" ? EXPERIENCE_CATEGORY_DATA
     : CATEGORY_DATA;
 
   const toggleExpand = (cat: string) =>
