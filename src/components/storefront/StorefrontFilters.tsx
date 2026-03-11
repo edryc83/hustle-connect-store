@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Search, SlidersHorizontal, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { ATTRIBUTE_LIBRARY as ATTRIBUTE_TYPES } from "@/lib/attributeLibrary";
+import { CATEGORY_EMOJI } from "@/lib/categoryMapping";
 
 export interface FilterState {
   search: string;
