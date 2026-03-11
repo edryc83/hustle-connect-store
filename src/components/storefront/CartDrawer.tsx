@@ -25,8 +25,6 @@ export function CartDrawer({ currency, whatsappNumber, storeName, storeSlug, sel
   const handleCheckout = async () => {
     if (items.length === 0) return;
 
-    const cleanNumber = (whatsappNumber ?? "").replace(/[^0-9+]/g, "").replace("+", "");
-
     // Build consolidated message
     const lines = [
       `Hello, I would like to order:`,
@@ -38,7 +36,6 @@ export function CartDrawer({ currency, whatsappNumber, storeName, storeSlug, sel
       const subtotal = Number(price) * item.quantity;
       lines.push(`${i + 1}. *${item.product.name}*${item.variant ? ` (${item.variant})` : ""}`);
       lines.push(`   Qty: ${item.quantity} × ${formatPrice(Number(price), currency)} = ${formatPrice(subtotal, currency)}`);
-      lines.push(`   https://afristall.com/${storeSlug}/${item.product.id}`);
     });
 
     lines.push(``);
@@ -80,14 +77,38 @@ export function CartDrawer({ currency, whatsappNumber, storeName, storeSlug, sel
       },
     });
 
-    const waUrl = `https://wa.me/${cleanNumber}?text=${encodeURIComponent(lines.join("\n"))}`;
-    const a = document.createElement("a");
-    a.href = waUrl;
-    a.target = "_blank";
-    a.rel = "noopener noreferrer";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
+    const messageText = lines.join("\n");
+
+    // Try native share with first product image
+    const firstImg = items[0]?.imageUrl || items[0]?.product.image_url;
+    let shared = false;
+    if (firstImg && navigator.share) {
+      try {
+        const res = await fetch(firstImg);
+        const blob = await res.blob();
+        const ext = blob.type.includes("png") ? "png" : "jpg";
+        const file = new File([blob], `order.${ext}`, { type: blob.type });
+        if (navigator.canShare && navigator.canShare({ files: [file] })) {
+          await navigator.share({ files: [file], text: messageText });
+          shared = true;
+        }
+      } catch (e: any) {
+        if (e?.name !== "AbortError") console.warn("Share failed, falling back to wa.me", e);
+      }
+    }
+
+    if (!shared) {
+      const cleanNumber = (whatsappNumber ?? "").replace(/[^0-9+]/g, "").replace("+", "");
+      const waUrl = `https://wa.me/${cleanNumber}?text=${encodeURIComponent(messageText)}`;
+      const a = document.createElement("a");
+      a.href = waUrl;
+      a.target = "_blank";
+      a.rel = "noopener noreferrer";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    }
+
     clearCart();
     setIsOpen(false);
   };
