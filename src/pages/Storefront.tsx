@@ -239,7 +239,6 @@ function ProductDetailView({
 
   const buildWhatsAppMessage = () => {
     const dp = Number(displayPrice);
-    const productUrl = `https://afristall.com/${storeSlug}/${product.id}`;
     const lines: string[] = [
       `Hello, I would like to order:`,
       ``,
@@ -260,7 +259,6 @@ function ProductDetailView({
     if (deliveryAddress.trim()) {
       lines.push(``, `📍 Delivery address: ${deliveryAddress.trim()}`);
     }
-    lines.push(``, productUrl);
 
     return lines.join("\n");
   };
@@ -447,14 +445,13 @@ function ProductDetailView({
               size="lg"
               variant="outline"
               className="gap-2 text-base"
-              onClick={() => {
+              onClick={async () => {
                 // Validate required attribute selections
                 if (!validateSelections()) {
                   toast.error("Please select all required options before ordering");
                   return;
                 }
 
-                const cleanNumber = (profile.whatsapp_number ?? "").replace(/[^0-9+]/g, "");
                 const message = buildWhatsAppMessage();
                 supabase.from("orders").insert({
                   seller_id: profile.id,
@@ -476,14 +473,36 @@ function ProductDetailView({
                   });
                 });
                 supabase.rpc("increment_whatsapp_taps", { p_id: product.id }).then(() => {});
-                const waUrl = `https://wa.me/${cleanNumber.replace("+", "")}?text=${encodeURIComponent(message)}`;
-                const a = document.createElement("a");
-                a.href = waUrl;
-                a.target = "_blank";
-                a.rel = "noopener noreferrer";
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
+
+                // Try native share with product image
+                const imgUrl = images[0] || product.image_url;
+                let shared = false;
+                if (imgUrl && navigator.share) {
+                  try {
+                    const res = await fetch(imgUrl);
+                    const blob = await res.blob();
+                    const ext = blob.type.includes("png") ? "png" : "jpg";
+                    const file = new File([blob], `product.${ext}`, { type: blob.type });
+                    if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                      await navigator.share({ files: [file], text: message });
+                      shared = true;
+                    }
+                  } catch (e: any) {
+                    if (e?.name !== "AbortError") console.warn("Share failed, falling back to wa.me", e);
+                  }
+                }
+
+                if (!shared) {
+                  const cleanNumber = (profile.whatsapp_number ?? "").replace(/[^0-9+]/g, "");
+                  const waUrl = `https://wa.me/${cleanNumber.replace("+", "")}?text=${encodeURIComponent(message)}`;
+                  const a = document.createElement("a");
+                  a.href = waUrl;
+                  a.target = "_blank";
+                  a.rel = "noopener noreferrer";
+                  document.body.appendChild(a);
+                  a.click();
+                  document.body.removeChild(a);
+                }
               }}
             >
               <img src={whatsappIcon} alt="" className="h-5 w-5" />
