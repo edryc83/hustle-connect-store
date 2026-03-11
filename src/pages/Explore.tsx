@@ -506,7 +506,7 @@ const Explore = () => {
                   </div>
                   {hasFilters && (
                     <button
-                      onClick={() => { setSelectedLocation("All"); setSearch(""); }}
+                      onClick={() => { setSelectedLocation("All"); setSearch(""); setExploreCategoryFilter(null); }}
                       className="text-xs text-primary font-medium hover:underline"
                     >
                       Clear all filters
