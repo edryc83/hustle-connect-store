@@ -567,7 +567,7 @@ const Explore = () => {
                               )}
                             </div>
                           </Link>
-                          {displayNumber && (
+                          {cleanNumber && (
                             <a
                               href={`https://wa.me/${cleanNumber}`}
                               target="_blank"
@@ -575,7 +575,7 @@ const Explore = () => {
                               className="flex items-center gap-1.5 mx-3 mb-3 px-2.5 py-1.5 rounded-xl bg-[#25D366]/10 hover:bg-[#25D366]/20 transition-colors"
                             >
                               <img src={whatsappIcon} alt="WhatsApp" className="h-3.5 w-3.5" />
-                              <span className="text-[10px] font-medium text-foreground/70 truncate">{displayNumber}</span>
+                              <span className="text-[10px] font-medium text-foreground/70">Message</span>
                             </a>
                           )}
                         </div>
