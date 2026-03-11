@@ -143,7 +143,7 @@ const Explore = () => {
     setSelectedSubcategory(null);
   }, [selectedCategory]);
 
-  const categoryData = TAB_CATEGORY_MAP[activeTab];
+  const categoryData = activeTab ? TAB_CATEGORY_MAP[activeTab] : {};
   const categoryKeys = Object.keys(categoryData);
   const subcategories = selectedCategory ? categoryData[selectedCategory] ?? [] : [];
 
