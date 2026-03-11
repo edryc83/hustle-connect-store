@@ -264,6 +264,19 @@ const DashboardProducts = () => {
 
     setSaving(true);
     try {
+      // If no category detected yet, do a quick text-based AI detection
+      let finalCategory = detectedCategory;
+      if (!finalCategory && name.trim()) {
+        try {
+          const { data: catData } = await supabase.functions.invoke("analyze-product-image", {
+            body: { productName: name.trim(), productDescription: description.trim() || undefined },
+          });
+          if (catData?.category) {
+            finalCategory = aiSlugToCategory(catData.category) || "";
+          }
+        } catch { /* silent — save without category */ }
+      }
+
       const newImageUrls: string[] = [];
       for (const file of imageFiles) {
         const ext = file.name.split(".").pop();
@@ -284,7 +297,7 @@ const DashboardProducts = () => {
         image_url: allImages[0] ?? null, listing_type: listingType,
         condition: listingType === "product" ? (condition || null) : null,
         attributes: Object.keys(attributes).length > 0 ? attributes : null,
-        category: detectedCategory || null,
+        category: finalCategory || null,
       } as any;
 
       let productId: string;
