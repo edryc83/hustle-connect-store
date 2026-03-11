@@ -6,7 +6,7 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Search, MapPin, X, SlidersHorizontal, Store } from "lucide-react";
+import { Search, MapPin, X, SlidersHorizontal, Store, ArrowLeft, ShoppingBag, Wrench, Sparkles } from "lucide-react";
 import { LazyImage } from "@/components/ui/lazy-image";
 import { categoriesToDisplay } from "@/components/CategoryPicker";
 import { PRODUCT_CATEGORY_DATA, SERVICE_CATEGORY_DATA, EXPERIENCE_CATEGORY_DATA } from "@/components/CategoryPicker";
