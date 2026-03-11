@@ -77,6 +77,7 @@ export function CategoryPicker({ value, onChange, filter = "all" }: CategoryPick
 
   const categorySource = filter === "products" ? PRODUCT_CATEGORY_DATA
     : filter === "services" ? SERVICE_CATEGORY_DATA
+    : filter === "experiences" ? EXPERIENCE_CATEGORY_DATA
     : CATEGORY_DATA;
 
   const toggleExpand = (cat: string) =>
