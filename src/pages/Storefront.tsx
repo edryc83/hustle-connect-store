@@ -35,21 +35,69 @@ import type { Tables } from "@/integrations/supabase/types";
 type Product = Tables<"products">;
 type Profile = Tables<"profiles">;
 
-function ShareButton({ storeName, storeSlug }: { storeName: string; storeSlug: string }) {
+function ShareButton({ storeName, storeSlug, product, currency }: { storeName: string; storeSlug: string; product?: Product; currency?: string }) {
   const [copied, setCopied] = useState(false);
-  const storeUrl = `https://afristall.com/${storeSlug}`;
-  const shareText = `🛍️ Check out ${storeName} on Afristall — order directly on WhatsApp!`;
+  const shareUrl = product
+    ? `https://afristall.com/${storeSlug}/${product.id}`
+    : `https://afristall.com/${storeSlug}`;
+  const fallbackText = product
+    ? `🔥 ${product.name} — ${formatPrice(product.discount_price ?? product.price, currency || "UGX")}\n\nShop here 👉 ${shareUrl}`
+    : `🛍️ Check out ${storeName} on Afristall — order directly on WhatsApp!`;
 
   const copyLink = async () => {
-    await navigator.clipboard.writeText(storeUrl);
+    await navigator.clipboard.writeText(shareUrl);
     setCopied(true);
     toast.success("Link copied!");
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const shareWhatsApp = () => window.open(`https://wa.me/?text=${encodeURIComponent(`${shareText}\n${storeUrl}`)}`, "_blank");
-  const shareFacebook = () => window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(storeUrl)}`, "_blank");
-  const shareTwitter = () => window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${encodeURIComponent(storeUrl)}`, "_blank");
+  const getAiCaption = async (platform: string) => {
+    if (!product) return fallbackText;
+    try {
+      const { data } = await supabase.functions.invoke("generate-share-caption", {
+        body: {
+          productName: product.name,
+          price: formatPrice(product.discount_price ?? product.price, currency || "UGX"),
+          description: product.description || "",
+          storeName,
+          storeSlug,
+          platform,
+        },
+      });
+      return data?.caption || fallbackText;
+    } catch {
+      return fallbackText;
+    }
+  };
+
+  const shareWhatsApp = async () => {
+    const caption = await getAiCaption("WhatsApp");
+    // Try native share with image
+    if (product?.image_url && navigator.share) {
+      try {
+        const res = await fetch(product.image_url);
+        const blob = await res.blob();
+        const file = new File([blob], "product.jpg", { type: blob.type });
+        if (navigator.canShare?.({ files: [file] })) {
+          await navigator.share({ files: [file], text: caption });
+          return;
+        }
+      } catch (e: any) {
+        if (e?.name === "AbortError") return;
+      }
+    }
+    window.open(`https://wa.me/?text=${encodeURIComponent(caption)}`, "_blank");
+  };
+
+  const shareTikTok = async () => {
+    const caption = await getAiCaption("TikTok");
+    // Copy caption to clipboard for TikTok paste
+    await navigator.clipboard.writeText(caption);
+    toast.success("Caption copied! Paste it on TikTok");
+  };
+
+  const shareFacebook = () => window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`, "_blank");
+  const shareTwitter = () => window.open(`https://twitter.com/intent/tweet?text=${encodeURIComponent(fallbackText)}&url=${encodeURIComponent(shareUrl)}`, "_blank");
 
   return (
     <DropdownMenu>
@@ -66,6 +114,11 @@ function ShareButton({ storeName, storeSlug }: { storeName: string; storeSlug: s
         <DropdownMenuItem onClick={shareWhatsApp} className="gap-2">
           <img src={whatsappIcon} alt="" className="h-4 w-4" /> WhatsApp
         </DropdownMenuItem>
+        {product && (
+          <DropdownMenuItem onClick={shareTikTok} className="gap-2">
+            <span className="text-base leading-none">🎵</span> TikTok
+          </DropdownMenuItem>
+        )}
         <DropdownMenuItem onClick={shareFacebook} className="gap-2">
           <span className="text-base leading-none">📘</span> Facebook
         </DropdownMenuItem>
@@ -290,7 +343,7 @@ function ProductDetailView({
               >
                 <Heart className={`h-4 w-4 transition-colors ${isWished(product.id) ? "fill-destructive text-destructive" : "text-muted-foreground"}`} />
               </button>
-              <ShareButton storeName={profile.store_name ?? "Store"} storeSlug={storeSlug} />
+              <ShareButton storeName={profile.store_name ?? "Store"} storeSlug={storeSlug} product={product} currency={currency} />
             </div>
         </div>
       </header>

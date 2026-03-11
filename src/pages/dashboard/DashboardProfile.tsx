@@ -453,7 +453,25 @@ const DashboardProfile = () => {
                   const imgUrl = productImages[selectedProduct.id] || selectedProduct.image_url;
                   const price = formatPrice(selectedProduct.discount_price ?? selectedProduct.price, currency);
                   const shopLink = profile.store_slug ? `https://afristall.com/${profile.store_slug}` : "";
-                  const caption = `🔥 ${selectedProduct.name} — ${price}\n\nShop here 👉 ${shopLink}`;
+                  const fallbackCaption = `🔥 ${selectedProduct.name} — ${price}\n\nShop here 👉 ${shopLink}`;
+
+                  // Try AI caption
+                  let caption = fallbackCaption;
+                  try {
+                    const { data } = await supabase.functions.invoke("generate-share-caption", {
+                      body: {
+                        productName: selectedProduct.name,
+                        price,
+                        description: selectedProduct.description || "",
+                        storeName: profile.store_name || "",
+                        storeSlug: profile.store_slug || "",
+                        platform: "WhatsApp Status",
+                      },
+                    });
+                    if (data?.caption) caption = data.caption;
+                  } catch {
+                    // Use fallback
+                  }
 
                   try {
                     if (imgUrl && navigator.canShare) {
