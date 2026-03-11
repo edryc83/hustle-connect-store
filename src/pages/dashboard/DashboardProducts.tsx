@@ -191,6 +191,10 @@ const DashboardProducts = () => {
         if (data.listing_type) { setListingType(data.listing_type); filled.add("type"); }
         
         if (data.category) {
+          const mappedCat = aiSlugToCategory(data.category);
+          if (mappedCat) {
+            setDetectedCategory(mappedCat);
+          }
           setAttributes((prev) => ({ ...prev, product_type: data.category }));
           filled.add("category");
         }
