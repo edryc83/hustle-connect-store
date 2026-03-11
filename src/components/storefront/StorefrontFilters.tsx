@@ -237,14 +237,13 @@ export function applyFilters(products: any[], filters: FilterState): any[] {
     );
   }
 
-  // Category (from attributes.product_type)
+  // Category filter — match product.category
   if (filters.category) {
     result = result.filter((p) => {
-      const type = p.listing_type || "product";
-      if (type === filters.category) return true;
-      // Fallback: check attributes.product_type
-      const attrs = p.attributes as Record<string, any> | null;
-      return attrs?.product_type === filters.category;
+      if (p.category === filters.category) return true;
+      // Fallback: check listing_type for "Services"
+      if (filters.category === "Services" && p.listing_type === "service") return true;
+      return false;
     });
   }
 
