@@ -343,7 +343,7 @@ function ProductDetailView({
               >
                 <Heart className={`h-4 w-4 transition-colors ${isWished(product.id) ? "fill-destructive text-destructive" : "text-muted-foreground"}`} />
               </button>
-              <ShareButton storeName={profile.store_name ?? "Store"} storeSlug={storeSlug} />
+              <ShareButton storeName={profile.store_name ?? "Store"} storeSlug={storeSlug} product={product} currency={currency} />
             </div>
         </div>
       </header>
