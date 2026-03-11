@@ -386,15 +386,26 @@ const DashboardProducts = () => {
                   </div>
                 )}
                 {allFormImages.length < 5 && (
-                  <label className="cursor-pointer block">
-                    <div className="flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-border/60 bg-muted/30 py-6 hover:border-primary/40 hover:bg-muted/50 transition-colors">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
-                        <ImageIcon className="h-5 w-5 text-primary" />
+                  <div className="flex gap-3">
+                    <label className="cursor-pointer flex-1">
+                      <div className="flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-border/60 bg-muted/30 py-6 hover:border-primary/40 hover:bg-muted/50 transition-colors">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
+                          <Camera className="h-5 w-5 text-primary" />
+                        </div>
+                        <span className="text-sm font-medium text-muted-foreground">Camera</span>
                       </div>
-                      <span className="text-sm font-medium text-muted-foreground">{allFormImages.length > 0 ? "Add more photos" : "Tap to add photos"}</span>
-                    </div>
-                    <input type="file" accept="image/*" multiple className="hidden" onChange={handleImageChange} />
-                  </label>
+                      <input type="file" accept="image/*" capture="environment" className="hidden" onChange={handleImageChange} />
+                    </label>
+                    <label className="cursor-pointer flex-1">
+                      <div className="flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-border/60 bg-muted/30 py-6 hover:border-primary/40 hover:bg-muted/50 transition-colors">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary/10">
+                          <ImageIcon className="h-5 w-5 text-primary" />
+                        </div>
+                        <span className="text-sm font-medium text-muted-foreground">Gallery</span>
+                      </div>
+                      <input type="file" accept="image/*" multiple className="hidden" onChange={handleImageChange} />
+                    </label>
+                  </div>
                 )}
                 {analyzing ? (
                   <div className="flex items-center gap-2 rounded-lg bg-primary/5 border border-primary/20 px-3 py-2">
