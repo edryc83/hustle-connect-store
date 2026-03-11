@@ -239,7 +239,6 @@ function ProductDetailView({
 
   const buildWhatsAppMessage = () => {
     const dp = Number(displayPrice);
-    const productUrl = `https://afristall.com/${storeSlug}/${product.id}`;
     const lines: string[] = [
       `Hello, I would like to order:`,
       ``,
@@ -260,7 +259,6 @@ function ProductDetailView({
     if (deliveryAddress.trim()) {
       lines.push(``, `📍 Delivery address: ${deliveryAddress.trim()}`);
     }
-    lines.push(``, productUrl);
 
     return lines.join("\n");
   };
