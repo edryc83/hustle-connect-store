@@ -34,10 +34,10 @@ const TAB_CATEGORY_MAP: Record<TabType, Record<string, string[]>> = {
   experiences: EXPERIENCE_CATEGORY_DATA,
 };
 
-const TAB_LABELS: { key: TabType; label: string; emoji: string }[] = [
-  { key: "products", label: "Products", emoji: "📦" },
-  { key: "services", label: "Services", emoji: "🔧" },
-  { key: "experiences", label: "Experiences", emoji: "✨" },
+const TAB_CARDS: { key: TabType; label: string; emoji: string; description: string; icon: typeof ShoppingBag }[] = [
+  { key: "products", label: "Products", emoji: "📦", description: "Browse items from stores near you", icon: ShoppingBag },
+  { key: "services", label: "Services", emoji: "🔧", description: "Find service providers & freelancers", icon: Wrench },
+  { key: "experiences", label: "Experiences", emoji: "✨", description: "Discover trips, events & activities", icon: Sparkles },
 ];
 
 function getLocationLabel(store: StoreProfile) {
