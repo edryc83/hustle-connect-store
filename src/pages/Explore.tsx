@@ -257,6 +257,18 @@ const Explore = () => {
     return Array.from(dists).sort();
   }, [tabStores]);
 
+  // Derive category pills from store profiles for the stores step
+  const exploreCategoryPills = useMemo(() => {
+    const catCount = new Map<string, number>();
+    tabStores.forEach((s) => {
+      const tags = categoriesToDisplay(s.category);
+      tags.forEach((tag) => catCount.set(tag, (catCount.get(tag) || 0) + 1));
+    });
+    return Array.from(catCount.entries())
+      .sort((a, b) => b[1] - a[1])
+      .map(([cat, count]) => ({ cat, count, emoji: CATEGORY_EMOJI[cat] || "📋" }));
+  }, [tabStores]);
+
   const filtered = useMemo(() => {
     return tabStores.filter((s) => {
       const q = search.trim().toLowerCase().replace(/^@/, "");
@@ -276,16 +288,23 @@ const Explore = () => {
         matchesCategory = !!(s.category && s.category.toLowerCase().includes(selectedSubcategory.toLowerCase()));
       }
 
+      // Explore category filter pill
+      let matchesExploreCat = true;
+      if (exploreCategoryFilter) {
+        const tags = categoriesToDisplay(s.category);
+        matchesExploreCat = tags.includes(exploreCategoryFilter);
+      }
+
       const matchesLocation =
         selectedLocation === "All" ||
         s.city === selectedLocation ||
         s.district === selectedLocation;
-      return matchesSearch && matchesCategory && matchesLocation;
+      return matchesSearch && matchesCategory && matchesExploreCat && matchesLocation;
     });
-  }, [tabStores, search, selectedCategory, selectedSubcategory, selectedLocation]);
+  }, [tabStores, search, selectedCategory, selectedSubcategory, selectedLocation, exploreCategoryFilter]);
 
   const activeFilterCount =
-    (selectedLocation !== "All" ? 1 : 0);
+    (selectedLocation !== "All" ? 1 : 0) + (exploreCategoryFilter ? 1 : 0);
   const hasFilters = activeFilterCount > 0 || search.trim() !== "";
 
   // Breadcrumb text
