@@ -8,8 +8,9 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { formatPrice } from "@/lib/currency";
 import {
-  Camera, Loader2, Sparkles, Eye, ShoppingCart, Settings, Pencil, Check, X,
+  Camera, Loader2, Sparkles, Eye, ShoppingCart, Settings, Pencil, Check, X, Share2,
 } from "lucide-react";
+import whatsappIcon from "@/assets/whatsapp-icon.png";
 import AfristallLogo from "@/components/AfristallLogo";
 import type { Tables } from "@/integrations/supabase/types";
 import {
@@ -444,6 +445,36 @@ const DashboardProfile = () => {
                 <Link to={`/dashboard/products?edit=${selectedProduct.id}`} onClick={() => setSelectedProduct(null)}>
                   <Pencil className="h-4 w-4" /> Edit {terms.singular}
                 </Link>
+              </Button>
+              <Button
+                variant="outline"
+                className="w-full rounded-xl gap-2 border-[#25D366]/30 text-[#25D366] hover:bg-[#25D366]/10"
+                onClick={async () => {
+                  const imgUrl = productImages[selectedProduct.id] || selectedProduct.image_url;
+                  const price = formatPrice(selectedProduct.discount_price ?? selectedProduct.price, currency);
+                  const shopLink = profile.store_slug ? `https://afristall.com/${profile.store_slug}` : "";
+                  const caption = `🔥 ${selectedProduct.name} — ${price}\n\nShop here 👉 ${shopLink}`;
+
+                  try {
+                    if (imgUrl && navigator.canShare) {
+                      const res = await fetch(imgUrl);
+                      const blob = await res.blob();
+                      const ext = blob.type.split("/")[1] || "jpg";
+                      const file = new File([blob], `product.${ext}`, { type: blob.type });
+
+                      if (navigator.canShare({ files: [file] })) {
+                        await navigator.share({ files: [file], text: caption });
+                        return;
+                      }
+                    }
+                  } catch (err: any) {
+                    if (err?.name === "AbortError") return;
+                  }
+                  // Fallback: text-only WhatsApp share
+                  window.open(`https://wa.me/?text=${encodeURIComponent(caption)}`, "_blank");
+                }}
+              >
+                <img src={whatsappIcon} alt="" className="h-4 w-4" /> Share to Status
               </Button>
             </div>
           )}
