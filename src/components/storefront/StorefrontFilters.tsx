@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Search, SlidersHorizontal, X } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { ATTRIBUTE_LIBRARY as ATTRIBUTE_TYPES } from "@/lib/attributeLibrary";
+import { CATEGORY_EMOJI } from "@/lib/categoryMapping";
 
 export interface FilterState {
   search: string;
@@ -43,23 +44,21 @@ export function StorefrontFilters({ filters, onChange, totalCount, filteredCount
 
   const clearAll = () => onChange({ search: "", category: "", condition: "", priceRange: null });
 
-  // Derive categories from actual product listing_type values
+  // Derive categories from product.category (AI-detected) with fallback to listing_type
   const categorySet = new Map<string, number>();
   products.forEach((p) => {
-    const type = p.listing_type || "product";
-    categorySet.set(type, (categorySet.get(type) || 0) + 1);
+    const cat = p.category || (p.listing_type === "service" ? "Services" : null);
+    if (cat) categorySet.set(cat, (categorySet.get(cat) || 0) + 1);
   });
-  const CATEGORY_META: Record<string, { label: string; emoji: string }> = {
-    product: { label: "Products", emoji: "📦" },
-    service: { label: "Services", emoji: "🔧" },
-  };
   const categories = [
     { value: "", label: "All", emoji: "" },
-    ...Array.from(categorySet.entries()).map(([value, count]) => ({
-      value,
-      label: `${CATEGORY_META[value]?.label || value} (${count})`,
-      emoji: CATEGORY_META[value]?.emoji || "📋",
-    })),
+    ...Array.from(categorySet.entries())
+      .sort((a, b) => b[1] - a[1])
+      .map(([value, count]) => ({
+        value,
+        label: `${value} (${count})`,
+        emoji: CATEGORY_EMOJI[value] || "📋",
+      })),
   ];
 
   // Only show conditions that exist in this store's products
@@ -238,14 +237,13 @@ export function applyFilters(products: any[], filters: FilterState): any[] {
     );
   }
 
-  // Category (from attributes.product_type)
+  // Category filter — match product.category
   if (filters.category) {
     result = result.filter((p) => {
-      const type = p.listing_type || "product";
-      if (type === filters.category) return true;
-      // Fallback: check attributes.product_type
-      const attrs = p.attributes as Record<string, any> | null;
-      return attrs?.product_type === filters.category;
+      if (p.category === filters.category) return true;
+      // Fallback: check listing_type for "Services"
+      if (filters.category === "Services" && p.listing_type === "service") return true;
+      return false;
     });
   }
 
