@@ -1,4 +1,4 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useCallback } from "react";
 import whatsappIcon from "@/assets/whatsapp-icon.png";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
@@ -19,6 +19,7 @@ import {
 import { LazyImage } from "@/components/ui/lazy-image";
 import { categoriesToDisplay } from "@/components/CategoryPicker";
 import { PRODUCT_CATEGORY_DATA, SERVICE_CATEGORY_DATA, EXPERIENCE_CATEGORY_DATA } from "@/components/CategoryPicker";
+import { CATEGORY_EMOJI } from "@/lib/categoryMapping";
 
 type StoreProfile = {
   id: string;
@@ -117,6 +118,7 @@ const Explore = () => {
   const [detectedCountry, setDetectedCountry] = useState<string | null>(null);
   const [selectedLocation, setSelectedLocation] = useState("All");
   const [showFilters, setShowFilters] = useState(false);
+  const [exploreCategoryFilter, setExploreCategoryFilter] = useState<string | null>(null);
 
   // Drill-down state
   const [activeTab, setActiveTab] = useState<TabType | null>(null);
@@ -255,6 +257,18 @@ const Explore = () => {
     return Array.from(dists).sort();
   }, [tabStores]);
 
+  // Derive category pills from store profiles for the stores step
+  const exploreCategoryPills = useMemo(() => {
+    const catCount = new Map<string, number>();
+    tabStores.forEach((s) => {
+      const tags = categoriesToDisplay(s.category);
+      tags.forEach((tag) => catCount.set(tag, (catCount.get(tag) || 0) + 1));
+    });
+    return Array.from(catCount.entries())
+      .sort((a, b) => b[1] - a[1])
+      .map(([cat, count]) => ({ cat, count, emoji: CATEGORY_EMOJI[cat] || "📋" }));
+  }, [tabStores]);
+
   const filtered = useMemo(() => {
     return tabStores.filter((s) => {
       const q = search.trim().toLowerCase().replace(/^@/, "");
@@ -274,16 +288,23 @@ const Explore = () => {
         matchesCategory = !!(s.category && s.category.toLowerCase().includes(selectedSubcategory.toLowerCase()));
       }
 
+      // Explore category filter pill
+      let matchesExploreCat = true;
+      if (exploreCategoryFilter) {
+        const tags = categoriesToDisplay(s.category);
+        matchesExploreCat = tags.includes(exploreCategoryFilter);
+      }
+
       const matchesLocation =
         selectedLocation === "All" ||
         s.city === selectedLocation ||
         s.district === selectedLocation;
-      return matchesSearch && matchesCategory && matchesLocation;
+      return matchesSearch && matchesCategory && matchesExploreCat && matchesLocation;
     });
-  }, [tabStores, search, selectedCategory, selectedSubcategory, selectedLocation]);
+  }, [tabStores, search, selectedCategory, selectedSubcategory, selectedLocation, exploreCategoryFilter]);
 
   const activeFilterCount =
-    (selectedLocation !== "All" ? 1 : 0);
+    (selectedLocation !== "All" ? 1 : 0) + (exploreCategoryFilter ? 1 : 0);
   const hasFilters = activeFilterCount > 0 || search.trim() !== "";
 
   // Breadcrumb text
@@ -485,12 +506,45 @@ const Explore = () => {
                   </div>
                   {hasFilters && (
                     <button
-                      onClick={() => { setSelectedLocation("All"); setSearch(""); }}
+                      onClick={() => { setSelectedLocation("All"); setSearch(""); setExploreCategoryFilter(null); }}
                       className="text-xs text-primary font-medium hover:underline"
                     >
                       Clear all filters
                     </button>
                   )}
+                </div>
+              </section>
+            )}
+
+            {/* Category filter pills */}
+            {exploreCategoryPills.length > 1 && (
+              <section className="border-b border-border/50">
+                <div className="mx-auto max-w-2xl sm:max-w-5xl px-4 py-3">
+                  <div className="flex gap-2 overflow-x-auto no-scrollbar">
+                    <button
+                      onClick={() => setExploreCategoryFilter(null)}
+                      className={`shrink-0 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
+                        !exploreCategoryFilter
+                          ? "border-primary bg-primary/10 text-primary"
+                          : "border-border/60 text-muted-foreground hover:border-primary/40"
+                      }`}
+                    >
+                      All
+                    </button>
+                    {exploreCategoryPills.map(({ cat, count, emoji }) => (
+                      <button
+                        key={cat}
+                        onClick={() => setExploreCategoryFilter(exploreCategoryFilter === cat ? null : cat)}
+                        className={`shrink-0 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
+                          exploreCategoryFilter === cat
+                            ? "border-primary bg-primary/10 text-primary"
+                            : "border-border/60 text-muted-foreground hover:border-primary/40"
+                        }`}
+                      >
+                        {emoji} {cat} ({count})
+                      </button>
+                    ))}
+                  </div>
                 </div>
               </section>
             )}
