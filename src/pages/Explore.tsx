@@ -155,13 +155,13 @@ const Explore = () => {
 
   // Filter by tab
   const tabStores = useMemo(() => {
+    if (!activeTab) return countryStores;
     if (activeTab === "services") {
       return countryStores.filter((s) => s.business_type === "service");
     }
     if (activeTab === "experiences") {
       return countryStores.filter((s) => s.business_type === "experience");
     }
-    // "products" tab shows products + both (not service, not experience)
     return countryStores.filter((s) => s.business_type !== "service" && s.business_type !== "experience");
   }, [countryStores, activeTab]);
 
