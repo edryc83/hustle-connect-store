@@ -69,7 +69,7 @@ export type CategorySelection = Record<string, string[]>;
 interface CategoryPickerProps {
   value: CategorySelection;
   onChange: (val: CategorySelection) => void;
-  filter?: "products" | "services" | "all";
+  filter?: "products" | "services" | "experiences" | "all";
 }
 
 export function CategoryPicker({ value, onChange, filter = "all" }: CategoryPickerProps) {

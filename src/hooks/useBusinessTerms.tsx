@@ -35,5 +35,8 @@ export function useBusinessTerms(): BusinessTerms {
   if (businessType === "service") {
     return { singular: "Package", plural: "Packages", emoji: "🔧", businessType };
   }
+  if (businessType === "experience") {
+    return { singular: "Experience", plural: "Experiences", emoji: "✨", businessType };
+  }
   return { singular: "Product", plural: "Products", emoji: "📦", businessType };
 }
