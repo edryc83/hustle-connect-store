@@ -6,7 +6,16 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Search, MapPin, X, SlidersHorizontal, Store, ArrowLeft, ShoppingBag, Wrench, Sparkles } from "lucide-react";
+import {
+  Search, MapPin, X, SlidersHorizontal, Store, ArrowLeft,
+  ShoppingBag, Wrench, Sparkles,
+  Shirt, Smartphone, Home, UtensilsCrossed, Sparkle, Sofa,
+  Heart, BookOpen, Palette, Dumbbell, Tractor, Car, Baby,
+  Phone, Gem, Hammer, PawPrint,
+  Truck, Settings, Scissors, SprayCan, Camera, ChefHat,
+  GraduationCap, PenTool, Code, PersonStanding, Ruler, Wrench as WrenchIcon, Scale, Building2,
+  Plane, PartyPopper, Wine, Mountain, Flower2, Theater, BookOpenCheck, Music, HeartHandshake, Users,
+} from "lucide-react";
 import { LazyImage } from "@/components/ui/lazy-image";
 import { categoriesToDisplay } from "@/components/CategoryPicker";
 import { PRODUCT_CATEGORY_DATA, SERVICE_CATEGORY_DATA, EXPERIENCE_CATEGORY_DATA } from "@/components/CategoryPicker";
@@ -27,6 +36,7 @@ type StoreProfile = {
 };
 
 type TabType = "products" | "services" | "experiences";
+type Step = "type" | "category" | "subcategory" | "stores";
 
 const TAB_CATEGORY_MAP: Record<TabType, Record<string, string[]>> = {
   products: PRODUCT_CATEGORY_DATA,
@@ -39,6 +49,53 @@ const TAB_CARDS: { key: TabType; label: string; emoji: string; description: stri
   { key: "services", label: "Services", emoji: "🔧", description: "Find service providers & freelancers", icon: Wrench },
   { key: "experiences", label: "Experiences", emoji: "✨", description: "Discover trips, events & activities", icon: Sparkles },
 ];
+
+// Icons for product categories
+const CATEGORY_ICONS: Record<string, typeof ShoppingBag> = {
+  "Fashion & Clothing": Shirt,
+  "Electronics & Gadgets": Smartphone,
+  "Home Appliances": Home,
+  "Food & Beverages": UtensilsCrossed,
+  "Beauty & Cosmetics": Sparkle,
+  "Home & Living": Sofa,
+  "Health & Wellness": Heart,
+  "Books & Stationery": BookOpen,
+  "Art & Crafts": Palette,
+  "Sports & Fitness": Dumbbell,
+  "Agriculture & Farm Produce": Tractor,
+  "Auto & Motor Parts": Car,
+  "Baby & Kids": Baby,
+  "Phones & Accessories": Phone,
+  "Jewelry & Accessories": Gem,
+  "Building & Hardware": Hammer,
+  "Pets & Animals": PawPrint,
+  // Service categories
+  "Delivery & Logistics": Truck,
+  "Repairs & Maintenance": Settings,
+  "Beauty & Grooming": Scissors,
+  "Cleaning Services": SprayCan,
+  "Photography & Videography": Camera,
+  "Catering & Events": ChefHat,
+  "Education & Tutoring": GraduationCap,
+  "Design & Creative": PenTool,
+  "IT & Tech Services": Code,
+  "Health & Fitness": PersonStanding,
+  "Tailoring & Fashion": Ruler,
+  "Auto Services": WrenchIcon,
+  "Legal & Professional": Scale,
+  "Real Estate": Building2,
+  // Experience categories
+  "Trips & Travel": Plane,
+  "Birthday Experiences": PartyPopper,
+  "Dining Experiences": Wine,
+  "Adventure & Outdoor": Mountain,
+  "Wellness & Spa": Flower2,
+  "Cultural Experiences": Theater,
+  "Workshops & Classes": BookOpenCheck,
+  "Nightlife & Entertainment": Music,
+  "Romantic Experiences": HeartHandshake,
+  "Kids & Family": Users,
+};
 
 function getLocationLabel(store: StoreProfile) {
   const parts = [store.district, store.city].filter(Boolean);
@@ -57,9 +114,46 @@ const Explore = () => {
   const [detectedCountry, setDetectedCountry] = useState<string | null>(null);
   const [selectedLocation, setSelectedLocation] = useState("All");
   const [showFilters, setShowFilters] = useState(false);
+
+  // Drill-down state
   const [activeTab, setActiveTab] = useState<TabType | null>(null);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [selectedSubcategory, setSelectedSubcategory] = useState<string | null>(null);
+
+  // Determine current step
+  const step: Step = !activeTab
+    ? "type"
+    : !selectedCategory
+    ? "category"
+    : selectedCategory && TAB_CATEGORY_MAP[activeTab]?.[selectedCategory]?.length > 0 && !selectedSubcategory
+    ? "subcategory"
+    : "stores";
+
+  const handleBack = () => {
+    if (step === "stores" && selectedSubcategory) {
+      setSelectedSubcategory(null);
+    } else if (step === "stores" && selectedCategory) {
+      // Category with no subcategories — go back to categories
+      setSelectedCategory(null);
+    } else if (step === "subcategory") {
+      setSelectedCategory(null);
+    } else if (step === "category") {
+      setActiveTab(null);
+    }
+  };
+
+  const handleSelectCategory = (cat: string) => {
+    setSelectedCategory(cat);
+    const subs = activeTab ? TAB_CATEGORY_MAP[activeTab][cat] ?? [] : [];
+    if (subs.length === 0) {
+      // No subcategories — go straight to stores
+      setSelectedSubcategory(null);
+    }
+  };
+
+  const handleSelectSubcategory = (sub: string) => {
+    setSelectedSubcategory(sub);
+  };
 
   useEffect(() => {
     fetch("https://ipapi.co/json/")
@@ -132,19 +226,8 @@ const Explore = () => {
     fetchStores();
   }, []);
 
-  // Reset category & subcategory when switching tabs
-  useEffect(() => {
-    setSelectedCategory(null);
-    setSelectedSubcategory(null);
-  }, [activeTab]);
-
-  // Reset subcategory when category changes
-  useEffect(() => {
-    setSelectedSubcategory(null);
-  }, [selectedCategory]);
-
   const categoryData = activeTab ? TAB_CATEGORY_MAP[activeTab] : {};
-  const categoryKeys = Object.keys(categoryData);
+  const categoryKeys = Object.keys(categoryData).filter((k) => k !== "Other");
   const subcategories = selectedCategory ? categoryData[selectedCategory] ?? [] : [];
 
   const countryStores = useMemo(() => {
@@ -153,15 +236,10 @@ const Explore = () => {
     return local.length > 0 ? local : stores;
   }, [stores, detectedCountry]);
 
-  // Filter by tab
   const tabStores = useMemo(() => {
     if (!activeTab) return countryStores;
-    if (activeTab === "services") {
-      return countryStores.filter((s) => s.business_type === "service");
-    }
-    if (activeTab === "experiences") {
-      return countryStores.filter((s) => s.business_type === "experience");
-    }
+    if (activeTab === "services") return countryStores.filter((s) => s.business_type === "service");
+    if (activeTab === "experiences") return countryStores.filter((s) => s.business_type === "experience");
     return countryStores.filter((s) => s.business_type !== "service" && s.business_type !== "experience");
   }, [countryStores, activeTab]);
 
@@ -202,28 +280,27 @@ const Explore = () => {
   }, [tabStores, search, selectedCategory, selectedSubcategory, selectedLocation]);
 
   const activeFilterCount =
-    (selectedCategory ? 1 : 0) +
-    (selectedSubcategory ? 1 : 0) +
     (selectedLocation !== "All" ? 1 : 0);
   const hasFilters = activeFilterCount > 0 || search.trim() !== "";
 
-  const headingText = activeTab === "services"
-    ? "Top Services Near You"
-    : activeTab === "experiences"
-    ? "Top Experiences Near You"
-    : "Top Stores Near You";
+  // Breadcrumb text
+  const breadcrumb = [
+    activeTab ? TAB_CARDS.find((t) => t.key === activeTab)?.label : null,
+    selectedCategory,
+    selectedSubcategory,
+  ].filter(Boolean);
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Navbar />
 
       <main className="flex-1">
-        {!activeTab ? (
-          /* ── Selection Screen ── */
+        {/* ── Step: Choose Type ── */}
+        {step === "type" && (
           <section className="mx-auto max-w-2xl px-4 py-12 sm:py-20">
             <div className="text-center mb-10">
-              <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">What are you looking for?</h1>
-              <p className="text-muted-foreground text-sm">Choose a category to start exploring</p>
+              <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">Explore</h1>
+              <p className="text-muted-foreground text-sm">What are you looking for?</p>
             </div>
             <div className="grid gap-4 sm:grid-cols-3">
               {TAB_CARDS.map((card) => {
@@ -237,32 +314,116 @@ const Explore = () => {
                     <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
                       <Icon className="h-7 w-7" />
                     </div>
-                    <span className="text-lg font-semibold text-foreground">{card.emoji} {card.label}</span>
+                    <span className="text-lg font-semibold text-foreground">{card.label}</span>
                     <span className="text-xs text-muted-foreground leading-relaxed">{card.description}</span>
                   </button>
                 );
               })}
             </div>
           </section>
-        ) : (
-          /* ── Browsing Screen ── */
+        )}
+
+        {/* ── Step: Choose Category ── */}
+        {step === "category" && (
+          <section className="mx-auto max-w-2xl px-4 py-6">
+            <button
+              onClick={handleBack}
+              className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-4"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              <span>Back</span>
+            </button>
+            <h2 className="text-xl font-bold text-foreground mb-1">
+              {TAB_CARDS.find((t) => t.key === activeTab)?.emoji} {TAB_CARDS.find((t) => t.key === activeTab)?.label}
+            </h2>
+            <p className="text-sm text-muted-foreground mb-6">Choose a category</p>
+
+            <div className="grid grid-cols-3 gap-3">
+              {categoryKeys.map((cat) => {
+                const Icon = CATEGORY_ICONS[cat] ?? ShoppingBag;
+                return (
+                  <button
+                    key={cat}
+                    onClick={() => handleSelectCategory(cat)}
+                    className="group flex flex-col items-center gap-2 rounded-xl border border-border/50 bg-card p-4 text-center transition-all hover:border-primary/40 hover:shadow-md hover:-translate-y-0.5"
+                  >
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-primary-foreground">
+                      <Icon className="h-5 w-5" />
+                    </div>
+                    <span className="text-[11px] font-medium text-foreground leading-tight line-clamp-2">{cat}</span>
+                  </button>
+                );
+              })}
+            </div>
+          </section>
+        )}
+
+        {/* ── Step: Choose Subcategory ── */}
+        {step === "subcategory" && (
+          <section className="mx-auto max-w-2xl px-4 py-6">
+            <button
+              onClick={handleBack}
+              className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mb-4"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              <span>Back</span>
+            </button>
+            <h2 className="text-xl font-bold text-foreground mb-1">
+              {selectedCategory}
+            </h2>
+            <p className="text-sm text-muted-foreground mb-6">Pick a subcategory</p>
+
+            {/* "All" option */}
+            <button
+              onClick={() => setSelectedSubcategory("__all__")}
+              className="w-full mb-3 flex items-center gap-3 rounded-xl border border-primary/30 bg-primary/5 p-4 text-left transition-all hover:border-primary/50 hover:bg-primary/10"
+            >
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                <Search className="h-5 w-5" />
+              </div>
+              <div>
+                <span className="text-sm font-semibold text-foreground">All {selectedCategory}</span>
+                <p className="text-xs text-muted-foreground">Browse everything in this category</p>
+              </div>
+            </button>
+
+            <div className="grid grid-cols-2 gap-2">
+              {subcategories.map((sub) => (
+                <button
+                  key={sub}
+                  onClick={() => handleSelectSubcategory(sub)}
+                  className="flex items-center gap-3 rounded-xl border border-border/50 bg-card p-3.5 text-left transition-all hover:border-primary/40 hover:shadow-sm"
+                >
+                  <span className="text-sm font-medium text-foreground">{sub}</span>
+                </button>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* ── Step: Stores List ── */}
+        {step === "stores" && (
           <>
-            {/* Back + Search bar */}
+            {/* Header with breadcrumb + search */}
             <section className="border-b border-border/50">
               <div className="mx-auto max-w-2xl px-4 pt-4 pb-4">
-                {/* Back button + tab label */}
                 <div className="flex items-center gap-2 mb-3">
                   <button
-                    onClick={() => setActiveTab(null)}
+                    onClick={handleBack}
                     className="flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
                   >
                     <ArrowLeft className="h-4 w-4" />
-                    <span>Back</span>
                   </button>
-                  <span className="text-sm font-semibold text-foreground">
-                    {TAB_CARDS.find((t) => t.key === activeTab)?.emoji}{" "}
-                    {TAB_CARDS.find((t) => t.key === activeTab)?.label}
-                  </span>
+                  <div className="flex items-center gap-1 text-sm text-muted-foreground overflow-x-auto">
+                    {breadcrumb.map((crumb, i) => (
+                      <span key={i} className="flex items-center gap-1 shrink-0">
+                        {i > 0 && <span className="text-border">›</span>}
+                        <span className={i === breadcrumb.length - 1 ? "font-semibold text-foreground" : ""}>
+                          {crumb === "__all__" ? `All ${selectedCategory}` : crumb}
+                        </span>
+                      </span>
+                    ))}
+                  </div>
                 </div>
                 <div className="relative flex gap-2">
                   <div className="relative flex-1">
@@ -301,7 +462,7 @@ const Explore = () => {
               </div>
             </section>
 
-            {/* Filters - collapsible */}
+            {/* Filters */}
             {showFilters && (
               <section className="border-b animate-in slide-in-from-top-2 duration-200">
                 <div className="mx-auto max-w-2xl px-4 py-4 space-y-4">
@@ -321,7 +482,7 @@ const Explore = () => {
                   </div>
                   {hasFilters && (
                     <button
-                      onClick={() => { setSelectedCategory(null); setSelectedSubcategory(null); setSelectedLocation("All"); setSearch(""); }}
+                      onClick={() => { setSelectedLocation("All"); setSearch(""); }}
                       className="text-xs text-primary font-medium hover:underline"
                     >
                       Clear all filters
@@ -331,84 +492,14 @@ const Explore = () => {
               </section>
             )}
 
-            {/* Main content */}
+            {/* Results */}
             <section className="mx-auto max-w-2xl sm:max-w-5xl px-4 py-6">
-              {/* Tab switcher pills */}
-              <div className="flex gap-2 mb-4">
-                {TAB_CARDS.map((tab) => (
-                  <button
-                    key={tab.key}
-                    onClick={() => setActiveTab(tab.key)}
-                    className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
-                      activeTab === tab.key
-                        ? "bg-primary text-primary-foreground"
-                        : "bg-secondary text-muted-foreground hover:text-foreground"
-                    }`}
-                  >
-                    {tab.emoji} {tab.label}
-                  </button>
-                ))}
-              </div>
-
-              {/* Level 2: Categories (horizontal scroll) */}
-              <div className="flex gap-2 overflow-x-auto pb-2 mb-2 scrollbar-hide">
-                <button
-                  onClick={() => setSelectedCategory(null)}
-                  className={`whitespace-nowrap rounded-full border px-3 py-1.5 text-xs font-medium transition-colors shrink-0 ${
-                    !selectedCategory
-                      ? "border-primary bg-primary/10 text-primary"
-                      : "border-border text-muted-foreground hover:border-primary/30"
-                  }`}
-                >
-                  🔥 All
-                </button>
-                {categoryKeys.map((cat) => (
-                  <button
-                    key={cat}
-                    onClick={() => setSelectedCategory(cat === selectedCategory ? null : cat)}
-                    className={`whitespace-nowrap rounded-full border px-3 py-1.5 text-xs font-medium transition-colors shrink-0 ${
-                      selectedCategory === cat
-                        ? "border-primary bg-primary/10 text-primary"
-                        : "border-border text-muted-foreground hover:border-primary/30"
-                    }`}
-                  >
-                    {cat}
-                  </button>
-                ))}
-              </div>
-
-              {/* Level 3: Subcategories */}
-              {selectedCategory && subcategories.length > 0 && (
-                <div className="flex gap-2 overflow-x-auto pb-2 mb-4 scrollbar-hide">
-                  <button
-                    onClick={() => setSelectedSubcategory(null)}
-                    className={`whitespace-nowrap rounded-full border px-2.5 py-1 text-[11px] font-medium transition-colors shrink-0 ${
-                      !selectedSubcategory
-                        ? "border-primary bg-primary/10 text-primary"
-                        : "border-border text-muted-foreground hover:border-primary/30"
-                    }`}
-                  >
-                    All {selectedCategory}
-                  </button>
-                  {subcategories.map((sub) => (
-                    <button
-                      key={sub}
-                      onClick={() => setSelectedSubcategory(sub === selectedSubcategory ? null : sub)}
-                      className={`whitespace-nowrap rounded-full border px-2.5 py-1 text-[11px] font-medium transition-colors shrink-0 ${
-                        selectedSubcategory === sub
-                          ? "border-primary bg-primary/10 text-primary"
-                          : "border-border text-muted-foreground hover:border-primary/30"
-                      }`}
-                    >
-                      {sub}
-                    </button>
-                  ))}
-                </div>
-              )}
-
-              {/* Heading + count */}
               <div className="flex items-center justify-between mb-4">
-                <h2 className="text-lg font-bold text-foreground">{headingText}</h2>
+                <h2 className="text-lg font-bold text-foreground">
+                  {selectedSubcategory && selectedSubcategory !== "__all__"
+                    ? selectedSubcategory
+                    : selectedCategory ?? "Stores"}
+                </h2>
                 <span className="text-xs text-muted-foreground">
                   {filtered.length} result{filtered.length !== 1 ? "s" : ""}
                 </span>
@@ -417,18 +508,6 @@ const Explore = () => {
               {/* Active filter summary */}
               {hasFilters && !showFilters && (
                 <div className="flex flex-wrap gap-2 mb-4">
-                  {selectedCategory && (
-                    <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
-                      {selectedCategory}
-                      <button onClick={() => setSelectedCategory(null)}><X className="h-3 w-3" /></button>
-                    </span>
-                  )}
-                  {selectedSubcategory && (
-                    <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
-                      {selectedSubcategory}
-                      <button onClick={() => setSelectedSubcategory(null)}><X className="h-3 w-3" /></button>
-                    </span>
-                  )}
                   {selectedLocation !== "All" && (
                     <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
                       <MapPin className="h-3 w-3" /> {selectedLocation}
@@ -438,19 +517,18 @@ const Explore = () => {
                 </div>
               )}
 
-              {/* Results */}
               {loading ? (
                 <div className="py-16 text-center animate-pulse text-muted-foreground">Loading…</div>
               ) : filtered.length === 0 ? (
                 <div className="flex flex-col items-center gap-3 py-16 text-center">
                   <Store className="h-12 w-12 text-muted-foreground/40" />
-                  <p className="text-lg font-medium">No results found</p>
+                  <p className="text-lg font-medium">No stores found</p>
                   <p className="text-sm text-muted-foreground">
                     {hasFilters ? "Try adjusting your filters" : "Be the first to create one!"}
                   </p>
                   {hasFilters && (
                     <button
-                      onClick={() => { setSearch(""); setSelectedCategory(null); setSelectedSubcategory(null); setSelectedLocation("All"); }}
+                      onClick={() => { setSearch(""); setSelectedLocation("All"); }}
                       className="text-sm text-primary font-medium hover:underline"
                     >
                       Clear all filters
@@ -459,86 +537,86 @@ const Explore = () => {
                 </div>
               ) : (
                 <>
-                {/* Mobile list */}
-                <div className="flex flex-col gap-2 px-3 sm:hidden">
-                  {filtered.map((store) => {
-                    const businessLabel = getBusinessLabel(store);
-                    const avatarUrl = store.profile_picture_url || store.first_product_image;
-                    const cleanNumber = store.whatsapp_number?.replace(/[^0-9+]/g, "").replace(/^\+/, "") || "";
-                    return (
-                      <div key={store.id} className="flex items-center gap-3 px-4 py-3 rounded-2xl backdrop-blur-2xl bg-white/[0.04] border border-white/[0.06] shadow-[inset_0_0.5px_0_0_rgba(255,255,255,0.04),0_2px_12px_-4px_rgba(0,0,0,0.3)]">
-                        <Link to={`/${store.store_slug}`} className="flex items-center gap-3 flex-1 min-w-0">
-                          <div className="ig-ring ig-ring-sm shrink-0">
-                            {avatarUrl ? (
-                              <LazyImage src={avatarUrl} alt={store.store_name ?? "Store"} wrapperClassName="h-12 w-12 rounded-full" className="w-full h-full rounded-full object-cover" />
-                            ) : (
-                              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-secondary">
-                                <img src="/logo-glow.png" alt="Afristall" className="h-8 w-8 rounded-full object-cover" />
-                              </div>
-                            )}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <h3 className="font-semibold text-sm text-foreground truncate">{store.store_name}</h3>
-                            {businessLabel && (
-                              <p className="text-xs text-primary truncate mt-0.5">{businessLabel}</p>
-                            )}
-                          </div>
-                        </Link>
-                        <a
-                          href={cleanNumber ? `https://wa.me/${cleanNumber}` : `/${store.store_slug}`}
-                          target={cleanNumber ? "_blank" : undefined}
-                          rel="noopener noreferrer"
-                          className="shrink-0 flex items-center justify-center h-9 w-9 rounded-full bg-[#25D366]/10 hover:bg-[#25D366]/20 transition-colors"
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          <img src={whatsappIcon} alt="WhatsApp" className="h-5 w-5" />
-                        </a>
-                      </div>
-                    );
-                  })}
-                </div>
-
-                {/* Desktop card grid */}
-                <div className="hidden sm:grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {filtered.map((store) => {
-                    const businessLabel = getBusinessLabel(store);
-                    const location = getLocationLabel(store);
-                    const avatarUrl = store.profile_picture_url || store.first_product_image;
-                    const coverUrl = store.cover_photo_url || store.first_product_image || "/default-cover.png";
-                    return (
-                      <Link key={store.id} to={`/${store.store_slug}`} className="block group">
-                        <div className="rounded-2xl bg-card border border-border/50 hover:border-primary/20 hover:shadow-md transition-all overflow-hidden h-full">
-                          <div className="relative h-28 bg-secondary/50">
-                            <LazyImage src={coverUrl} alt="" wrapperClassName="h-full w-full" className="h-full w-full object-cover" />
-                            <div className="absolute -bottom-6 left-4 ig-ring ig-ring-sm">
+                  {/* Mobile list */}
+                  <div className="flex flex-col gap-2 px-3 sm:hidden">
+                    {filtered.map((store) => {
+                      const businessLabel = getBusinessLabel(store);
+                      const avatarUrl = store.profile_picture_url || store.first_product_image;
+                      const cleanNumber = store.whatsapp_number?.replace(/[^0-9+]/g, "").replace(/^\+/, "") || "";
+                      return (
+                        <div key={store.id} className="flex items-center gap-3 px-4 py-3 rounded-2xl backdrop-blur-2xl bg-white/[0.04] border border-white/[0.06] shadow-[inset_0_0.5px_0_0_rgba(255,255,255,0.04),0_2px_12px_-4px_rgba(0,0,0,0.3)]">
+                          <Link to={`/${store.store_slug}`} className="flex items-center gap-3 flex-1 min-w-0">
+                            <div className="ig-ring ig-ring-sm shrink-0">
                               {avatarUrl ? (
                                 <LazyImage src={avatarUrl} alt={store.store_name ?? "Store"} wrapperClassName="h-12 w-12 rounded-full" className="w-full h-full rounded-full object-cover" />
                               ) : (
-                                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-card border-2 border-card">
+                                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-secondary">
                                   <img src="/logo-glow.png" alt="Afristall" className="h-8 w-8 rounded-full object-cover" />
                                 </div>
                               )}
                             </div>
-                          </div>
-                          <div className="pt-8 px-4 pb-4">
-                            {businessLabel && (
-                              <span className="inline-block rounded bg-primary/10 px-1.5 py-0.5 text-[10px] font-semibold text-primary uppercase tracking-wide mb-1">{businessLabel}</span>
-                            )}
-                            <h3 className="font-semibold text-sm text-foreground truncate">{store.store_name}</h3>
-                            {store.store_slug && (
-                              <p className="text-xs text-muted-foreground mt-0.5">@{store.store_slug}</p>
-                            )}
-                            {location && (
-                              <p className="flex items-center gap-1 text-xs text-muted-foreground mt-1.5 truncate">
-                                <MapPin className="h-3 w-3 shrink-0" /> {location}
-                              </p>
-                            )}
-                          </div>
+                            <div className="flex-1 min-w-0">
+                              <h3 className="font-semibold text-sm text-foreground truncate">{store.store_name}</h3>
+                              {businessLabel && (
+                                <p className="text-xs text-primary truncate mt-0.5">{businessLabel}</p>
+                              )}
+                            </div>
+                          </Link>
+                          <a
+                            href={cleanNumber ? `https://wa.me/${cleanNumber}` : `/${store.store_slug}`}
+                            target={cleanNumber ? "_blank" : undefined}
+                            rel="noopener noreferrer"
+                            className="shrink-0 flex items-center justify-center h-9 w-9 rounded-full bg-[#25D366]/10 hover:bg-[#25D366]/20 transition-colors"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <img src={whatsappIcon} alt="WhatsApp" className="h-5 w-5" />
+                          </a>
                         </div>
-                      </Link>
-                    );
-                  })}
-                </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* Desktop card grid */}
+                  <div className="hidden sm:grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {filtered.map((store) => {
+                      const businessLabel = getBusinessLabel(store);
+                      const location = getLocationLabel(store);
+                      const avatarUrl = store.profile_picture_url || store.first_product_image;
+                      const coverUrl = store.cover_photo_url || store.first_product_image || "/default-cover.png";
+                      return (
+                        <Link key={store.id} to={`/${store.store_slug}`} className="block group">
+                          <div className="rounded-2xl bg-card border border-border/50 hover:border-primary/20 hover:shadow-md transition-all overflow-hidden h-full">
+                            <div className="relative h-28 bg-secondary/50">
+                              <LazyImage src={coverUrl} alt="" wrapperClassName="h-full w-full" className="h-full w-full object-cover" />
+                              <div className="absolute -bottom-6 left-4 ig-ring ig-ring-sm">
+                                {avatarUrl ? (
+                                  <LazyImage src={avatarUrl} alt={store.store_name ?? "Store"} wrapperClassName="h-12 w-12 rounded-full" className="w-full h-full rounded-full object-cover" />
+                                ) : (
+                                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-card border-2 border-card">
+                                    <img src="/logo-glow.png" alt="Afristall" className="h-8 w-8 rounded-full object-cover" />
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                            <div className="pt-8 px-4 pb-4">
+                              {businessLabel && (
+                                <span className="inline-block rounded bg-primary/10 px-1.5 py-0.5 text-[10px] font-semibold text-primary uppercase tracking-wide mb-1">{businessLabel}</span>
+                              )}
+                              <h3 className="font-semibold text-sm text-foreground truncate">{store.store_name}</h3>
+                              {store.store_slug && (
+                                <p className="text-xs text-muted-foreground mt-0.5">@{store.store_slug}</p>
+                              )}
+                              {location && (
+                                <p className="flex items-center gap-1 text-xs text-muted-foreground mt-1.5 truncate">
+                                  <MapPin className="h-3 w-3 shrink-0" /> {location}
+                                </p>
+                              )}
+                            </div>
+                          </div>
+                        </Link>
+                      );
+                    })}
+                  </div>
                 </>
               )}
             </section>
