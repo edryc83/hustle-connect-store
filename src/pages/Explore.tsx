@@ -171,7 +171,7 @@ const Explore = () => {
     const fetchStores = async () => {
       const { data } = await supabase
         .from("profiles")
-        .select("id, store_name, store_slug, profile_picture_url, cover_photo_url, category, country, district, city, business_type, whatsapp_number")
+        .select("id, store_name, store_slug, profile_picture_url, cover_photo_url, category, country, district, city, business_type, whatsapp_number, instagram_url, tiktok_url, facebook_url")
         .not("store_name", "is", null)
         .not("store_slug", "is", null)
         .order("last_active_at", { ascending: false });
