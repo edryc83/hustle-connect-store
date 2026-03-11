@@ -16,7 +16,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Plus, Pencil, Trash2, ImageIcon, Package, Sparkles, Loader2, Wrench, X, Star, ChevronRight, Copy } from "lucide-react";
+import { Plus, Pencil, Trash2, ImageIcon, Package, Sparkles, Loader2, Wrench, X, Star, ChevronRight, Copy, Camera } from "lucide-react";
 import { toast } from "sonner";
 import { formatPrice } from "@/lib/currency";
 import { Badge } from "@/components/ui/badge";
