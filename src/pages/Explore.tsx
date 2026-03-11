@@ -6,11 +6,11 @@ import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Search, MapPin, X, SlidersHorizontal, Store, Bookmark } from "lucide-react";
+import { Search, MapPin, X, SlidersHorizontal, Store } from "lucide-react";
 import AfristallLogo from "@/components/AfristallLogo";
 import { LazyImage } from "@/components/ui/lazy-image";
 import { categoriesToDisplay } from "@/components/CategoryPicker";
-import { PRODUCT_CATEGORY_DATA, SERVICE_CATEGORY_DATA } from "@/components/CategoryPicker";
+import { PRODUCT_CATEGORY_DATA, SERVICE_CATEGORY_DATA, EXPERIENCE_CATEGORY_DATA } from "@/components/CategoryPicker";
 
 type StoreProfile = {
   id: string;
@@ -27,37 +27,13 @@ type StoreProfile = {
   first_product_image?: string | null;
 };
 
-type TabType = "stores" | "services";
+type TabType = "products" | "services" | "experiences";
 
-const STORE_CATEGORIES = [
-  { label: "All", icon: "🔥" },
-  ...Object.keys(PRODUCT_CATEGORY_DATA).map((k) => ({ label: k, icon: "" })),
-];
-
-const SERVICE_CATEGORIES = [
-  { label: "All", icon: "🔥" },
-  ...Object.keys(SERVICE_CATEGORY_DATA).map((k) => ({ label: k, icon: "" })),
-];
-
-function getLocationLabel(store: StoreProfile) {
-  const parts = [store.district, store.city].filter(Boolean);
-  return parts.length > 0 ? parts.join(", ") : null;
-}
-
-function getBusinessLabel(store: StoreProfile): string | null {
-  const tags = categoriesToDisplay(store.category);
-  return tags.length > 0 ? tags[0] : null;
-}
-
-const Explore = () => {
-  const [stores, setStores] = useState<StoreProfile[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [search, setSearch] = useState("");
-  const [selectedCategory, setSelectedCategory] = useState("All");
-  const [detectedCountry, setDetectedCountry] = useState<string | null>(null);
-  const [selectedLocation, setSelectedLocation] = useState("All");
-  const [showFilters, setShowFilters] = useState(false);
-  const [activeTab, setActiveTab] = useState<TabType>("stores");
+const TAB_CATEGORY_MAP: Record<TabType, Record<string, string[]>> = {
+  products: PRODUCT_CATEGORY_DATA,
+  services: SERVICE_CATEGORY_DATA,
+  experiences: EXPERIENCE_CATEGORY_DATA,
+};
 
   useEffect(() => {
     fetch("https://ipapi.co/json/")
