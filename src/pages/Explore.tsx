@@ -7,7 +7,6 @@ import Footer from "@/components/layout/Footer";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Search, MapPin, X, SlidersHorizontal, Store } from "lucide-react";
-import AfristallLogo from "@/components/AfristallLogo";
 import { LazyImage } from "@/components/ui/lazy-image";
 import { categoriesToDisplay } from "@/components/CategoryPicker";
 import { PRODUCT_CATEGORY_DATA, SERVICE_CATEGORY_DATA, EXPERIENCE_CATEGORY_DATA } from "@/components/CategoryPicker";
@@ -35,6 +34,33 @@ const TAB_CATEGORY_MAP: Record<TabType, Record<string, string[]>> = {
   experiences: EXPERIENCE_CATEGORY_DATA,
 };
 
+const TAB_LABELS: { key: TabType; label: string; emoji: string }[] = [
+  { key: "products", label: "Products", emoji: "📦" },
+  { key: "services", label: "Services", emoji: "🔧" },
+  { key: "experiences", label: "Experiences", emoji: "✨" },
+];
+
+function getLocationLabel(store: StoreProfile) {
+  const parts = [store.district, store.city].filter(Boolean);
+  return parts.length > 0 ? parts.join(", ") : null;
+}
+
+function getBusinessLabel(store: StoreProfile): string | null {
+  const tags = categoriesToDisplay(store.category);
+  return tags.length > 0 ? tags[0] : null;
+}
+
+const Explore = () => {
+  const [stores, setStores] = useState<StoreProfile[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState("");
+  const [detectedCountry, setDetectedCountry] = useState<string | null>(null);
+  const [selectedLocation, setSelectedLocation] = useState("All");
+  const [showFilters, setShowFilters] = useState(false);
+  const [activeTab, setActiveTab] = useState<TabType>("products");
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [selectedSubcategory, setSelectedSubcategory] = useState<string | null>(null);
+
   useEffect(() => {
     fetch("https://ipapi.co/json/")
       .then((r) => r.json())
@@ -55,7 +81,6 @@ const TAB_CATEGORY_MAP: Record<TabType, Record<string, string[]>> = {
 
       const storeList = (data as StoreProfile[]) ?? [];
 
-      // For stores missing profile pic or cover, fetch their first product image
       const needsImage = storeList.filter((s) => !s.profile_picture_url || !s.cover_photo_url);
       if (needsImage.length > 0) {
         const ids = needsImage.map((s) => s.id);
@@ -71,7 +96,6 @@ const TAB_CATEGORY_MAP: Record<TabType, Record<string, string[]>> = {
             if (!firstImg[p.user_id] && p.image_url) firstImg[p.user_id] = p.image_url;
           });
 
-          // Also check product_images table
           const stillMissing = ids.filter((id) => !firstImg[id]);
           if (stillMissing.length > 0) {
             const { data: prodImgs } = await supabase
@@ -108,10 +132,20 @@ const TAB_CATEGORY_MAP: Record<TabType, Record<string, string[]>> = {
     fetchStores();
   }, []);
 
-  // Reset category when switching tabs
+  // Reset category & subcategory when switching tabs
   useEffect(() => {
-    setSelectedCategory("All");
+    setSelectedCategory(null);
+    setSelectedSubcategory(null);
   }, [activeTab]);
+
+  // Reset subcategory when category changes
+  useEffect(() => {
+    setSelectedSubcategory(null);
+  }, [selectedCategory]);
+
+  const categoryData = TAB_CATEGORY_MAP[activeTab];
+  const categoryKeys = Object.keys(categoryData);
+  const subcategories = selectedCategory ? categoryData[selectedCategory] ?? [] : [];
 
   const countryStores = useMemo(() => {
     if (!detectedCountry) return stores;
@@ -119,16 +153,17 @@ const TAB_CATEGORY_MAP: Record<TabType, Record<string, string[]>> = {
     return local.length > 0 ? local : stores;
   }, [stores, detectedCountry]);
 
-  // Filter by tab (stores vs services)
+  // Filter by tab
   const tabStores = useMemo(() => {
     if (activeTab === "services") {
       return countryStores.filter((s) => s.business_type === "service");
     }
-    // "stores" tab shows products + both
-    return countryStores.filter((s) => s.business_type !== "service");
+    if (activeTab === "experiences") {
+      return countryStores.filter((s) => s.business_type === "experience");
+    }
+    // "products" tab shows products + both (not service, not experience)
+    return countryStores.filter((s) => s.business_type !== "service" && s.business_type !== "experience");
   }, [countryStores, activeTab]);
-
-  const categories = activeTab === "services" ? SERVICE_CATEGORIES : STORE_CATEGORIES;
 
   const districtOptions = useMemo(() => {
     const dists = new Set<string>();
@@ -149,19 +184,34 @@ const TAB_CATEGORY_MAP: Record<TabType, Record<string, string[]>> = {
         s.category?.toLowerCase().includes(q) ||
         s.city?.toLowerCase().includes(q) ||
         s.district?.toLowerCase().includes(q);
-      const matchesCategory =
-        selectedCategory === "All" ||
-        (s.category && s.category.toLowerCase().includes(selectedCategory.toLowerCase()));
+
+      let matchesCategory = true;
+      if (selectedCategory) {
+        matchesCategory = !!(s.category && s.category.toLowerCase().includes(selectedCategory.toLowerCase()));
+      }
+      if (selectedSubcategory) {
+        matchesCategory = !!(s.category && s.category.toLowerCase().includes(selectedSubcategory.toLowerCase()));
+      }
+
       const matchesLocation =
         selectedLocation === "All" ||
         s.city === selectedLocation ||
         s.district === selectedLocation;
       return matchesSearch && matchesCategory && matchesLocation;
     });
-  }, [tabStores, search, selectedCategory, selectedLocation]);
+  }, [tabStores, search, selectedCategory, selectedSubcategory, selectedLocation]);
 
-  const activeFilterCount = (selectedCategory !== "All" ? 1 : 0) + (selectedLocation !== "All" ? 1 : 0);
+  const activeFilterCount =
+    (selectedCategory ? 1 : 0) +
+    (selectedSubcategory ? 1 : 0) +
+    (selectedLocation !== "All" ? 1 : 0);
   const hasFilters = activeFilterCount > 0 || search.trim() !== "";
+
+  const headingText = activeTab === "services"
+    ? "Top Services Near You"
+    : activeTab === "experiences"
+    ? "Top Experiences Near You"
+    : "Top Stores Near You";
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
@@ -175,7 +225,7 @@ const TAB_CATEGORY_MAP: Record<TabType, Record<string, string[]>> = {
               <div className="relative flex-1">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
-                  placeholder={activeTab === "services" ? "Search services…" : "Search stores…"}
+                  placeholder="Search stores…"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                   className="pl-10 h-11 rounded-xl"
@@ -228,30 +278,10 @@ const TAB_CATEGORY_MAP: Record<TabType, Record<string, string[]>> = {
                 </Select>
               </div>
 
-              {/* Category chips */}
-              <div className="space-y-1.5">
-                <label className="text-xs font-medium text-muted-foreground">Category</label>
-                <div className="flex flex-wrap gap-2">
-                  {categories.map((cat) => (
-                    <button
-                      key={cat.label}
-                      onClick={() => setSelectedCategory(cat.label)}
-                      className={`whitespace-nowrap rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
-                        selectedCategory === cat.label
-                          ? "border-primary bg-primary/10 text-primary"
-                          : "border-border text-muted-foreground hover:border-primary/30"
-                      }`}
-                    >
-                      {cat.icon ? `${cat.icon} ` : ""}{cat.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
               {/* Clear filters */}
               {hasFilters && (
                 <button
-                  onClick={() => { setSelectedCategory("All"); setSelectedLocation("All"); setSearch(""); }}
+                  onClick={() => { setSelectedCategory(null); setSelectedSubcategory(null); setSelectedLocation("All"); setSearch(""); }}
                   className="text-xs text-primary font-medium hover:underline"
                 >
                   Clear all filters
@@ -261,48 +291,101 @@ const TAB_CATEGORY_MAP: Record<TabType, Record<string, string[]>> = {
           </section>
         )}
 
-        {/* Top Stores Near You */}
+        {/* Main content */}
         <section className="mx-auto max-w-2xl sm:max-w-5xl px-4 py-8">
           <div className="flex items-center justify-between mb-5">
-            <h2 className="text-lg font-bold text-foreground">
-              {activeTab === "services" ? "Top Services Near You" : "Top Stores Near You"}
-            </h2>
+            <h2 className="text-lg font-bold text-foreground">{headingText}</h2>
             <span className="text-xs text-muted-foreground">
               {filtered.length} result{filtered.length !== 1 ? "s" : ""}
             </span>
           </div>
 
-          {/* Stores / Services toggle */}
-          <div className="flex gap-2 mb-5">
-            <button
-              onClick={() => setActiveTab("stores")}
-              className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
-                activeTab === "stores"
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-secondary text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              All Stores
-            </button>
-            <button
-              onClick={() => setActiveTab("services")}
-              className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
-                activeTab === "services"
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-secondary text-muted-foreground hover:text-foreground"
-              }`}
-            >
-              Services
-            </button>
+          {/* Level 1: Top tabs */}
+          <div className="flex gap-2 mb-4">
+            {TAB_LABELS.map((tab) => (
+              <button
+                key={tab.key}
+                onClick={() => setActiveTab(tab.key)}
+                className={`rounded-full px-4 py-1.5 text-sm font-medium transition-colors ${
+                  activeTab === tab.key
+                    ? "bg-primary text-primary-foreground"
+                    : "bg-secondary text-muted-foreground hover:text-foreground"
+                }`}
+              >
+                {tab.emoji} {tab.label}
+              </button>
+            ))}
           </div>
+
+          {/* Level 2: Categories (horizontal scroll) */}
+          <div className="flex gap-2 overflow-x-auto pb-2 mb-2 scrollbar-hide">
+            <button
+              onClick={() => setSelectedCategory(null)}
+              className={`whitespace-nowrap rounded-full border px-3 py-1.5 text-xs font-medium transition-colors shrink-0 ${
+                !selectedCategory
+                  ? "border-primary bg-primary/10 text-primary"
+                  : "border-border text-muted-foreground hover:border-primary/30"
+              }`}
+            >
+              🔥 All
+            </button>
+            {categoryKeys.map((cat) => (
+              <button
+                key={cat}
+                onClick={() => setSelectedCategory(cat === selectedCategory ? null : cat)}
+                className={`whitespace-nowrap rounded-full border px-3 py-1.5 text-xs font-medium transition-colors shrink-0 ${
+                  selectedCategory === cat
+                    ? "border-primary bg-primary/10 text-primary"
+                    : "border-border text-muted-foreground hover:border-primary/30"
+                }`}
+              >
+                {cat}
+              </button>
+            ))}
+          </div>
+
+          {/* Level 3: Subcategories */}
+          {selectedCategory && subcategories.length > 0 && (
+            <div className="flex gap-2 overflow-x-auto pb-2 mb-4 scrollbar-hide">
+              <button
+                onClick={() => setSelectedSubcategory(null)}
+                className={`whitespace-nowrap rounded-full border px-2.5 py-1 text-[11px] font-medium transition-colors shrink-0 ${
+                  !selectedSubcategory
+                    ? "border-primary bg-primary/10 text-primary"
+                    : "border-border text-muted-foreground hover:border-primary/30"
+                }`}
+              >
+                All {selectedCategory}
+              </button>
+              {subcategories.map((sub) => (
+                <button
+                  key={sub}
+                  onClick={() => setSelectedSubcategory(sub === selectedSubcategory ? null : sub)}
+                  className={`whitespace-nowrap rounded-full border px-2.5 py-1 text-[11px] font-medium transition-colors shrink-0 ${
+                    selectedSubcategory === sub
+                      ? "border-primary bg-primary/10 text-primary"
+                      : "border-border text-muted-foreground hover:border-primary/30"
+                  }`}
+                >
+                  {sub}
+                </button>
+              ))}
+            </div>
+          )}
 
           {/* Active filter summary */}
           {hasFilters && !showFilters && (
             <div className="flex flex-wrap gap-2 mb-4">
-              {selectedCategory !== "All" && (
+              {selectedCategory && (
                 <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
                   {selectedCategory}
-                  <button onClick={() => setSelectedCategory("All")}><X className="h-3 w-3" /></button>
+                  <button onClick={() => setSelectedCategory(null)}><X className="h-3 w-3" /></button>
+                </span>
+              )}
+              {selectedSubcategory && (
+                <span className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-3 py-1 text-xs font-medium text-primary">
+                  {selectedSubcategory}
+                  <button onClick={() => setSelectedSubcategory(null)}><X className="h-3 w-3" /></button>
                 </span>
               )}
               {selectedLocation !== "All" && (
@@ -320,13 +403,13 @@ const TAB_CATEGORY_MAP: Record<TabType, Record<string, string[]>> = {
           ) : filtered.length === 0 ? (
             <div className="flex flex-col items-center gap-3 py-16 text-center">
               <Store className="h-12 w-12 text-muted-foreground/40" />
-              <p className="text-lg font-medium">No {activeTab} found</p>
+              <p className="text-lg font-medium">No results found</p>
               <p className="text-sm text-muted-foreground">
                 {hasFilters ? "Try adjusting your filters" : "Be the first to create one!"}
               </p>
               {hasFilters && (
                 <button
-                  onClick={() => { setSearch(""); setSelectedCategory("All"); setSelectedLocation("All"); }}
+                  onClick={() => { setSearch(""); setSelectedCategory(null); setSelectedSubcategory(null); setSelectedLocation("All"); }}
                   className="text-sm text-primary font-medium hover:underline"
                 >
                   Clear all filters
@@ -335,6 +418,7 @@ const TAB_CATEGORY_MAP: Record<TabType, Record<string, string[]>> = {
             </div>
           ) : (
             <>
+            {/* Mobile list */}
             <div className="flex flex-col gap-2 px-3 sm:hidden">
               {filtered.map((store) => {
                 const businessLabel = getBusinessLabel(store);
@@ -343,7 +427,6 @@ const TAB_CATEGORY_MAP: Record<TabType, Record<string, string[]>> = {
                 return (
                   <div key={store.id} className="flex items-center gap-3 px-4 py-3 rounded-2xl backdrop-blur-2xl bg-white/[0.04] border border-white/[0.06] shadow-[inset_0_0.5px_0_0_rgba(255,255,255,0.04),0_2px_12px_-4px_rgba(0,0,0,0.3)]">
                     <Link to={`/${store.store_slug}`} className="flex items-center gap-3 flex-1 min-w-0">
-                      {/* Profile pic */}
                       <div className="ig-ring ig-ring-sm shrink-0">
                         {avatarUrl ? (
                           <LazyImage src={avatarUrl} alt={store.store_name ?? "Store"} wrapperClassName="h-12 w-12 rounded-full" className="w-full h-full rounded-full object-cover" />
@@ -353,7 +436,6 @@ const TAB_CATEGORY_MAP: Record<TabType, Record<string, string[]>> = {
                           </div>
                         )}
                       </div>
-                      {/* Name & category */}
                       <div className="flex-1 min-w-0">
                         <h3 className="font-semibold text-sm text-foreground truncate">{store.store_name}</h3>
                         {businessLabel && (
@@ -361,7 +443,6 @@ const TAB_CATEGORY_MAP: Record<TabType, Record<string, string[]>> = {
                         )}
                       </div>
                     </Link>
-                    {/* WhatsApp icon */}
                     <a
                       href={cleanNumber ? `https://wa.me/${cleanNumber}` : `/${store.store_slug}`}
                       target={cleanNumber ? "_blank" : undefined}
@@ -386,7 +467,6 @@ const TAB_CATEGORY_MAP: Record<TabType, Record<string, string[]>> = {
                 return (
                   <Link key={store.id} to={`/${store.store_slug}`} className="block group">
                     <div className="rounded-2xl bg-card border border-border/50 hover:border-primary/20 hover:shadow-md transition-all overflow-hidden h-full">
-                      {/* Cover / avatar area */}
                       <div className="relative h-28 bg-secondary/50">
                         <LazyImage src={coverUrl} alt="" wrapperClassName="h-full w-full" className="h-full w-full object-cover" />
                         <div className="absolute -bottom-6 left-4 ig-ring ig-ring-sm">
@@ -399,7 +479,6 @@ const TAB_CATEGORY_MAP: Record<TabType, Record<string, string[]>> = {
                           )}
                         </div>
                       </div>
-                      {/* Info */}
                       <div className="pt-8 px-4 pb-4">
                         {businessLabel && (
                           <span className="inline-block rounded bg-primary/10 px-1.5 py-0.5 text-[10px] font-semibold text-primary uppercase tracking-wide mb-1">{businessLabel}</span>
