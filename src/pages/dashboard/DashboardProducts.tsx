@@ -283,6 +283,7 @@ const DashboardProducts = () => {
         image_url: allImages[0] ?? null, listing_type: listingType,
         condition: listingType === "product" ? (condition || null) : null,
         attributes: Object.keys(attributes).length > 0 ? attributes : null,
+        category: detectedCategory || null,
       } as any;
 
       let productId: string;
