@@ -26,8 +26,8 @@ Analyze the provided product information and return ONLY valid JSON with this st
 {
   "name": "short product name (max 5 words, only if image provided)",
   "description": "2 sentence selling description, warm and direct tone (only if image provided)",
-  "category": "one of: fashion, shoes, cakes, flowers, beauty, wigs, phones, home, food, jewellery, pets, plants, other",
-  "subcategory": "a specific subcategory like dresses, sneakers, birthday_cakes, bouquets, skincare, phones_sub, furniture, etc.",
+  "category": "one of: fashion, shoes, cakes, flowers, beauty, wigs, phones, home, food, jewellery, pets, plants, furniture, appliances, baby, sports, books, auto, building, health, delivery, repair, grooming, cleaning, photography, catering, education, design, tech, tailoring, trips, adventure, dining, wellness, cultural, other",
+  "subcategory": "exact subcategory display name from the valid list below",
   "listing_type": "product or service",
   "suggestions": [
     {
