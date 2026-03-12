@@ -487,11 +487,6 @@ function ProductDetailView({
               variant="outline"
               className="gap-2 text-base"
               onClick={async () => {
-                // Validate required attribute selections
-                if (!validateSelections()) {
-                  toast.error("Please select all required options before ordering");
-                  return;
-                }
 
                 const message = buildWhatsAppMessage();
                 supabase.from("orders").insert({
