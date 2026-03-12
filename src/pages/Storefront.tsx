@@ -263,7 +263,6 @@ function ProductDetailView({
   const [selectedImg, setSelectedImg] = useState(0);
   const [qty, setQty] = useState(1);
   const [attrSelections, setAttrSelections] = useState<Record<string, string>>({});
-  const [validationErrors] = useState<Record<string, boolean>>({});
   const [deliveryAddress, setDeliveryAddress] = useState("");
 
   const attrs = (product as any).attributes as Record<string, any> | null;
