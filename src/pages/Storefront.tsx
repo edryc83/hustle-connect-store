@@ -273,7 +273,6 @@ function ProductDetailView({
 
   const handleAttrSelect = (key: string, value: string) => {
     setAttrSelections((prev) => ({ ...prev, [key]: value }));
-    setValidationErrors((prev) => ({ ...prev, [key]: false }));
   };
 
    // Attributes are always optional — no validation needed
