@@ -278,12 +278,19 @@ function ProductDetailView({
 
   const buildWhatsAppMessage = () => {
     const dp = Number(displayPrice);
-    const lines: string[] = [
+    const imgUrl = images[0] || product.image_url;
+    const lines: string[] = [];
+
+    if (imgUrl) {
+      lines.push(imgUrl, ``);
+    }
+
+    lines.push(
       `Hello, I would like to order:`,
       ``,
       `*${product.name}*${qty > 1 ? ` x${qty}` : ""}`,
       `Price: ${formatPrice(dp * qty, currency)}`,
-    ];
+    );
 
     if (isChatOnly) {
       lines.push(``, `I'd like to discuss the details with you directly.`);
