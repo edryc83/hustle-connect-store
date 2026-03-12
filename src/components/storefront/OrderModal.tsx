@@ -8,7 +8,7 @@ import whatsappIcon from "@/assets/whatsapp-icon.png";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { formatPrice } from "@/lib/currency";
-import { proxyImageUrl } from "@/lib/imageUrl";
+
 import type { Tables } from "@/integrations/supabase/types";
 
 type Product = Tables<"products">;
