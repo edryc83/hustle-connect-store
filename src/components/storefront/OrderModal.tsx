@@ -71,9 +71,10 @@ export function OrderModal({ product, whatsappNumber, storeName, storeSlug, sell
       // Don't block the WhatsApp redirect if logging fails
     }
 
+    const productPageUrl = `https://afristall.com/${storeSlug}/${product.id}`;
     const message = [
-      product.image_url ? proxyImageUrl(product.image_url) : null,
-      product.image_url ? `` : null,
+      productPageUrl,
+      ``,
       `Hello, I would like to order:`,
       ``,
       `*${product.name}*`,

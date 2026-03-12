@@ -279,12 +279,8 @@ function ProductDetailView({
 
   const buildWhatsAppMessage = () => {
     const dp = Number(displayPrice);
-    const imgUrl = proxyImageUrl(images[0] || product.image_url);
-    const lines: string[] = [];
-
-    if (imgUrl) {
-      lines.push(imgUrl, ``);
-    }
+    const productPageUrl = `https://afristall.com/${profile.store_slug}/${product.id}`;
+    const lines: string[] = [productPageUrl, ``];
 
     lines.push(
       `Hello, I would like to order:`,
