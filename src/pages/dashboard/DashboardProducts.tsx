@@ -298,7 +298,7 @@ const DashboardProducts = () => {
         condition: listingType === "product" ? (condition || null) : null,
         attributes: Object.keys(attributes).length > 0 ? attributes : null,
         category: finalCategory || null,
-      } as any;
+        subcategory: detectedSubcategory || null,
 
       let productId: string;
       if (editingProduct) {
