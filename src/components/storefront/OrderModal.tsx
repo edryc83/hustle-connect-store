@@ -83,35 +83,15 @@ export function OrderModal({ product, whatsappNumber, storeName, storeSlug, sell
       .filter(Boolean)
       .join("\n");
 
-    // Try native share with product image
-    const imgUrl = product.image_url;
-    let shared = false;
-    if (imgUrl && navigator.share) {
-      try {
-        const res = await fetch(imgUrl);
-        const blob = await res.blob();
-        const ext = blob.type.includes("png") ? "png" : "jpg";
-        const file = new File([blob], `product.${ext}`, { type: blob.type });
-        if (navigator.canShare && navigator.canShare({ files: [file] })) {
-          await navigator.share({ files: [file], text: message });
-          shared = true;
-        }
-      } catch (e: any) {
-        if (e?.name !== "AbortError") console.warn("Share failed, falling back to wa.me", e);
-      }
-    }
-
-    if (!shared) {
-      const cleanNumber = whatsappNumber.replace(/[^0-9+]/g, "");
-      const waUrl = `https://wa.me/${cleanNumber.replace("+", "")}?text=${encodeURIComponent(message)}`;
-      const a = document.createElement("a");
-      a.href = waUrl;
-      a.target = "_blank";
-      a.rel = "noopener noreferrer";
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-    }
+    const cleanNumber = whatsappNumber.replace(/[^0-9+]/g, "");
+    const waUrl = `https://wa.me/${cleanNumber.replace("+", "")}?text=${encodeURIComponent(message)}`;
+    const a = document.createElement("a");
+    a.href = waUrl;
+    a.target = "_blank";
+    a.rel = "noopener noreferrer";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
     onOpenChange(false);
   };
 
