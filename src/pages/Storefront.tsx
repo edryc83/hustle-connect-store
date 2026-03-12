@@ -263,7 +263,6 @@ function ProductDetailView({
   const [selectedImg, setSelectedImg] = useState(0);
   const [qty, setQty] = useState(1);
   const [attrSelections, setAttrSelections] = useState<Record<string, string>>({});
-  const [validationErrors, setValidationErrors] = useState<Record<string, boolean>>({});
   const [deliveryAddress, setDeliveryAddress] = useState("");
 
   const attrs = (product as any).attributes as Record<string, any> | null;
@@ -273,22 +272,9 @@ function ProductDetailView({
 
   const handleAttrSelect = (key: string, value: string) => {
     setAttrSelections((prev) => ({ ...prev, [key]: value }));
-    setValidationErrors((prev) => ({ ...prev, [key]: false }));
   };
 
-  const validateSelections = (): boolean => {
-    if (isChatOnly || !hasAttributes) return true;
-    const errors: Record<string, boolean> = {};
-    let valid = true;
-    for (const key of selectableKeys) {
-      if (!attrSelections[key]) {
-        errors[key] = true;
-        valid = false;
-      }
-    }
-    setValidationErrors(errors);
-    return valid;
-  };
+   // Attributes are always optional — no validation needed
 
   const buildWhatsAppMessage = () => {
     const dp = Number(displayPrice);
@@ -436,12 +422,11 @@ function ProductDetailView({
         )}
         {hasAttributes && attrs && !isChatOnly && (
           <div className="rounded-2xl border border-border/60 bg-card p-4 space-y-4">
-            <p className="text-sm font-semibold">Customize your order</p>
+            <p className="text-sm font-semibold">Customize your order <span className="text-muted-foreground font-normal">(optional)</span></p>
             <BuyerAttributePicker
               attributes={attrs}
               selections={attrSelections}
               onSelect={handleAttrSelect}
-              validationErrors={validationErrors}
             />
           </div>
         )}
@@ -499,11 +484,6 @@ function ProductDetailView({
               variant="outline"
               className="gap-2 text-base"
               onClick={async () => {
-                // Validate required attribute selections
-                if (!validateSelections()) {
-                  toast.error("Please select all required options before ordering");
-                  return;
-                }
 
                 const message = buildWhatsAppMessage();
                 supabase.from("orders").insert({
