@@ -276,19 +276,7 @@ function ProductDetailView({
     setValidationErrors((prev) => ({ ...prev, [key]: false }));
   };
 
-  const validateSelections = (): boolean => {
-    if (isChatOnly || !hasAttributes) return true;
-    const errors: Record<string, boolean> = {};
-    let valid = true;
-    for (const key of selectableKeys) {
-      if (!attrSelections[key]) {
-        errors[key] = true;
-        valid = false;
-      }
-    }
-    setValidationErrors(errors);
-    return valid;
-  };
+   // Attributes are always optional — no validation needed
 
   const buildWhatsAppMessage = () => {
     const dp = Number(displayPrice);
