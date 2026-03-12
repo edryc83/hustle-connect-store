@@ -284,7 +284,7 @@ const Explore = () => {
       if (selectedCategory) {
         matchesCategory = !!(s.category && s.category.toLowerCase().includes(selectedCategory.toLowerCase()));
       }
-      if (selectedSubcategory) {
+      if (selectedSubcategory && selectedSubcategory !== "__all__") {
         matchesCategory = !!(s.category && s.category.toLowerCase().includes(selectedSubcategory.toLowerCase()));
       }
 
