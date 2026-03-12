@@ -27,7 +27,7 @@ export function CartDrawer({ currency, whatsappNumber, storeName, storeSlug, sel
     if (items.length === 0) return;
 
     // Build consolidated message
-    const firstImg = items[0]?.imageUrl || items[0]?.product.image_url;
+    const firstImg = proxyImageUrl(items[0]?.imageUrl || items[0]?.product.image_url);
     const lines = [
       ...(firstImg ? [firstImg, ``] : []),
       `Hello, I would like to order:`,

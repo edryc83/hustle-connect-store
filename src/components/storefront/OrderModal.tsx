@@ -72,7 +72,7 @@ export function OrderModal({ product, whatsappNumber, storeName, storeSlug, sell
     }
 
     const message = [
-      product.image_url ? product.image_url : null,
+      product.image_url ? proxyImageUrl(product.image_url) : null,
       product.image_url ? `` : null,
       `Hello, I would like to order:`,
       ``,
