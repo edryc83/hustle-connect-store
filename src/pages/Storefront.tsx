@@ -422,12 +422,11 @@ function ProductDetailView({
         )}
         {hasAttributes && attrs && !isChatOnly && (
           <div className="rounded-2xl border border-border/60 bg-card p-4 space-y-4">
-            <p className="text-sm font-semibold">Customize your order</p>
+            <p className="text-sm font-semibold">Customize your order <span className="text-muted-foreground font-normal">(optional)</span></p>
             <BuyerAttributePicker
               attributes={attrs}
               selections={attrSelections}
               onSelect={handleAttrSelect}
-              validationErrors={validationErrors}
             />
           </div>
         )}
