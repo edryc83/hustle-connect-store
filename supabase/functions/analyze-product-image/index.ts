@@ -26,8 +26,8 @@ Analyze the provided product information and return ONLY valid JSON with this st
 {
   "name": "short product name (max 5 words, only if image provided)",
   "description": "2 sentence selling description, warm and direct tone (only if image provided)",
-  "category": "one of: fashion, shoes, cakes, flowers, beauty, wigs, phones, home, food, jewellery, pets, plants, other",
-  "subcategory": "a specific subcategory like dresses, sneakers, birthday_cakes, bouquets, skincare, phones_sub, furniture, etc.",
+  "category": "one of: fashion, shoes, cakes, flowers, beauty, wigs, phones, home, food, jewellery, pets, plants, furniture, appliances, baby, sports, books, auto, building, health, delivery, repair, grooming, cleaning, photography, catering, education, design, tech, tailoring, trips, adventure, dining, wellness, cultural, other",
+  "subcategory": "exact subcategory display name from the valid list below",
   "listing_type": "product or service",
   "suggestions": [
     {
@@ -48,7 +48,21 @@ IMPORTANT RULES:
 - Return 5-15 attribute suggestions maximum
 - No explanation. JSON only.
 
-Category guide: wigs includes weaves, extensions, braids. phones includes tablets, laptops, electronics, phone cases. fashion includes clothing, bags, accessories. beauty includes skincare, makeup, perfumes. cakes includes all baked goods. jewellery includes watches, bracelets, necklaces, earrings. flowers includes bouquets, gift hampers.`;
+Category guide: wigs includes weaves, extensions, braids. phones includes tablets, laptops, electronics, phone cases. fashion includes clothing, bags, accessories. beauty includes skincare, makeup, perfumes. cakes includes all baked goods. jewellery includes watches, bracelets, necklaces, earrings. flowers includes bouquets, gift hampers.
+
+Valid subcategories per category:
+Fashion & Clothing: Men's Wear, Women's Wear, Kids' Wear, Shoes, Bags, Dresses, Vintage, Uniforms, Sportswear, Traditional Wear
+Electronics & Gadgets: Phones, Laptops, Tablets, Accessories, Chargers & Cables, Speakers, TVs, Headphones, Cameras, Smart Watches, Gaming Consoles, Printers
+Home Appliances: Microwaves, Fridges, Freezers, Washing Machines, Blenders, Cookers & Ovens, Air Conditioners, Fans, Irons, Water Dispensers, Vacuum Cleaners
+Food & Beverages: Fresh Produce, Snacks, Drinks, Baked Goods, Spices, Catering, Frozen Foods, Organic, Cereals & Grains, Cooking Oils
+Beauty & Cosmetics: Skincare, Makeup, Haircare, Perfumes, Natural/Organic, Wigs & Extensions, Nail Products, Body Care
+Home & Living: Furniture, Kitchen, Décor, Bedding, Cleaning Supplies, Curtains & Blinds, Lighting, Storage & Organisation, Carpets & Rugs
+Health & Wellness: Supplements, Fitness Gear, Natural Remedies, Personal Care, Medical Devices, Essential Oils
+Jewelry & Accessories: Necklaces, Bracelets, Watches, Rings, Sunglasses, Belts, Hats & Caps
+Baby & Kids: Clothing, Toys, Feeding, Diapers, Strollers, Car Seats, School Supplies
+Art & Crafts: Paintings, Handmade Goods, Beadwork, Pottery, Woodwork, Candles
+Sports & Fitness: Sportswear, Equipment, Outdoor Gear, Gym Equipment, Cycling, Swimming
+Use the EXACT subcategory name from the list above. If none fits, set subcategory to null.`;
 
     const userContent: any[] = [];
     

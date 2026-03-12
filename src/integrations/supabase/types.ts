@@ -152,6 +152,7 @@ export type Database = {
           listing_type: string | null
           name: string
           price: number
+          subcategory: string | null
           updated_at: string
           user_id: string
           variants_text: string | null
@@ -170,6 +171,7 @@ export type Database = {
           listing_type?: string | null
           name: string
           price: number
+          subcategory?: string | null
           updated_at?: string
           user_id: string
           variants_text?: string | null
@@ -188,6 +190,7 @@ export type Database = {
           listing_type?: string | null
           name?: string
           price?: number
+          subcategory?: string | null
           updated_at?: string
           user_id?: string
           variants_text?: string | null
