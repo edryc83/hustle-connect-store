@@ -3,6 +3,7 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { Store, ShoppingBag, Share2, Copy, Check, Star, ShoppingCart, Sun, Moon, LayoutDashboard, Minus, Plus, Heart } from "lucide-react";
 import { formatPrice } from "@/lib/currency";
+import { proxyImageUrl } from "@/lib/imageUrl";
 import AfristallLogo from "@/components/AfristallLogo";
 import whatsappIcon from "@/assets/whatsapp-icon.png";
 import { ProductImageCarousel } from "@/components/storefront/ProductImageCarousel";
