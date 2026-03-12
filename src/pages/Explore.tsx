@@ -439,14 +439,36 @@ const Explore = () => {
                     <ArrowLeft className="h-4 w-4" />
                   </button>
                   <div className="flex items-center gap-1 text-sm text-muted-foreground overflow-x-auto">
-                    {breadcrumb.map((crumb, i) => (
-                      <span key={i} className="flex items-center gap-1 shrink-0">
-                        {i > 0 && <span className="text-border">›</span>}
-                        <span className={i === breadcrumb.length - 1 ? "font-semibold text-foreground" : ""}>
-                          {crumb === "__all__" ? `All ${selectedCategory}` : crumb}
+                    {breadcrumb.map((crumb, i) => {
+                      const isLast = i === breadcrumb.length - 1;
+                      const displayText = crumb === "__all__" ? `All ${selectedCategory}` : crumb;
+                      const handleCrumbClick = () => {
+                        if (isLast) return;
+                        if (i === 0) {
+                          // Click on type (e.g. "Products") → go back to category selection
+                          setSelectedCategory(null);
+                          setSelectedSubcategory(null);
+                        } else if (i === 1) {
+                          // Click on category → go back to subcategory selection
+                          setSelectedSubcategory(null);
+                        }
+                      };
+                      return (
+                        <span key={i} className="flex items-center gap-1 shrink-0">
+                          {i > 0 && <span className="text-border">›</span>}
+                          {isLast ? (
+                            <span className="font-semibold text-foreground">{displayText}</span>
+                          ) : (
+                            <button
+                              onClick={handleCrumbClick}
+                              className="hover:text-primary transition-colors underline-offset-2 hover:underline"
+                            >
+                              {displayText}
+                            </button>
+                          )}
                         </span>
-                      </span>
-                    ))}
+                      );
+                    })}
                   </div>
                 </div>
                 <div className="relative flex gap-2">
