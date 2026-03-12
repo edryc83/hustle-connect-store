@@ -5,6 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useCart } from "@/hooks/useCart";
 import { formatPrice } from "@/lib/currency";
+import { proxyImageUrl } from "@/lib/imageUrl";
 import { Minus, Plus, Trash2, ShoppingCart } from "lucide-react";
 import whatsappIcon from "@/assets/whatsapp-icon.png";
 import { supabase } from "@/integrations/supabase/client";
@@ -26,7 +27,7 @@ export function CartDrawer({ currency, whatsappNumber, storeName, storeSlug, sel
     if (items.length === 0) return;
 
     // Build consolidated message
-    const firstImg = items[0]?.imageUrl || items[0]?.product.image_url;
+    const firstImg = proxyImageUrl(items[0]?.imageUrl || items[0]?.product.image_url);
     const lines = [
       ...(firstImg ? [firstImg, ``] : []),
       `Hello, I would like to order:`,

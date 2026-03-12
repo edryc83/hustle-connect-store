@@ -8,6 +8,7 @@ import whatsappIcon from "@/assets/whatsapp-icon.png";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { formatPrice } from "@/lib/currency";
+import { proxyImageUrl } from "@/lib/imageUrl";
 import type { Tables } from "@/integrations/supabase/types";
 
 type Product = Tables<"products">;
@@ -71,7 +72,7 @@ export function OrderModal({ product, whatsappNumber, storeName, storeSlug, sell
     }
 
     const message = [
-      product.image_url ? product.image_url : null,
+      product.image_url ? proxyImageUrl(product.image_url) : null,
       product.image_url ? `` : null,
       `Hello, I would like to order:`,
       ``,
