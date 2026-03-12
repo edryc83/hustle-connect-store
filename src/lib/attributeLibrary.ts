@@ -379,7 +379,7 @@ export function buildAttributeLines(
 export function getSelectableKeys(attributes: Record<string, any>): string[] {
   if (!attributes || attributes.chat_only) return [];
   return Object.keys(attributes).filter(
-    (k) => k !== "chat_only" && k !== "product_type" && k !== "ai_suggestions" && Array.isArray(attributes[k]) && attributes[k].length > 0
+    (k) => k !== "chat_only" && k !== "product_type" && k !== "ai_suggestions" && k !== "stock" && Array.isArray(attributes[k]) && attributes[k].length > 0
   );
 }
 
