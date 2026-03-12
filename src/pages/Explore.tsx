@@ -284,7 +284,7 @@ const Explore = () => {
       if (selectedCategory) {
         matchesCategory = !!(s.category && s.category.toLowerCase().includes(selectedCategory.toLowerCase()));
       }
-      if (selectedSubcategory) {
+      if (selectedSubcategory && selectedSubcategory !== "__all__") {
         matchesCategory = !!(s.category && s.category.toLowerCase().includes(selectedSubcategory.toLowerCase()));
       }
 
@@ -538,32 +538,63 @@ const Explore = () => {
               </section>
             )}
 
-            {/* Category filter pills */}
-            {exploreCategoryPills.length > 1 && (
+            {/* Main category pills — switch between categories */}
+            {activeTab && categoryKeys.length > 1 && (
               <section className="border-b border-border/50">
-                <div className="mx-auto max-w-2xl sm:max-w-5xl px-4 py-3">
+                <div className="mx-auto max-w-2xl sm:max-w-5xl px-4 py-2.5">
                   <div className="flex gap-2 overflow-x-auto no-scrollbar">
+                    {categoryKeys.map((cat) => {
+                      const isActive = selectedCategory === cat;
+                      const emoji = CATEGORY_EMOJI[cat] || "📋";
+                      return (
+                        <button
+                          key={cat}
+                          onClick={() => {
+                            setSelectedCategory(cat);
+                            setSelectedSubcategory("__all__");
+                            setExploreCategoryFilter(null);
+                          }}
+                          className={`shrink-0 rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors ${
+                            isActive
+                              ? "border-primary bg-primary/10 text-primary"
+                              : "border-border/60 text-muted-foreground hover:border-primary/40"
+                          }`}
+                        >
+                          {emoji} {cat}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              </section>
+            )}
+
+            {/* Subcategory pills — filter within current category */}
+            {selectedCategory && subcategories.length > 0 && (
+              <section className="border-b border-border/50">
+                <div className="mx-auto max-w-2xl sm:max-w-5xl px-4 py-2">
+                  <div className="flex gap-1.5 overflow-x-auto no-scrollbar">
                     <button
-                      onClick={() => setExploreCategoryFilter(null)}
-                      className={`shrink-0 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
-                        !exploreCategoryFilter
+                      onClick={() => { setSelectedSubcategory("__all__"); setExploreCategoryFilter(null); }}
+                      className={`shrink-0 rounded-full border px-2.5 py-1 text-[11px] font-medium transition-colors ${
+                        !selectedSubcategory || selectedSubcategory === "__all__"
                           ? "border-primary bg-primary/10 text-primary"
                           : "border-border/60 text-muted-foreground hover:border-primary/40"
                       }`}
                     >
                       All
                     </button>
-                    {exploreCategoryPills.map(({ cat, count, emoji }) => (
+                    {subcategories.map((sub) => (
                       <button
-                        key={cat}
-                        onClick={() => setExploreCategoryFilter(exploreCategoryFilter === cat ? null : cat)}
-                        className={`shrink-0 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
-                          exploreCategoryFilter === cat
+                        key={sub}
+                        onClick={() => { setSelectedSubcategory(sub); setExploreCategoryFilter(null); }}
+                        className={`shrink-0 rounded-full border px-2.5 py-1 text-[11px] font-medium transition-colors ${
+                          selectedSubcategory === sub
                             ? "border-primary bg-primary/10 text-primary"
                             : "border-border/60 text-muted-foreground hover:border-primary/40"
                         }`}
                       >
-                        {emoji} {cat} ({count})
+                        {sub}
                       </button>
                     ))}
                   </div>
