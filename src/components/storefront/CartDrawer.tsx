@@ -5,6 +5,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { useCart } from "@/hooks/useCart";
 import { formatPrice } from "@/lib/currency";
+import { proxyImageUrl } from "@/lib/imageUrl";
 import { Minus, Plus, Trash2, ShoppingCart } from "lucide-react";
 import whatsappIcon from "@/assets/whatsapp-icon.png";
 import { supabase } from "@/integrations/supabase/client";
