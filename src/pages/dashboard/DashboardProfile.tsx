@@ -113,8 +113,9 @@ const DashboardProfile = () => {
       const path = `${user.id}/profile.${ext}`;
       await supabase.storage.from("store-images").upload(path, file, { upsert: true });
       const { data: urlData } = supabase.storage.from("store-images").getPublicUrl(path);
-      await supabase.from("profiles").update({ profile_picture_url: urlData.publicUrl } as any).eq("id", user.id);
-      setProfile((prev: any) => ({ ...prev, profile_picture_url: `${urlData.publicUrl}?t=${Date.now()}` }));
+      const freshUrl = `${urlData.publicUrl}?t=${Date.now()}`;
+      await supabase.from("profiles").update({ profile_picture_url: freshUrl } as any).eq("id", user.id);
+      setProfile((prev: any) => ({ ...prev, profile_picture_url: freshUrl }));
       toast.success("Profile picture updated!");
     } catch { toast.error("Failed to upload"); }
     setUploadingPic(false);
@@ -132,8 +133,9 @@ const DashboardProfile = () => {
       const path = `${user.id}/cover.${ext}`;
       await supabase.storage.from("store-images").upload(path, file, { upsert: true });
       const { data: urlData } = supabase.storage.from("store-images").getPublicUrl(path);
-      await supabase.from("profiles").update({ cover_photo_url: urlData.publicUrl } as any).eq("id", user.id);
-      setProfile((prev: any) => ({ ...prev, cover_photo_url: `${urlData.publicUrl}?t=${Date.now()}` }));
+      const freshCoverUrl = `${urlData.publicUrl}?t=${Date.now()}`;
+      await supabase.from("profiles").update({ cover_photo_url: freshCoverUrl } as any).eq("id", user.id);
+      setProfile((prev: any) => ({ ...prev, cover_photo_url: freshCoverUrl }));
       toast.success("Cover photo updated!");
     } catch { toast.error("Failed to upload"); }
     setUploadingCover(false);
