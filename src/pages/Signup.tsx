@@ -1,7 +1,8 @@
-import { useState, useRef } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import { useState, useRef, useEffect } from "react";
+import { useNavigate, Link, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
+import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -28,9 +29,21 @@ const TOTAL_STEPS = 4;
 
 const Signup = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const { user } = useAuth();
+  const isOAuthUser = !!user && !searchParams.get("step") ? false : !!user;
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [createdUserId, setCreatedUserId] = useState<string | null>(null);
+
+  // If arriving as an OAuth user (e.g. ?step=2), skip to step 2
+  useEffect(() => {
+    const stepParam = searchParams.get("step");
+    if (stepParam === "2" && user) {
+      setStep(2);
+      setCreatedUserId(user.id);
+    }
+  }, [searchParams, user]);
 
   // Step 1 — Account
   const [email, setEmail] = useState("");
@@ -150,31 +163,39 @@ const Signup = () => {
     window.open(`https://wa.me/${cleanNumber}?text=${encodeURIComponent(`Hi! I'm interested in ordering from ${storeName || "your store"} on Afristall 🛒`)}`, "_blank");
   };
 
-  // Create account (after step 3)
+  // Create account (after step 3) — or just save profile for OAuth users
   const handleCreateAccount = async () => {
     if (!validateStep3()) return;
     setLoading(true);
     try {
       const fullWhatsapp = getFullWhatsApp();
-      const { data: authData, error: authError } = await supabase.auth.signUp({
-        email: email.trim(),
-        password,
-        options: { emailRedirectTo: window.location.origin },
-      });
+      let userId = createdUserId;
 
-      if (authError) {
-        const msg = authError.message?.toLowerCase() || "";
-        if (msg.includes("already registered") || msg.includes("already been registered") || msg.includes("duplicate")) {
+      // If user is already authenticated (OAuth), skip signup
+      if (!user) {
+        const { data: authData, error: authError } = await supabase.auth.signUp({
+          email: email.trim(),
+          password,
+          options: { emailRedirectTo: window.location.origin },
+        });
+
+        if (authError) {
+          const msg = authError.message?.toLowerCase() || "";
+          if (msg.includes("already registered") || msg.includes("already been registered") || msg.includes("duplicate")) {
+            toast.error("This email already has a store. Try signing in instead.");
+            setStep(1);
+          } else { toast.error(authError.message); }
+          return;
+        }
+        if (!authData.user) throw new Error("Signup failed");
+        if (authData.user.identities && authData.user.identities.length === 0) {
           toast.error("This email already has a store. Try signing in instead.");
           setStep(1);
-        } else { toast.error(authError.message); }
-        return;
-      }
-      if (!authData.user) throw new Error("Signup failed");
-      if (authData.user.identities && authData.user.identities.length === 0) {
-        toast.error("This email already has a store. Try signing in instead.");
-        setStep(1);
-        return;
+          return;
+        }
+        userId = authData.user.id;
+      } else {
+        userId = user.id;
       }
 
       const { error: profileError } = await supabase.from("profiles").update({
@@ -186,10 +207,10 @@ const Signup = () => {
         category: serializeCategories(categorySelection),
         business_type: businessType,
         whatsapp_number: fullWhatsapp,
-      } as any).eq("id", authData.user.id);
+      } as any).eq("id", userId);
 
       if (profileError) throw profileError;
-      setCreatedUserId(authData.user.id);
+      setCreatedUserId(userId);
 
       // Auto-generate bio
       const catString = serializeCategories(categorySelection);
@@ -199,7 +220,7 @@ const Signup = () => {
         });
         if (data?.bio) {
           setBioText(data.bio);
-          await supabase.from("profiles").update({ store_bio: data.bio, welcome_message: data.bio } as any).eq("id", authData.user.id);
+          await supabase.from("profiles").update({ store_bio: data.bio, welcome_message: data.bio } as any).eq("id", userId);
         }
       } catch {}
 
@@ -226,7 +247,7 @@ const Signup = () => {
   const handleFinish = async () => {
     setLoading(true);
     try {
-      const userId = createdUserId;
+      const userId = createdUserId || user?.id;
       if (!userId) { navigate("/dashboard"); return; }
 
       // Upload profile pic
@@ -467,9 +488,11 @@ const Signup = () => {
               </div>
 
               <div className="flex gap-2 pt-1">
-                <Button variant="outline" size="sm" onClick={() => setStep(1)} className="gap-1">
-                  <ArrowLeft className="h-3.5 w-3.5" /> Back
-                </Button>
+                {!user && (
+                  <Button variant="outline" size="sm" onClick={() => setStep(1)} className="gap-1">
+                    <ArrowLeft className="h-3.5 w-3.5" /> Back
+                  </Button>
+                )}
                 <Button className="flex-1 h-10 gap-2 text-sm font-semibold" onClick={() => validateStep2() && setStep(3)}>
                   Continue <ArrowRight className="h-4 w-4" />
                 </Button>
