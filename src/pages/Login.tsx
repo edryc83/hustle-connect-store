@@ -3,6 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
 import { useAuth } from "@/hooks/useAuth";
+import { useOnboardingCheck } from "@/hooks/useOnboardingCheck";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -16,15 +17,21 @@ import { useInstallPrompt } from "@/hooks/useInstallPrompt";
 const Login = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
+  const { needsOnboarding, checking } = useOnboardingCheck(user?.id);
   const { canInstall, isInstalled, promptInstall } = useInstallPrompt();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  // Redirect if already authenticated (e.g. after Google OAuth)
+  // Redirect if already authenticated
   useEffect(() => {
-    if (user) navigate("/dashboard", { replace: true });
-  }, [user, navigate]);
+    if (!user || checking) return;
+    if (needsOnboarding) {
+      navigate("/signup?step=2", { replace: true });
+    } else {
+      navigate("/dashboard", { replace: true });
+    }
+  }, [user, checking, needsOnboarding, navigate]);
   const [loading, setLoading] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
   const [forgotMode, setForgotMode] = useState(false);
