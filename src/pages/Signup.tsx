@@ -37,13 +37,23 @@ const Signup = () => {
   const [createdUserId, setCreatedUserId] = useState<string | null>(null);
 
   // If arriving as an OAuth user (e.g. ?step=2), skip to step 2
+  // On page refresh (no sessionStorage flag), sign out and redirect to login
   useEffect(() => {
     const stepParam = searchParams.get("step");
     if (stepParam === "2" && user) {
-      setStep(2);
-      setCreatedUserId(user.id);
+      const wasRedirected = sessionStorage.getItem("onboarding_redirect");
+      if (wasRedirected) {
+        sessionStorage.removeItem("onboarding_redirect");
+        setStep(2);
+        setCreatedUserId(user.id);
+      } else {
+        // Page was refreshed — sign out and send to login
+        supabase.auth.signOut().then(() => {
+          navigate("/login", { replace: true });
+        });
+      }
     }
-  }, [searchParams, user]);
+  }, [searchParams, user, navigate]);
 
   // Step 1 — Account
   const [email, setEmail] = useState("");
