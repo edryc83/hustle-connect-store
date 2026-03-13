@@ -43,6 +43,7 @@ type TabType = "all" | "products" | "services" | "experiences";
 type Step = "type" | "category" | "subcategory" | "stores";
 
 const TAB_CATEGORY_MAP: Record<TabType, Record<string, string[]>> = {
+  all: { ...PRODUCT_CATEGORY_DATA, ...SERVICE_CATEGORY_DATA, ...EXPERIENCE_CATEGORY_DATA },
   products: PRODUCT_CATEGORY_DATA,
   services: SERVICE_CATEGORY_DATA,
   experiences: EXPERIENCE_CATEGORY_DATA,
