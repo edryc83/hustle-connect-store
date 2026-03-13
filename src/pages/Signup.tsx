@@ -205,7 +205,7 @@ const Signup = () => {
         country: country?.name || null,
         city: city || null,
         category: serializeCategories(categorySelection),
-        business_type: businessType,
+        business_type: businessTypes.length === 1 ? businessTypes[0] : businessTypes.join(","),
         whatsapp_number: fullWhatsapp,
       } as any).eq("id", userId);
 
