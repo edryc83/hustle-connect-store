@@ -27,6 +27,7 @@ const Login = () => {
   useEffect(() => {
     if (!user || checking) return;
     if (needsOnboarding) {
+      sessionStorage.setItem("onboarding_redirect", "true");
       navigate("/signup?step=2", { replace: true });
     } else {
       navigate("/dashboard", { replace: true });

@@ -24,7 +24,10 @@ export function DashboardLayout({ children }: { children: ReactNode }) {
   }
 
   if (!user) return <Navigate to="/login" replace />;
-  if (needsOnboarding) return <Navigate to="/signup?step=2" replace />;
+  if (needsOnboarding) {
+    sessionStorage.setItem("onboarding_redirect", "true");
+    return <Navigate to="/signup?step=2" replace />;
+  }
 
   return (
     <SidebarProvider>
