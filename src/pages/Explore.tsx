@@ -139,10 +139,11 @@ const Explore = () => {
     : "stores";
 
   const handleBack = () => {
-    if (step === "stores" && selectedSubcategory) {
+    if (activeTab === "all") {
+      setActiveTab(null);
+    } else if (step === "stores" && selectedSubcategory) {
       setSelectedSubcategory(null);
     } else if (step === "stores" && selectedCategory) {
-      // Category with no subcategories — go back to categories
       setSelectedCategory(null);
     } else if (step === "subcategory") {
       setSelectedCategory(null);
