@@ -62,7 +62,7 @@ const Signup = () => {
   const [selectedCountry, setSelectedCountry] = useState("UG");
   const [city, setCity] = useState("");
   const [categorySelection, setCategorySelection] = useState<CategorySelection>({});
-  const [businessType, setBusinessType] = useState<"product" | "service" | "both">("product");
+  const [businessTypes, setBusinessTypes] = useState<string[]>(["product"]);
 
   // Step 3 — WhatsApp
   const [whatsappNumber, setWhatsappNumber] = useState("");
@@ -205,7 +205,7 @@ const Signup = () => {
         country: country?.name || null,
         city: city || null,
         category: serializeCategories(categorySelection),
-        business_type: businessType,
+        business_type: businessTypes.length === 1 ? businessTypes[0] : businessTypes.join(","),
         whatsapp_number: fullWhatsapp,
       } as any).eq("id", userId);
 
@@ -289,7 +289,7 @@ const Signup = () => {
     }
   };
 
-  const categoryFilter = businessType === "service" ? "services" : businessType === "product" ? "products" : "all";
+  const categoryFilter = businessTypes.length > 1 ? "all" : businessTypes[0] === "service" ? "services" : businessTypes[0] === "experience" ? "all" : "products";
 
   const stepLabels = ["Account", "Store", "WhatsApp", "Profile"];
 
@@ -463,27 +463,36 @@ const Signup = () => {
 
               {/* Business type */}
               <div className="space-y-1.5">
-                <Label>Type</Label>
+                <Label>Type <span className="text-xs text-muted-foreground font-normal">(select all that apply)</span></Label>
                 <div className="grid grid-cols-3 gap-2">
                   {([
-                    { value: "product" as const, label: "Products", emoji: "📦" },
-                    { value: "service" as const, label: "Services", emoji: "🔧" },
-                    { value: "both" as const, label: "Both", emoji: "📦🔧" },
-                  ]).map((t) => (
-                    <button key={t.value} type="button" onClick={() => { setBusinessType(t.value); setCategorySelection({}); }}
-                      className={`flex flex-col items-center gap-0.5 rounded-xl border-2 p-2.5 text-center transition-all ${
-                        businessType === t.value ? "border-primary bg-primary/5 shadow-sm" : "border-border hover:border-primary/30"
-                      }`}>
-                      <span className="text-lg">{t.emoji}</span>
-                      <span className="text-[11px] font-medium">{t.label}</span>
-                    </button>
-                  ))}
+                    { value: "product", label: "Products", emoji: "📦" },
+                    { value: "service", label: "Services", emoji: "🔧" },
+                    { value: "experience", label: "Experiences", emoji: "✨" },
+                  ]).map((t) => {
+                    const selected = businessTypes.includes(t.value);
+                    return (
+                      <button key={t.value} type="button" onClick={() => {
+                        setBusinessTypes(prev => {
+                          const next = prev.includes(t.value) ? prev.filter(v => v !== t.value) : [...prev, t.value];
+                          return next.length === 0 ? [t.value] : next;
+                        });
+                        setCategorySelection({});
+                      }}
+                        className={`flex flex-col items-center gap-0.5 rounded-xl border-2 p-2.5 text-center transition-all ${
+                          selected ? "border-primary bg-primary/5 shadow-sm" : "border-border hover:border-primary/30"
+                        }`}>
+                        <span className="text-lg">{t.emoji}</span>
+                        <span className="text-[11px] font-medium">{t.label}</span>
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
 
               {/* Categories */}
               <div className="space-y-1.5">
-                <Label>{businessType === "service" ? "Services" : businessType === "both" ? "What do you sell/offer?" : "What do you sell?"}</Label>
+                <Label>{businessTypes.length === 1 && businessTypes[0] === "service" ? "Services" : businessTypes.length > 1 ? "What do you sell/offer?" : "What do you sell?"}</Label>
                 <CategoryPicker value={categorySelection} onChange={setCategorySelection} filter={categoryFilter} />
               </div>
 

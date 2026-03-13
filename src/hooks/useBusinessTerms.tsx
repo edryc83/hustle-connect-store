@@ -32,6 +32,10 @@ export function useBusinessTerms(): BusinessTerms {
       });
   }, [user]);
 
+  const types = businessType.split(",");
+  if (types.length > 1) {
+    return { singular: "Item", plural: "Items", emoji: "📦", businessType };
+  }
   if (businessType === "service") {
     return { singular: "Package", plural: "Packages", emoji: "🔧", businessType };
   }
