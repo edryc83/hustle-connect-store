@@ -716,7 +716,7 @@ const Explore = () => {
                   </div>
 
                   {/* Desktop card grid */}
-                  <div className="hidden sm:grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  <div className="hidden sm:grid sm:grid-cols-2 md:grid-cols-3 gap-4">
                     {filtered.map((store) => {
                       const businessLabel = getBusinessLabel(store);
                       const location = getLocationLabel(store);
