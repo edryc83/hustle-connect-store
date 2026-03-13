@@ -363,7 +363,7 @@ const Signup = () => {
                 <Label htmlFor="confirmPassword">Confirm password</Label>
                 <Input id="confirmPassword" type={showPassword ? "text" : "password"} placeholder="Repeat password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} autoComplete="new-password" className="h-11" />
               </div>
-              <Button className="w-full h-11 gap-2 text-sm font-semibold" onClick={() => validateStep1() && setStep(2)}>
+              <Button className="w-full h-11 gap-2 text-sm font-semibold" onClick={() => { if (validateStep1()) { sessionStorage.setItem("onboarding_redirect", "true"); setStep(2); } }}>
                 Continue <ArrowRight className="h-4 w-4" />
               </Button>
 
