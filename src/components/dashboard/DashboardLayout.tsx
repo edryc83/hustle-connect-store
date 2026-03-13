@@ -1,5 +1,5 @@
 import { ReactNode } from "react";
-import { Navigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useOnboardingCheck } from "@/hooks/useOnboardingCheck";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
@@ -7,7 +7,7 @@ import { DashboardSidebar } from "./DashboardSidebar";
 import { MobileBottomNav } from "./MobileBottomNav";
 import AfristallLogo from "@/components/AfristallLogo";
 import { useTheme } from "@/hooks/useTheme";
-import { Moon, Sun, Sparkles } from "lucide-react";
+import { Moon, Sun, LogOut, Settings } from "lucide-react";
 import { Link } from "react-router-dom";
 
 export function DashboardLayout({ children }: { children: ReactNode }) {
