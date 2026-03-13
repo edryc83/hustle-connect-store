@@ -49,6 +49,7 @@ const TAB_CATEGORY_MAP: Record<TabType, Record<string, string[]>> = {
 };
 
 const TAB_CARDS: { key: TabType; label: string; emoji: string; description: string; icon: typeof ShoppingBag }[] = [
+  { key: "all", label: "All Shops", emoji: "🏪", description: "Browse every store on the platform", icon: Store },
   { key: "products", label: "Products", emoji: "📦", description: "Browse items from stores near you", icon: ShoppingBag },
   { key: "services", label: "Services", emoji: "🔧", description: "Find service providers & freelancers", icon: Wrench },
   { key: "experiences", label: "Experiences", emoji: "✨", description: "Discover trips, events & activities", icon: Sparkles },
