@@ -64,7 +64,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   // Show nothing while restoring — prevents flash to login
-  if (loading) return null;
+  if (loading) return <SplashScreen />;
 
   return (
     <AuthContext.Provider value={{ session, user: session?.user ?? null, loading, signOut }}>
