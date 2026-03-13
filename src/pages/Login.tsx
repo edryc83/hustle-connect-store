@@ -14,6 +14,7 @@ import { useInstallPrompt } from "@/hooks/useInstallPrompt";
 
 const Login = () => {
   const navigate = useNavigate();
+  const { canInstall, isInstalled, promptInstall } = useInstallPrompt();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
