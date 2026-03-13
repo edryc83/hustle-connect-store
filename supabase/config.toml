@@ -1,28 +1,23 @@
 project_id = "rmhpdalhkcbsbrphhjre"
 
-[functions.generate-bio]
-verify_jwt = false
-
-[functions.generate-description]
-verify_jwt = false
-
-[functions.og-store]
-verify_jwt = false
-
-[functions.store-assistant]
-verify_jwt = false
-
-[functions.push-notifications]
-verify_jwt = false
-
-[functions.bannerbear-generate]
-verify_jwt = false
-
-[functions.generate-tagline]
-verify_jwt = false
-
-[functions.process-email-queue]
-verify_jwt = true
-
-[functions.send-welcome-email]
-verify_jwt = false
+[functions]
+  [functions.auth-email-hook]
+    verify_jwt = false
+  [functions.bannerbear-generate]
+    verify_jwt = false
+  [functions.generate-bio]
+    verify_jwt = false
+  [functions.generate-description]
+    verify_jwt = false
+  [functions.generate-tagline]
+    verify_jwt = false
+  [functions.og-store]
+    verify_jwt = false
+  [functions.process-email-queue]
+    verify_jwt = true
+  [functions.push-notifications]
+    verify_jwt = false
+  [functions.send-welcome-email]
+    verify_jwt = false
+  [functions.store-assistant]
+    verify_jwt = false
