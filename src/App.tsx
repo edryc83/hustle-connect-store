@@ -33,6 +33,13 @@ import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
 
+import { useForceUpdate } from "@/hooks/useForceUpdate";
+
+const AppInner = () => {
+  useForceUpdate();
+  return null;
+};
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
