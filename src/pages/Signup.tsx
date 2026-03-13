@@ -289,7 +289,7 @@ const Signup = () => {
     }
   };
 
-  const categoryFilter = businessTypes.length > 1 ? "all" : businessTypes[0] === "service" ? "services" : businessTypes[0] === "experience" ? "all" : "products";
+  const categoryFilter = businessTypes.length > 1 ? "all" : businessTypes[0] === "service" ? "services" : businessTypes[0] === "experience" ? "experiences" : "products";
 
   const stepLabels = ["Account", "Store", "WhatsApp", "Profile"];
 
