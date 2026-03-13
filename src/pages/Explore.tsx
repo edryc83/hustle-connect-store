@@ -39,16 +39,18 @@ type StoreProfile = {
   first_product_image?: string | null;
 };
 
-type TabType = "products" | "services" | "experiences";
+type TabType = "all" | "products" | "services" | "experiences";
 type Step = "type" | "category" | "subcategory" | "stores";
 
 const TAB_CATEGORY_MAP: Record<TabType, Record<string, string[]>> = {
+  all: { ...PRODUCT_CATEGORY_DATA, ...SERVICE_CATEGORY_DATA, ...EXPERIENCE_CATEGORY_DATA },
   products: PRODUCT_CATEGORY_DATA,
   services: SERVICE_CATEGORY_DATA,
   experiences: EXPERIENCE_CATEGORY_DATA,
 };
 
 const TAB_CARDS: { key: TabType; label: string; emoji: string; description: string; icon: typeof ShoppingBag }[] = [
+  { key: "all", label: "All Shops", emoji: "🏪", description: "Browse every store on the platform", icon: Store },
   { key: "products", label: "Products", emoji: "📦", description: "Browse items from stores near you", icon: ShoppingBag },
   { key: "services", label: "Services", emoji: "🔧", description: "Find service providers & freelancers", icon: Wrench },
   { key: "experiences", label: "Experiences", emoji: "✨", description: "Discover trips, events & activities", icon: Sparkles },
@@ -128,6 +130,8 @@ const Explore = () => {
   // Determine current step
   const step: Step = !activeTab
     ? "type"
+    : activeTab === "all"
+    ? "stores"
     : !selectedCategory
     ? "category"
     : selectedCategory && TAB_CATEGORY_MAP[activeTab]?.[selectedCategory]?.length > 0 && !selectedSubcategory
@@ -135,10 +139,11 @@ const Explore = () => {
     : "stores";
 
   const handleBack = () => {
-    if (step === "stores" && selectedSubcategory) {
+    if (activeTab === "all") {
+      setActiveTab(null);
+    } else if (step === "stores" && selectedSubcategory) {
       setSelectedSubcategory(null);
     } else if (step === "stores" && selectedCategory) {
-      // Category with no subcategories — go back to categories
       setSelectedCategory(null);
     } else if (step === "subcategory") {
       setSelectedCategory(null);
@@ -242,7 +247,7 @@ const Explore = () => {
   }, [stores, detectedCountry]);
 
   const tabStores = useMemo(() => {
-    if (!activeTab) return countryStores;
+    if (!activeTab || activeTab === "all") return countryStores;
     if (activeTab === "services") return countryStores.filter((s) => s.business_type === "service");
     if (activeTab === "experiences") return countryStores.filter((s) => s.business_type === "experience");
     return countryStores.filter((s) => s.business_type !== "service" && s.business_type !== "experience");
@@ -326,7 +331,7 @@ const Explore = () => {
               <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">Explore</h1>
               <p className="text-muted-foreground text-sm">What are you looking for?</p>
             </div>
-            <div className="grid gap-4 sm:grid-cols-3">
+            <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-4">
               {TAB_CARDS.map((card) => {
                 const Icon = card.icon;
                 return (
