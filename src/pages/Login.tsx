@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { lovable } from "@/integrations/lovable/index";
+import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,8 +15,16 @@ import { useInstallPrompt } from "@/hooks/useInstallPrompt";
 
 const Login = () => {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const { canInstall, isInstalled, promptInstall } = useInstallPrompt();
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+
+  // Redirect if already authenticated (e.g. after Google OAuth)
+  useEffect(() => {
+    if (user) navigate("/dashboard", { replace: true });
+  }, [user, navigate]);
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
