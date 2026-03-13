@@ -29,9 +29,21 @@ const TOTAL_STEPS = 4;
 
 const Signup = () => {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const { user } = useAuth();
+  const isOAuthUser = !!user && !searchParams.get("step") ? false : !!user;
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
   const [createdUserId, setCreatedUserId] = useState<string | null>(null);
+
+  // If arriving as an OAuth user (e.g. ?step=2), skip to step 2
+  useEffect(() => {
+    const stepParam = searchParams.get("step");
+    if (stepParam === "2" && user) {
+      setStep(2);
+      setCreatedUserId(user.id);
+    }
+  }, [searchParams, user]);
 
   // Step 1 — Account
   const [email, setEmail] = useState("");
