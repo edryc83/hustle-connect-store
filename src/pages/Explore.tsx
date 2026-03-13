@@ -330,7 +330,7 @@ const Explore = () => {
               <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">Explore</h1>
               <p className="text-muted-foreground text-sm">What are you looking for?</p>
             </div>
-            <div className="grid gap-4 sm:grid-cols-3">
+            <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-4">
               {TAB_CARDS.map((card) => {
                 const Icon = card.icon;
                 return (
