@@ -39,7 +39,7 @@ type StoreProfile = {
   first_product_image?: string | null;
 };
 
-type TabType = "products" | "services" | "experiences";
+type TabType = "all" | "products" | "services" | "experiences";
 type Step = "type" | "category" | "subcategory" | "stores";
 
 const TAB_CATEGORY_MAP: Record<TabType, Record<string, string[]>> = {
