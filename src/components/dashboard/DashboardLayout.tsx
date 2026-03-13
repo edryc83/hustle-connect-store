@@ -11,7 +11,8 @@ import { Moon, Sun, LogOut, Settings } from "lucide-react";
 import { Link } from "react-router-dom";
 
 export function DashboardLayout({ children }: { children: ReactNode }) {
-  const { user, loading } = useAuth();
+  const { user, loading, signOut } = useAuth();
+  const navigate = useNavigate();
   const { theme, toggleTheme } = useTheme();
   const { needsOnboarding, checking } = useOnboardingCheck(user?.id);
 
