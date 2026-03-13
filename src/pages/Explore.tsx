@@ -244,7 +244,7 @@ const Explore = () => {
   }, [stores, detectedCountry]);
 
   const tabStores = useMemo(() => {
-    if (!activeTab) return countryStores;
+    if (!activeTab || activeTab === "all") return countryStores;
     if (activeTab === "services") return countryStores.filter((s) => s.business_type === "service");
     if (activeTab === "experiences") return countryStores.filter((s) => s.business_type === "experience");
     return countryStores.filter((s) => s.business_type !== "service" && s.business_type !== "experience");
