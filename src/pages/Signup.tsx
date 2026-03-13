@@ -62,7 +62,7 @@ const Signup = () => {
   const [selectedCountry, setSelectedCountry] = useState("UG");
   const [city, setCity] = useState("");
   const [categorySelection, setCategorySelection] = useState<CategorySelection>({});
-  const [businessType, setBusinessType] = useState<"product" | "service" | "both">("product");
+  const [businessTypes, setBusinessTypes] = useState<string[]>(["product"]);
 
   // Step 3 — WhatsApp
   const [whatsappNumber, setWhatsappNumber] = useState("");
