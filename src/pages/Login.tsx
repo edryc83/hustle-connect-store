@@ -199,6 +199,17 @@ const Login = () => {
           </p>
         </div>
       </div>
+
+      {/* PWA Install prompt */}
+      {canInstall && !isInstalled && (
+        <button
+          onClick={promptInstall}
+          className="relative z-10 mt-4 flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-2 text-sm font-medium text-primary backdrop-blur-sm transition-colors hover:bg-primary/20"
+        >
+          <Download className="h-4 w-4" />
+          Install Afristall for the full native experience
+        </button>
+      )}
     </div>
   );
 };
