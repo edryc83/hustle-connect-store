@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, ShoppingBag, Package, Eye } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Users, ShoppingBag, Package, Eye, RefreshCw } from "lucide-react";
+import { toast } from "sonner";
 
 export default function AdminOverview() {
   const [stats, setStats] = useState({ sellers: 0, products: 0, orders: 0, totalViews: 0 });
@@ -42,7 +44,28 @@ export default function AdminOverview() {
 
   return (
     <div className="space-y-6">
-      <h1 className="text-2xl font-bold">Platform Overview</h1>
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold">Platform Overview</h1>
+        <Button
+          variant="outline"
+          size="sm"
+          className="gap-2"
+          onClick={async () => {
+            const { error } = await supabase
+              .from("app_config")
+              .update({ value: new Date().toISOString() })
+              .eq("key", "force_update_at");
+            if (error) {
+              toast.error("Failed to push update");
+            } else {
+              toast.success("Update pushed — all users will refresh within 30s");
+            }
+          }}
+        >
+          <RefreshCw className="h-4 w-4" />
+          Push Update
+        </Button>
+      </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
         {cards.map((c) => (
