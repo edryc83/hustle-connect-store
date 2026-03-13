@@ -25,6 +25,10 @@ import Explore from "./pages/Explore";
 import ResetPassword from "./pages/ResetPassword";
 import SuperAdminLogin from "./pages/SuperAdminLogin";
 import AdStudio from "./pages/AdStudio";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsOfService from "./pages/TermsOfService";
+import CookiePolicy from "./pages/CookiePolicy";
+import RefundPolicy from "./pages/RefundPolicy";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
