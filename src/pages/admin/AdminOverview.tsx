@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Users, ShoppingBag, Package, Eye } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Users, ShoppingBag, Package, Eye, RefreshCw } from "lucide-react";
+import { toast } from "sonner";
 
 export default function AdminOverview() {
   const [stats, setStats] = useState({ sellers: 0, products: 0, orders: 0, totalViews: 0 });
