@@ -5,14 +5,16 @@ import { lovable } from "@/integrations/lovable/index";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Eye, EyeOff, Loader2 } from "lucide-react";
+import { Eye, EyeOff, Loader2, Download } from "lucide-react";
 import AfristallLogo from "@/components/AfristallLogo";
 import EmojiGrid from "@/components/landing/EmojiGrid";
 import { toast } from "sonner";
+import { useInstallPrompt } from "@/hooks/useInstallPrompt";
 
 
 const Login = () => {
   const navigate = useNavigate();
+  const { canInstall, isInstalled, promptInstall } = useInstallPrompt();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -197,6 +199,17 @@ const Login = () => {
           </p>
         </div>
       </div>
+
+      {/* PWA Install prompt */}
+      {canInstall && !isInstalled && (
+        <button
+          onClick={promptInstall}
+          className="relative z-10 mt-4 flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-2 text-sm font-medium text-primary backdrop-blur-sm transition-colors hover:bg-primary/20"
+        >
+          <Download className="h-4 w-4" />
+          Install Afristall for the full native experience
+        </button>
+      )}
     </div>
   );
 };
