@@ -1,6 +1,7 @@
 import { ReactNode } from "react";
 import { Navigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import { useOnboardingCheck } from "@/hooks/useOnboardingCheck";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { DashboardSidebar } from "./DashboardSidebar";
 import { MobileBottomNav } from "./MobileBottomNav";
@@ -12,8 +13,9 @@ import { Link } from "react-router-dom";
 export function DashboardLayout({ children }: { children: ReactNode }) {
   const { user, loading } = useAuth();
   const { theme, toggleTheme } = useTheme();
+  const { needsOnboarding, checking } = useOnboardingCheck(user?.id);
 
-  if (loading) {
+  if (loading || checking) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <div className="animate-pulse text-muted-foreground">Loading…</div>
@@ -22,6 +24,7 @@ export function DashboardLayout({ children }: { children: ReactNode }) {
   }
 
   if (!user) return <Navigate to="/login" replace />;
+  if (needsOnboarding) return <Navigate to="/signup?step=2" replace />;
 
   return (
     <SidebarProvider>
