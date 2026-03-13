@@ -130,6 +130,8 @@ const Explore = () => {
   // Determine current step
   const step: Step = !activeTab
     ? "type"
+    : activeTab === "all"
+    ? "stores"
     : !selectedCategory
     ? "category"
     : selectedCategory && TAB_CATEGORY_MAP[activeTab]?.[selectedCategory]?.length > 0 && !selectedSubcategory
