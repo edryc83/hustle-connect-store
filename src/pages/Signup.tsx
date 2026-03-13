@@ -163,31 +163,39 @@ const Signup = () => {
     window.open(`https://wa.me/${cleanNumber}?text=${encodeURIComponent(`Hi! I'm interested in ordering from ${storeName || "your store"} on Afristall 🛒`)}`, "_blank");
   };
 
-  // Create account (after step 3)
+  // Create account (after step 3) — or just save profile for OAuth users
   const handleCreateAccount = async () => {
     if (!validateStep3()) return;
     setLoading(true);
     try {
       const fullWhatsapp = getFullWhatsApp();
-      const { data: authData, error: authError } = await supabase.auth.signUp({
-        email: email.trim(),
-        password,
-        options: { emailRedirectTo: window.location.origin },
-      });
+      let userId = createdUserId;
 
-      if (authError) {
-        const msg = authError.message?.toLowerCase() || "";
-        if (msg.includes("already registered") || msg.includes("already been registered") || msg.includes("duplicate")) {
+      // If user is already authenticated (OAuth), skip signup
+      if (!user) {
+        const { data: authData, error: authError } = await supabase.auth.signUp({
+          email: email.trim(),
+          password,
+          options: { emailRedirectTo: window.location.origin },
+        });
+
+        if (authError) {
+          const msg = authError.message?.toLowerCase() || "";
+          if (msg.includes("already registered") || msg.includes("already been registered") || msg.includes("duplicate")) {
+            toast.error("This email already has a store. Try signing in instead.");
+            setStep(1);
+          } else { toast.error(authError.message); }
+          return;
+        }
+        if (!authData.user) throw new Error("Signup failed");
+        if (authData.user.identities && authData.user.identities.length === 0) {
           toast.error("This email already has a store. Try signing in instead.");
           setStep(1);
-        } else { toast.error(authError.message); }
-        return;
-      }
-      if (!authData.user) throw new Error("Signup failed");
-      if (authData.user.identities && authData.user.identities.length === 0) {
-        toast.error("This email already has a store. Try signing in instead.");
-        setStep(1);
-        return;
+          return;
+        }
+        userId = authData.user.id;
+      } else {
+        userId = user.id;
       }
 
       const { error: profileError } = await supabase.from("profiles").update({
@@ -199,10 +207,10 @@ const Signup = () => {
         category: serializeCategories(categorySelection),
         business_type: businessType,
         whatsapp_number: fullWhatsapp,
-      } as any).eq("id", authData.user.id);
+      } as any).eq("id", userId);
 
       if (profileError) throw profileError;
-      setCreatedUserId(authData.user.id);
+      setCreatedUserId(userId);
 
       // Auto-generate bio
       const catString = serializeCategories(categorySelection);
@@ -212,7 +220,7 @@ const Signup = () => {
         });
         if (data?.bio) {
           setBioText(data.bio);
-          await supabase.from("profiles").update({ store_bio: data.bio, welcome_message: data.bio } as any).eq("id", authData.user.id);
+          await supabase.from("profiles").update({ store_bio: data.bio, welcome_message: data.bio } as any).eq("id", userId);
         }
       } catch {}
 
