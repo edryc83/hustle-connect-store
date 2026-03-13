@@ -247,7 +247,7 @@ const Signup = () => {
   const handleFinish = async () => {
     setLoading(true);
     try {
-      const userId = createdUserId;
+      const userId = createdUserId || user?.id;
       if (!userId) { navigate("/dashboard"); return; }
 
       // Upload profile pic
