@@ -290,6 +290,19 @@ const Signup = () => {
         } as any).eq("id", userId);
       }
 
+      // Send welcome email (fire-and-forget)
+      const userEmail = user?.email || email.trim();
+      if (userEmail) {
+        supabase.functions.invoke("send-welcome-email", {
+          body: {
+            storeName: storeName.trim(),
+            firstName: firstName.trim(),
+            email: userEmail,
+            storeSlug: storeSlug.trim(),
+          },
+        }).catch(() => {}); // non-blocking
+      }
+
       toast.success("Welcome to Afristall! 🚀");
       navigate("/dashboard");
     } catch {
