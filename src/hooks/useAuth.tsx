@@ -1,4 +1,5 @@
 import { createContext, useContext, useEffect, useState, useRef, ReactNode } from "react";
+import SplashScreen from "@/components/SplashScreen";
 import { Session, User } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 
