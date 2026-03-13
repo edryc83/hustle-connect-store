@@ -488,9 +488,11 @@ const Signup = () => {
               </div>
 
               <div className="flex gap-2 pt-1">
-                <Button variant="outline" size="sm" onClick={() => setStep(1)} className="gap-1">
-                  <ArrowLeft className="h-3.5 w-3.5" /> Back
-                </Button>
+                {!user && (
+                  <Button variant="outline" size="sm" onClick={() => setStep(1)} className="gap-1">
+                    <ArrowLeft className="h-3.5 w-3.5" /> Back
+                  </Button>
+                )}
                 <Button className="flex-1 h-10 gap-2 text-sm font-semibold" onClick={() => validateStep2() && setStep(3)}>
                   Continue <ArrowRight className="h-4 w-4" />
                 </Button>
