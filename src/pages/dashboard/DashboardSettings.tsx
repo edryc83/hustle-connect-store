@@ -717,6 +717,29 @@ const DashboardSettings = () => {
           </div>
         </CardContent>
       </Card>
+      {/* Support */}
+      <Card className="border-border/50 bg-card/60 backdrop-blur-xl">
+        <CardHeader>
+          <CardTitle className="text-base flex items-center gap-2">
+            <span>💬</span> Need Help?
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <p className="text-sm text-muted-foreground">
+            Having trouble or need assistance? Chat with our support team on WhatsApp — we're happy to help!
+          </p>
+          <a
+            href={`https://wa.me/447466719311?text=${encodeURIComponent(`Hi Afristall Support 👋\n\nI need help with my store "${storeName}".\n\nUsername: ${firstName}\nEmail: ${user?.email || "N/A"}`)}`}
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            <Button className="w-full gap-2" variant="outline">
+              <img src="/favicon.png" alt="" className="h-4 w-4" />
+              Contact Support
+            </Button>
+          </a>
+        </CardContent>
+      </Card>
     </div>
   );
 };
