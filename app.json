@@ -1,30 +1,57 @@
 {
   "expo": {
-    "name": "hustle-connect-mobile",
-    "slug": "hustle-connect-mobile",
+    "name": "Afristall",
+    "slug": "afristall",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
-    "userInterfaceStyle": "light",
+    "userInterfaceStyle": "automatic",
+    "scheme": "afristall",
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#ffffff"
+      "backgroundColor": "#F97316"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.afristall.app",
+      "infoPlist": {
+        "NSCameraUsageDescription": "Afristall needs camera access to take product photos",
+        "NSPhotoLibraryUsageDescription": "Afristall needs photo library access to upload product images"
+      }
     },
     "android": {
+      "package": "com.afristall.app",
       "adaptiveIcon": {
-        "backgroundColor": "#E6F4FE",
-        "foregroundImage": "./assets/android-icon-foreground.png",
-        "backgroundImage": "./assets/android-icon-background.png",
-        "monochromeImage": "./assets/android-icon-monochrome.png"
+        "backgroundColor": "#F97316",
+        "foregroundImage": "./assets/android-icon-foreground.png"
       },
-      "predictiveBackGestureEnabled": false
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.RECORD_AUDIO"
+      ]
     },
     "web": {
-      "favicon": "./assets/favicon.png"
+      "favicon": "./assets/favicon.png",
+      "bundler": "metro"
+    },
+    "plugins": [
+      "expo-secure-store",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Afristall needs access to your photos to upload product images",
+          "cameraPermission": "Afristall needs access to your camera to take product photos"
+        }
+      ]
+    ],
+    "owner": "shakazulu",
+    "extra": {
+      "eas": {
+        "projectId": "79e2d46b-f246-4dd1-b3a9-7b8c85db6c42"
+      }
     }
   }
 }
