@@ -672,7 +672,9 @@ function ListingRow({
         <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => onEdit(product)} title="Edit">
           <Pencil className="h-3.5 w-3.5" />
         </Button>
-        <Button size="icon" variant="ghost" className="h-7 w-7 text-destructive hover:text-destructive" onClick={() => onDelete(product.id)} title="Delete">
+        <Button size="icon" variant="ghost" className="h-7 w-7 text-destructive hover:text-destructive" onClick={() => {
+          if (confirm(`Delete "${product.name}"? This cannot be undone.`)) onDelete(product.id);
+        }} title="Delete">
           <Trash2 className="h-3.5 w-3.5" />
         </Button>
       </div>
