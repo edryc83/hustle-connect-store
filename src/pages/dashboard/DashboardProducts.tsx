@@ -325,10 +325,15 @@ const DashboardProducts = () => {
     finally { setSaving(false); }
   };
 
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+
   const handleDelete = async (id: string) => {
+    // Delete product_images first (FK constraint — no cascade)
+    await supabase.from("product_images").delete().eq("product_id", id);
     const { error } = await supabase.from("products").delete().eq("id", id);
     if (error) toast.error("Failed to delete");
     else { toast.success(`${terms.singular} deleted`); fetchProducts(); }
+    setDeleteConfirmId(null);
   };
 
   const toggleFeatured = async (product: Product) => {
