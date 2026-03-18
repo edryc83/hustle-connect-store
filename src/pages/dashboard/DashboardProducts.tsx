@@ -241,6 +241,8 @@ const DashboardProducts = () => {
 
   const removeExistingImage = (idx: number) => setExistingImages((prev) => prev.filter((_, i) => i !== idx));
   const removeNewImage = (idx: number) => {
+    // Revoke the object URL to prevent memory leak
+    URL.revokeObjectURL(imagePreviews[idx]);
     setImageFiles((prev) => prev.filter((_, i) => i !== idx));
     setImagePreviews((prev) => prev.filter((_, i) => i !== idx));
   };
@@ -325,10 +327,15 @@ const DashboardProducts = () => {
     finally { setSaving(false); }
   };
 
+  const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+
   const handleDelete = async (id: string) => {
+    // Delete product_images first (FK constraint — no cascade)
+    await supabase.from("product_images").delete().eq("product_id", id);
     const { error } = await supabase.from("products").delete().eq("id", id);
     if (error) toast.error("Failed to delete");
     else { toast.success(`${terms.singular} deleted`); fetchProducts(); }
+    setDeleteConfirmId(null);
   };
 
   const toggleFeatured = async (product: Product) => {
@@ -665,7 +672,9 @@ function ListingRow({
         <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => onEdit(product)} title="Edit">
           <Pencil className="h-3.5 w-3.5" />
         </Button>
-        <Button size="icon" variant="ghost" className="h-7 w-7 text-destructive hover:text-destructive" onClick={() => onDelete(product.id)} title="Delete">
+        <Button size="icon" variant="ghost" className="h-7 w-7 text-destructive hover:text-destructive" onClick={() => {
+          if (confirm(`Delete "${product.name}"? This cannot be undone.`)) onDelete(product.id);
+        }} title="Delete">
           <Trash2 className="h-3.5 w-3.5" />
         </Button>
       </div>
