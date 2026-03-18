@@ -241,6 +241,8 @@ const DashboardProducts = () => {
 
   const removeExistingImage = (idx: number) => setExistingImages((prev) => prev.filter((_, i) => i !== idx));
   const removeNewImage = (idx: number) => {
+    // Revoke the object URL to prevent memory leak
+    URL.revokeObjectURL(imagePreviews[idx]);
     setImageFiles((prev) => prev.filter((_, i) => i !== idx));
     setImagePreviews((prev) => prev.filter((_, i) => i !== idx));
   };
