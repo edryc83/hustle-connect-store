@@ -10,7 +10,18 @@ import { Textarea } from "@/components/ui/textarea";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { Sparkles, Loader2, Camera, ImagePlus, Bell } from "lucide-react";
+import { Sparkles, Loader2, Camera, ImagePlus, Bell, Trash2, AlertTriangle } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { usePushNotifications } from "@/hooks/usePushNotifications";
 import { Switch } from "@/components/ui/switch";
 import WallpaperPicker from "@/components/dashboard/WallpaperPicker";
@@ -75,6 +86,7 @@ const DashboardSettings = () => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [generating, setGenerating] = useState(false);
+  const [deleting, setDeleting] = useState(false);
   const [uploadingPic, setUploadingPic] = useState(false);
   const [uploadingCover, setUploadingCover] = useState(false);
   const [firstName, setFirstName] = useState("");
@@ -319,6 +331,35 @@ const DashboardSettings = () => {
     if (error) toast.error("Failed to save");
     else toast.success("Settings saved!");
     setSaving(false);
+  };
+
+  const handleDeleteAccount = async () => {
+    if (!user) return;
+    setDeleting(true);
+    try {
+      // Delete user's products first
+      await supabase.from("products").delete().eq("user_id", user.id);
+
+      // Delete user's product images from storage
+      const { data: files } = await supabase.storage.from("store-images").list(user.id);
+      if (files && files.length > 0) {
+        const filePaths = files.map((f) => `${user.id}/${f.name}`);
+        await supabase.storage.from("store-images").remove(filePaths);
+      }
+
+      // Delete user's profile
+      await supabase.from("profiles").delete().eq("id", user.id);
+
+      // Sign out the user
+      await supabase.auth.signOut();
+
+      toast.success("Your account has been deleted");
+      window.location.href = "/";
+    } catch (err) {
+      console.error("Delete account error:", err);
+      toast.error("Failed to delete account. Please contact support.");
+    }
+    setDeleting(false);
   };
 
   if (loading)
@@ -738,6 +779,64 @@ const DashboardSettings = () => {
               Contact Support
             </Button>
           </a>
+        </CardContent>
+      </Card>
+
+      {/* Delete Account - Apple App Store Compliance */}
+      <Card className="border-destructive/30 bg-card/60 backdrop-blur-xl">
+        <CardHeader>
+          <CardTitle className="text-base flex items-center gap-2 text-destructive">
+            <AlertTriangle className="h-4 w-4" />
+            Danger Zone
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <p className="text-sm text-muted-foreground">
+            Permanently delete your account and all associated data. This action cannot be undone.
+          </p>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button variant="destructive" className="w-full gap-2">
+                <Trash2 className="h-4 w-4" />
+                Delete Account
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle className="flex items-center gap-2">
+                  <AlertTriangle className="h-5 w-5 text-destructive" />
+                  Delete Account?
+                </AlertDialogTitle>
+                <AlertDialogDescription className="space-y-2">
+                  <p>This will permanently delete:</p>
+                  <ul className="list-disc list-inside text-sm space-y-1">
+                    <li>Your store profile and settings</li>
+                    <li>All your products and images</li>
+                    <li>Your order history</li>
+                    <li>Your account credentials</li>
+                  </ul>
+                  <p className="font-medium text-destructive">This action cannot be undone.</p>
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={handleDeleteAccount}
+                  disabled={deleting}
+                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                >
+                  {deleting ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                      Deleting...
+                    </>
+                  ) : (
+                    "Yes, Delete My Account"
+                  )}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </CardContent>
       </Card>
     </div>
