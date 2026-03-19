@@ -765,16 +765,9 @@ function ListingRow({
       </div>
 
       {/* Actions */}
-      <div className="flex items-center gap-1 shrink-0">
+      <div className="flex items-center gap-1 shrink-0" onClick={(e) => e.stopPropagation()}>
         <Button size="icon" variant={isFeatured ? "default" : "ghost"} className="h-7 w-7" onClick={() => onToggleFeatured(product)} title="Toggle featured">
           <Star className={`h-3.5 w-3.5 ${isFeatured ? "fill-current" : ""}`} />
-        </Button>
-        <Button size="icon" variant="ghost" className="h-7 w-7" onClick={handleShareToStatus} disabled={sharing} title="Share to WhatsApp Status">
-          {sharing ? (
-            <Loader2 className="h-3.5 w-3.5 animate-spin" />
-          ) : (
-            <img src={whatsappIcon} alt="WhatsApp" className="h-4 w-4" />
-          )}
         </Button>
         <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => onEdit(product)} title="Edit">
           <Pencil className="h-3.5 w-3.5" />
