@@ -4,19 +4,17 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Safe area padding ONLY in PWA standalone mode (notch/status bar) */
-@media all and (display-mode: standalone) {
-  html {
-    padding-top: env(safe-area-inset-top);
-    padding-left: env(safe-area-inset-left);
-    padding-right: env(safe-area-inset-right);
-    padding-bottom: env(safe-area-inset-bottom);
-    background-color: hsl(var(--background));
-  }
+/* Safe area padding for PWA standalone mode and Capacitor native apps */
+html {
+  padding-top: env(safe-area-inset-top);
+  padding-left: env(safe-area-inset-left);
+  padding-right: env(safe-area-inset-right);
+  padding-bottom: env(safe-area-inset-bottom);
+  background-color: hsl(var(--background));
+}
 
-  .mobile-bottom-nav {
-    padding-bottom: env(safe-area-inset-bottom);
-  }
+.mobile-bottom-nav {
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
 @layer base {

@@ -1,12 +1,10 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Sun, Moon } from "lucide-react";
-import { useState } from "react";
+import { User, Sun, Moon } from "lucide-react";
 import AfristallLogo from "@/components/AfristallLogo";
 import { useTheme } from "@/hooks/useTheme";
 
 const Navbar = () => {
-  const [mobileOpen, setMobileOpen] = useState(false);
   const { theme, toggleTheme } = useTheme();
 
   return (
@@ -47,31 +45,13 @@ const Navbar = () => {
           >
             {theme === "light" ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
           </button>
-          <button
-            className="p-2"
-            onClick={() => setMobileOpen(!mobileOpen)}
-          >
-            {mobileOpen ? <X className="h-6 w-6" /> : <Menu className="h-6 w-6" />}
-          </button>
+          <Link to="/login">
+            <div className="h-9 w-9 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center">
+              <User className="h-5 w-5 text-primary" />
+            </div>
+          </Link>
         </div>
       </div>
-
-      {/* Mobile menu */}
-      {mobileOpen && (
-        <div className="border-t border-border/50 bg-background/95 backdrop-blur-xl px-4 pb-4 pt-2 sm:hidden">
-          <div className="flex flex-col gap-2">
-            <Link to="/explore" onClick={() => setMobileOpen(false)}>
-              <Button variant="ghost" className="w-full justify-start">Explore Stores</Button>
-            </Link>
-            <Link to="/login" onClick={() => setMobileOpen(false)}>
-              <Button variant="outline" className="w-full">Sign In</Button>
-            </Link>
-            <Link to="/signup" onClick={() => setMobileOpen(false)}>
-              <Button className="w-full">Create Your Store</Button>
-            </Link>
-          </div>
-        </div>
-      )}
     </nav>
   );
 };
