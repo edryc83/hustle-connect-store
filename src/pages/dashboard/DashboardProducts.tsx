@@ -590,6 +590,42 @@ const DashboardProducts = () => {
           </section>
         </div>
       )}
+
+      {/* Product detail modal with Share to Status */}
+      <Dialog open={!!detailProduct} onOpenChange={(open) => !open && setDetailProduct(null)}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="truncate">{detailProduct?.name}</DialogTitle>
+          </DialogHeader>
+          {detailProduct && (() => {
+            const imgs = productImages[detailProduct.id] ?? (detailProduct.image_url ? [detailProduct.image_url] : []);
+            return (
+              <div className="space-y-4">
+                {imgs[0] && (
+                  <img src={imgs[0]} alt={detailProduct.name} className="w-full aspect-square object-cover rounded-xl" />
+                )}
+                <div className="space-y-1">
+                  <p className="text-lg font-bold">
+                    {formatPrice(detailProduct.discount_price ?? detailProduct.price, currency)}
+                  </p>
+                  {detailProduct.discount_price && (
+                    <p className="text-sm text-muted-foreground line-through">
+                      {formatPrice(detailProduct.price, currency)}
+                    </p>
+                  )}
+                </div>
+                {detailProduct.description && (
+                  <p className="text-sm text-muted-foreground">{detailProduct.description}</p>
+                )}
+                <Button className="w-full rounded-xl gap-2" onClick={() => { setDetailProduct(null); openEdit(detailProduct); }}>
+                  <Pencil className="h-4 w-4" /> Edit {terms.singular}
+                </Button>
+                <ShareToStatusButton product={detailProduct} imgs={imgs} currency={currency} profile={profile} />
+              </div>
+            );
+          })()}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
