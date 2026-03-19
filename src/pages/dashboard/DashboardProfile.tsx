@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { formatPrice } from "@/lib/currency";
 import {
-  Camera, Loader2, Sparkles, Eye, ShoppingCart, Settings, Pencil, Check, X, Share2,
+  Camera, Loader2, Sparkles, Eye, ShoppingCart, Settings, Pencil, Check, X, Share2, Trash2, AlertTriangle,
 } from "lucide-react";
 import whatsappIcon from "@/assets/whatsapp-icon.png";
 import AfristallLogo from "@/components/AfristallLogo";
