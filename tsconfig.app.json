@@ -31,5 +31,11 @@
   },
   "include": [
     "src"
+  ],
+  "exclude": [
+    "src/screens",
+    "src/navigation",
+    "src/lib/supabase.ts",
+    "src/types/navigation.ts"
   ]
 }
