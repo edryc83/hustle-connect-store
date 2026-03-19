@@ -1,0 +1,239 @@
+import { useState, useEffect, useRef } from "react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
+import { Loader2, Sparkles, Check } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/hooks/use-toast";
+import type { Template } from "@/components/ad-studio/TemplatePicker";
+import type { ImageSlotData } from "@/components/ad-studio/ImageSourceStep";
+import CanvasEditor from "./CanvasEditor";
+
+interface CopyVariation {
+  subtitle: string;
+  tagline: string;
+}
+
+interface TextStepProps {
+  productName: string;
+  setProductName: (v: string) => void;
+  subtitle: string;
+  setSubtitle: (v: string) => void;
+  tagline: string;
+  setTagline: (v: string) => void;
+  price: string;
+  setPrice: (v: string) => void;
+  template: Template | null;
+  imageSlots: ImageSlotData[];
+  storeName: string;
+  profilePicture?: string;
+  autoSuggest?: boolean;
+  onUpdateSlot?: (index: number, data: Partial<ImageSlotData>) => void;
+}
+
+export default function TextStep({
+  productName, setProductName,
+  subtitle, setSubtitle,
+  tagline, setTagline,
+  price, setPrice,
+  template,
+  imageSlots,
+  storeName,
+  profilePicture,
+  autoSuggest,
+  onUpdateSlot,
+}: TextStepProps) {
+  const [suggesting, setSuggesting] = useState(false);
+  const [variations, setVariations] = useState<CopyVariation[]>([]);
+  const [selectedVariation, setSelectedVariation] = useState<number | null>(null);
+  const autoSuggestDone = useRef(false);
+
+  // Template fields (from Railway API)
+  const fields = template?.fields || ["product_name", "price", "subtitle", "tagline"];
+  const hasField = (f: string) => fields.includes(f);
+
+  const mainImage = imageSlots[0]?.processedUrl || imageSlots[0]?.url;
+  const templateThumbnail = template?.thumbnail || "";
+
+  // Character limits from template (Railway can define these)
+  const charLimits = {
+    subtitle: (template as any)?.char_limits?.subtitle || 50,
+    tagline: (template as any)?.char_limits?.tagline || 35,
+  };
+
+
+  // Auto-suggest copy when entering step 3 with a product name
+  useEffect(() => {
+    if (autoSuggest && productName.trim() && !autoSuggestDone.current) {
+      autoSuggestDone.current = true;
+      handleAiSuggest();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [autoSuggest, productName]);
+
+  const handleAiSuggest = async () => {
+    if (!productName.trim()) return;
+    setSuggesting(true);
+    setVariations([]);
+    setSelectedVariation(null);
+    try {
+      const { data, error } = await supabase.functions.invoke("ad-suggest-text", {
+        body: {
+          productName,
+          price,
+          templateStyle: template?.name || "modern",
+          charLimits,
+        },
+      });
+      if (error) throw error;
+
+      if (data?.variations && data.variations.length > 0) {
+        setVariations(data.variations);
+        // Auto-select the first one
+        applyVariation(data.variations[0], 0);
+      } else if (data?.subtitle || data?.tagline) {
+        // Legacy single response
+        const v = { subtitle: data.subtitle || "", tagline: data.tagline || "" };
+        setVariations([v]);
+        applyVariation(v, 0);
+      }
+    } catch (err: any) {
+      console.error("AI suggest error:", err);
+      toast({ title: "AI suggestion failed", description: err?.message || "Try again", variant: "destructive" });
+    } finally {
+      setSuggesting(false);
+    }
+  };
+
+  const applyVariation = (v: CopyVariation, index: number) => {
+    setSelectedVariation(index);
+    if (hasField("subtitle") && v.subtitle) setSubtitle(v.subtitle);
+    if (hasField("tagline") && v.tagline) setTagline(v.tagline);
+  };
+
+  return (
+    <div className="space-y-4 pb-4">
+      {/* Interactive canvas editor */}
+      <CanvasEditor
+        templateThumbnail={templateThumbnail}
+        productImage={mainImage || null}
+        productName={productName}
+        subtitle={subtitle}
+        tagline={tagline}
+        price={price}
+        storeName={storeName}
+        profilePicture={profilePicture}
+        onPositionChange={(posData) => {
+          if (onUpdateSlot) {
+            onUpdateSlot(0, {
+              cropData: {
+                scale: posData.imagePos.scaleX,
+                offsetX: posData.imagePos.left,
+                offsetY: posData.imagePos.top,
+              },
+            });
+          }
+        }}
+      />
+
+      <h2 className="text-base font-semibold">Edit text</h2>
+
+      <div className="space-y-3">
+        {hasField("product_name") && (
+          <div>
+            <Label className="text-xs text-muted-foreground mb-1 block">Product Name</Label>
+            <Input
+              value={productName}
+              onChange={(e) => setProductName(e.target.value)}
+              placeholder="e.g. Nike Air Max 90"
+              maxLength={40}
+            />
+          </div>
+        )}
+        {hasField("price") && (
+          <div>
+            <Label className="text-xs text-muted-foreground mb-1 block">Price</Label>
+            <Input
+              value={price}
+              onChange={(e) => setPrice(e.target.value)}
+              placeholder="e.g. UGX 150,000"
+            />
+          </div>
+        )}
+        {hasField("subtitle") && (
+          <div>
+            <Label className="text-xs text-muted-foreground mb-1 block">
+              Subtitle <span className="text-muted-foreground/50">({charLimits.subtitle} chars max)</span>
+            </Label>
+            <Input
+              value={subtitle}
+              onChange={(e) => setSubtitle(e.target.value)}
+              placeholder="Short benefit line"
+              maxLength={charLimits.subtitle}
+            />
+          </div>
+        )}
+        {hasField("tagline") && (
+          <div>
+            <Label className="text-xs text-muted-foreground mb-1 block">
+              Tagline <span className="text-muted-foreground/50">({charLimits.tagline} chars max)</span>
+            </Label>
+            <Input
+              value={tagline}
+              onChange={(e) => setTagline(e.target.value)}
+              placeholder="Catchy tagline"
+              maxLength={charLimits.tagline}
+            />
+          </div>
+        )}
+      </div>
+
+      {/* Copy variations */}
+      {variations.length > 0 && (
+        <div className="space-y-2">
+          <Label className="text-xs text-muted-foreground">Pick a copy style</Label>
+          <div className="grid gap-2">
+            {variations.map((v, i) => (
+              <button
+                key={i}
+                onClick={() => applyVariation(v, i)}
+                className={`text-left p-3 rounded-xl border transition-all ${
+                  selectedVariation === i
+                    ? "border-primary bg-primary/5 ring-1 ring-primary/20"
+                    : "border-border hover:border-primary/30 bg-card"
+                }`}
+              >
+                <div className="flex items-start justify-between gap-2">
+                  <div className="space-y-0.5 min-w-0">
+                    <p className="text-sm font-medium truncate">{v.subtitle}</p>
+                    <p className="text-xs text-muted-foreground italic truncate">{v.tagline}</p>
+                  </div>
+                  {selectedVariation === i && (
+                    <Check className="h-4 w-4 text-primary flex-shrink-0 mt-0.5" />
+                  )}
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* AI Suggest button */}
+      {(hasField("subtitle") || hasField("tagline")) && (
+        <Button
+          variant="outline"
+          className="w-full gap-2 border-primary/30 text-primary hover:bg-primary/5"
+          onClick={handleAiSuggest}
+          disabled={suggesting || !productName.trim()}
+        >
+          {suggesting ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <Sparkles className="h-4 w-4" />
+          )}
+          {variations.length > 0 ? "Regenerate Copy" : "AI Smart Copy"}
+        </Button>
+      )}
+    </div>
+  );
+}

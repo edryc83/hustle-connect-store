@@ -1,0 +1,157 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Safe area padding ONLY in PWA standalone mode (notch/status bar) */
+@media all and (display-mode: standalone) {
+  html {
+    padding-top: env(safe-area-inset-top);
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+    padding-bottom: env(safe-area-inset-bottom);
+    background-color: hsl(var(--background));
+  }
+
+  .mobile-bottom-nav {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
+@layer base {
+  :root {
+    --background: 210 18% 91%;
+    --foreground: 210 15% 15%;
+
+    --card: 210 18% 95%;
+    --card-foreground: 210 15% 15%;
+
+    --popover: 210 16% 95%;
+    --popover-foreground: 210 15% 15%;
+
+    --primary: 18 100% 60%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 210 14% 88%;
+    --secondary-foreground: 210 15% 15%;
+
+    --muted: 210 12% 87%;
+    --muted-foreground: 210 8% 42%;
+
+    --accent: 18 100% 60%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 210 11% 80%;
+    --input: 210 11% 80%;
+    --ring: 18 100% 60%;
+
+    --success: 142 72% 45%;
+    --success-foreground: 0 0% 100%;
+
+    --sidebar-background: 210 16% 92%;
+    --sidebar-foreground: 210 15% 15%;
+    --sidebar-primary: 18 100% 60%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 210 13% 88%;
+    --sidebar-accent-foreground: 210 15% 15%;
+    --sidebar-border: 210 11% 80%;
+    --sidebar-ring: 18 100% 60%;
+
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 220 15% 10%;
+    --foreground: 30 10% 90%;
+
+    --card: 220 15% 13%;
+    --card-foreground: 30 10% 90%;
+
+    --popover: 220 15% 13%;
+    --popover-foreground: 30 10% 90%;
+
+    --primary: 18 100% 60%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 220 12% 18%;
+    --secondary-foreground: 30 10% 85%;
+
+    --muted: 220 12% 18%;
+    --muted-foreground: 30 8% 55%;
+
+    --accent: 18 100% 60%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 70% 50%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 220 12% 20%;
+    --input: 220 12% 20%;
+    --ring: 18 100% 60%;
+
+    --success: 142 72% 45%;
+    --success-foreground: 0 0% 100%;
+
+    --sidebar-background: 220 15% 11%;
+    --sidebar-foreground: 30 10% 90%;
+    --sidebar-primary: 18 100% 60%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 220 12% 18%;
+    --sidebar-accent-foreground: 30 10% 85%;
+    --sidebar-border: 220 12% 20%;
+    --sidebar-ring: 18 100% 60%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground font-sans;
+  }
+}
+
+@keyframes emoji-pulse {
+  0%, 100% {
+    opacity: 0.4;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.15);
+  }
+}
+
+.animate-emoji-pulse {
+  animation: emoji-pulse 3s ease-in-out infinite;
+}
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Instagram gradient ring for profile pictures */
+.ig-ring {
+  background: linear-gradient(135deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+  padding: 1.5px;
+  border-radius: 9999px;
+  display: inline-flex;
+}
+.ig-ring-sm {
+  padding: 1px;
+}
+.ig-ring > img,
+.ig-ring > div {
+  border: 2px solid hsl(var(--background));
+  border-radius: 9999px;
+}
