@@ -570,7 +570,7 @@ const DashboardProducts = () => {
               <div className="space-y-2">
                 {featured.map((product) => (
                   <ListingRow key={product.id} product={product} productImages={productImages} currency={currency} formatDate={formatDate}
-                    onEdit={openEdit} onDelete={handleDelete} onToggleFeatured={toggleFeatured} profile={profile} />
+                    onEdit={openEdit} onDelete={handleDelete} onToggleFeatured={toggleFeatured} profile={profile} onDetail={setDetailProduct} />
                 ))}
               </div>
             </section>
