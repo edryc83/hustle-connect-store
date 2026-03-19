@@ -814,7 +814,7 @@ const StorefrontInner = () => {
       <StorefrontHeader
         profile={profile}
         visitorName={visitorName}
-        onBack={() => navigate("/explore")}
+        onBack={() => { window.history.length > 1 ? navigate(-1) : navigate("/explore"); }}
         firstProductImage={(() => {
           // Find first available product image as fallback
           for (const p of products) {
