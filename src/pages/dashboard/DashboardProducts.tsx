@@ -56,6 +56,7 @@ const DashboardProducts = () => {
   const [dialogOpen, setDialogOpen] = useState(searchParams.get("add") === "true");
   const [saving, setSaving] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [detailProduct, setDetailProduct] = useState<Product | null>(null);
   const [currency, setCurrency] = useState("UGX");
   const [profile, setProfile] = useState<{ store_name?: string; store_slug?: string } | null>(null);
   const [generatingDesc, setGeneratingDesc] = useState(false);
