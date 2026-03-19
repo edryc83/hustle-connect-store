@@ -16,9 +16,10 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Plus, Pencil, Trash2, ImageIcon, Package, Sparkles, Loader2, Wrench, X, Star, ChevronRight, Copy, Camera } from "lucide-react";
+import { Plus, Pencil, Trash2, ImageIcon, Package, Sparkles, Loader2, Wrench, X, Star, ChevronRight, Camera } from "lucide-react";
 import { toast } from "sonner";
 import { formatPrice } from "@/lib/currency";
+import whatsappIcon from "@/assets/whatsapp-icon.png";
 import { Badge } from "@/components/ui/badge";
 import type { Tables } from "@/integrations/supabase/types";
 import { ProductAttributeForm } from "@/components/dashboard/ProductAttributeForm";
@@ -56,6 +57,7 @@ const DashboardProducts = () => {
   const [saving, setSaving] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [currency, setCurrency] = useState("UGX");
+  const [profile, setProfile] = useState<{ store_name?: string; store_slug?: string } | null>(null);
   const [generatingDesc, setGeneratingDesc] = useState(false);
   const [analyzing, setAnalyzing] = useState(false);
   const [aiFilledFields, setAiFilledFields] = useState<Set<string>>(new Set());
@@ -79,16 +81,18 @@ const DashboardProducts = () => {
 
   const fetchProducts = async () => {
     if (!user) return;
-    const [{ data }, { data: profile }] = await Promise.all([
+    const [{ data }, { data: profileData }] = await Promise.all([
       supabase.from("products").select("*").eq("user_id", user.id).order("created_at", { ascending: false }),
-      supabase.from("profiles").select("currency").eq("id", user.id).single(),
+      supabase.from("profiles").select("currency, store_name, store_slug").eq("id", user.id).single(),
     ]);
     const productIds = (data ?? []).map((p) => p.id);
     const { data: images } = productIds.length > 0
       ? await supabase.from("product_images").select("*").in("product_id", productIds).order("position", { ascending: true })
       : { data: [] };
     setProducts(data ?? []);
-    setCurrency((profile as any)?.currency ?? "UGX");
+    const p = profileData as any;
+    setCurrency(p?.currency ?? "UGX");
+    setProfile({ store_name: p?.store_name, store_slug: p?.store_slug });
 
     const imgMap: Record<string, string[]> = {};
     const productIdSet = new Set(productIds);
@@ -565,7 +569,7 @@ const DashboardProducts = () => {
               <div className="space-y-2">
                 {featured.map((product) => (
                   <ListingRow key={product.id} product={product} productImages={productImages} currency={currency} formatDate={formatDate}
-                    onEdit={openEdit} onDelete={handleDelete} onToggleFeatured={toggleFeatured} onDuplicate={openDuplicate} />
+                    onEdit={openEdit} onDelete={handleDelete} onToggleFeatured={toggleFeatured} profile={profile} />
                 ))}
               </div>
             </section>
@@ -579,7 +583,7 @@ const DashboardProducts = () => {
             <div className="space-y-2">
               {(featured.length > 0 ? regular : products).map((product) => (
                 <ListingRow key={product.id} product={product} productImages={productImages} currency={currency} formatDate={formatDate}
-                  onEdit={openEdit} onDelete={handleDelete} onToggleFeatured={toggleFeatured} onDuplicate={openDuplicate} />
+                  onEdit={openEdit} onDelete={handleDelete} onToggleFeatured={toggleFeatured} profile={profile} />
               ))}
             </div>
           </section>
@@ -591,7 +595,7 @@ const DashboardProducts = () => {
 
 /** List-style row for a single item */
 function ListingRow({
-  product, productImages, currency, formatDate, onEdit, onDelete, onToggleFeatured, onDuplicate,
+  product, productImages, currency, formatDate, onEdit, onDelete, onToggleFeatured, profile,
 }: {
   product: Product;
   productImages: Record<string, string[]>;
@@ -600,12 +604,62 @@ function ListingRow({
   onEdit: (p: Product) => void;
   onDelete: (id: string) => void;
   onToggleFeatured: (p: Product) => void;
-  onDuplicate: (p: Product) => void;
+  profile: { store_name?: string; store_slug?: string } | null;
 }) {
+  const [sharing, setSharing] = useState(false);
   const imgs = productImages[product.id] ?? (product.image_url ? [product.image_url] : []);
   const { month, day } = formatDate(product.created_at);
   const isFeatured = (product as any).is_featured;
   const isService = (product as any).listing_type === "service";
+
+  const handleShareToStatus = async () => {
+    setSharing(true);
+    const imgUrl = imgs[0];
+    const price = formatPrice((product as any).discount_price ?? product.price, currency);
+    const shopLink = profile?.store_slug ? `https://afristall.com/${profile.store_slug}` : "";
+    const fallbackCaption = `🔥 ${product.name} — ${price}\n\nShop here 👉 ${shopLink}`;
+
+    // Try AI caption
+    let caption = fallbackCaption;
+    try {
+      const { data } = await supabase.functions.invoke("generate-share-caption", {
+        body: {
+          productName: product.name,
+          price,
+          description: product.description || "",
+          storeName: profile?.store_name || "",
+          storeSlug: profile?.store_slug || "",
+          platform: "WhatsApp Status",
+        },
+      });
+      if (data?.caption) caption = data.caption;
+    } catch {
+      // Use fallback
+    }
+
+    try {
+      if (imgUrl && navigator.canShare) {
+        const res = await fetch(imgUrl);
+        const blob = await res.blob();
+        const ext = blob.type.split("/")[1] || "jpg";
+        const file = new File([blob], `product.${ext}`, { type: blob.type });
+
+        if (navigator.canShare({ files: [file] })) {
+          await navigator.share({ files: [file], text: caption });
+          setSharing(false);
+          return;
+        }
+      }
+    } catch (err: any) {
+      if (err?.name === "AbortError") {
+        setSharing(false);
+        return;
+      }
+    }
+    // Fallback: text-only WhatsApp share
+    window.open(`https://wa.me/?text=${encodeURIComponent(caption)}`, "_blank");
+    setSharing(false);
+  };
 
   return (
     <div className="group flex items-center gap-3 rounded-2xl bg-card/60 backdrop-blur-xl border border-border/50 p-3 transition-shadow hover:shadow-md">
@@ -666,8 +720,12 @@ function ListingRow({
         <Button size="icon" variant={isFeatured ? "default" : "ghost"} className="h-7 w-7" onClick={() => onToggleFeatured(product)} title="Toggle featured">
           <Star className={`h-3.5 w-3.5 ${isFeatured ? "fill-current" : ""}`} />
         </Button>
-        <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => onDuplicate(product)} title="Duplicate">
-          <Copy className="h-3.5 w-3.5" />
+        <Button size="icon" variant="ghost" className="h-7 w-7" onClick={handleShareToStatus} disabled={sharing} title="Share to WhatsApp Status">
+          {sharing ? (
+            <Loader2 className="h-3.5 w-3.5 animate-spin" />
+          ) : (
+            <img src={whatsappIcon} alt="WhatsApp" className="h-4 w-4" />
+          )}
         </Button>
         <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => onEdit(product)} title="Edit">
           <Pencil className="h-3.5 w-3.5" />
