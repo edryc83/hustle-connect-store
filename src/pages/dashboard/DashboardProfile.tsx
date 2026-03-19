@@ -35,6 +35,7 @@ const DashboardProfile = () => {
   const [orderCount, setOrderCount] = useState(0);
   const [uploadingPic, setUploadingPic] = useState(false);
   const [uploadingCover, setUploadingCover] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   // Inline bio editing
   const [editingBio, setEditingBio] = useState(false);
