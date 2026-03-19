@@ -630,9 +630,70 @@ const DashboardProducts = () => {
   );
 };
 
+function ShareToStatusButton({ product, imgs, currency, profile }: {
+  product: Product;
+  imgs: string[];
+  currency: string;
+  profile: { store_name?: string; store_slug?: string } | null;
+}) {
+  const [sharing, setSharing] = useState(false);
+
+  const handleShareToStatus = async () => {
+    setSharing(true);
+    const imgUrl = imgs[0];
+    const price = formatPrice((product as any).discount_price ?? product.price, currency);
+    const shopLink = profile?.store_slug ? `https://afristall.com/${profile.store_slug}` : "";
+    const fallbackCaption = `🔥 ${product.name} — ${price}\n\nShop here 👉 ${shopLink}`;
+
+    let caption = fallbackCaption;
+    try {
+      const { data } = await supabase.functions.invoke("generate-share-caption", {
+        body: {
+          productName: product.name, price,
+          description: product.description || "",
+          storeName: profile?.store_name || "",
+          storeSlug: profile?.store_slug || "",
+          platform: "WhatsApp Status",
+        },
+      });
+      if (data?.caption) caption = data.caption;
+    } catch {}
+
+    try {
+      if (imgUrl && navigator.canShare) {
+        const res = await fetch(imgUrl);
+        const blob = await res.blob();
+        const ext = blob.type.split("/")[1] || "jpg";
+        const file = new File([blob], `product.${ext}`, { type: blob.type });
+        if (navigator.canShare({ files: [file] })) {
+          await navigator.share({ files: [file], text: caption });
+          setSharing(false);
+          return;
+        }
+      }
+    } catch (err: any) {
+      if (err?.name === "AbortError") { setSharing(false); return; }
+    }
+    window.open(`https://wa.me/?text=${encodeURIComponent(caption)}`, "_blank");
+    setSharing(false);
+  };
+
+  return (
+    <Button
+      variant="outline"
+      className="w-full rounded-xl gap-2 border-[#25D366]/30 text-[#25D366] hover:bg-[#25D366]/10"
+      onClick={handleShareToStatus}
+      disabled={sharing}
+    >
+      {sharing ? <Loader2 className="h-4 w-4 animate-spin" /> : <img src={whatsappIcon} alt="" className="h-4 w-4" />}
+      Share to Status
+    </Button>
+  );
+}
+
 /** List-style row for a single item */
 function ListingRow({
-  product, productImages, currency, formatDate, onEdit, onDelete, onToggleFeatured, profile,
+  product, productImages, currency, formatDate, onEdit, onDelete, onToggleFeatured, profile, onDetail,
 }: {
   product: Product;
   productImages: Record<string, string[]>;
@@ -642,6 +703,7 @@ function ListingRow({
   onDelete: (id: string) => void;
   onToggleFeatured: (p: Product) => void;
   profile: { store_name?: string; store_slug?: string } | null;
+  onDetail: (p: Product) => void;
 }) {
   const [sharing, setSharing] = useState(false);
   const imgs = productImages[product.id] ?? (product.image_url ? [product.image_url] : []);
