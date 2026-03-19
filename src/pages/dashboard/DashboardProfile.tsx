@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { formatPrice } from "@/lib/currency";
 import {
-  Camera, Loader2, Sparkles, Eye, ShoppingCart, Settings, Pencil, Check, X, Share2,
+  Camera, Loader2, Sparkles, Eye, ShoppingCart, Settings, Pencil, Check, X, Share2, Trash2, AlertTriangle,
 } from "lucide-react";
 import whatsappIcon from "@/assets/whatsapp-icon.png";
 import AfristallLogo from "@/components/AfristallLogo";
@@ -16,6 +16,10 @@ import type { Tables } from "@/integrations/supabase/types";
 import {
   Dialog, DialogContent, DialogHeader, DialogTitle,
 } from "@/components/ui/dialog";
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle, AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 type Product = Tables<"products">;
 
@@ -31,6 +35,7 @@ const DashboardProfile = () => {
   const [orderCount, setOrderCount] = useState(0);
   const [uploadingPic, setUploadingPic] = useState(false);
   const [uploadingCover, setUploadingCover] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   // Inline bio editing
   const [editingBio, setEditingBio] = useState(false);
@@ -306,6 +311,74 @@ const DashboardProfile = () => {
             </Button>
           </div>
         )}
+
+        {/* Delete Account — Apple App Store compliance */}
+        <div className="mt-4">
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <button className="flex items-center gap-2 text-sm text-destructive hover:text-destructive/80 transition-colors py-2">
+                <Trash2 className="h-4 w-4" />
+                Delete Account
+              </button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle className="flex items-center gap-2">
+                  <AlertTriangle className="h-5 w-5 text-destructive" />
+                  Delete Account?
+                </AlertDialogTitle>
+                <AlertDialogDescription className="space-y-2">
+                  <p>This will permanently delete:</p>
+                  <ul className="list-disc list-inside text-sm space-y-1">
+                    <li>Your store profile and settings</li>
+                    <li>All your products and images</li>
+                    <li>Your order history</li>
+                    <li>Your account credentials</li>
+                  </ul>
+                  <p className="font-medium text-destructive">This action cannot be undone.</p>
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={async () => {
+                    if (!user) return;
+                    setDeleting(true);
+                    try {
+                      await supabase.from("product_images").delete().in(
+                        "product_id",
+                        products.map((p) => p.id)
+                      );
+                      await supabase.from("products").delete().eq("user_id", user.id);
+                      const { data: files } = await supabase.storage.from("store-images").list(user.id);
+                      if (files?.length) {
+                        await supabase.storage.from("store-images").remove(files.map((f) => `${user.id}/${f.name}`));
+                      }
+                      await supabase.from("profiles").delete().eq("id", user.id);
+                      await supabase.auth.signOut();
+                      toast.success("Your account has been deleted");
+                      window.location.href = "/";
+                    } catch {
+                      toast.error("Failed to delete account. Please contact support.");
+                    }
+                    setDeleting(false);
+                  }}
+                  disabled={deleting}
+                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                >
+                  {deleting ? (
+                    <>
+                      <Loader2 className="h-4 w-4 animate-spin mr-2" />
+                      Deleting...
+                    </>
+                  ) : (
+                    "Yes, Delete My Account"
+                  )}
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        </div>
       </div>
 
       {/* Featured Products — horizontal scroll */}

@@ -56,6 +56,7 @@ const DashboardProducts = () => {
   const [dialogOpen, setDialogOpen] = useState(searchParams.get("add") === "true");
   const [saving, setSaving] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
+  const [detailProduct, setDetailProduct] = useState<Product | null>(null);
   const [currency, setCurrency] = useState("UGX");
   const [profile, setProfile] = useState<{ store_name?: string; store_slug?: string } | null>(null);
   const [generatingDesc, setGeneratingDesc] = useState(false);
@@ -569,7 +570,7 @@ const DashboardProducts = () => {
               <div className="space-y-2">
                 {featured.map((product) => (
                   <ListingRow key={product.id} product={product} productImages={productImages} currency={currency} formatDate={formatDate}
-                    onEdit={openEdit} onDelete={handleDelete} onToggleFeatured={toggleFeatured} profile={profile} />
+                    onEdit={openEdit} onDelete={handleDelete} onToggleFeatured={toggleFeatured} profile={profile} onDetail={setDetailProduct} />
                 ))}
               </div>
             </section>
@@ -583,19 +584,116 @@ const DashboardProducts = () => {
             <div className="space-y-2">
               {(featured.length > 0 ? regular : products).map((product) => (
                 <ListingRow key={product.id} product={product} productImages={productImages} currency={currency} formatDate={formatDate}
-                  onEdit={openEdit} onDelete={handleDelete} onToggleFeatured={toggleFeatured} profile={profile} />
+                  onEdit={openEdit} onDelete={handleDelete} onToggleFeatured={toggleFeatured} profile={profile} onDetail={setDetailProduct} />
               ))}
             </div>
           </section>
         </div>
       )}
+
+      {/* Product detail modal with Share to Status */}
+      <Dialog open={!!detailProduct} onOpenChange={(open) => !open && setDetailProduct(null)}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="truncate">{detailProduct?.name}</DialogTitle>
+          </DialogHeader>
+          {detailProduct && (() => {
+            const imgs = productImages[detailProduct.id] ?? (detailProduct.image_url ? [detailProduct.image_url] : []);
+            return (
+              <div className="space-y-4">
+                {imgs[0] && (
+                  <img src={imgs[0]} alt={detailProduct.name} className="w-full aspect-square object-cover rounded-xl" />
+                )}
+                <div className="space-y-1">
+                  <p className="text-lg font-bold">
+                    {formatPrice(detailProduct.discount_price ?? detailProduct.price, currency)}
+                  </p>
+                  {detailProduct.discount_price && (
+                    <p className="text-sm text-muted-foreground line-through">
+                      {formatPrice(detailProduct.price, currency)}
+                    </p>
+                  )}
+                </div>
+                {detailProduct.description && (
+                  <p className="text-sm text-muted-foreground">{detailProduct.description}</p>
+                )}
+                <Button className="w-full rounded-xl gap-2" onClick={() => { setDetailProduct(null); openEdit(detailProduct); }}>
+                  <Pencil className="h-4 w-4" /> Edit {terms.singular}
+                </Button>
+                <ShareToStatusButton product={detailProduct} imgs={imgs} currency={currency} profile={profile} />
+              </div>
+            );
+          })()}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
 
+function ShareToStatusButton({ product, imgs, currency, profile }: {
+  product: Product;
+  imgs: string[];
+  currency: string;
+  profile: { store_name?: string; store_slug?: string } | null;
+}) {
+  const [sharing, setSharing] = useState(false);
+
+  const handleShareToStatus = async () => {
+    setSharing(true);
+    const imgUrl = imgs[0];
+    const price = formatPrice((product as any).discount_price ?? product.price, currency);
+    const shopLink = profile?.store_slug ? `https://afristall.com/${profile.store_slug}` : "";
+    const fallbackCaption = `🔥 ${product.name} — ${price}\n\nShop here 👉 ${shopLink}`;
+
+    let caption = fallbackCaption;
+    try {
+      const { data } = await supabase.functions.invoke("generate-share-caption", {
+        body: {
+          productName: product.name, price,
+          description: product.description || "",
+          storeName: profile?.store_name || "",
+          storeSlug: profile?.store_slug || "",
+          platform: "WhatsApp Status",
+        },
+      });
+      if (data?.caption) caption = data.caption;
+    } catch {}
+
+    try {
+      if (imgUrl && navigator.canShare) {
+        const res = await fetch(imgUrl);
+        const blob = await res.blob();
+        const ext = blob.type.split("/")[1] || "jpg";
+        const file = new File([blob], `product.${ext}`, { type: blob.type });
+        if (navigator.canShare({ files: [file] })) {
+          await navigator.share({ files: [file], text: caption });
+          setSharing(false);
+          return;
+        }
+      }
+    } catch (err: any) {
+      if (err?.name === "AbortError") { setSharing(false); return; }
+    }
+    window.open(`https://wa.me/?text=${encodeURIComponent(caption)}`, "_blank");
+    setSharing(false);
+  };
+
+  return (
+    <Button
+      variant="outline"
+      className="w-full rounded-xl gap-2 border-[#25D366]/30 text-[#25D366] hover:bg-[#25D366]/10"
+      onClick={handleShareToStatus}
+      disabled={sharing}
+    >
+      {sharing ? <Loader2 className="h-4 w-4 animate-spin" /> : <img src={whatsappIcon} alt="" className="h-4 w-4" />}
+      Share to Status
+    </Button>
+  );
+}
+
 /** List-style row for a single item */
 function ListingRow({
-  product, productImages, currency, formatDate, onEdit, onDelete, onToggleFeatured, profile,
+  product, productImages, currency, formatDate, onEdit, onDelete, onToggleFeatured, profile, onDetail,
 }: {
   product: Product;
   productImages: Record<string, string[]>;
@@ -605,64 +703,15 @@ function ListingRow({
   onDelete: (id: string) => void;
   onToggleFeatured: (p: Product) => void;
   profile: { store_name?: string; store_slug?: string } | null;
+  onDetail: (p: Product) => void;
 }) {
-  const [sharing, setSharing] = useState(false);
   const imgs = productImages[product.id] ?? (product.image_url ? [product.image_url] : []);
   const { month, day } = formatDate(product.created_at);
   const isFeatured = (product as any).is_featured;
   const isService = (product as any).listing_type === "service";
 
-  const handleShareToStatus = async () => {
-    setSharing(true);
-    const imgUrl = imgs[0];
-    const price = formatPrice((product as any).discount_price ?? product.price, currency);
-    const shopLink = profile?.store_slug ? `https://afristall.com/${profile.store_slug}` : "";
-    const fallbackCaption = `🔥 ${product.name} — ${price}\n\nShop here 👉 ${shopLink}`;
-
-    // Try AI caption
-    let caption = fallbackCaption;
-    try {
-      const { data } = await supabase.functions.invoke("generate-share-caption", {
-        body: {
-          productName: product.name,
-          price,
-          description: product.description || "",
-          storeName: profile?.store_name || "",
-          storeSlug: profile?.store_slug || "",
-          platform: "WhatsApp Status",
-        },
-      });
-      if (data?.caption) caption = data.caption;
-    } catch {
-      // Use fallback
-    }
-
-    try {
-      if (imgUrl && navigator.canShare) {
-        const res = await fetch(imgUrl);
-        const blob = await res.blob();
-        const ext = blob.type.split("/")[1] || "jpg";
-        const file = new File([blob], `product.${ext}`, { type: blob.type });
-
-        if (navigator.canShare({ files: [file] })) {
-          await navigator.share({ files: [file], text: caption });
-          setSharing(false);
-          return;
-        }
-      }
-    } catch (err: any) {
-      if (err?.name === "AbortError") {
-        setSharing(false);
-        return;
-      }
-    }
-    // Fallback: text-only WhatsApp share
-    window.open(`https://wa.me/?text=${encodeURIComponent(caption)}`, "_blank");
-    setSharing(false);
-  };
-
   return (
-    <div className="group flex items-center gap-3 rounded-2xl bg-card/60 backdrop-blur-xl border border-border/50 p-3 transition-shadow hover:shadow-md">
+    <div className="group flex items-center gap-3 rounded-2xl bg-card/60 backdrop-blur-xl border border-border/50 p-3 transition-shadow hover:shadow-md cursor-pointer" onClick={() => onDetail(product)}>
       {/* Date column */}
       <div className="hidden sm:flex flex-col items-center text-center w-10 shrink-0">
         <span className="text-[10px] font-medium text-muted-foreground uppercase">{month}</span>
@@ -716,16 +765,9 @@ function ListingRow({
       </div>
 
       {/* Actions */}
-      <div className="flex items-center gap-1 shrink-0">
+      <div className="flex items-center gap-1 shrink-0" onClick={(e) => e.stopPropagation()}>
         <Button size="icon" variant={isFeatured ? "default" : "ghost"} className="h-7 w-7" onClick={() => onToggleFeatured(product)} title="Toggle featured">
           <Star className={`h-3.5 w-3.5 ${isFeatured ? "fill-current" : ""}`} />
-        </Button>
-        <Button size="icon" variant="ghost" className="h-7 w-7" onClick={handleShareToStatus} disabled={sharing} title="Share to WhatsApp Status">
-          {sharing ? (
-            <Loader2 className="h-3.5 w-3.5 animate-spin" />
-          ) : (
-            <img src={whatsappIcon} alt="WhatsApp" className="h-4 w-4" />
-          )}
         </Button>
         <Button size="icon" variant="ghost" className="h-7 w-7" onClick={() => onEdit(product)} title="Edit">
           <Pencil className="h-3.5 w-3.5" />
