@@ -705,63 +705,13 @@ function ListingRow({
   profile: { store_name?: string; store_slug?: string } | null;
   onDetail: (p: Product) => void;
 }) {
-  const [sharing, setSharing] = useState(false);
   const imgs = productImages[product.id] ?? (product.image_url ? [product.image_url] : []);
   const { month, day } = formatDate(product.created_at);
   const isFeatured = (product as any).is_featured;
   const isService = (product as any).listing_type === "service";
 
-  const handleShareToStatus = async () => {
-    setSharing(true);
-    const imgUrl = imgs[0];
-    const price = formatPrice((product as any).discount_price ?? product.price, currency);
-    const shopLink = profile?.store_slug ? `https://afristall.com/${profile.store_slug}` : "";
-    const fallbackCaption = `🔥 ${product.name} — ${price}\n\nShop here 👉 ${shopLink}`;
-
-    // Try AI caption
-    let caption = fallbackCaption;
-    try {
-      const { data } = await supabase.functions.invoke("generate-share-caption", {
-        body: {
-          productName: product.name,
-          price,
-          description: product.description || "",
-          storeName: profile?.store_name || "",
-          storeSlug: profile?.store_slug || "",
-          platform: "WhatsApp Status",
-        },
-      });
-      if (data?.caption) caption = data.caption;
-    } catch {
-      // Use fallback
-    }
-
-    try {
-      if (imgUrl && navigator.canShare) {
-        const res = await fetch(imgUrl);
-        const blob = await res.blob();
-        const ext = blob.type.split("/")[1] || "jpg";
-        const file = new File([blob], `product.${ext}`, { type: blob.type });
-
-        if (navigator.canShare({ files: [file] })) {
-          await navigator.share({ files: [file], text: caption });
-          setSharing(false);
-          return;
-        }
-      }
-    } catch (err: any) {
-      if (err?.name === "AbortError") {
-        setSharing(false);
-        return;
-      }
-    }
-    // Fallback: text-only WhatsApp share
-    window.open(`https://wa.me/?text=${encodeURIComponent(caption)}`, "_blank");
-    setSharing(false);
-  };
-
   return (
-    <div className="group flex items-center gap-3 rounded-2xl bg-card/60 backdrop-blur-xl border border-border/50 p-3 transition-shadow hover:shadow-md">
+    <div className="group flex items-center gap-3 rounded-2xl bg-card/60 backdrop-blur-xl border border-border/50 p-3 transition-shadow hover:shadow-md cursor-pointer" onClick={() => onDetail(product)}>
       {/* Date column */}
       <div className="hidden sm:flex flex-col items-center text-center w-10 shrink-0">
         <span className="text-[10px] font-medium text-muted-foreground uppercase">{month}</span>
