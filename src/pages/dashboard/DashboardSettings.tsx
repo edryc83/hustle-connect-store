@@ -26,6 +26,7 @@ import { usePushNotifications } from "@/hooks/usePushNotifications";
 import { Switch } from "@/components/ui/switch";
 import WallpaperPicker from "@/components/dashboard/WallpaperPicker";
 import WhatsAppTestCard from "@/components/dashboard/WhatsAppTestCard";
+import { AccentColorPicker } from "@/components/dashboard/AccentColorPicker";
 import { CURRENCY_OPTIONS } from "@/lib/currency";
 import AfristallLogo from "@/components/AfristallLogo";
 import {
