@@ -105,6 +105,7 @@ const DashboardSettings = () => {
   const [facebookUrl, setFacebookUrl] = useState("");
   
   const [productCount, setProductCount] = useState(0);
+  const [accentColor, setAccentColor] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user) return;
