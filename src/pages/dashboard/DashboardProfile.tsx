@@ -10,7 +10,7 @@ import { formatPrice } from "@/lib/currency";
 import {
   Camera, Loader2, Sparkles, Eye, ShoppingCart, Settings, Pencil, Check, X, Share2, Trash2, AlertTriangle,
 } from "lucide-react";
-import { AccentColorPicker } from "@/components/dashboard/AccentColorPicker";
+
 import whatsappIcon from "@/assets/whatsapp-icon.png";
 import AfristallLogo from "@/components/AfristallLogo";
 import type { Tables } from "@/integrations/supabase/types";
