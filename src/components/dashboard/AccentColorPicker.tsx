@@ -52,17 +52,18 @@ export function AccentColorPicker({ userId, currentColor, onColorChange }: Accen
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <button
-          className="h-8 w-8 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center text-white hover:bg-black/60 transition-colors"
+          className="inline-flex h-8 items-center gap-1.5 rounded-full border border-white/20 bg-black/45 px-2.5 text-white shadow-sm backdrop-blur-sm transition-colors hover:bg-black/60"
           aria-label="Choose store accent color"
         >
           {currentColor ? (
-            <div
-              className="h-4 w-4 rounded-full border-2 border-white/80"
+            <span
+              className="h-3.5 w-3.5 rounded-full border border-white/80"
               style={{ backgroundColor: currentColor }}
             />
           ) : (
-            <Palette className="h-4 w-4" />
+            <Palette className="h-3.5 w-3.5" />
           )}
+          <span className="text-[11px] font-semibold">Theme</span>
         </button>
       </PopoverTrigger>
       <PopoverContent className="w-48 p-3" align="end" sideOffset={8}>
