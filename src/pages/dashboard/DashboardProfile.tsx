@@ -210,15 +210,8 @@ const DashboardProfile = () => {
           <input type="file" accept="image/*" className="hidden" onChange={handleCoverChange} disabled={uploadingCover} />
         </label>
 
-        {/* Settings gear + Accent color picker */}
-        <div className="absolute top-3 right-3 flex items-center gap-2 z-10">
-          {user && (
-            <AccentColorPicker
-              userId={user.id}
-              currentColor={(profile as any).accent_color || null}
-              onColorChange={(color) => setProfile((prev: any) => ({ ...prev, accent_color: color }))}
-            />
-          )}
+        {/* Settings gear */}
+        <div className="absolute top-3 right-3 z-10">
           <Link
             to="/dashboard/settings"
             className="h-8 w-8 rounded-full bg-black/40 backdrop-blur-sm flex items-center justify-center text-white hover:bg-black/60 transition-colors"
@@ -320,6 +313,17 @@ const DashboardProfile = () => {
                 <Eye className="h-4 w-4" /> View as buyer
               </Link>
             </Button>
+          </div>
+        )}
+
+        {/* Store theme color picker */}
+        {user && (
+          <div className="mt-3">
+            <AccentColorPicker
+              userId={user.id}
+              currentColor={(profile as any).accent_color || null}
+              onColorChange={(color) => setProfile((prev: any) => ({ ...prev, accent_color: color }))}
+            />
           </div>
         )}
 
