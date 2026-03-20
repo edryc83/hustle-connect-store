@@ -109,7 +109,7 @@ const DashboardSettings = () => {
     if (!user) return;
     supabase
       .from("profiles")
-      .select("first_name, profile_picture_url, store_name, store_slug, whatsapp_number, city, store_bio, category, delivery_areas, currency, welcome_message, cover_photo_url, country, district, street, shop_number, building, is_online_only, instagram_url, tiktok_url, facebook_url, ai_assistant_enabled")
+      .select("first_name, profile_picture_url, store_name, store_slug, whatsapp_number, city, store_bio, category, delivery_areas, currency, welcome_message, cover_photo_url, country, district, street, shop_number, building, is_online_only, instagram_url, tiktok_url, facebook_url, ai_assistant_enabled, accent_color")
       .eq("id", user.id)
       .single()
       .then(({ data }) => {
