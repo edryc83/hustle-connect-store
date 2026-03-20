@@ -756,6 +756,12 @@ const DashboardSettings = () => {
               </AlertDialogFooter>
             </AlertDialogContent>
           </AlertDialog>
+          <p className="text-xs text-muted-foreground text-center pt-2">
+            Or submit a request via our{" "}
+            <a href="/delete-account" className="underline hover:text-destructive transition-colors">
+              account deletion page
+            </a>
+          </p>
         </CardContent>
       </Card>
     </div>
