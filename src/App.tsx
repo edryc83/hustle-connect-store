@@ -73,6 +73,7 @@ const App = () => (
               <Route path="/terms" element={<TermsOfService />} />
               <Route path="/cookies" element={<CookiePolicy />} />
               <Route path="/refund-policy" element={<RefundPolicy />} />
+              <Route path="/delete-account" element={<DeleteAccount />} />
               <Route path="/:storeSlug" element={<Storefront />} />
               <Route path="/:storeSlug/:productId" element={<Storefront />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
