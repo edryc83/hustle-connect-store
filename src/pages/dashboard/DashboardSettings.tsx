@@ -26,6 +26,7 @@ import { usePushNotifications } from "@/hooks/usePushNotifications";
 import { Switch } from "@/components/ui/switch";
 import WallpaperPicker from "@/components/dashboard/WallpaperPicker";
 import WhatsAppTestCard from "@/components/dashboard/WhatsAppTestCard";
+import { AccentColorPicker } from "@/components/dashboard/AccentColorPicker";
 import { CURRENCY_OPTIONS } from "@/lib/currency";
 import AfristallLogo from "@/components/AfristallLogo";
 import {
@@ -75,14 +76,6 @@ const DashboardSettings = () => {
   const { user } = useAuth();
   const location = useLocation();
 
-  // Scroll to #install-app if hash present
-  useEffect(() => {
-    if (location.hash === "#install-app") {
-      setTimeout(() => {
-        document.getElementById("install-app")?.scrollIntoView({ behavior: "smooth" });
-      }, 500);
-    }
-  }, [location.hash]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [generating, setGenerating] = useState(false);
@@ -112,12 +105,13 @@ const DashboardSettings = () => {
   const [facebookUrl, setFacebookUrl] = useState("");
   
   const [productCount, setProductCount] = useState(0);
+  const [accentColor, setAccentColor] = useState<string | null>(null);
 
   useEffect(() => {
     if (!user) return;
     supabase
       .from("profiles")
-      .select("first_name, profile_picture_url, store_name, store_slug, whatsapp_number, city, store_bio, category, delivery_areas, currency, welcome_message, cover_photo_url, country, district, street, shop_number, building, is_online_only, instagram_url, tiktok_url, facebook_url, ai_assistant_enabled")
+      .select("first_name, profile_picture_url, store_name, store_slug, whatsapp_number, city, store_bio, category, delivery_areas, currency, welcome_message, cover_photo_url, country, district, street, shop_number, building, is_online_only, instagram_url, tiktok_url, facebook_url, ai_assistant_enabled, accent_color")
       .eq("id", user.id)
       .single()
       .then(({ data }) => {
@@ -158,6 +152,7 @@ const DashboardSettings = () => {
           setDeliveryAreas(d.delivery_areas ?? "");
           setCurrency(d.currency ?? "UGX");
           setWelcomeMessage(d.welcome_message || d.store_bio || "");
+          setAccentColor(d.accent_color ?? null);
         }
         setLoading(false);
       });
@@ -667,95 +662,19 @@ const DashboardSettings = () => {
       {/* WhatsApp Test */}
       <WhatsAppTestCard whatsappNumber={whatsappNumber} storeName={storeName} storeSlug={firstName} />
 
-      {/* Add to Home Screen Tutorial */}
-      <Card id="install-app" className="border-border/50 bg-card/60 backdrop-blur-xl">
+      {/* Shop Branding */}
+      <Card className="border-border/50 bg-card/60 backdrop-blur-xl">
         <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-lg">
-            📲 Install Afristall as an App
-          </CardTitle>
+          <CardTitle className="text-base">Shop Branding</CardTitle>
         </CardHeader>
-        <CardContent className="space-y-6">
-          <p className="text-sm text-muted-foreground">
-            Add Afristall to your home screen for quick access — it works just like a real app, no download needed!
-          </p>
-
-          {/* iPhone - Safari */}
-          <div className="rounded-xl border border-border/50 bg-muted/20 p-4 space-y-3">
-            <div className="flex items-center gap-2">
-              <span className="text-xl">🍎</span>
-              <h3 className="font-semibold text-sm">iPhone / iPad — Safari</h3>
-            </div>
-            <ol className="space-y-2.5 text-sm text-muted-foreground ml-1">
-              <li className="flex items-start gap-2">
-                <span className="font-bold text-foreground shrink-0">1.</span>
-                <span>Open Afristall in <strong className="text-foreground">Safari</strong></span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="font-bold text-foreground shrink-0">2.</span>
-                <span>Tap the <strong className="text-foreground">Share button</strong> <span className="inline-flex items-center justify-center h-5 w-5 rounded bg-primary/10 text-primary text-xs">⬆</span> at the bottom of the screen</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="font-bold text-foreground shrink-0">3.</span>
-                <span>Scroll down and tap <strong className="text-foreground">"Add to Home Screen"</strong> <span className="inline-flex items-center justify-center h-5 w-5 rounded bg-primary/10 text-primary text-xs">＋</span></span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="font-bold text-foreground shrink-0">4.</span>
-                <span>Tap <strong className="text-foreground">"Add"</strong> in the top right — done! 🎉</span>
-              </li>
-            </ol>
-          </div>
-
-          {/* iPhone - Chrome */}
-          <div className="rounded-xl border border-border/50 bg-muted/20 p-4 space-y-3">
-            <div className="flex items-center gap-2">
-              <span className="text-xl">🍎</span>
-              <h3 className="font-semibold text-sm">iPhone / iPad — Chrome</h3>
-            </div>
-            <ol className="space-y-2.5 text-sm text-muted-foreground ml-1">
-              <li className="flex items-start gap-2">
-                <span className="font-bold text-foreground shrink-0">1.</span>
-                <span>Open Afristall in <strong className="text-foreground">Chrome</strong></span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="font-bold text-foreground shrink-0">2.</span>
-                <span>Tap the <strong className="text-foreground">Share button</strong> <span className="inline-flex items-center justify-center h-5 w-5 rounded bg-primary/10 text-primary text-xs">⬆</span> at the top of the screen</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="font-bold text-foreground shrink-0">3.</span>
-                <span>Tap <strong className="text-foreground">"More…"</strong> then scroll and find <strong className="text-foreground">"Add to Home Screen"</strong></span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="font-bold text-foreground shrink-0">4.</span>
-                <span>Tap <strong className="text-foreground">"Add"</strong> — done! 🎉</span>
-              </li>
-            </ol>
-          </div>
-
-          {/* Android Section */}
-          <div className="rounded-xl border border-border/50 bg-muted/20 p-4 space-y-3">
-            <div className="flex items-center gap-2">
-              <span className="text-xl">🤖</span>
-              <h3 className="font-semibold text-sm">Android</h3>
-            </div>
-            <ol className="space-y-2.5 text-sm text-muted-foreground ml-1">
-              <li className="flex items-start gap-2">
-                <span className="font-bold text-foreground shrink-0">1.</span>
-                <span>Open Afristall in <strong className="text-foreground">Chrome</strong></span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="font-bold text-foreground shrink-0">2.</span>
-                <span>Tap the <strong className="text-foreground">three dots menu</strong> <span className="inline-flex items-center justify-center h-5 w-5 rounded bg-primary/10 text-primary text-xs">⋮</span> in the top right corner</span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="font-bold text-foreground shrink-0">3.</span>
-                <span>Tap <strong className="text-foreground">"Add to Home screen"</strong> or <strong className="text-foreground">"Install app"</strong></span>
-              </li>
-              <li className="flex items-start gap-2">
-                <span className="font-bold text-foreground shrink-0">4.</span>
-                <span>Tap <strong className="text-foreground">"Install"</strong> — you're all set! 🎉</span>
-              </li>
-            </ol>
-          </div>
+        <CardContent>
+          {user && (
+            <AccentColorPicker
+              userId={user.id}
+              currentColor={accentColor}
+              onColorChange={(color) => setAccentColor(color)}
+            />
+          )}
         </CardContent>
       </Card>
       {/* Support */}
