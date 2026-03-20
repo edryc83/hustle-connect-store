@@ -210,6 +210,17 @@ const DashboardProfile = () => {
           <input type="file" accept="image/*" className="hidden" onChange={handleCoverChange} disabled={uploadingCover} />
         </label>
 
+        {/* Accent color picker */}
+        {user && (
+          <div className="absolute top-3 right-12">
+            <AccentColorPicker
+              userId={user.id}
+              currentColor={profile.accent_color || null}
+              onColorChange={(color) => setProfile((prev: any) => ({ ...prev, accent_color: color }))}
+            />
+          </div>
+        )}
+
         {/* Settings gear */}
         <Link
           to="/dashboard/settings"
