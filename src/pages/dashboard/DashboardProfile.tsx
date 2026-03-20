@@ -316,6 +316,17 @@ const DashboardProfile = () => {
           </div>
         )}
 
+        {/* Store theme color picker */}
+        {user && (
+          <div className="mt-3">
+            <AccentColorPicker
+              userId={user.id}
+              currentColor={(profile as any).accent_color || null}
+              onColorChange={(color) => setProfile((prev: any) => ({ ...prev, accent_color: color }))}
+            />
+          </div>
+        )}
+
         {/* Delete Account — Apple App Store compliance */}
         <div className="mt-4">
           <AlertDialog>
