@@ -152,6 +152,7 @@ const DashboardSettings = () => {
           setDeliveryAreas(d.delivery_areas ?? "");
           setCurrency(d.currency ?? "UGX");
           setWelcomeMessage(d.welcome_message || d.store_bio || "");
+          setAccentColor(d.accent_color ?? null);
         }
         setLoading(false);
       });
