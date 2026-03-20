@@ -10,6 +10,7 @@ import { formatPrice } from "@/lib/currency";
 import {
   Camera, Loader2, Sparkles, Eye, ShoppingCart, Settings, Pencil, Check, X, Share2, Trash2, AlertTriangle,
 } from "lucide-react";
+import { AccentColorPicker } from "@/components/dashboard/AccentColorPicker";
 import whatsappIcon from "@/assets/whatsapp-icon.png";
 import AfristallLogo from "@/components/AfristallLogo";
 import type { Tables } from "@/integrations/supabase/types";
@@ -208,6 +209,17 @@ const DashboardProfile = () => {
           )}
           <input type="file" accept="image/*" className="hidden" onChange={handleCoverChange} disabled={uploadingCover} />
         </label>
+
+        {/* Accent color picker */}
+        {user && (
+          <div className="absolute top-3 right-12">
+            <AccentColorPicker
+              userId={user.id}
+              currentColor={profile.accent_color || null}
+              onColorChange={(color) => setProfile((prev: any) => ({ ...prev, accent_color: color }))}
+            />
+          </div>
+        )}
 
         {/* Settings gear */}
         <Link
