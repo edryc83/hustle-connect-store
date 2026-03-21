@@ -9,12 +9,11 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
-    if (!LOVABLE_API_KEY) throw new Error('LOVABLE_API_KEY not configured');
+    const ANTHROPIC_API_KEY = Deno.env.get('ANTHROPIC_API_KEY');
+    if (!ANTHROPIC_API_KEY) throw new Error('ANTHROPIC_API_KEY not configured');
 
     const { imageBase64, mimeType, productName, productDescription } = await req.json();
     
-    // Build analysis prompt with available context
     let contextLines = '';
     if (productName) contextLines += `\nProduct title: "${productName}"`;
     if (productDescription) contextLines += `\nProduct description: "${productDescription}"`;
@@ -68,9 +67,11 @@ Use the EXACT subcategory name from the list above. If none fits, set subcategor
     
     if (hasImage) {
       userContent.push({
-        type: 'image_url',
-        image_url: {
-          url: `data:${mimeType || 'image/jpeg'};base64,${imageBase64}`,
+        type: 'image',
+        source: {
+          type: 'base64',
+          media_type: mimeType || 'image/jpeg',
+          data: imageBase64,
         },
       });
     }
@@ -82,17 +83,18 @@ Use the EXACT subcategory name from the list above. If none fits, set subcategor
         : `Analyze this product from the text context below.${contextLines}\n\nReturn JSON only. Do NOT include "name" or "description" fields since no image was provided.`,
     });
 
-    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+        'x-api-key': ANTHROPIC_API_KEY,
+        'anthropic-version': '2023-06-01',
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'google/gemini-2.5-flash',
+        model: 'claude-sonnet-4-20250514',
         max_tokens: 1024,
+        system: systemPrompt,
         messages: [
-          { role: 'system', content: systemPrompt },
           { role: 'user', content: userContent },
         ],
       }),
@@ -100,16 +102,10 @@ Use the EXACT subcategory name from the list above. If none fits, set subcategor
 
     if (!response.ok) {
       const errText = await response.text();
-      console.error('AI Gateway error:', response.status, errText);
+      console.error('Anthropic error:', response.status, errText);
       if (response.status === 429) {
         return new Response(JSON.stringify({ error: 'Rate limit exceeded, please try again later' }), {
           status: 429,
-          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        });
-      }
-      if (response.status === 402) {
-        return new Response(JSON.stringify({ error: 'AI credits exhausted' }), {
-          status: 402,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
       }
@@ -117,7 +113,7 @@ Use the EXACT subcategory name from the list above. If none fits, set subcategor
     }
 
     const data = await response.json();
-    let content = data.choices?.[0]?.message?.content || '';
+    let content = data.content?.[0]?.text || '';
     content = content.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim();
     const parsed = JSON.parse(content);
 
