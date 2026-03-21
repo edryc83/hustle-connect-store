@@ -11,8 +11,8 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
-    if (!LOVABLE_API_KEY) throw new Error('LOVABLE_API_KEY not configured');
+    const ANTHROPIC_API_KEY = Deno.env.get('ANTHROPIC_API_KEY');
+    if (!ANTHROPIC_API_KEY) throw new Error('ANTHROPIC_API_KEY not configured');
 
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
@@ -118,27 +118,25 @@ Deno.serve(async (req) => {
       `${i + 1}. "${p.name}"${p.description ? ` — ${p.description.slice(0, 80)}` : ''}${p.category ? ` [current category: ${p.category}]` : ''}`
     ).join('\n');
 
-    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+        'x-api-key': ANTHROPIC_API_KEY,
+        'anthropic-version': '2023-06-01',
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'google/gemini-2.5-flash-lite',
+        model: 'claude-sonnet-4-20250514',
         max_tokens: 4096,
-        messages: [
-          {
-            role: 'system',
-            content: `You categorize products for an African marketplace. For each numbered product, return its category slug AND a subcategory name.
+        system: `You categorize products for an African marketplace. For each numbered product, return its category slug AND a subcategory name.
 
 Category slugs: fashion, shoes, phones, electronics, home, food, beauty, wigs, cakes, flowers, jewellery, pets, plants, furniture, appliances, baby, sports, books, auto, building, health, delivery, repair, grooming, cleaning, photography, catering, education, design, tech, tailoring, trips, adventure, dining, wellness, cultural, other.
 
 Valid subcategories per category:
 ${subcatList}
 
-Return ONLY a JSON array of objects with "index" (1-based), "slug" (category), and "subcategory" (exact subcategory name from the list above). If no subcategory fits, use null. No explanation.`
-          },
+Return ONLY a JSON array of objects with "index" (1-based), "slug" (category), and "subcategory" (exact subcategory name from the list above). If no subcategory fits, use null. No explanation.`,
+        messages: [
           {
             role: 'user',
             content: `Categorize these products with category and subcategory:\n${productList}`
@@ -149,12 +147,12 @@ Return ONLY a JSON array of objects with "index" (1-based), "slug" (category), a
 
     if (!response.ok) {
       const errText = await response.text();
-      console.error('AI error:', response.status, errText);
+      console.error('Anthropic error:', response.status, errText);
       throw new Error('AI categorization failed');
     }
 
     const data = await response.json();
-    let content = data.choices?.[0]?.message?.content || '';
+    let content = data.content?.[0]?.text || '';
     content = content.replace(/```json\s*/g, '').replace(/```\s*/g, '').trim();
     const results = JSON.parse(content) as { index: number; slug: string; subcategory: string | null }[];
 

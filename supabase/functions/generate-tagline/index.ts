@@ -9,8 +9,8 @@ Deno.serve(async (req) => {
   }
 
   try {
-    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
-    if (!LOVABLE_API_KEY) throw new Error('LOVABLE_API_KEY not configured');
+    const ANTHROPIC_API_KEY = Deno.env.get('ANTHROPIC_API_KEY');
+    if (!ANTHROPIC_API_KEY) throw new Error('ANTHROPIC_API_KEY not configured');
 
     const { productName, price, type } = await req.json();
 
@@ -18,16 +18,18 @@ Deno.serve(async (req) => {
       ? 'You write short compelling subtitles for African small business product ads. Max 8 words. Focus on benefits, offers, or calls-to-action like "Free delivery", "Limited stock", "Order now on WhatsApp". Do NOT repeat or rephrase the product name. Return ONLY the subtitle text, nothing else.'
       : 'You write ultra-short catchy product taglines for African small business ads. Max 6 words. Punchy, fun, no hashtags. Return ONLY the tagline text, nothing else.';
 
-    const response = await fetch('https://ai.gateway.lovable.dev/v1/chat/completions', {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${LOVABLE_API_KEY}`,
+        'x-api-key': ANTHROPIC_API_KEY,
+        'anthropic-version': '2023-06-01',
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'google/gemini-2.5-flash-lite',
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 128,
+        system: systemPrompt,
         messages: [
-          { role: 'system', content: systemPrompt },
           { role: 'user', content: `Product: ${productName}${price ? `, Price: ${price}` : ''}` },
         ],
       }),
@@ -35,12 +37,17 @@ Deno.serve(async (req) => {
 
     if (!response.ok) {
       const t = await response.text();
-      console.error('AI error:', response.status, t);
+      console.error('Anthropic error:', response.status, t);
+      if (response.status === 429) {
+        return new Response(JSON.stringify({ error: 'Rate limited, try again shortly.' }), {
+          status: 429, headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
       throw new Error('AI error');
     }
 
     const data = await response.json();
-    const tagline = data.choices?.[0]?.message?.content?.trim() || '';
+    const tagline = data.content?.[0]?.text?.trim() || '';
 
     return new Response(JSON.stringify({ tagline }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

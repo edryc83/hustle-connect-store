@@ -8,8 +8,8 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY is not configured");
+    const ANTHROPIC_API_KEY = Deno.env.get("ANTHROPIC_API_KEY");
+    if (!ANTHROPIC_API_KEY) throw new Error("ANTHROPIC_API_KEY is not configured");
 
     const { productName, price, description, storeName, storeSlug, platform } = await req.json();
 
@@ -27,16 +27,18 @@ Link: ${link}
 
 Return ONLY the caption text, nothing else. Must include the price and link "${link}" at the end.`;
 
-    const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    const response = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
       headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
+        "x-api-key": ANTHROPIC_API_KEY,
+        "anthropic-version": "2023-06-01",
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-2.5-flash-lite",
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 256,
+        system: systemPrompt,
         messages: [
-          { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt },
         ],
       }),
@@ -49,19 +51,13 @@ Return ONLY the caption text, nothing else. Must include the price and link "${l
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       }
-      if (response.status === 402) {
-        return new Response(JSON.stringify({ error: "Credits exhausted" }), {
-          status: 402,
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-        });
-      }
       const t = await response.text();
-      console.error("AI error:", response.status, t);
+      console.error("Anthropic error:", response.status, t);
       throw new Error("AI error");
     }
 
     const data = await response.json();
-    const caption = data.choices?.[0]?.message?.content?.trim() || "";
+    const caption = data.content?.[0]?.text?.trim() || "";
 
     return new Response(JSON.stringify({ caption }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
