@@ -55,6 +55,9 @@ export default defineConfig(({ mode }) => ({
       },
     }),
   ].filter(Boolean),
+  optimizeDeps: {
+    exclude: ["onnxruntime-web", "onnxruntime-web/webgpu"],
+  },
   build: {
     rollupOptions: {
       external: ["onnxruntime-web", "onnxruntime-web/webgpu"],
