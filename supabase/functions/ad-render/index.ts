@@ -32,6 +32,8 @@ serve(async (req) => {
       });
     }
 
+    console.log("Bannerbear request:", JSON.stringify({ template: template_uid, modifications }, null, 2));
+
     // Step 1: Create image
     const createRes = await fetch(`${BB_BASE}/images`, {
       method: "POST",
@@ -40,6 +42,7 @@ serve(async (req) => {
     });
 
     const createData = await createRes.json();
+    console.log("Bannerbear create response:", JSON.stringify(createData, null, 2));
     if (!createRes.ok) {
       console.error("Bannerbear create error:", createData);
       return new Response(JSON.stringify({ error: createData?.message || `Create error ${createRes.status}` }), {

@@ -13,20 +13,6 @@ export default defineConfig(({ mode }) => ({
     },
   },
   plugins: [
-    // Stub out onnxruntime-web so Vite doesn't crash resolving @imgly/background-removal's dynamic imports
-    {
-      name: "stub-onnxruntime",
-      resolveId(id: string) {
-        if (id === "onnxruntime-web" || id === "onnxruntime-web/webgpu") {
-          return id;
-        }
-      },
-      load(id: string) {
-        if (id === "onnxruntime-web" || id === "onnxruntime-web/webgpu") {
-          return "export default {}";
-        }
-      },
-    },
     react(),
     mode === "development" && componentTagger(),
     VitePWA({
@@ -69,14 +55,6 @@ export default defineConfig(({ mode }) => ({
       },
     }),
   ].filter(Boolean),
-  optimizeDeps: {
-    exclude: ["onnxruntime-web", "onnxruntime-web/webgpu"],
-  },
-  build: {
-    rollupOptions: {
-      external: ["onnxruntime-web", "onnxruntime-web/webgpu"],
-    },
-  },
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),

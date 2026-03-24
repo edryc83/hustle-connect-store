@@ -112,30 +112,31 @@ export default function AdStudio() {
         store_name: profile?.store_name || profile?.store_slug || "My Store",
       };
 
-      for (const layer of layers) {
-        if (layer.type === "text") {
-          // Match layer name to known fields (case-insensitive, flexible matching)
-          const lowerName = layer.name.toLowerCase().replace(/[\s_-]+/g, "_");
-          const value = textValues[lowerName]
-            || Object.entries(textValues).find(([k]) => lowerName.includes(k))?.[1];
-          if (value) {
-            modifications.push({ name: layer.name, text: value });
-          }
-        } else if (layer.type === "image") {
-          // Assign images to image layers in order
-          const imageIndex = layers
-            .filter((l) => l.type === "image")
-            .indexOf(layer);
-          const slot = imageSlots[imageIndex];
-          const imgUrl = slot?.processedUrl || slot?.url;
-          if (imgUrl) {
-            modifications.push({ name: layer.name, image_url: imgUrl });
-          }
+      // Collect image layers separately
+      const imageLayers = layers.filter((l) => l.type === "image");
+      const textLayers = layers.filter((l) => l.type === "text");
+
+      // Map text layers
+      for (const layer of textLayers) {
+        const lowerName = layer.name.toLowerCase().replace(/[\s_-]+/g, "_");
+        const value = textValues[lowerName]
+          || Object.entries(textValues).find(([k]) => lowerName.includes(k))?.[1];
+        if (value) {
+          modifications.push({ name: layer.name, text: value });
         }
       }
 
-      // If no layers metadata, use field names directly as layer names
-      if (modifications.length === 0) {
+      // Map image layers — assign user images in order
+      for (let i = 0; i < imageLayers.length; i++) {
+        const slot = imageSlots[i];
+        const imgUrl = slot?.processedUrl || slot?.url;
+        if (imgUrl) {
+          modifications.push({ name: imageLayers[i].name, image_url: imgUrl });
+        }
+      }
+
+      // If no layers metadata, use field names directly
+      if (layers.length === 0) {
         const fields = selectedTemplate!.fields || [];
         for (const field of fields) {
           if (textValues[field]) {
@@ -149,6 +150,8 @@ export default function AdStudio() {
           }
         });
       }
+
+      console.log("Sending modifications to Bannerbear:", modifications);
 
       const res = await fetch(
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ad-render`,
