@@ -99,21 +99,56 @@ export default function AdStudio() {
     setError(null);
     setGenerating(true);
     try {
-      const body: Record<string, any> = {
-        template: selectedTemplate!.id,
+      // Build Bannerbear modifications array from template layers
+      const layers = selectedTemplate!.layers || [];
+      const modifications: Array<{ name: string; text?: string; image_url?: string }> = [];
+
+      // Map text fields to layer names
+      const textValues: Record<string, string> = {
         product_name: productName,
+        price: price,
         subtitle: subtitle || " ",
         tagline: tagline || " ",
-        price,
         store_name: profile?.store_name || profile?.store_slug || "My Store",
-        profile_picture: profile?.profile_picture_url || "",
       };
 
-      imageSlots.forEach((slot, i) => {
-        const imgUrl = slot.processedUrl || slot.url;
-        if (imgUrl) body[`image${i + 1}`] = imgUrl;
-        if (slot.cropData) body[`image${i + 1}_crop`] = slot.cropData;
-      });
+      for (const layer of layers) {
+        if (layer.type === "text") {
+          // Match layer name to known fields (case-insensitive, flexible matching)
+          const lowerName = layer.name.toLowerCase().replace(/[\s_-]+/g, "_");
+          const value = textValues[lowerName]
+            || Object.entries(textValues).find(([k]) => lowerName.includes(k))?.[1];
+          if (value) {
+            modifications.push({ name: layer.name, text: value });
+          }
+        } else if (layer.type === "image") {
+          // Assign images to image layers in order
+          const imageIndex = layers
+            .filter((l) => l.type === "image")
+            .indexOf(layer);
+          const slot = imageSlots[imageIndex];
+          const imgUrl = slot?.processedUrl || slot?.url;
+          if (imgUrl) {
+            modifications.push({ name: layer.name, image_url: imgUrl });
+          }
+        }
+      }
+
+      // If no layers metadata, use field names directly as layer names
+      if (modifications.length === 0) {
+        const fields = selectedTemplate!.fields || [];
+        for (const field of fields) {
+          if (textValues[field]) {
+            modifications.push({ name: field, text: textValues[field] });
+          }
+        }
+        imageSlots.forEach((slot, i) => {
+          const imgUrl = slot.processedUrl || slot.url;
+          if (imgUrl) {
+            modifications.push({ name: `image${i + 1}`, image_url: imgUrl });
+          }
+        });
+      }
 
       const res = await fetch(
         `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ad-render`,
@@ -123,7 +158,10 @@ export default function AdStudio() {
             Authorization: `Bearer ${import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY}`,
             "Content-Type": "application/json",
           },
-          body: JSON.stringify(body),
+          body: JSON.stringify({
+            template_uid: selectedTemplate!.id,
+            modifications,
+          }),
         }
       );
 
