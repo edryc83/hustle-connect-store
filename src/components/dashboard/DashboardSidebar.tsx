@@ -34,7 +34,7 @@ export function DashboardSidebar() {
     { title: "Analytics", url: "/dashboard/analytics", icon: BarChart3 },
     { title: "Profile", url: "/dashboard/profile", icon: User },
     { title: "Settings", url: "/dashboard/settings", icon: Settings },
-    { title: "AI Design", url: "/ad-studio", icon: Sparkles },
+    // { title: "AI Design", url: "/ad-studio", icon: Sparkles }, // Hidden for now
   ];
 
   const handleSignOut = async () => {
