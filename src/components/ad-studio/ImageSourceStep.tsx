@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Upload, Package, Loader2, Wand2, ImagePlus, RefreshCw } from "lucide-react";
-import { removeBackground } from "@imgly/background-removal";
+import { toast } from "@/hooks/use-toast";
 
 
 export interface ImageSlotData {
@@ -89,17 +89,16 @@ function ImageSourceStep({ slots, onUpdateSlot, userId }: Props) {
     if (enabled && slot.url) {
       setProcessingBg(true);
       try {
-        const blob = await removeBackground(slot.url);
-        // Upload the processed image to storage so Railway can access it
-        const path = `${userId}/bg-removed-${Date.now()}.png`;
-        const { error: uploadErr } = await supabase.storage
-          .from("ad-images")
-          .upload(path, blob, { contentType: "image/png", upsert: true });
-        if (uploadErr) throw uploadErr;
-        const { data: urlData } = supabase.storage.from("ad-images").getPublicUrl(path);
-        onUpdateSlot(0, { processedUrl: urlData.publicUrl });
-      } catch (err) {
+        const { data, error } = await supabase.functions.invoke("remove-background", {
+          body: { image_url: slot.url },
+        });
+        if (error) throw error;
+        if (!data?.url) throw new Error("No processed image returned");
+        onUpdateSlot(0, { processedUrl: data.url });
+        toast({ title: "Background removed!", description: "Image processed successfully" });
+      } catch (err: any) {
         console.error("BG removal error:", err);
+        toast({ title: "Background removal failed", description: err?.message || "Try again", variant: "destructive" });
         onUpdateSlot(0, { removeBg: false });
       } finally {
         setProcessingBg(false);
