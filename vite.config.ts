@@ -13,6 +13,20 @@ export default defineConfig(({ mode }) => ({
     },
   },
   plugins: [
+    // Stub out onnxruntime-web so Vite doesn't crash resolving @imgly/background-removal's dynamic imports
+    {
+      name: "stub-onnxruntime",
+      resolveId(id: string) {
+        if (id === "onnxruntime-web" || id === "onnxruntime-web/webgpu") {
+          return id;
+        }
+      },
+      load(id: string) {
+        if (id === "onnxruntime-web" || id === "onnxruntime-web/webgpu") {
+          return "export default {}";
+        }
+      },
+    },
     react(),
     mode === "development" && componentTagger(),
     VitePWA({
