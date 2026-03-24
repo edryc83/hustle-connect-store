@@ -135,18 +135,32 @@ export default function AdStudio() {
         }
       }
 
-      // If no layers metadata, use field names directly
-      if (layers.length === 0) {
+      // Fallback: if no modifications matched from layers, use field names directly
+      if (modifications.length === 0) {
         const fields = selectedTemplate!.fields || [];
         for (const field of fields) {
-          if (textValues[field]) {
-            modifications.push({ name: field, text: textValues[field] });
+          const normalizedField = field.toLowerCase().replace(/[\s_-]+/g, "_");
+          const value = textValues[normalizedField]
+            || Object.entries(textValues).find(([k]) => normalizedField.includes(k))?.[1];
+          if (value) {
+            modifications.push({ name: field, text: value });
           }
         }
+      }
+
+      // Always ensure images are included even if layer matching failed
+      if (!modifications.some((m) => m.image_url)) {
+        // Try using field names from template for images
+        const imgFields = (selectedTemplate!.fields || []).filter((f) => {
+          const n = f.toLowerCase();
+          return n.includes("image") || n.includes("photo") || n.includes("product") || n.includes("logo");
+        });
+
         imageSlots.forEach((slot, i) => {
           const imgUrl = slot.processedUrl || slot.url;
           if (imgUrl) {
-            modifications.push({ name: `image${i + 1}`, image_url: imgUrl });
+            const layerName = imgFields[i] || imageLayers[i]?.name || `image${i + 1}`;
+            modifications.push({ name: layerName, image_url: imgUrl });
           }
         });
       }
