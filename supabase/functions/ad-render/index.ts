@@ -6,62 +6,105 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version",
 };
 
+const BB_BASE = "https://api.bannerbear.com/v2";
+const POLL_INTERVAL = 2000;
+const MAX_POLLS = 30; // 60 seconds max
+
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const API_KEY = Deno.env.get("AFRISTALL_API_KEY");
-    if (!API_KEY) throw new Error("AFRISTALL_API_KEY not configured");
+    const BANNERBEAR_API_KEY = Deno.env.get("BANNERBEAR_API_KEY");
+    if (!BANNERBEAR_API_KEY) throw new Error("BANNERBEAR_API_KEY not configured");
+
+    const bbHeaders = {
+      "Authorization": `Bearer ${BANNERBEAR_API_KEY}`,
+      "Content-Type": "application/json",
+    };
 
     const body = await req.json();
+    const { template_uid, modifications } = body;
 
-    const res = await fetch("https://afristall.up.railway.app/render", {
+    if (!template_uid || !modifications) {
+      return new Response(JSON.stringify({ error: "Missing template_uid or modifications" }), {
+        status: 400,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    // Step 1: Create image
+    const createRes = await fetch(`${BB_BASE}/images`, {
       method: "POST",
-      headers: {
-        "x-api-key": API_KEY,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(body),
+      headers: bbHeaders,
+      body: JSON.stringify({ template: template_uid, modifications }),
     });
 
-    if (!res.ok) {
-      const text = await res.text();
-      console.error("Render API error:", res.status, text);
-      return new Response(JSON.stringify({ error: text || `Render error ${res.status}` }), {
-        status: res.status,
+    const createData = await createRes.json();
+    if (!createRes.ok) {
+      console.error("Bannerbear create error:", createData);
+      return new Response(JSON.stringify({ error: createData?.message || `Create error ${createRes.status}` }), {
+        status: createRes.status,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    const contentType = res.headers.get("content-type") || "";
+    const imageUid = createData.uid;
+    if (!imageUid) {
+      return new Response(JSON.stringify({ error: "No image UID returned from Bannerbear" }), {
+        status: 500,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
 
-    // If response is an image, upload to storage and return public URL
-    if (contentType.includes("image")) {
-      const supabase = createClient(
-        Deno.env.get("SUPABASE_URL")!,
-        Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
-      );
-
-      const buffer = await res.arrayBuffer();
-      const path = `renders/${crypto.randomUUID()}.png`;
-      const { error: uploadError } = await supabase.storage
-        .from("ad-images")
-        .upload(path, new Uint8Array(buffer), { contentType: "image/png", upsert: true });
-
-      if (uploadError) {
-        console.error("Storage upload error:", uploadError);
-        throw new Error("Failed to store generated image");
+    // Step 2: Poll until completed
+    let finalData = createData;
+    for (let i = 0; i < MAX_POLLS; i++) {
+      if (finalData.status === "completed" && finalData.image_url) break;
+      if (finalData.status === "failed") {
+        return new Response(JSON.stringify({ error: "Bannerbear rendering failed" }), {
+          status: 500,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
       }
 
-      const { data: urlData } = supabase.storage.from("ad-images").getPublicUrl(path);
-      return new Response(JSON.stringify({ url: urlData.publicUrl }), {
+      await new Promise((r) => setTimeout(r, POLL_INTERVAL));
+
+      const pollRes = await fetch(`${BB_BASE}/images/${imageUid}`, {
+        headers: { "Authorization": `Bearer ${BANNERBEAR_API_KEY}` },
+      });
+      finalData = await pollRes.json();
+    }
+
+    if (!finalData.image_url) {
+      return new Response(JSON.stringify({ error: "Bannerbear timed out" }), {
+        status: 504,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    // If JSON, pass through
-    const data = await res.json();
-    return new Response(JSON.stringify(data), {
+    // Step 3: Download and upload to our storage for permanence
+    const supabase = createClient(
+      Deno.env.get("SUPABASE_URL")!,
+      Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
+    );
+
+    const imgRes = await fetch(finalData.image_url);
+    const buffer = await imgRes.arrayBuffer();
+    const path = `renders/${crypto.randomUUID()}.png`;
+    const { error: uploadError } = await supabase.storage
+      .from("ad-images")
+      .upload(path, new Uint8Array(buffer), { contentType: "image/png", upsert: true });
+
+    if (uploadError) {
+      console.error("Storage upload error:", uploadError);
+      // Fall back to Bannerbear URL
+      return new Response(JSON.stringify({ url: finalData.image_url }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
+    const { data: urlData } = supabase.storage.from("ad-images").getPublicUrl(path);
+    return new Response(JSON.stringify({ url: urlData.publicUrl }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
