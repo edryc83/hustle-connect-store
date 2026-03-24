@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Upload, Package, Loader2, Wand2, ImagePlus, RefreshCw } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { removeBackground } from "@imgly/background-removal";
 
 
 export interface ImageSlotData {
@@ -89,12 +90,9 @@ function ImageSourceStep({ slots, onUpdateSlot, userId }: Props) {
     if (enabled && slot.url) {
       setProcessingBg(true);
       try {
-        const { data, error } = await supabase.functions.invoke("remove-background", {
-          body: { image_url: slot.url },
-        });
-        if (error) throw error;
-        if (!data?.url) throw new Error("No processed image returned");
-        onUpdateSlot(0, { processedUrl: data.url });
+        const blob = await removeBackground(slot.url);
+        const objectUrl = URL.createObjectURL(blob);
+        onUpdateSlot(0, { processedUrl: objectUrl });
         toast({ title: "Background removed!", description: "Image processed successfully" });
       } catch (err: any) {
         console.error("BG removal error:", err);
