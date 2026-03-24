@@ -13,25 +13,6 @@ export default defineConfig(({ mode }) => ({
     },
   },
   plugins: [
-    // Provide a minimal onnxruntime-web shim that exposes `env` + `InferenceSession`
-    // so @imgly/background-removal can initialise. The real ONNX wasm backend is
-    // fetched at runtime from the CDN by the library itself.
-    {
-      name: "ort-shim",
-      enforce: "pre" as const,
-      resolveId(id: string) {
-        if (id === "onnxruntime-web" || id === "onnxruntime-web/webgpu") return id;
-      },
-      load(id: string) {
-        if (id === "onnxruntime-web" || id === "onnxruntime-web/webgpu") {
-          return `
-            export const env = { wasm: {}, webgl: {}, webgpu: {} };
-            export const InferenceSession = { create: async () => { throw new Error("ONNX runtime not loaded"); } };
-            export default { env, InferenceSession };
-          `;
-        }
-      },
-    },
     react(),
     mode === "development" && componentTagger(),
     VitePWA({
