@@ -89,9 +89,12 @@ function ImageSourceStep({ slots, onUpdateSlot, userId }: Props) {
     if (enabled && slot.url) {
       setProcessingBg(true);
       try {
-        const blob = await removeBackground(slot.url);
-        const objectUrl = URL.createObjectURL(blob);
-        onUpdateSlot(0, { processedUrl: objectUrl });
+        const { data, error } = await supabase.functions.invoke("remove-background", {
+          body: { image_url: slot.url },
+        });
+        if (error) throw error;
+        if (!data?.url) throw new Error("No processed image returned");
+        onUpdateSlot(0, { processedUrl: data.url });
         toast({ title: "Background removed!", description: "Image processed successfully" });
       } catch (err: any) {
         console.error("BG removal error:", err);
