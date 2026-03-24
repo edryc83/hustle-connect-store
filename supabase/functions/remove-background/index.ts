@@ -21,37 +21,28 @@ serve(async (req) => {
       });
     }
 
-    // Fetch the image and convert to base64
-    console.log("Fetching image:", image_url.substring(0, 100));
-    const imgRes = await fetch(image_url);
-    if (!imgRes.ok) throw new Error(`Failed to fetch image: ${imgRes.status}`);
-    const imgBuffer = await imgRes.arrayBuffer();
-    const base64 = btoa(String.fromCharCode(...new Uint8Array(imgBuffer)));
-    const mimeType = imgRes.headers.get("content-type") || "image/png";
-    const dataUrl = `data:${mimeType};base64,${base64}`;
+    console.log("Processing image:", image_url.substring(0, 100));
 
-    console.log("Sending to AI gateway for background removal...");
-
-    // Use Gemini image editing model to remove background
     const aiRes = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
       headers: {
-        "Authorization": `Bearer ${LOVABLE_API_KEY}`,
+        Authorization: `Bearer ${LOVABLE_API_KEY}`,
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "google/gemini-3.1-flash-image-preview",
+        model: "google/gemini-2.5-flash-image",
+        modalities: ["image", "text"],
         messages: [
           {
             role: "user",
             content: [
               {
                 type: "text",
-                text: "Remove the background from this image completely. Keep only the main subject/product with a fully transparent background. Output just the image with no background.",
+                text: "Remove the background from this product image. Keep only the main product, preserve its exact shape and details, and return only the edited image with a fully transparent background. Do not add text, props, shadows, or any new objects.",
               },
               {
                 type: "image_url",
-                image_url: { url: dataUrl },
+                image_url: { url: image_url },
               },
             ],
           },
@@ -62,51 +53,47 @@ serve(async (req) => {
     if (!aiRes.ok) {
       const errText = await aiRes.text();
       console.error("AI gateway error:", aiRes.status, errText);
-      throw new Error(`AI gateway error: ${aiRes.status}`);
+      return new Response(JSON.stringify({ error: `AI gateway error: ${aiRes.status}` }), {
+        status: aiRes.status,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
     }
 
     const aiData = await aiRes.json();
-    console.log("AI response received, extracting image...");
+    const message = aiData.choices?.[0]?.message;
+    if (!message) throw new Error("No response from AI model");
 
-    // Extract the generated image from the response
-    const choice = aiData.choices?.[0]?.message;
-    if (!choice) throw new Error("No response from AI model");
+    const resultImageUrl = message.images?.[0]?.image_url?.url
+      || (Array.isArray(message.content)
+        ? message.content.find((part: { type?: string; image_url?: { url?: string } }) => part.type === "image_url" && part.image_url?.url)?.image_url?.url
+        : null);
 
-    // Look for image content in the response (could be base64 inline_data or parts)
-    let resultBase64: string | null = null;
-
-    // Check multipart content array
-    if (Array.isArray(choice.content)) {
-      for (const part of choice.content) {
-        if (part.type === "image_url" && part.image_url?.url) {
-          // Extract base64 from data URL
-          const match = part.image_url.url.match(/^data:image\/\w+;base64,(.+)$/);
-          resultBase64 = match ? match[1] : null;
-          break;
-        }
-        if (part.type === "inline_data" || part.inline_data) {
-          resultBase64 = part.inline_data?.data || part.data;
-          break;
-        }
-      }
-    }
-
-    if (!resultBase64) {
-      console.error("AI response structure:", JSON.stringify(aiData).substring(0, 500));
+    if (!resultImageUrl) {
+      console.error("AI response structure:", JSON.stringify(aiData).slice(0, 1000));
       throw new Error("No image returned from AI model");
     }
 
-    // Upload the processed image to storage
+    const dataUrlMatch = resultImageUrl.match(/^data:(image\/[a-zA-Z0-9.+-]+);base64,(.+)$/);
+    if (!dataUrlMatch) {
+      throw new Error("AI returned an unsupported image format");
+    }
+
+    const [, contentType, base64Data] = dataUrlMatch;
+    const binaryString = atob(base64Data);
+    const binaryData = new Uint8Array(binaryString.length);
+    for (let i = 0; i < binaryString.length; i++) {
+      binaryData[i] = binaryString.charCodeAt(i);
+    }
+
     const supabase = createClient(
       Deno.env.get("SUPABASE_URL")!,
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!
     );
 
-    const binaryData = Uint8Array.from(atob(resultBase64), c => c.charCodeAt(0));
     const path = `bg-removed/${crypto.randomUUID()}.png`;
     const { error: uploadError } = await supabase.storage
       .from("ad-images")
-      .upload(path, binaryData, { contentType: "image/png", upsert: true });
+      .upload(path, binaryData, { contentType, upsert: true });
 
     if (uploadError) {
       console.error("Upload error:", uploadError);
