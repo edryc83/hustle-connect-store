@@ -57,16 +57,30 @@ export function DashboardSidebar() {
             <SidebarMenu>
               {navItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <NavLink
-                      to={item.url}
-                      end
-                      className="flex items-center gap-2 rounded-md px-3 py-2 text-sm transition-colors hover:bg-accent/10"
-                      activeClassName="bg-primary/10 text-primary font-medium"
-                    >
-                      <item.icon className="h-4 w-4 shrink-0" />
-                      {!collapsed && <span>{item.title}</span>}
-                    </NavLink>
+                  <SidebarMenuButton asChild={!item.comingSoon}>
+                    {item.comingSoon ? (
+                      <div className="flex items-center gap-2 rounded-md px-3 py-2 text-sm text-muted-foreground/50 cursor-not-allowed">
+                        <item.icon className="h-4 w-4 shrink-0" />
+                        {!collapsed && (
+                          <>
+                            <span>{item.title}</span>
+                            <Badge variant="outline" className="ml-auto text-[9px] px-1.5 py-0 border-muted-foreground/30 text-muted-foreground/50">
+                              Soon
+                            </Badge>
+                          </>
+                        )}
+                      </div>
+                    ) : (
+                      <NavLink
+                        to={item.url}
+                        end
+                        className="flex items-center gap-2 rounded-md px-3 py-2 text-sm transition-colors hover:bg-accent/10"
+                        activeClassName="bg-primary/10 text-primary font-medium"
+                      >
+                        <item.icon className="h-4 w-4 shrink-0" />
+                        {!collapsed && <span>{item.title}</span>}
+                      </NavLink>
+                    )}
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
