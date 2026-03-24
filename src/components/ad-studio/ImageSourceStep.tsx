@@ -8,7 +8,9 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Upload, Package, Loader2, Wand2, ImagePlus, RefreshCw } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { removeBackground } from "@imgly/background-removal";
 
+const IMGLY_PUBLIC_PATH = "https://staticimgly.com/@imgly/background-removal-data/1.7.0/dist/";
 
 export interface ImageSlotData {
   url: string | null;
@@ -89,17 +91,34 @@ function ImageSourceStep({ slots, onUpdateSlot, userId }: Props) {
     if (enabled && slot.url) {
       setProcessingBg(true);
       try {
-        const { data, error } = await supabase.functions.invoke("remove-background", {
-          body: { image_url: slot.url },
+        const cutoutBlob = await removeBackground(slot.url, {
+          publicPath: IMGLY_PUBLIC_PATH,
+          device: "cpu",
+          model: "isnet_fp16",
+          output: {
+            format: "image/png",
+            quality: 1,
+            type: "foreground",
+          },
         });
-        if (error) throw error;
-        if (!data?.url) throw new Error("No processed image returned");
-        onUpdateSlot(0, { processedUrl: data.url });
+
+        const processedPath = `${userId}/bg-removed-${Date.now()}.png`;
+        const { error: uploadError } = await supabase.storage
+          .from("ad-images")
+          .upload(processedPath, cutoutBlob, {
+            contentType: "image/png",
+            upsert: true,
+          });
+
+        if (uploadError) throw uploadError;
+
+        const { data } = supabase.storage.from("ad-images").getPublicUrl(processedPath);
+        onUpdateSlot(0, { processedUrl: `${data.publicUrl}?t=${Date.now()}` });
         toast({ title: "Background removed!", description: "Image processed successfully" });
       } catch (err: any) {
         console.error("BG removal error:", err);
         toast({ title: "Background removal failed", description: err?.message || "Try again", variant: "destructive" });
-        onUpdateSlot(0, { removeBg: false });
+        onUpdateSlot(0, { removeBg: false, processedUrl: null });
       } finally {
         setProcessingBg(false);
       }
