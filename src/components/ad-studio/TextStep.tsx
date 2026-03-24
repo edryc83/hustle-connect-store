@@ -48,9 +48,15 @@ export default function TextStep({
   const [selectedVariation, setSelectedVariation] = useState<number | null>(null);
   const autoSuggestDone = useRef(false);
 
-  // Template fields (from Railway API)
+  // Template fields (from Bannerbear layers or explicit fields)
   const fields = template?.fields || ["product_name", "price", "subtitle", "tagline"];
-  const hasField = (f: string) => fields.includes(f);
+  const hasField = (f: string) => {
+    // Check exact match or if any field name contains the key
+    return fields.some((field) => {
+      const normalized = field.toLowerCase().replace(/[\s_-]+/g, "_");
+      return normalized === f || normalized.includes(f);
+    });
+  };
 
   const mainImage = imageSlots[0]?.processedUrl || imageSlots[0]?.url;
   const templateThumbnail = template?.thumbnail || "";
