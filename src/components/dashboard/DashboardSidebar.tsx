@@ -1,4 +1,5 @@
-import { Package, LayoutDashboard, User, Settings, LogOut, ClipboardList, BarChart3, Moon, Sun, Sparkles } from "lucide-react";
+import { Package, LayoutDashboard, User, Settings, LogOut, ClipboardList, BarChart3, Moon, Sun, Sparkles, Lock } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 import { NavLink } from "@/components/NavLink";
 import { useAuth } from "@/hooks/useAuth";
 import { useTheme } from "@/hooks/useTheme";
@@ -34,7 +35,7 @@ export function DashboardSidebar() {
     { title: "Analytics", url: "/dashboard/analytics", icon: BarChart3 },
     { title: "Profile", url: "/dashboard/profile", icon: User },
     { title: "Settings", url: "/dashboard/settings", icon: Settings },
-    { title: "AI Design", url: "/ad-studio", icon: Sparkles },
+    { title: "AI Design", url: "#", icon: Sparkles, comingSoon: true },
   ];
 
   const handleSignOut = async () => {
@@ -56,16 +57,30 @@ export function DashboardSidebar() {
             <SidebarMenu>
               {navItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild>
-                    <NavLink
-                      to={item.url}
-                      end
-                      className="flex items-center gap-2 rounded-md px-3 py-2 text-sm transition-colors hover:bg-accent/10"
-                      activeClassName="bg-primary/10 text-primary font-medium"
-                    >
-                      <item.icon className="h-4 w-4 shrink-0" />
-                      {!collapsed && <span>{item.title}</span>}
-                    </NavLink>
+                  <SidebarMenuButton asChild={!item.comingSoon}>
+                    {item.comingSoon ? (
+                      <div className="flex items-center gap-2 rounded-md px-3 py-2 text-sm text-muted-foreground/50 cursor-not-allowed">
+                        <item.icon className="h-4 w-4 shrink-0" />
+                        {!collapsed && (
+                          <>
+                            <span>{item.title}</span>
+                            <Badge variant="outline" className="ml-auto text-[9px] px-1.5 py-0 border-muted-foreground/30 text-muted-foreground/50">
+                              Soon
+                            </Badge>
+                          </>
+                        )}
+                      </div>
+                    ) : (
+                      <NavLink
+                        to={item.url}
+                        end
+                        className="flex items-center gap-2 rounded-md px-3 py-2 text-sm transition-colors hover:bg-accent/10"
+                        activeClassName="bg-primary/10 text-primary font-medium"
+                      >
+                        <item.icon className="h-4 w-4 shrink-0" />
+                        {!collapsed && <span>{item.title}</span>}
+                      </NavLink>
+                    )}
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
