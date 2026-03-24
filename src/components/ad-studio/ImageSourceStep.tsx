@@ -98,7 +98,6 @@ function ImageSourceStep({ slots, onUpdateSlot, userId }: Props) {
           output: {
             format: "image/png",
             quality: 1,
-            type: "foreground",
           },
         });
 
