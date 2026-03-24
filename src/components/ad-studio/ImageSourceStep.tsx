@@ -8,6 +8,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Upload, Package, Loader2, Wand2, ImagePlus, RefreshCw } from "lucide-react";
 import { toast } from "@/hooks/use-toast";
+import { removeBackground } from "@imgly/background-removal";
 
 
 export interface ImageSlotData {
