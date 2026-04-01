@@ -46,25 +46,34 @@ export default function AgentLanding() {
       </nav>
 
       {/* HERO */}
-      <section className="relative overflow-hidden px-4 pt-20 pb-24 text-center">
+      <section className="relative overflow-hidden px-4 pt-20 pb-24">
         <div className="pointer-events-none absolute -top-40 left-1/2 -translate-x-1/2 h-[500px] w-[500px] rounded-full bg-primary/10 blur-[120px]" />
-        <div className="relative mx-auto max-w-2xl space-y-8">
-          <span className="inline-block rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5 text-xs font-semibold text-primary">
-            Agent Programme
-          </span>
-          <h1 className="text-4xl sm:text-6xl font-extralight leading-[1.1] tracking-tight">
-            Get Paid to Build Africa's{" "}
-            <span className="text-primary font-light">Biggest Market</span>
-          </h1>
-          <p className="mx-auto max-w-lg text-base sm:text-lg text-muted-foreground leading-relaxed">
-            Join the Afristall Agent Programme. Share your link. Onboard sellers. Earn{" "}
-            <span className="font-bold text-primary">2,000 UGX</span> for every complete shop you add. No cap. No limit.
-          </p>
-          <Link to="/agent-signup">
-            <Button size="lg" className="gap-2 text-base font-bold shadow-lg shadow-primary/25 mt-4">
-              Become an Agent — It's Free <ArrowRight className="h-4 w-4" />
-            </Button>
-          </Link>
+        <div className="relative mx-auto max-w-5xl grid grid-cols-1 md:grid-cols-2 items-center gap-10">
+          <div className="space-y-8 text-center md:text-left">
+            <span className="inline-block rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5 text-xs font-semibold text-primary">
+              Agent Programme
+            </span>
+            <h1 className="text-4xl sm:text-6xl font-extralight leading-[1.1] tracking-tight">
+              Get Paid to Build Africa's{" "}
+              <span className="text-primary font-light">Biggest Market</span>
+            </h1>
+            <p className="max-w-lg text-base sm:text-lg text-muted-foreground leading-relaxed">
+              Join the Afristall Agent Programme. Share your link. Onboard sellers. Earn{" "}
+              <span className="font-bold text-primary">2,000 UGX</span> for every complete shop you add. No cap. No limit.
+            </p>
+            <Link to="/agent-signup">
+              <Button size="lg" className="gap-2 text-base font-bold shadow-lg shadow-primary/25 mt-4">
+                Become an Agent — It's Free <ArrowRight className="h-4 w-4" />
+              </Button>
+            </Link>
+          </div>
+          <div className="relative flex justify-center">
+            <img
+              src={agentHeroMan}
+              alt="Afristall agent pointing"
+              className="w-72 sm:w-80 md:w-96 object-contain drop-shadow-2xl"
+            />
+          </div>
         </div>
       </section>
 
