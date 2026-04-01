@@ -157,17 +157,7 @@ const Explore = () => {
     : "stores";
 
   const handleBack = () => {
-    if (activeTab === "all") {
-      setActiveTab(null);
-    } else if (step === "stores" && selectedSubcategory) {
-      setSelectedSubcategory(null);
-    } else if (step === "stores" && selectedCategory) {
-      setSelectedCategory(null);
-    } else if (step === "subcategory") {
-      setSelectedCategory(null);
-    } else if (step === "category") {
-      setActiveTab(null);
-    }
+    window.history.back();
   };
 
   const handleSelectCategory = (cat: string) => {
