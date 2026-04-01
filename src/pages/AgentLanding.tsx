@@ -5,8 +5,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import {
   Link2, Share2, Store, Wallet, CheckCircle2, ArrowRight,
 } from "lucide-react";
-import agentHeroMan from "@/assets/agent-hero-man.png";
 import agentHeroWoman from "@/assets/agent-hero-woman.png";
+import agentBgFriends from "@/assets/agent-bg-friends.jpeg";
 
 const steps = [
   { icon: Link2, title: "Get your link", desc: "Sign up as an agent and get your unique Afristall referral link instantly." },
@@ -46,11 +46,20 @@ export default function AgentLanding() {
       </nav>
 
       {/* HERO */}
-      <section className="relative overflow-hidden px-4 pt-20 pb-24">
-        <div className="pointer-events-none absolute -top-40 left-1/2 -translate-x-1/2 h-[500px] w-[500px] rounded-full bg-primary/10 blur-[120px]" />
-        <div className="relative mx-auto max-w-5xl grid grid-cols-1 md:grid-cols-2 items-center gap-10">
-          <div className="space-y-8 text-center md:text-left">
-            <span className="inline-block rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5 text-xs font-semibold text-primary">
+      <section className="relative overflow-hidden min-h-[80vh] flex items-center">
+        {/* Background image */}
+        <img
+          src={agentBgFriends}
+          alt=""
+          className="absolute inset-0 w-full h-full object-cover"
+        />
+        {/* Gradient overlay: strong on left, fading to transparent on right */}
+        <div className="absolute inset-0 bg-gradient-to-r from-background via-background/90 to-background/20" />
+        <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent" />
+
+        <div className="relative z-10 mx-auto max-w-5xl px-4 py-20 w-full">
+          <div className="max-w-xl space-y-8">
+            <span className="inline-block rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5 text-xs font-semibold text-primary backdrop-blur-sm">
               Agent Programme
             </span>
             <h1 className="text-4xl sm:text-6xl font-extralight leading-[1.1] tracking-tight">
@@ -66,13 +75,6 @@ export default function AgentLanding() {
                 Become an Agent — It's Free <ArrowRight className="h-4 w-4" />
               </Button>
             </Link>
-          </div>
-          <div className="relative flex justify-center">
-            <img
-              src={agentHeroMan}
-              alt="Afristall agent pointing"
-              className="w-72 sm:w-80 md:w-96 object-contain drop-shadow-2xl"
-            />
           </div>
         </div>
       </section>
