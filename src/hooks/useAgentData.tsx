@@ -50,10 +50,10 @@ export function useAgentData() {
       setAgentSlug(agentProfile?.store_slug || user.id.slice(0, 8));
 
       // Get referred sellers
-      const { data: referredProfiles } = await supabase
+      const { data: referredProfiles } = await (supabase
         .from("profiles")
-        .select("id, store_name, first_name, whatsapp_number, store_slug")
-        .eq("referred_by" as any, user.id);
+        .select("id, store_name, first_name, whatsapp_number, store_slug") as any)
+        .eq("referred_by", user.id);
 
       if (!referredProfiles || referredProfiles.length === 0) {
         setSellers([]);
