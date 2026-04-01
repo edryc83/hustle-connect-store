@@ -314,6 +314,8 @@ export type Database = {
           instagram_url: string | null
           is_online_only: boolean
           last_active_at: string
+          momo_name: string | null
+          momo_number: string | null
           phone: string | null
           profile_picture_url: string | null
           referred_by: string | null
@@ -347,6 +349,8 @@ export type Database = {
           instagram_url?: string | null
           is_online_only?: boolean
           last_active_at?: string
+          momo_name?: string | null
+          momo_number?: string | null
           phone?: string | null
           profile_picture_url?: string | null
           referred_by?: string | null
@@ -380,6 +384,8 @@ export type Database = {
           instagram_url?: string | null
           is_online_only?: boolean
           last_active_at?: string
+          momo_name?: string | null
+          momo_number?: string | null
           phone?: string | null
           profile_picture_url?: string | null
           referred_by?: string | null

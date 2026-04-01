@@ -1,0 +1,1 @@
+ALTER TABLE public.profiles ADD COLUMN momo_number text, ADD COLUMN momo_name text;
