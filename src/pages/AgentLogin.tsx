@@ -13,8 +13,7 @@ export default function AgentLogin() {
   const { user } = useAuth();
   const navigate = useNavigate();
 
-  // If already logged in, check agent role and redirect
-  useState(() => {
+  useEffect(() => {
     if (user) {
       supabase
         .from("user_roles" as any)
@@ -22,11 +21,11 @@ export default function AgentLogin() {
         .eq("user_id", user.id)
         .eq("role", "agent")
         .maybeSingle()
-        .then(({ data }) => {
+        .then(({ data }: any) => {
           if (data) navigate("/agent", { replace: true });
         });
     }
-  });
+  }, [user, navigate]);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
