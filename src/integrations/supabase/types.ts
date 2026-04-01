@@ -316,6 +316,7 @@ export type Database = {
           last_active_at: string
           phone: string | null
           profile_picture_url: string | null
+          referred_by: string | null
           shop_number: string | null
           store_bio: string | null
           store_name: string | null
@@ -348,6 +349,7 @@ export type Database = {
           last_active_at?: string
           phone?: string | null
           profile_picture_url?: string | null
+          referred_by?: string | null
           shop_number?: string | null
           store_bio?: string | null
           store_name?: string | null
@@ -380,6 +382,7 @@ export type Database = {
           last_active_at?: string
           phone?: string | null
           profile_picture_url?: string | null
+          referred_by?: string | null
           shop_number?: string | null
           store_bio?: string | null
           store_name?: string | null
@@ -443,6 +446,27 @@ export type Database = {
         }
         Relationships: []
       }
+      user_roles: {
+        Row: {
+          created_at: string
+          id: string
+          role: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          role?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          role?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -463,6 +487,7 @@ export type Database = {
       increment_store_views: { Args: { slug: string }; Returns: undefined }
       increment_whatsapp_taps: { Args: { p_id: string }; Returns: undefined }
       is_admin: { Args: { _user_id: string }; Returns: boolean }
+      is_agent: { Args: { _user_id: string }; Returns: boolean }
       move_to_dlq: {
         Args: {
           dlq_name: string
