@@ -28,7 +28,7 @@ export default function AgentPortal() {
 
   if (!isAgent) return null;
 
-  const referralUrl = `${window.location.origin}/join?ref=${agentSlug}`;
+  const referralUrl = `https://afristall.com/${agentSlug}`;
 
   const copyLink = () => {
     navigator.clipboard.writeText(referralUrl);
