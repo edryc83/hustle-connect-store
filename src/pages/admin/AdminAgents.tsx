@@ -56,14 +56,14 @@ export default function AdminAgents() {
 
     // Get products for referred sellers to determine "complete" status
     const referredIds = (referredProfiles || []).map((p: any) => p.id);
-    let productMap: Record<string, boolean> = {};
+    let productMap: Record<string, number> = {};
     if (referredIds.length > 0) {
       const { data: products } = await supabase
         .from("products")
-        .select("user_id, image_url, price")
+        .select("user_id")
         .in("user_id", referredIds);
       for (const p of products || []) {
-        if (p.image_url && p.price > 0) productMap[p.user_id] = true;
+        productMap[p.user_id] = (productMap[p.user_id] || 0) + 1;
       }
     }
 
@@ -74,7 +74,7 @@ export default function AdminAgents() {
       if (!agentShops[agentId]) agentShops[agentId] = { total: 0, complete: 0 };
       agentShops[agentId].total++;
       const hasWhatsApp = !!p.whatsapp_number && p.whatsapp_number.length > 5;
-      if (hasWhatsApp && productMap[p.id]) agentShops[agentId].complete++;
+      if (hasWhatsApp && (productMap[p.id] || 0) >= 5) agentShops[agentId].complete++;
     }
 
     // Get all withdrawals

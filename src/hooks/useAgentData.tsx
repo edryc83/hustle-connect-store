@@ -89,15 +89,13 @@ export function useAgentData() {
         .select("user_id, image_url, price")
         .in("user_id", sellerIds);
 
-      const productMap: Record<string, { count: number; hasComplete: boolean }> = {};
+      const productMap: Record<string, number> = {};
       for (const p of products || []) {
-        if (!productMap[p.user_id]) productMap[p.user_id] = { count: 0, hasComplete: false };
-        productMap[p.user_id].count++;
-        if (p.image_url && p.price > 0) productMap[p.user_id].hasComplete = true;
+        productMap[p.user_id] = (productMap[p.user_id] || 0) + 1;
       }
 
       const mapped: ReferredSeller[] = referredProfiles.map((p: any) => {
-        const pm = productMap[p.id] || { count: 0, hasComplete: false };
+        const count = productMap[p.id] || 0;
         const hasWhatsApp = !!p.whatsapp_number && p.whatsapp_number.length > 5;
         return {
           id: p.id,
@@ -105,8 +103,8 @@ export function useAgentData() {
           first_name: p.first_name,
           whatsapp_number: p.whatsapp_number,
           store_slug: p.store_slug,
-          productCount: pm.count,
-          isComplete: hasWhatsApp && pm.hasComplete,
+          productCount: count,
+          isComplete: hasWhatsApp && count >= 5,
         };
       });
 
