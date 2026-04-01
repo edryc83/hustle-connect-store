@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import { Link } from "react-router-dom";
 import AfristallLogo from "@/components/AfristallLogo";
 import { Button } from "@/components/ui/button";
