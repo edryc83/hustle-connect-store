@@ -10,7 +10,23 @@ import AfristallLogo from "@/components/AfristallLogo";
 import { toast } from "sonner";
 
 export default function AgentLogin() {
+  const { user } = useAuth();
   const navigate = useNavigate();
+
+  // If already logged in, check agent role and redirect
+  useState(() => {
+    if (user) {
+      supabase
+        .from("user_roles" as any)
+        .select("role")
+        .eq("user_id", user.id)
+        .eq("role", "agent")
+        .maybeSingle()
+        .then(({ data }) => {
+          if (data) navigate("/agent", { replace: true });
+        });
+    }
+  });
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
