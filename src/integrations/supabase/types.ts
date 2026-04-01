@@ -14,6 +14,39 @@ export type Database = {
   }
   public: {
     Tables: {
+      agent_withdrawals: {
+        Row: {
+          agent_id: string
+          amount: number
+          completed_at: string | null
+          created_at: string
+          id: string
+          momo_name: string | null
+          momo_number: string | null
+          status: string
+        }
+        Insert: {
+          agent_id: string
+          amount: number
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          momo_name?: string | null
+          momo_number?: string | null
+          status?: string
+        }
+        Update: {
+          agent_id?: string
+          amount?: number
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          momo_name?: string | null
+          momo_number?: string | null
+          status?: string
+        }
+        Relationships: []
+      }
       app_config: {
         Row: {
           created_at: string
