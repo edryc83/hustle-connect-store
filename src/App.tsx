@@ -30,6 +30,7 @@ import JoinRedirect from "./pages/JoinRedirect";
 import AgentLogin from "./pages/AgentLogin";
 import AgentLanding from "./pages/AgentLanding";
 import AgentSignup from "./pages/AgentSignup";
+import AgentPortal from "./pages/AgentPortal";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
 import CookiePolicy from "./pages/CookiePolicy";
@@ -79,6 +80,7 @@ const App = () => (
               <Route path="/agent-login" element={<AgentLogin />} />
               <Route path="/agents" element={<AgentLanding />} />
               <Route path="/agent-signup" element={<AgentSignup />} />
+              <Route path="/agent" element={<AgentPortal />} />
               <Route path="/join" element={<JoinRedirect />} />
               <Route path="/privacy" element={<PrivacyPolicy />} />
               <Route path="/terms" element={<TermsOfService />} />
