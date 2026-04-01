@@ -25,7 +25,7 @@ import Explore from "./pages/Explore";
 import ResetPassword from "./pages/ResetPassword";
 import SuperAdminLogin from "./pages/SuperAdminLogin";
 import AdStudio from "./pages/AdStudio";
-import AgentPortal from "./pages/AgentPortal";
+
 import JoinRedirect from "./pages/JoinRedirect";
 import AgentLogin from "./pages/AgentLogin";
 import AgentLanding from "./pages/AgentLanding";
@@ -75,7 +75,7 @@ const App = () => (
               <Route path="/superadmin" element={<SuperAdminLogin />} />
               <Route path="/explore" element={<Explore />} />
               <Route path="/ad-studio" element={<AdStudio />} />
-              <Route path="/agent" element={<AgentPortal />} />
+              
               <Route path="/agent-login" element={<AgentLogin />} />
               <Route path="/agents" element={<AgentLanding />} />
               <Route path="/agent-signup" element={<AgentSignup />} />
