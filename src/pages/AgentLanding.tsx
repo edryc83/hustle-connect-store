@@ -172,7 +172,7 @@ export default function AgentLanding() {
       <section className="bg-card/60">
         <div className="mx-auto max-w-6xl px-4 py-20 grid md:grid-cols-3 gap-8">
           <div className="md:col-span-1">
-            <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight">What Your Sellers Get</h2>
+            <h2 className="text-2xl sm:text-3xl font-extralight tracking-tight">What Your Sellers Get</h2>
           </div>
           <div className="md:col-span-2 grid sm:grid-cols-3 gap-4">
             {[
