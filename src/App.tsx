@@ -28,6 +28,8 @@ import AdStudio from "./pages/AdStudio";
 import AgentPortal from "./pages/AgentPortal";
 import JoinRedirect from "./pages/JoinRedirect";
 import AgentLogin from "./pages/AgentLogin";
+import AgentLanding from "./pages/AgentLanding";
+import AgentSignup from "./pages/AgentSignup";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
 import CookiePolicy from "./pages/CookiePolicy";
