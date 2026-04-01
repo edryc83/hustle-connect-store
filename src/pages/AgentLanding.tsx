@@ -70,7 +70,7 @@ export default function AgentLanding() {
             <span className="inline-block rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-xs font-semibold text-white backdrop-blur-sm">
               Agent Programme
             </span>
-            <h1 className="text-3xl sm:text-5xl font-extrabold leading-[1.1] tracking-tight text-white">
+            <h1 className="text-3xl sm:text-5xl font-extralight leading-[1.1] tracking-tight text-white">
               Get Paid to Build Africa's{" "}
               <span className="text-primary">Biggest Market</span>
             </h1>
