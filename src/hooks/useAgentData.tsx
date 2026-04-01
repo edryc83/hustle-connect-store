@@ -21,6 +21,8 @@ export function useAgentData() {
   const [momoName, setMomoName] = useState<string>("");
   const [sellers, setSellers] = useState<ReferredSeller[]>([]);
   const [loading, setLoading] = useState(true);
+  const [pendingWithdrawal, setPendingWithdrawal] = useState(false);
+  const [totalWithdrawn, setTotalWithdrawn] = useState(0);
 
   useEffect(() => {
     if (!user) { setIsAgent(false); setLoading(false); return; }
@@ -53,6 +55,21 @@ export function useAgentData() {
       setMomoNumber((agentProfile as any)?.momo_number || "");
       setMomoName((agentProfile as any)?.momo_name || "");
 
+      // Check withdrawals
+      const { data: withdrawals } = await (supabase
+        .from("agent_withdrawals" as any)
+        .select("status, amount") as any)
+        .eq("agent_id", user.id);
+
+      if (withdrawals && withdrawals.length > 0) {
+        const hasPending = withdrawals.some((w: any) => w.status === "pending");
+        setPendingWithdrawal(hasPending);
+        const completed = withdrawals
+          .filter((w: any) => w.status === "completed")
+          .reduce((sum: number, w: any) => sum + Number(w.amount), 0);
+        setTotalWithdrawn(completed);
+      }
+
       // Get referred sellers
       const { data: referredProfiles } = await (supabase
         .from("profiles")
@@ -66,7 +83,7 @@ export function useAgentData() {
       }
 
       // Get product counts for each referred seller
-      const sellerIds = referredProfiles.map((p) => p.id);
+      const sellerIds = referredProfiles.map((p: any) => p.id);
       const { data: products } = await supabase
         .from("products")
         .select("user_id, image_url, price")
@@ -79,7 +96,7 @@ export function useAgentData() {
         if (p.image_url && p.price > 0) productMap[p.user_id].hasComplete = true;
       }
 
-      const mapped: ReferredSeller[] = referredProfiles.map((p) => {
+      const mapped: ReferredSeller[] = referredProfiles.map((p: any) => {
         const pm = productMap[p.id] || { count: 0, hasComplete: false };
         const hasWhatsApp = !!p.whatsapp_number && p.whatsapp_number.length > 5;
         return {
@@ -103,7 +120,8 @@ export function useAgentData() {
   }, [user]);
 
   const completeCount = sellers.filter((s) => s.isComplete).length;
-  const balance = completeCount * 2000;
+  const earnedTotal = completeCount * 2000;
+  const balance = earnedTotal - totalWithdrawn;
 
   const saveMomo = async (number: string, name: string) => {
     if (!user) return;
@@ -115,5 +133,24 @@ export function useAgentData() {
     setMomoName(name);
   };
 
-  return { isAgent, loading, agentName, agentSlug, sellers, completeCount, balance, momoNumber, momoName, saveMomo };
+  const requestWithdrawal = async () => {
+    if (!user || balance < 2000 || pendingWithdrawal) return false;
+    const { error } = await (supabase.from("agent_withdrawals" as any) as any).insert({
+      agent_id: user.id,
+      amount: balance,
+      momo_number: momoNumber,
+      momo_name: momoName,
+    });
+    if (!error) {
+      setPendingWithdrawal(true);
+      return true;
+    }
+    return false;
+  };
+
+  return {
+    isAgent, loading, agentName, agentSlug, sellers, completeCount, balance,
+    momoNumber, momoName, saveMomo,
+    pendingWithdrawal, requestWithdrawal,
+  };
 }
