@@ -170,6 +170,9 @@ export default function AgentPortal() {
               <Save className="h-3.5 w-3.5" /> {savingMomo ? "Saving..." : "Save Details"}
             </Button>
           </CardContent>
+        </Card>
+
+        {/* Referred sellers list */}
         <div>
           <h2 className="text-sm font-semibold mb-3 text-muted-foreground">Your Shops ({sellers.length})</h2>
           {sellers.length === 0 ? (
