@@ -121,7 +121,7 @@ export default function AgentLanding() {
 
       {/* EARNINGS — side by side like "About Company" section */}
       <section className="bg-foreground text-card">
-        <div className="mx-auto max-w-6xl px-4 py-20 grid md:grid-cols-2 gap-12 items-center">
+        <div className="mx-auto max-w-6xl px-4 py-20 grid md:grid-cols-2 gap-12 items-center bg-muted-foreground">
           <div className="space-y-5">
             <h2 className="text-2xl sm:text-3xl font-extralight tracking-tight">The Numbers</h2>
             <p className="text-sm opacity-70 leading-relaxed max-w-md">
