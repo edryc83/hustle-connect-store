@@ -159,12 +159,15 @@ export default function AgentLanding() {
             No tech skills needed. No money to start. Just your phone and the people you already know.
           </p>
         </div>
-        <div className="flex justify-center">
-          <img
-            src={agentHeroWoman}
-            alt="Excited Afristall agent"
-            className="w-60 sm:w-72 object-contain drop-shadow-2xl"
-          />
+        <div className="relative flex justify-center">
+          <div className="relative">
+            <img
+              src={agentHeroWoman}
+              alt="Excited Afristall agent"
+              className="w-60 sm:w-72 object-contain drop-shadow-2xl"
+            />
+            <div className="absolute inset-x-0 bottom-0 h-24 bg-gradient-to-t from-background to-transparent" />
+          </div>
         </div>
       </section>
 
