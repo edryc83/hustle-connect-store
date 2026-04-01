@@ -30,6 +30,7 @@ import JoinRedirect from "./pages/JoinRedirect";
 import AgentLogin from "./pages/AgentLogin";
 import AgentLanding from "./pages/AgentLanding";
 import AgentSignup from "./pages/AgentSignup";
+import AgentPortal from "./pages/AgentPortal";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsOfService from "./pages/TermsOfService";
 import CookiePolicy from "./pages/CookiePolicy";
