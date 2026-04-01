@@ -5,8 +5,9 @@ import AfristallLogo from "@/components/AfristallLogo";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Copy, Share2, MessageCircle, Store, CheckCircle2, Users, Wallet, Loader2, Package } from "lucide-react";
+import { Copy, Share2, MessageCircle, Store, CheckCircle2, Users, Wallet, Loader2, Package, LogOut } from "lucide-react";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 const REWARD_PER_SHOP = 2_000;
 
@@ -58,7 +59,16 @@ export default function AgentPortal() {
               Afri<span className="text-primary">stall</span>
             </span>
           </div>
-          <span className="text-sm font-medium text-muted-foreground">{agentName}</span>
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-medium text-muted-foreground">{agentName}</span>
+            <button
+              onClick={async () => { await supabase.auth.signOut(); navigate("/agents", { replace: true }); }}
+              className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors"
+              title="Sign out"
+            >
+              <LogOut className="h-4 w-4" />
+            </button>
+          </div>
         </div>
       </header>
 
