@@ -17,6 +17,8 @@ export function useAgentData() {
   const [isAgent, setIsAgent] = useState<boolean | null>(null);
   const [agentSlug, setAgentSlug] = useState<string | null>(null);
   const [agentName, setAgentName] = useState<string>("");
+  const [momoNumber, setMomoNumber] = useState<string>("");
+  const [momoName, setMomoName] = useState<string>("");
   const [sellers, setSellers] = useState<ReferredSeller[]>([]);
   const [loading, setLoading] = useState(true);
 
