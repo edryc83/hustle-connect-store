@@ -44,12 +44,14 @@ export function useAgentData() {
       // Get agent profile
       const { data: agentProfile } = await supabase
         .from("profiles")
-        .select("first_name, store_slug")
+        .select("first_name, store_slug, momo_number, momo_name")
         .eq("id", user.id)
         .single();
 
       setAgentName(agentProfile?.first_name || "Agent");
       setAgentSlug(agentProfile?.store_slug || user.id.slice(0, 8));
+      setMomoNumber((agentProfile as any)?.momo_number || "");
+      setMomoName((agentProfile as any)?.momo_name || "");
 
       // Get referred sellers
       const { data: referredProfiles } = await (supabase
