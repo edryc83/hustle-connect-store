@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,6 +15,25 @@ export default function AgentLogin() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [forgotMode, setForgotMode] = useState(false);
+  const [forgotLoading, setForgotLoading] = useState(false);
+
+  const handleForgotPassword = async () => {
+    if (!email.trim()) { toast.error("Enter your email first"); return; }
+    setForgotLoading(true);
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+      if (error) throw error;
+      toast.success("Check your email for a reset link! 📧");
+      setForgotMode(false);
+    } catch (error: any) {
+      toast.error(error.message || "Failed to send reset email");
+    } finally {
+      setForgotLoading(false);
+    }
+  };
 
   const handleLogin = async () => {
     if (!email.trim()) { toast.error("Email is required"); return; }
@@ -89,9 +109,27 @@ export default function AgentLogin() {
               </button>
             </div>
           </div>
-          <Button className="w-full shadow-sm shadow-primary/20" onClick={handleLogin} disabled={loading}>
-            {loading ? "Signing in..." : "Sign In"}
-          </Button>
+          {!forgotMode ? (
+            <>
+              <div className="flex justify-end">
+                <button type="button" onClick={() => setForgotMode(true)} className="text-xs text-primary hover:underline">
+                  Forgot password?
+                </button>
+              </div>
+              <Button className="w-full shadow-sm shadow-primary/20" onClick={handleLogin} disabled={loading}>
+                {loading ? "Signing in..." : "Sign In"}
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button className="w-full shadow-sm shadow-primary/20" onClick={handleForgotPassword} disabled={forgotLoading}>
+                {forgotLoading ? "Sending…" : "Send Reset Link"}
+              </Button>
+              <button type="button" onClick={() => setForgotMode(false)} className="w-full text-sm text-muted-foreground hover:text-foreground text-center">
+                Back to sign in
+              </button>
+            </>
+          )}
         </div>
       </div>
     </div>
