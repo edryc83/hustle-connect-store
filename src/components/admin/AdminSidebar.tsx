@@ -1,4 +1,4 @@
-import { LayoutDashboard, Users, ShoppingBag, BarChart3, ArrowLeft, LogOut } from "lucide-react";
+import { LayoutDashboard, Users, ShoppingBag, BarChart3, ArrowLeft, LogOut, UserCheck } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { useAuth } from "@/hooks/useAuth";
 import { useNavigate } from "react-router-dom";
@@ -19,6 +19,7 @@ import { Button } from "@/components/ui/button";
 const navItems = [
   { title: "Overview", url: "/admin", icon: LayoutDashboard },
   { title: "Sellers", url: "/admin/sellers", icon: Users },
+  { title: "Agents", url: "/admin/agents", icon: UserCheck },
   { title: "Orders", url: "/admin/orders", icon: ShoppingBag },
   { title: "Analytics", url: "/admin/analytics", icon: BarChart3 },
 ];

@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { Copy, Share2, MessageCircle, Store, CheckCircle2, Users, Wallet, Loader2, Package, LogOut, ExternalLink, Smartphone, Save } from "lucide-react";
+import { Copy, Share2, MessageCircle, Store, CheckCircle2, Users, Wallet, Loader2, Package, LogOut, ExternalLink, Smartphone, Save, ArrowDownToLine, Clock } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -14,11 +14,16 @@ const REWARD_PER_SHOP = 2_000;
 
 export default function AgentPortal() {
   const navigate = useNavigate();
-  const { isAgent, loading, agentName, agentSlug, sellers, completeCount, balance, momoNumber, momoName, saveMomo } = useAgentData();
+  const {
+    isAgent, loading, agentName, agentSlug, sellers, completeCount, balance,
+    momoNumber, momoName, saveMomo,
+    pendingWithdrawal, requestWithdrawal,
+  } = useAgentData();
   const [editMomoNumber, setEditMomoNumber] = useState("");
   const [editMomoName, setEditMomoName] = useState("");
   const [momoInitialized, setMomoInitialized] = useState(false);
   const [savingMomo, setSavingMomo] = useState(false);
+  const [requestingWithdrawal, setRequestingWithdrawal] = useState(false);
 
   useEffect(() => {
     if (!momoInitialized && !loading) {
@@ -43,6 +48,8 @@ export default function AgentPortal() {
   if (!isAgent) return null;
 
   const referralUrl = `https://afristall.com/${agentSlug}`;
+  const hasMomoSaved = !!(momoNumber && momoName);
+  const canWithdraw = balance >= 2000 && hasMomoSaved && !pendingWithdrawal;
 
   const copyLink = () => {
     navigator.clipboard.writeText(referralUrl);
@@ -58,6 +65,18 @@ export default function AgentPortal() {
       }).catch(() => {});
     } else {
       copyLink();
+    }
+  };
+
+  const handleWithdraw = async () => {
+    if (!canWithdraw) return;
+    setRequestingWithdrawal(true);
+    const ok = await requestWithdrawal();
+    setRequestingWithdrawal(false);
+    if (ok) {
+      toast.success("Withdrawal requested! You'll receive your money soon.");
+    } else {
+      toast.error("Failed to request withdrawal");
     }
   };
 
@@ -98,6 +117,28 @@ export default function AgentPortal() {
             <p className="text-xs text-muted-foreground mt-1">
               {REWARD_PER_SHOP.toLocaleString()} UGX per complete shop
             </p>
+
+            {/* Withdraw section */}
+            <div className="mt-3">
+              {pendingWithdrawal ? (
+                <Badge className="bg-orange-500/15 text-orange-600 border-orange-500/30 hover:bg-orange-500/15 gap-1">
+                  <Clock className="h-3 w-3" /> Withdrawal Requested
+                </Badge>
+              ) : (
+                <Button
+                  size="sm"
+                  className="gap-1.5"
+                  disabled={!canWithdraw || requestingWithdrawal}
+                  onClick={handleWithdraw}
+                >
+                  <ArrowDownToLine className="h-3.5 w-3.5" />
+                  {requestingWithdrawal ? "Requesting..." : "Withdraw"}
+                </Button>
+              )}
+              {!hasMomoSaved && balance >= 2000 && (
+                <p className="text-xs text-destructive mt-1">Add your mobile money details below to withdraw</p>
+              )}
+            </div>
           </CardContent>
         </Card>
 
@@ -143,7 +184,18 @@ export default function AgentPortal() {
             <div className="flex items-center gap-2">
               <Smartphone className="h-4 w-4 text-primary" />
               <p className="text-sm font-semibold">Mobile Money Details</p>
+              {hasMomoSaved && (
+                <CheckCircle2 className="h-4 w-4 text-green-500 ml-auto" />
+              )}
             </div>
+            {hasMomoSaved && (
+              <div className="flex items-center gap-2 rounded-lg border border-green-500/20 bg-green-500/5 px-3 py-2">
+                <div className="text-xs">
+                  <p className="font-medium text-foreground">{momoName}</p>
+                  <p className="text-muted-foreground">{momoNumber}</p>
+                </div>
+              </div>
+            )}
             <div className="space-y-2">
               <Input
                 placeholder="Mobile Money Number (e.g. 0771234567)"

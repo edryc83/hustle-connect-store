@@ -20,6 +20,7 @@ import AdminOverview from "./pages/admin/AdminOverview";
 import AdminSellers from "./pages/admin/AdminSellers";
 import AdminOrders from "./pages/admin/AdminOrders";
 import AdminAnalyticsPage from "./pages/admin/AdminAnalytics";
+import AdminAgents from "./pages/admin/AdminAgents";
 import Storefront from "./pages/Storefront";
 import Explore from "./pages/Explore";
 import ResetPassword from "./pages/ResetPassword";
