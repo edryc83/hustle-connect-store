@@ -63,9 +63,10 @@ export default function AgentLanding() {
       <section className="relative overflow-hidden min-h-[80vh] flex items-center">
         {/* Background image */}
         <img
+          ref={heroImgRef}
           src={agentBgFriends}
           alt=""
-          className="absolute inset-0 w-full h-full object-cover"
+          className="absolute inset-0 w-full h-full object-cover scale-110 will-change-transform"
         />
         {/* Gradient overlay: strong on left, fading to transparent on right */}
         <div className="absolute inset-0 bg-gradient-to-r from-background via-background/90 to-background/20" />
