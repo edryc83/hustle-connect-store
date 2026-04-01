@@ -80,6 +80,7 @@ const App = () => (
               <Route path="/agent-login" element={<AgentLogin />} />
               <Route path="/agents" element={<AgentLanding />} />
               <Route path="/agent-signup" element={<AgentSignup />} />
+              <Route path="/agent" element={<AgentPortal />} />
               <Route path="/join" element={<JoinRedirect />} />
               <Route path="/privacy" element={<PrivacyPolicy />} />
               <Route path="/terms" element={<TermsOfService />} />
