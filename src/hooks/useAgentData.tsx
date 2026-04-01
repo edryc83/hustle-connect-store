@@ -105,5 +105,15 @@ export function useAgentData() {
   const completeCount = sellers.filter((s) => s.isComplete).length;
   const balance = completeCount * 2000;
 
-  return { isAgent, loading, agentName, agentSlug, sellers, completeCount, balance };
+  const saveMomo = async (number: string, name: string) => {
+    if (!user) return;
+    await supabase
+      .from("profiles")
+      .update({ momo_number: number, momo_name: name } as any)
+      .eq("id", user.id);
+    setMomoNumber(number);
+    setMomoName(name);
+  };
+
+  return { isAgent, loading, agentName, agentSlug, sellers, completeCount, balance, momoNumber, momoName, saveMomo };
 }
