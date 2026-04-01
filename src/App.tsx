@@ -74,6 +74,7 @@ const App = () => (
               <Route path="/ad-studio" element={<AdStudio />} />
               <Route path="/agent" element={<AgentPortal />} />
               <Route path="/join" element={<JoinRedirect />} />
+              <Route path="/privacy" element={<PrivacyPolicy />} />
               <Route path="/terms" element={<TermsOfService />} />
               <Route path="/cookies" element={<CookiePolicy />} />
               <Route path="/refund-policy" element={<RefundPolicy />} />
