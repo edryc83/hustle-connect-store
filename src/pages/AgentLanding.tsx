@@ -123,7 +123,7 @@ export default function AgentLanding() {
       <section className="bg-foreground text-background">
         <div className="mx-auto max-w-6xl px-4 py-20 grid md:grid-cols-2 gap-12 items-center">
           <div className="space-y-5">
-            <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight">The Numbers</h2>
+            <h2 className="text-2xl sm:text-3xl font-extralight tracking-tight">The Numbers</h2>
             <p className="text-sm opacity-70 leading-relaxed max-w-md">
               There is no ceiling. The more sellers you bring in, the more you earn. Here's what it looks like.
             </p>
