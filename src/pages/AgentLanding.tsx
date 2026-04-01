@@ -217,7 +217,7 @@ export default function AgentLanding() {
       {/* FINAL CTA */}
       <section className="bg-foreground text-background">
         <div className="mx-auto max-w-6xl px-4 py-24 text-center space-y-6">
-          <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight">Ready to Start?</h2>
+          <h2 className="text-3xl sm:text-4xl font-extralight tracking-tight">Ready to Start?</h2>
           <p className="text-sm opacity-70 max-w-md mx-auto leading-relaxed">
             There are sellers in your area right now who need this. Every day you wait is money you're not earning.
           </p>
