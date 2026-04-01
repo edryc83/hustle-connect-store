@@ -215,7 +215,7 @@ export default function AgentLanding() {
       </section>
 
       {/* FINAL CTA */}
-      <section className="bg-foreground text-background">
+      <section className="bg-foreground text-card">
         <div className="mx-auto max-w-6xl px-4 py-24 text-center space-y-6">
           <h2 className="text-3xl sm:text-4xl font-extralight tracking-tight">Ready to Start?</h2>
           <p className="text-sm opacity-70 max-w-md mx-auto leading-relaxed">
