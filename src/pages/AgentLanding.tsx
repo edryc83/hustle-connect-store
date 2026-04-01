@@ -70,7 +70,7 @@ export default function AgentLanding() {
             <span className="inline-block rounded-full border border-white/20 bg-white/10 px-4 py-1.5 text-xs font-semibold text-white backdrop-blur-sm">
               Agent Programme
             </span>
-            <h1 className="text-3xl sm:text-5xl font-extrabold leading-[1.1] tracking-tight text-white">
+            <h1 className="text-3xl sm:text-5xl font-extralight leading-[1.1] tracking-tight text-white">
               Get Paid to Build Africa's{" "}
               <span className="text-primary">Biggest Market</span>
             </h1>
@@ -102,7 +102,7 @@ export default function AgentLanding() {
       {/* HOW IT WORKS — numbered cards like "Services we provide" */}
       <section className="mx-auto max-w-6xl px-4 pb-20">
         <div className="flex items-center justify-between mb-10">
-          <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight">How It Works</h2>
+          <h2 className="text-2xl sm:text-3xl font-extralight tracking-tight">How It Works</h2>
         </div>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {steps.map((s, i) => (
@@ -120,10 +120,10 @@ export default function AgentLanding() {
       </section>
 
       {/* EARNINGS — side by side like "About Company" section */}
-      <section className="bg-foreground text-background">
+      <section className="bg-foreground text-card">
         <div className="mx-auto max-w-6xl px-4 py-20 grid md:grid-cols-2 gap-12 items-center">
           <div className="space-y-5">
-            <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight">The Numbers</h2>
+            <h2 className="text-2xl sm:text-3xl font-extralight tracking-tight">The Numbers</h2>
             <p className="text-sm opacity-70 leading-relaxed max-w-md">
               There is no ceiling. The more sellers you bring in, the more you earn. Here's what it looks like.
             </p>
@@ -142,7 +142,7 @@ export default function AgentLanding() {
       {/* WHO SHOULD BECOME AN AGENT — image + text grid like portfolio */}
       <section className="mx-auto max-w-6xl px-4 py-20 grid md:grid-cols-2 gap-12 items-center">
         <div className="space-y-6">
-          <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
+          <h2 className="text-2xl sm:text-3xl font-extralight tracking-tight">
             Who Should Become an Agent
           </h2>
           <p className="text-sm text-muted-foreground leading-relaxed">
@@ -172,7 +172,7 @@ export default function AgentLanding() {
       <section className="bg-card/60">
         <div className="mx-auto max-w-6xl px-4 py-20 grid md:grid-cols-3 gap-8">
           <div className="md:col-span-1">
-            <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight">What Your Sellers Get</h2>
+            <h2 className="text-2xl sm:text-3xl font-extralight tracking-tight">What Your Sellers Get</h2>
           </div>
           <div className="md:col-span-2 grid sm:grid-cols-3 gap-4">
             {[
@@ -195,7 +195,7 @@ export default function AgentLanding() {
       {/* COMPLETE SHOP CHECKLIST */}
       <section className="mx-auto max-w-6xl px-4 py-20 grid md:grid-cols-2 gap-12 items-center">
         <div className="space-y-4">
-          <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
+          <h2 className="text-2xl sm:text-3xl font-extralight tracking-tight">
             What a Complete Shop Looks Like
           </h2>
           <p className="text-sm text-muted-foreground">
@@ -215,9 +215,9 @@ export default function AgentLanding() {
       </section>
 
       {/* FINAL CTA */}
-      <section className="bg-foreground text-background">
+      <section className="bg-foreground text-card">
         <div className="mx-auto max-w-6xl px-4 py-24 text-center space-y-6">
-          <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight">Ready to Start?</h2>
+          <h2 className="text-3xl sm:text-4xl font-extralight tracking-tight">Ready to Start?</h2>
           <p className="text-sm opacity-70 max-w-md mx-auto leading-relaxed">
             There are sellers in your area right now who need this. Every day you wait is money you're not earning.
           </p>
