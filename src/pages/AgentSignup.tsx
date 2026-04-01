@@ -28,6 +28,23 @@ export default function AgentSignup() {
 
     setLoading(true);
     try {
+      // 0. Check slug uniqueness
+      const slug = slugify(firstName);
+      if (!slug) { toast.error("Please enter a valid name"); setLoading(false); return; }
+
+      const { data: existing } = await supabase
+        .from("profiles")
+        .select("id")
+        .eq("store_slug", slug)
+        .maybeSingle();
+
+      let finalSlug = slug;
+      if (existing) {
+        // Append random suffix if taken
+        finalSlug = `${slug}-${Math.random().toString(36).slice(2, 6)}`;
+        toast.info(`Username "${slug}" was taken, using "${finalSlug}" instead.`);
+      }
+
       // 1. Create auth user
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email: email.trim(),
@@ -46,13 +63,12 @@ export default function AgentSignup() {
       if (!authData.user) throw new Error("Signup failed");
 
       const userId = authData.user.id;
-      const slug = slugify(firstName);
 
       // 2. Update profile with agent's name
       await supabase.from("profiles").update({
         first_name: firstName.trim(),
         store_name: `${firstName.trim()}'s Referrals`,
-        store_slug: slug || userId.slice(0, 8),
+        store_slug: finalSlug,
       } as any).eq("id", userId);
 
       // 3. Assign agent role

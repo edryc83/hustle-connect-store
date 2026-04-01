@@ -637,6 +637,20 @@ const StorefrontInner = () => {
         return;
       }
 
+      // Check if this profile belongs to an agent — redirect to signup with referral
+      const { data: agentRole } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", prof.id)
+        .eq("role", "agent")
+        .maybeSingle();
+
+      if (agentRole) {
+        sessionStorage.setItem("afristall_ref", storeSlug!);
+        navigate("/signup", { replace: true });
+        return;
+      }
+
       setProfile(prof);
 
       supabase.rpc("increment_store_views", { slug: storeSlug! }).then(() => {});
