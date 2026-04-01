@@ -29,6 +29,19 @@ const checklist = [
 ];
 
 export default function AgentLanding() {
+  const heroImgRef = useRef<HTMLImageElement>(null);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (heroImgRef.current) {
+        const y = window.scrollY;
+        heroImgRef.current.style.transform = `translateY(${y * 0.35}px) scale(1.1)`;
+      }
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       {/* Nav */}
