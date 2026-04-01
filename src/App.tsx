@@ -72,7 +72,8 @@ const App = () => (
               <Route path="/superadmin" element={<SuperAdminLogin />} />
               <Route path="/explore" element={<Explore />} />
               <Route path="/ad-studio" element={<AdStudio />} />
-              <Route path="/privacy" element={<PrivacyPolicy />} />
+              <Route path="/agent" element={<AgentPortal />} />
+              <Route path="/join" element={<JoinRedirect />} />
               <Route path="/terms" element={<TermsOfService />} />
               <Route path="/cookies" element={<CookiePolicy />} />
               <Route path="/refund-policy" element={<RefundPolicy />} />
