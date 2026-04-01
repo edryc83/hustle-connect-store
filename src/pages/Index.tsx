@@ -8,6 +8,7 @@ import HowItWorks from "@/components/landing/HowItWorks";
 import ExampleStores from "@/components/landing/ExampleStores";
 import { Button } from "@/components/ui/button";
 import { Users, ArrowRight } from "lucide-react";
+import agentCtaImage from "@/assets/agent-cta-home.jpeg";
 
 const Index = () => {
   const { user } = useAuth();
