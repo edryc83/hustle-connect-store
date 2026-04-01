@@ -5,6 +5,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import {
   Link2, Share2, Store, Wallet, CheckCircle2, ArrowRight,
 } from "lucide-react";
+import agentHeroMan from "@/assets/agent-hero-man.png";
+import agentHeroWoman from "@/assets/agent-hero-woman.png";
 
 const steps = [
   { icon: Link2, title: "Get your link", desc: "Sign up as an agent and get your unique Afristall referral link instantly." },
@@ -44,25 +46,34 @@ export default function AgentLanding() {
       </nav>
 
       {/* HERO */}
-      <section className="relative overflow-hidden px-4 pt-20 pb-24 text-center">
+      <section className="relative overflow-hidden px-4 pt-20 pb-24">
         <div className="pointer-events-none absolute -top-40 left-1/2 -translate-x-1/2 h-[500px] w-[500px] rounded-full bg-primary/10 blur-[120px]" />
-        <div className="relative mx-auto max-w-2xl space-y-8">
-          <span className="inline-block rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5 text-xs font-semibold text-primary">
-            Agent Programme
-          </span>
-          <h1 className="text-4xl sm:text-6xl font-extralight leading-[1.1] tracking-tight">
-            Get Paid to Build Africa's{" "}
-            <span className="text-primary font-light">Biggest Market</span>
-          </h1>
-          <p className="mx-auto max-w-lg text-base sm:text-lg text-muted-foreground leading-relaxed">
-            Join the Afristall Agent Programme. Share your link. Onboard sellers. Earn{" "}
-            <span className="font-bold text-primary">2,000 UGX</span> for every complete shop you add. No cap. No limit.
-          </p>
-          <Link to="/agent-signup">
-            <Button size="lg" className="gap-2 text-base font-bold shadow-lg shadow-primary/25 mt-4">
-              Become an Agent — It's Free <ArrowRight className="h-4 w-4" />
-            </Button>
-          </Link>
+        <div className="relative mx-auto max-w-5xl grid grid-cols-1 md:grid-cols-2 items-center gap-10">
+          <div className="space-y-8 text-center md:text-left">
+            <span className="inline-block rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5 text-xs font-semibold text-primary">
+              Agent Programme
+            </span>
+            <h1 className="text-4xl sm:text-6xl font-extralight leading-[1.1] tracking-tight">
+              Get Paid to Build Africa's{" "}
+              <span className="text-primary font-light">Biggest Market</span>
+            </h1>
+            <p className="max-w-lg text-base sm:text-lg text-muted-foreground leading-relaxed">
+              Join the Afristall Agent Programme. Share your link. Onboard sellers. Earn{" "}
+              <span className="font-bold text-primary">2,000 UGX</span> for every complete shop you add. No cap. No limit.
+            </p>
+            <Link to="/agent-signup">
+              <Button size="lg" className="gap-2 text-base font-bold shadow-lg shadow-primary/25 mt-4">
+                Become an Agent — It's Free <ArrowRight className="h-4 w-4" />
+              </Button>
+            </Link>
+          </div>
+          <div className="relative flex justify-center">
+            <img
+              src={agentHeroMan}
+              alt="Afristall agent pointing"
+              className="w-72 sm:w-80 md:w-96 object-contain drop-shadow-2xl"
+            />
+          </div>
         </div>
       </section>
 
@@ -112,22 +123,31 @@ export default function AgentLanding() {
 
       {/* WHO SHOULD BECOME AN AGENT */}
       <section className="px-4 py-20">
-        <div className="mx-auto max-w-2xl text-center space-y-6">
-          <h2 className="text-3xl sm:text-4xl font-extralight tracking-tight">
-            Who Should Become an Agent
-          </h2>
-          <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
-            You know people who sell things. Market traders. Home-based sellers. Fashion girls. Food vendors. Salon owners. Barbers. Event planners.
-            If they sell anything, they need Afristall — and <span className="font-semibold text-foreground">you get paid for introducing them.</span>
-          </p>
-          <div className="flex flex-wrap justify-center gap-2.5 pt-3">
-            {["Market Traders", "Fashion Sellers", "Food Vendors", "Salon Owners", "Event Planners"].map((t) => (
-              <span key={t} className="rounded-full border border-border bg-muted/50 px-4 py-1.5 text-xs font-medium text-muted-foreground">{t}</span>
-            ))}
+        <div className="mx-auto max-w-5xl grid grid-cols-1 md:grid-cols-2 items-center gap-12">
+          <div className="flex justify-center order-2 md:order-1">
+            <img
+              src={agentHeroWoman}
+              alt="Excited Afristall seller"
+              className="w-64 sm:w-72 md:w-80 object-contain drop-shadow-2xl"
+            />
           </div>
-          <p className="text-sm text-muted-foreground pt-2">
-            You don't need to be technical. You don't need any money to start. You just need your phone and the people you already know.
-          </p>
+          <div className="text-center md:text-left space-y-6 order-1 md:order-2">
+            <h2 className="text-3xl sm:text-4xl font-extralight tracking-tight">
+              Who Should Become an Agent
+            </h2>
+            <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
+              You know people who sell things. Market traders. Home-based sellers. Fashion girls. Food vendors. Salon owners. Barbers. Event planners.
+              If they sell anything, they need Afristall — and <span className="font-semibold text-foreground">you get paid for introducing them.</span>
+            </p>
+            <div className="flex flex-wrap justify-center md:justify-start gap-2.5 pt-3">
+              {["Market Traders", "Fashion Sellers", "Food Vendors", "Salon Owners", "Event Planners"].map((t) => (
+                <span key={t} className="rounded-full border border-border bg-muted/50 px-4 py-1.5 text-xs font-medium text-muted-foreground">{t}</span>
+              ))}
+            </div>
+            <p className="text-sm text-muted-foreground pt-2">
+              You don't need to be technical. You don't need any money to start. You just need your phone and the people you already know.
+            </p>
+          </div>
         </div>
       </section>
 
