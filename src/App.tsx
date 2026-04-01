@@ -75,7 +75,7 @@ const App = () => (
               <Route path="/superadmin" element={<SuperAdminLogin />} />
               <Route path="/explore" element={<Explore />} />
               <Route path="/ad-studio" element={<AdStudio />} />
-              <Route path="/agent" element={<AgentPortal />} />
+              
               <Route path="/agent-login" element={<AgentLogin />} />
               <Route path="/agents" element={<AgentLanding />} />
               <Route path="/agent-signup" element={<AgentSignup />} />
