@@ -59,7 +59,16 @@ export default function AgentPortal() {
               Afri<span className="text-primary">stall</span>
             </span>
           </div>
-          <span className="text-sm font-medium text-muted-foreground">{agentName}</span>
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-medium text-muted-foreground">{agentName}</span>
+            <button
+              onClick={async () => { await supabase.auth.signOut(); navigate("/agents", { replace: true }); }}
+              className="p-1.5 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted/60 transition-colors"
+              title="Sign out"
+            >
+              <LogOut className="h-4 w-4" />
+            </button>
+          </div>
         </div>
       </header>
 
