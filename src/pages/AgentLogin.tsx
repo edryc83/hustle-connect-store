@@ -109,9 +109,27 @@ export default function AgentLogin() {
               </button>
             </div>
           </div>
-          <Button className="w-full shadow-sm shadow-primary/20" onClick={handleLogin} disabled={loading}>
-            {loading ? "Signing in..." : "Sign In"}
-          </Button>
+          {!forgotMode ? (
+            <>
+              <div className="flex justify-end">
+                <button type="button" onClick={() => setForgotMode(true)} className="text-xs text-primary hover:underline">
+                  Forgot password?
+                </button>
+              </div>
+              <Button className="w-full shadow-sm shadow-primary/20" onClick={handleLogin} disabled={loading}>
+                {loading ? "Signing in..." : "Sign In"}
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button className="w-full shadow-sm shadow-primary/20" onClick={handleForgotPassword} disabled={forgotLoading}>
+                {forgotLoading ? "Sending…" : "Send Reset Link"}
+              </Button>
+              <button type="button" onClick={() => setForgotMode(false)} className="w-full text-sm text-muted-foreground hover:text-foreground text-center">
+                Back to sign in
+              </button>
+            </>
+          )}
         </div>
       </div>
     </div>
