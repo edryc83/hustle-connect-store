@@ -4,14 +4,13 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   Link2, Share2, Store, Wallet, CheckCircle2, ArrowRight,
-  Users, ShoppingBag, MessageCircle, Smartphone,
 } from "lucide-react";
 
 const steps = [
   { icon: Link2, title: "Get your link", desc: "Sign up as an agent and get your unique Afristall referral link instantly." },
-  { icon: Share2, title: "Share it everywhere", desc: "Send it to shop owners, market traders, influencers, and small business owners in your area. WhatsApp. TikTok. In person. Anywhere." },
+  { icon: Share2, title: "Share it everywhere", desc: "Send it to shop owners, market traders, influencers, and small business owners in your area." },
   { icon: Store, title: "They open their store", desc: "Your seller creates their free Afristall shop, adds their products and their WhatsApp number." },
-  { icon: Wallet, title: "You get paid", desc: "The moment their shop is complete — products added, WhatsApp number confirmed — 2,000 UGX lands in your account. Automatically." },
+  { icon: Wallet, title: "You get paid", desc: "The moment their shop is complete — products added, WhatsApp number confirmed — 2,000 UGX lands in your account." },
 ];
 
 const earningsRows = [
@@ -45,22 +44,22 @@ export default function AgentLanding() {
       </nav>
 
       {/* HERO */}
-      <section className="relative overflow-hidden px-4 pt-16 pb-20 text-center">
+      <section className="relative overflow-hidden px-4 pt-20 pb-24 text-center">
         <div className="pointer-events-none absolute -top-40 left-1/2 -translate-x-1/2 h-[500px] w-[500px] rounded-full bg-primary/10 blur-[120px]" />
-        <div className="relative mx-auto max-w-2xl space-y-6">
+        <div className="relative mx-auto max-w-2xl space-y-8">
           <span className="inline-block rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5 text-xs font-semibold text-primary">
             Agent Programme
           </span>
-          <h1 className="text-3xl sm:text-5xl font-extrabold leading-tight tracking-tight">
+          <h1 className="text-4xl sm:text-6xl font-extralight leading-[1.1] tracking-tight">
             Get Paid to Build Africa's{" "}
-            <span className="text-primary">Biggest Market</span>
+            <span className="text-primary font-light">Biggest Market</span>
           </h1>
-          <p className="mx-auto max-w-lg text-base sm:text-lg text-muted-foreground">
+          <p className="mx-auto max-w-lg text-base sm:text-lg text-muted-foreground leading-relaxed">
             Join the Afristall Agent Programme. Share your link. Onboard sellers. Earn{" "}
             <span className="font-bold text-primary">2,000 UGX</span> for every complete shop you add. No cap. No limit.
           </p>
           <Link to="/agent-signup">
-            <Button size="lg" className="gap-2 text-base font-bold shadow-lg shadow-primary/25 mt-2">
+            <Button size="lg" className="gap-2 text-base font-bold shadow-lg shadow-primary/25 mt-4">
               Become an Agent — It's Free <ArrowRight className="h-4 w-4" />
             </Button>
           </Link>
@@ -68,19 +67,21 @@ export default function AgentLanding() {
       </section>
 
       {/* HOW IT WORKS */}
-      <section className="px-4 py-16">
+      <section className="px-4 py-20">
         <div className="mx-auto max-w-3xl">
-          <h2 className="text-center text-2xl sm:text-3xl font-extrabold mb-10">How It Works</h2>
-          <div className="grid gap-4 sm:grid-cols-2">
+          <h2 className="text-center text-3xl sm:text-4xl font-extralight tracking-tight mb-14">
+            How It Works
+          </h2>
+          <div className="grid gap-5 sm:grid-cols-2">
             {steps.map((s, i) => (
               <Card key={i} className="border-border/50">
-                <CardContent className="p-5">
+                <CardContent className="p-6">
                   <div className="flex items-start gap-4">
                     <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary font-bold text-sm">
                       {i + 1}
                     </div>
                     <div>
-                      <h3 className="font-bold text-sm mb-1">{s.title}</h3>
+                      <h3 className="font-semibold text-sm mb-1.5">{s.title}</h3>
                       <p className="text-xs text-muted-foreground leading-relaxed">{s.desc}</p>
                     </div>
                   </div>
@@ -92,12 +93,12 @@ export default function AgentLanding() {
       </section>
 
       {/* THE NUMBERS */}
-      <section className="px-4 py-16 bg-card/50">
-        <div className="mx-auto max-w-md text-center space-y-6">
-          <h2 className="text-2xl sm:text-3xl font-extrabold">The Numbers</h2>
+      <section className="px-4 py-20 bg-card/50">
+        <div className="mx-auto max-w-md text-center space-y-8">
+          <h2 className="text-3xl sm:text-4xl font-extralight tracking-tight">The Numbers</h2>
           <div className="space-y-3">
             {earningsRows.map((r) => (
-              <div key={r.shops} className="flex items-center justify-between rounded-xl border border-border/50 bg-background px-5 py-3.5">
+              <div key={r.shops} className="flex items-center justify-between rounded-xl border border-border/50 bg-background px-5 py-4">
                 <span className="text-sm font-medium text-muted-foreground">{r.shops} complete shops</span>
                 <span className="text-lg font-extrabold text-primary">UGX {r.amount}</span>
               </div>
@@ -110,28 +111,32 @@ export default function AgentLanding() {
       </section>
 
       {/* WHO SHOULD BECOME AN AGENT */}
-      <section className="px-4 py-16">
-        <div className="mx-auto max-w-2xl text-center space-y-5">
-          <h2 className="text-2xl sm:text-3xl font-extrabold">Who Should Become an Agent</h2>
+      <section className="px-4 py-20">
+        <div className="mx-auto max-w-2xl text-center space-y-6">
+          <h2 className="text-3xl sm:text-4xl font-extralight tracking-tight">
+            Who Should Become an Agent
+          </h2>
           <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
             You know people who sell things. Market traders. Home-based sellers. Fashion girls. Food vendors. Salon owners. Barbers. Event planners.
             If they sell anything, they need Afristall — and <span className="font-semibold text-foreground">you get paid for introducing them.</span>
           </p>
-          <div className="flex flex-wrap justify-center gap-2 pt-2">
+          <div className="flex flex-wrap justify-center gap-2.5 pt-3">
             {["Market Traders", "Fashion Sellers", "Food Vendors", "Salon Owners", "Event Planners"].map((t) => (
-              <span key={t} className="rounded-full border border-border bg-muted/50 px-3 py-1 text-xs font-medium text-muted-foreground">{t}</span>
+              <span key={t} className="rounded-full border border-border bg-muted/50 px-4 py-1.5 text-xs font-medium text-muted-foreground">{t}</span>
             ))}
           </div>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-sm text-muted-foreground pt-2">
             You don't need to be technical. You don't need any money to start. You just need your phone and the people you already know.
           </p>
         </div>
       </section>
 
       {/* WHAT YOUR SELLERS GET */}
-      <section className="px-4 py-16 bg-card/50">
-        <div className="mx-auto max-w-2xl text-center space-y-5">
-          <h2 className="text-2xl sm:text-3xl font-extrabold">What Your Sellers Get</h2>
+      <section className="px-4 py-20 bg-card/50">
+        <div className="mx-auto max-w-2xl text-center space-y-6">
+          <h2 className="text-3xl sm:text-4xl font-extralight tracking-tight">
+            What Your Sellers Get
+          </h2>
           <p className="text-sm sm:text-base text-muted-foreground leading-relaxed">
             Every seller you bring onto Afristall gets their own free online shop at{" "}
             <span className="font-mono text-foreground font-semibold">afristall.com/theirname</span>. Their customers can see all their products, prices, and order directly to their WhatsApp. No commission taken. Ever.
@@ -143,11 +148,13 @@ export default function AgentLanding() {
       </section>
 
       {/* WHAT A COMPLETE SHOP LOOKS LIKE */}
-      <section className="px-4 py-16">
-        <div className="mx-auto max-w-md space-y-6">
-          <h2 className="text-center text-2xl sm:text-3xl font-extrabold">What a Complete Shop Looks Like</h2>
+      <section className="px-4 py-20">
+        <div className="mx-auto max-w-md space-y-8">
+          <h2 className="text-center text-3xl sm:text-4xl font-extralight tracking-tight">
+            What a Complete Shop Looks Like
+          </h2>
           <Card className="border-primary/20">
-            <CardContent className="p-5 space-y-3">
+            <CardContent className="p-6 space-y-4">
               {checklist.map((item) => (
                 <div key={item} className="flex items-start gap-3">
                   <CheckCircle2 className="h-5 w-5 shrink-0 text-green-500 mt-0.5" />
@@ -163,10 +170,10 @@ export default function AgentLanding() {
       </section>
 
       {/* FINAL CTA */}
-      <section className="px-4 py-20 text-center">
-        <div className="mx-auto max-w-lg space-y-5">
-          <h2 className="text-2xl sm:text-3xl font-extrabold">Ready to Start?</h2>
-          <p className="text-sm text-muted-foreground">
+      <section className="px-4 py-24 text-center">
+        <div className="mx-auto max-w-lg space-y-6">
+          <h2 className="text-3xl sm:text-4xl font-extralight tracking-tight">Ready to Start?</h2>
+          <p className="text-sm text-muted-foreground leading-relaxed">
             There are sellers in your area right now who need this. Every day you wait is money you're not earning.
           </p>
           <Link to="/agent-signup">
@@ -174,7 +181,7 @@ export default function AgentLanding() {
               Join the Agent Programme — Free <ArrowRight className="h-4 w-4" />
             </Button>
           </Link>
-          <p className="text-xs text-muted-foreground pt-2">
+          <p className="text-xs text-muted-foreground pt-3">
             Already an agent?{" "}
             <Link to="/agent-login" className="text-primary font-medium hover:underline">Log in to your dashboard →</Link>
           </p>
@@ -182,7 +189,7 @@ export default function AgentLanding() {
       </section>
 
       {/* Footer */}
-      <footer className="border-t border-border/40 px-4 py-6 text-center">
+      <footer className="border-t border-border/40 px-4 py-8 text-center">
         <p className="text-xs text-muted-foreground">
           Afristall Agent Programme · afristall.com · Built for African sellers. Powered by their communities.
         </p>
