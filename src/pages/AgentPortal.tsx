@@ -1,11 +1,12 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAgentData, type ReferredSeller } from "@/hooks/useAgentData";
 import AfristallLogo from "@/components/AfristallLogo";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Copy, Share2, MessageCircle, Store, CheckCircle2, Users, Wallet, Loader2, Package, LogOut, ExternalLink } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Copy, Share2, MessageCircle, Store, CheckCircle2, Users, Wallet, Loader2, Package, LogOut, ExternalLink, Smartphone, Save } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
