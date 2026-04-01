@@ -195,7 +195,7 @@ export default function AgentLanding() {
       {/* COMPLETE SHOP CHECKLIST */}
       <section className="mx-auto max-w-6xl px-4 py-20 grid md:grid-cols-2 gap-12 items-center">
         <div className="space-y-4">
-          <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight">
+          <h2 className="text-2xl sm:text-3xl font-extralight tracking-tight">
             What a Complete Shop Looks Like
           </h2>
           <p className="text-sm text-muted-foreground">
