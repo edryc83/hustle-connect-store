@@ -207,6 +207,19 @@ const Signup = () => {
         userId = user.id;
       }
 
+      // Resolve agent referral
+      let referredBy: string | null = null;
+      const refSlug = sessionStorage.getItem("afristall_ref");
+      if (refSlug) {
+        const { data: agentProfile } = await supabase
+          .from("profiles")
+          .select("id")
+          .eq("store_slug", refSlug)
+          .maybeSingle();
+        if (agentProfile) referredBy = agentProfile.id;
+        sessionStorage.removeItem("afristall_ref");
+      }
+
       const { error: profileError } = await supabase.from("profiles").update({
         first_name: firstName.trim(),
         store_name: storeName.trim(),
@@ -216,6 +229,7 @@ const Signup = () => {
         category: serializeCategories(categorySelection),
         business_type: businessTypes.length === 1 ? businessTypes[0] : businessTypes.join(","),
         whatsapp_number: fullWhatsapp,
+        ...(referredBy ? { referred_by: referredBy } : {}),
       } as any).eq("id", userId);
 
       if (profileError) throw profileError;
