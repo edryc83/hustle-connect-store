@@ -74,7 +74,7 @@ export default function AdminAgents() {
       if (!agentShops[agentId]) agentShops[agentId] = { total: 0, complete: 0 };
       agentShops[agentId].total++;
       const hasWhatsApp = !!p.whatsapp_number && p.whatsapp_number.length > 5;
-      if (hasWhatsApp && productMap[p.id]) agentShops[agentId].complete++;
+      if (hasWhatsApp && (productMap[p.id] || 0) >= 5) agentShops[agentId].complete++;
     }
 
     // Get all withdrawals
