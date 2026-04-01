@@ -5,8 +5,8 @@ import { Card, CardContent } from "@/components/ui/card";
 import {
   Link2, Share2, Store, Wallet, CheckCircle2, ArrowRight,
 } from "lucide-react";
-import agentHeroMan from "@/assets/agent-hero-man.png";
 import agentHeroWoman from "@/assets/agent-hero-woman.png";
+import agentBgFriends from "@/assets/agent-bg-friends.jpeg";
 
 const steps = [
   { icon: Link2, title: "Get your link", desc: "Sign up as an agent and get your unique Afristall referral link instantly." },
