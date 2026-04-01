@@ -137,7 +137,39 @@ export default function AgentPortal() {
           </CardContent>
         </Card>
 
-        {/* Referred sellers list */}
+        {/* Mobile Money Details */}
+        <Card>
+          <CardContent className="p-4 space-y-3">
+            <div className="flex items-center gap-2">
+              <Smartphone className="h-4 w-4 text-primary" />
+              <p className="text-sm font-semibold">Mobile Money Details</p>
+            </div>
+            <div className="space-y-2">
+              <Input
+                placeholder="Mobile Money Number (e.g. 0771234567)"
+                value={editMomoNumber}
+                onChange={(e) => setEditMomoNumber(e.target.value)}
+              />
+              <Input
+                placeholder="Registered Name on Account"
+                value={editMomoName}
+                onChange={(e) => setEditMomoName(e.target.value)}
+              />
+            </div>
+            <Button
+              size="sm"
+              className="w-full gap-1.5"
+              disabled={savingMomo}
+              onClick={async () => {
+                setSavingMomo(true);
+                await saveMomo(editMomoNumber.trim(), editMomoName.trim());
+                setSavingMomo(false);
+                toast.success("Mobile money details saved!");
+              }}
+            >
+              <Save className="h-3.5 w-3.5" /> {savingMomo ? "Saving..." : "Save Details"}
+            </Button>
+          </CardContent>
         <div>
           <h2 className="text-sm font-semibold mb-3 text-muted-foreground">Your Shops ({sellers.length})</h2>
           {sellers.length === 0 ? (
