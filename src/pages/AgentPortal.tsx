@@ -5,7 +5,7 @@ import AfristallLogo from "@/components/AfristallLogo";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Copy, Share2, MessageCircle, Store, CheckCircle2, Users, Wallet, Loader2, Package, LogOut } from "lucide-react";
+import { Copy, Share2, MessageCircle, Store, CheckCircle2, Users, Wallet, Loader2, Package, LogOut, ExternalLink } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -152,6 +152,8 @@ function SellerRow({ seller }: { seller: ReferredSeller }) {
     ? `https://wa.me/${seller.whatsapp_number.replace(/^\+/, "").replace(/\D/g, "")}`
     : null;
 
+  const storeLink = seller.store_slug ? `/${seller.store_slug}` : null;
+
   return (
     <Card>
       <CardContent className="flex items-center gap-3 p-3">
@@ -167,6 +169,13 @@ function SellerRow({ seller }: { seller: ReferredSeller }) {
             </span>
           </div>
         </div>
+        {storeLink && (
+          <a href={storeLink} target="_blank" rel="noopener noreferrer" className="shrink-0">
+            <Button variant="ghost" size="sm" className="h-8 gap-1 text-xs px-2">
+              <ExternalLink className="h-3.5 w-3.5" /> View
+            </Button>
+          </a>
+        )}
         {whatsappLink && (
           <a href={whatsappLink} target="_blank" rel="noopener noreferrer" className="shrink-0">
             <MessageCircle className="h-5 w-5 text-green-500" />

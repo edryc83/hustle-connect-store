@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -10,7 +10,22 @@ import AfristallLogo from "@/components/AfristallLogo";
 import { toast } from "sonner";
 
 export default function AgentLogin() {
+  const { user } = useAuth();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (user) {
+      supabase
+        .from("user_roles" as any)
+        .select("role")
+        .eq("user_id", user.id)
+        .eq("role", "agent")
+        .maybeSingle()
+        .then(({ data }: any) => {
+          if (data) navigate("/agent", { replace: true });
+        });
+    }
+  }, [user, navigate]);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
