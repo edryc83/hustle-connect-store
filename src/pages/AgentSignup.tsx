@@ -64,10 +64,9 @@ export default function AgentSignup() {
 
       const userId = authData.user.id;
 
-      // 2. Update profile with agent's name
+      // 2. Update profile with agent's name (no store_name — agents aren't sellers)
       await supabase.from("profiles").update({
         first_name: firstName.trim(),
-        store_name: `${firstName.trim()}'s Referrals`,
         store_slug: finalSlug,
       } as any).eq("id", userId);
 
