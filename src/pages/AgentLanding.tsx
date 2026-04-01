@@ -102,7 +102,7 @@ export default function AgentLanding() {
       {/* HOW IT WORKS — numbered cards like "Services we provide" */}
       <section className="mx-auto max-w-6xl px-4 pb-20">
         <div className="flex items-center justify-between mb-10">
-          <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight">How It Works</h2>
+          <h2 className="text-2xl sm:text-3xl font-extralight tracking-tight">How It Works</h2>
         </div>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {steps.map((s, i) => (
