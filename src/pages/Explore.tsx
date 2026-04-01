@@ -1,6 +1,6 @@
 import { useEffect, useState, useMemo, useCallback } from "react";
 import whatsappIcon from "@/assets/whatsapp-icon.png";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/layout/Navbar";
 import Footer from "@/components/layout/Footer";
@@ -122,10 +122,28 @@ const Explore = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [exploreCategoryFilter, setExploreCategoryFilter] = useState<string | null>(null);
 
-  // Drill-down state
-  const [activeTab, setActiveTab] = useState<TabType | null>(null);
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [selectedSubcategory, setSelectedSubcategory] = useState<string | null>(null);
+  // Drill-down state — synced with URL search params for back navigation
+  const [searchParams, setSearchParams] = useSearchParams();
+  const activeTab = (searchParams.get("tab") as TabType) || null;
+  const selectedCategory = searchParams.get("cat") || null;
+  const selectedSubcategory = searchParams.get("sub") || null;
+
+  const setActiveTab = (tab: TabType | null) => {
+    const p = new URLSearchParams();
+    if (tab) p.set("tab", tab);
+    setSearchParams(p, { replace: false });
+  };
+  const setSelectedCategory = (cat: string | null) => {
+    const p = new URLSearchParams(searchParams);
+    if (cat) p.set("cat", cat); else p.delete("cat");
+    p.delete("sub");
+    setSearchParams(p, { replace: false });
+  };
+  const setSelectedSubcategory = (sub: string | null) => {
+    const p = new URLSearchParams(searchParams);
+    if (sub) p.set("sub", sub); else p.delete("sub");
+    setSearchParams(p, { replace: false });
+  };
 
   // Determine current step
   const step: Step = !activeTab
@@ -139,17 +157,7 @@ const Explore = () => {
     : "stores";
 
   const handleBack = () => {
-    if (activeTab === "all") {
-      setActiveTab(null);
-    } else if (step === "stores" && selectedSubcategory) {
-      setSelectedSubcategory(null);
-    } else if (step === "stores" && selectedCategory) {
-      setSelectedCategory(null);
-    } else if (step === "subcategory") {
-      setSelectedCategory(null);
-    } else if (step === "category") {
-      setActiveTab(null);
-    }
+    window.history.back();
   };
 
   const handleSelectCategory = (cat: string) => {
