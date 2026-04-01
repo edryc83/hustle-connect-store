@@ -17,6 +17,8 @@ export function useAgentData() {
   const [isAgent, setIsAgent] = useState<boolean | null>(null);
   const [agentSlug, setAgentSlug] = useState<string | null>(null);
   const [agentName, setAgentName] = useState<string>("");
+  const [momoNumber, setMomoNumber] = useState<string>("");
+  const [momoName, setMomoName] = useState<string>("");
   const [sellers, setSellers] = useState<ReferredSeller[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -42,12 +44,14 @@ export function useAgentData() {
       // Get agent profile
       const { data: agentProfile } = await supabase
         .from("profiles")
-        .select("first_name, store_slug")
+        .select("first_name, store_slug, momo_number, momo_name")
         .eq("id", user.id)
         .single();
 
       setAgentName(agentProfile?.first_name || "Agent");
       setAgentSlug(agentProfile?.store_slug || user.id.slice(0, 8));
+      setMomoNumber((agentProfile as any)?.momo_number || "");
+      setMomoName((agentProfile as any)?.momo_name || "");
 
       // Get referred sellers
       const { data: referredProfiles } = await (supabase
@@ -101,5 +105,15 @@ export function useAgentData() {
   const completeCount = sellers.filter((s) => s.isComplete).length;
   const balance = completeCount * 2000;
 
-  return { isAgent, loading, agentName, agentSlug, sellers, completeCount, balance };
+  const saveMomo = async (number: string, name: string) => {
+    if (!user) return;
+    await supabase
+      .from("profiles")
+      .update({ momo_number: number, momo_name: name } as any)
+      .eq("id", user.id);
+    setMomoNumber(number);
+    setMomoName(name);
+  };
+
+  return { isAgent, loading, agentName, agentSlug, sellers, completeCount, balance, momoNumber, momoName, saveMomo };
 }

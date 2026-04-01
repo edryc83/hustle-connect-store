@@ -1,11 +1,12 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAgentData, type ReferredSeller } from "@/hooks/useAgentData";
 import AfristallLogo from "@/components/AfristallLogo";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Copy, Share2, MessageCircle, Store, CheckCircle2, Users, Wallet, Loader2, Package, LogOut, ExternalLink } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Copy, Share2, MessageCircle, Store, CheckCircle2, Users, Wallet, Loader2, Package, LogOut, ExternalLink, Smartphone, Save } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -13,7 +14,19 @@ const REWARD_PER_SHOP = 2_000;
 
 export default function AgentPortal() {
   const navigate = useNavigate();
-  const { isAgent, loading, agentName, agentSlug, sellers, completeCount, balance } = useAgentData();
+  const { isAgent, loading, agentName, agentSlug, sellers, completeCount, balance, momoNumber, momoName, saveMomo } = useAgentData();
+  const [editMomoNumber, setEditMomoNumber] = useState("");
+  const [editMomoName, setEditMomoName] = useState("");
+  const [momoInitialized, setMomoInitialized] = useState(false);
+  const [savingMomo, setSavingMomo] = useState(false);
+
+  useEffect(() => {
+    if (!momoInitialized && !loading) {
+      setEditMomoNumber(momoNumber);
+      setEditMomoName(momoName);
+      setMomoInitialized(true);
+    }
+  }, [loading, momoNumber, momoName, momoInitialized]);
 
   useEffect(() => {
     if (!loading && isAgent === false) navigate("/", { replace: true });
@@ -121,6 +134,41 @@ export default function AgentPortal() {
                 <Share2 className="h-3.5 w-3.5" /> Share
               </Button>
             </div>
+          </CardContent>
+        </Card>
+
+        {/* Mobile Money Details */}
+        <Card>
+          <CardContent className="p-4 space-y-3">
+            <div className="flex items-center gap-2">
+              <Smartphone className="h-4 w-4 text-primary" />
+              <p className="text-sm font-semibold">Mobile Money Details</p>
+            </div>
+            <div className="space-y-2">
+              <Input
+                placeholder="Mobile Money Number (e.g. 0771234567)"
+                value={editMomoNumber}
+                onChange={(e) => setEditMomoNumber(e.target.value)}
+              />
+              <Input
+                placeholder="Registered Name on Account"
+                value={editMomoName}
+                onChange={(e) => setEditMomoName(e.target.value)}
+              />
+            </div>
+            <Button
+              size="sm"
+              className="w-full gap-1.5"
+              disabled={savingMomo}
+              onClick={async () => {
+                setSavingMomo(true);
+                await saveMomo(editMomoNumber.trim(), editMomoName.trim());
+                setSavingMomo(false);
+                toast.success("Mobile money details saved!");
+              }}
+            >
+              <Save className="h-3.5 w-3.5" /> {savingMomo ? "Saving..." : "Save Details"}
+            </Button>
           </CardContent>
         </Card>
 
