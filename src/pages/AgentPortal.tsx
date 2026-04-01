@@ -14,7 +14,19 @@ const REWARD_PER_SHOP = 2_000;
 
 export default function AgentPortal() {
   const navigate = useNavigate();
-  const { isAgent, loading, agentName, agentSlug, sellers, completeCount, balance } = useAgentData();
+  const { isAgent, loading, agentName, agentSlug, sellers, completeCount, balance, momoNumber, momoName, saveMomo } = useAgentData();
+  const [editMomoNumber, setEditMomoNumber] = useState("");
+  const [editMomoName, setEditMomoName] = useState("");
+  const [momoInitialized, setMomoInitialized] = useState(false);
+  const [savingMomo, setSavingMomo] = useState(false);
+
+  useEffect(() => {
+    if (!momoInitialized && !loading) {
+      setEditMomoNumber(momoNumber);
+      setEditMomoName(momoName);
+      setMomoInitialized(true);
+    }
+  }, [loading, momoNumber, momoName, momoInitialized]);
 
   useEffect(() => {
     if (!loading && isAgent === false) navigate("/", { replace: true });
