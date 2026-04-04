@@ -25,11 +25,18 @@ const ResetPassword = () => {
       }
     });
 
-    // Also check hash for type=recovery
+    // Check hash for type=recovery
     const hash = window.location.hash;
     if (hash.includes("type=recovery")) {
       setIsRecovery(true);
     }
+
+    // Also check if we already have a session (event may have fired before mount)
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session) {
+        setIsRecovery(true);
+      }
+    });
 
     return () => subscription.unsubscribe();
   }, []);
