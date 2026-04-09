@@ -306,6 +306,7 @@ const DashboardProducts = () => {
         attributes: Object.keys(attributes).length > 0 ? attributes : null,
         category: finalCategory || null,
         subcategory: detectedSubcategory || null,
+        updated_at: new Date().toISOString(),
       } as any;
 
       let productId: string;
