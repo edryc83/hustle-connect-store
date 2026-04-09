@@ -306,12 +306,13 @@ const DashboardProducts = () => {
         attributes: Object.keys(attributes).length > 0 ? attributes : null,
         category: finalCategory || null,
         subcategory: detectedSubcategory || null,
+        updated_at: new Date().toISOString(),
       } as any;
 
       let productId: string;
       if (editingProduct) {
-        const { error } = await supabase.from("products").update(payload).eq("id", editingProduct.id);
-        if (error) throw error;
+        const { error, status } = await supabase.from("products").update(payload).eq("id", editingProduct.id).eq("user_id", user.id);
+        if (error) { console.error("Product update error:", error, "Status:", status, "Payload:", payload); throw error; }
         productId = editingProduct.id;
         await supabase.from("product_images").delete().eq("product_id", productId);
       } else {
