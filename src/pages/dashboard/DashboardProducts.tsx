@@ -22,6 +22,7 @@ import { formatPrice } from "@/lib/currency";
 import whatsappIcon from "@/assets/whatsapp-icon.png";
 import { Badge } from "@/components/ui/badge";
 import type { Tables } from "@/integrations/supabase/types";
+import FlyerGeneratorModal from "@/components/flyer-generator/FlyerGeneratorModal";
 import { ProductAttributeForm } from "@/components/dashboard/ProductAttributeForm";
 import type { AiAttributeSuggestion } from "@/lib/attributeLibrary";
 import { aiSlugToCategory } from "@/lib/categoryMapping";
@@ -334,6 +335,7 @@ const DashboardProducts = () => {
   };
 
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+  const [flyerProduct, setFlyerProduct] = useState<Product | null>(null);
 
   const handleDelete = async (id: string) => {
     // Delete product_images first (FK constraint — no cascade)
@@ -594,14 +596,14 @@ const DashboardProducts = () => {
 
       {/* Product detail modal with Share to Status */}
       <Dialog open={!!detailProduct} onOpenChange={(open) => !open && setDetailProduct(null)}>
-        <DialogContent className="max-w-sm">
+        <DialogContent className="max-w-sm max-h-[85vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle className="truncate">{detailProduct?.name}</DialogTitle>
           </DialogHeader>
           {detailProduct && (() => {
             const imgs = productImages[detailProduct.id] ?? (detailProduct.image_url ? [detailProduct.image_url] : []);
             return (
-              <div className="space-y-4">
+              <div className="space-y-4 pb-2">
                 {imgs[0] && (
                   <img src={imgs[0]} alt={detailProduct.name} className="w-full aspect-square object-cover rounded-xl" />
                 )}
@@ -621,12 +623,31 @@ const DashboardProducts = () => {
                 <Button className="w-full rounded-xl gap-2" onClick={() => { setDetailProduct(null); openEdit(detailProduct); }}>
                   <Pencil className="h-4 w-4" /> Edit {terms.singular}
                 </Button>
+                <Button
+                  variant="outline"
+                  className="w-full rounded-xl gap-2 border-primary/30 text-primary hover:bg-primary/10"
+                  onClick={() => { setDetailProduct(null); setFlyerProduct(detailProduct); }}
+                >
+                  <Sparkles className="h-4 w-4" /> Create Flyer
+                </Button>
                 <ShareToStatusButton product={detailProduct} imgs={imgs} currency={currency} profile={profile} />
               </div>
             );
           })()}
         </DialogContent>
       </Dialog>
+
+      {/* Flyer Generator Modal */}
+      {flyerProduct && profile && (
+        <FlyerGeneratorModal
+          product={flyerProduct}
+          storeName={profile.store_name ?? "Store"}
+          storeSlug={profile.store_slug ?? ""}
+          currency={currency}
+          open={!!flyerProduct}
+          onClose={() => setFlyerProduct(null)}
+        />
+      )}
     </div>
   );
 };
