@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
-import { Store, ShoppingBag, Share2, Copy, Check, Star, ShoppingCart, Sun, Moon, LayoutDashboard, Minus, Plus, Heart } from "lucide-react";
+import { Store, ShoppingBag, Share2, Copy, Check, Star, ShoppingCart, Sun, Moon, LayoutDashboard, Minus, Plus, Heart, Sparkles } from "lucide-react";
 import { formatPrice } from "@/lib/currency";
 
 import AfristallLogo from "@/components/AfristallLogo";
@@ -19,6 +19,7 @@ import { BuyerAttributePicker, ChatOnlyBanner } from "@/components/storefront/Bu
 import { getAttributeSummary, getSelectableKeys, buildAttributeLines } from "@/lib/attributeLibrary";
 import { StorefrontFilters, applyFilters, type FilterState } from "@/components/storefront/StorefrontFilters";
 import { StoreAssistantButton } from "@/components/storefront/StoreAssistant";
+import FlyerGeneratorModal from "@/components/flyer-generator/FlyerGeneratorModal";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -244,6 +245,7 @@ function ProductDetailView({
   profile,
   storeSlug,
   visitorName,
+  isOwner,
   onBack,
   onNavigate,
 }: {
@@ -256,6 +258,7 @@ function ProductDetailView({
   profile: Profile;
   storeSlug: string;
   visitorName: string | null;
+  isOwner: boolean;
   onBack: () => void;
   onNavigate: (id: string) => void;
 }) {
@@ -265,6 +268,7 @@ function ProductDetailView({
   const [qty, setQty] = useState(1);
   const [attrSelections, setAttrSelections] = useState<Record<string, string>>({});
   const [deliveryAddress, setDeliveryAddress] = useState("");
+  const [flyerModalOpen, setFlyerModalOpen] = useState(false);
 
   const attrs = (product as any).attributes as Record<string, any> | null;
   const isChatOnly = attrs?.chat_only === true;
@@ -326,6 +330,17 @@ function ProductDetailView({
           </button>
           <h1 className="text-sm font-semibold truncate max-w-[200px]">{product.name}</h1>
           <div className="flex items-center gap-2">
+              {isOwner && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setFlyerModalOpen(true)}
+                  className="gap-1.5 h-9 rounded-full"
+                >
+                  <Sparkles className="h-4 w-4" />
+                  <span className="hidden sm:inline">Create Flyer</span>
+                </Button>
+              )}
               <button
                 onClick={() => toggle(product.id)}
                 className="h-9 w-9 rounded-full border border-border flex items-center justify-center hover:bg-muted transition-colors"
@@ -596,6 +611,17 @@ function ProductDetailView({
         sellerId={profile.id}
         visitorName={visitorName}
       />
+
+      {isOwner && (
+        <FlyerGeneratorModal
+          product={product}
+          storeName={profile.store_name ?? "Store"}
+          storeSlug={storeSlug}
+          currency={currency}
+          open={flyerModalOpen}
+          onClose={() => setFlyerModalOpen(false)}
+        />
+      )}
     </div>
   );
 }
@@ -812,6 +838,7 @@ const StorefrontInner = () => {
         profile={profile}
         storeSlug={storeSlug ?? ""}
         visitorName={visitorName}
+        isOwner={!!(user && profile && user.id === profile.id)}
         onBack={() => navigate(`/${storeSlug}`)}
         onNavigate={(id) => navigate(`/${storeSlug}/${id}`)}
       />
