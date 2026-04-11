@@ -3,7 +3,6 @@ import whatsappIcon from "@/assets/whatsapp-icon.png";
 import { Link, useSearchParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import Navbar from "@/components/layout/Navbar";
-import Footer from "@/components/layout/Footer";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import {
@@ -770,8 +769,6 @@ const Explore = () => {
           </>
         )}
       </main>
-
-      <Footer />
     </div>
   );
 };

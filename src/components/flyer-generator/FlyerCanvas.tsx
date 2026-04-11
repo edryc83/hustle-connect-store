@@ -14,6 +14,7 @@ interface FlyerCanvasProps {
   storeName: string;
   primaryColor?: string;
   secondaryColor?: string;
+  fontFamily?: string;
   isPreview?: boolean;
 }
 
@@ -56,6 +57,7 @@ const FlyerCanvas = forwardRef<FlyerCanvasRef, FlyerCanvasProps>(({
   storeName,
   primaryColor,
   secondaryColor,
+  fontFamily,
   isPreview = false,
 }, ref) => {
   const containerRef = useRef<HTMLDivElement>(null);
@@ -260,6 +262,11 @@ const FlyerCanvas = forwardRef<FlyerCanvasRef, FlyerCanvasProps>(({
         if (!text) return;
 
         const fontSize = (config.fontSize || 24) * scale;
+        // Use selected font for main text elements, keep store name in default font
+        const effectiveFont = key === 'storeName'
+          ? (config.fontFamily || 'Inter, sans-serif')
+          : (fontFamily || config.fontFamily || 'Inter, sans-serif');
+
         const textObj = new fabric.Textbox(text, {
           left: config.x * canvasWidth,
           top: config.y * canvasHeight,
@@ -267,7 +274,7 @@ const FlyerCanvas = forwardRef<FlyerCanvasRef, FlyerCanvasProps>(({
           originY: 'center',
           fontSize,
           fontWeight: config.fontWeight || '400',
-          fontFamily: config.fontFamily || 'Inter, sans-serif',
+          fontFamily: effectiveFont,
           fill: getEffectiveColor(config.color),
           textAlign: config.align || 'center',
           width: canvasWidth * 0.9,
@@ -317,6 +324,7 @@ const FlyerCanvas = forwardRef<FlyerCanvasRef, FlyerCanvasProps>(({
     storeName,
     primaryColor,
     secondaryColor,
+    fontFamily,
     canvasWidth,
     canvasHeight,
     scale,

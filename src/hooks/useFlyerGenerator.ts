@@ -3,11 +3,30 @@ import { removeBackground } from '@imgly/background-removal';
 import { supabase } from '@/integrations/supabase/client';
 import { extractColors, getDefaultPalette } from '@/lib/colorExtractor';
 import type { FlyerStyle, FlyerFormat } from '@/components/flyer-generator/templates';
+import { getRandomTemplates, type FlyerTemplate } from '@/components/flyer-generator/templates';
 
 export type FlyerStep = 'loading' | 'picking' | 'customizing';
 
+// Available font options
+export const FONT_OPTIONS = [
+  { id: 'inter', name: 'Inter', family: 'Inter, sans-serif', category: 'modern' },
+  { id: 'poppins', name: 'Poppins', family: 'Poppins, sans-serif', category: 'modern' },
+  { id: 'montserrat', name: 'Montserrat', family: 'Montserrat, sans-serif', category: 'modern' },
+  { id: 'playfair', name: 'Playfair', family: 'Playfair Display, serif', category: 'elegant' },
+  { id: 'dancing', name: 'Dancing Script', family: 'Dancing Script, cursive', category: 'script' },
+  { id: 'bebas', name: 'Bebas Neue', family: 'Bebas Neue, sans-serif', category: 'bold' },
+  { id: 'oswald', name: 'Oswald', family: 'Oswald, sans-serif', category: 'bold' },
+  { id: 'roboto', name: 'Roboto', family: 'Roboto, sans-serif', category: 'clean' },
+  { id: 'lato', name: 'Lato', family: 'Lato, sans-serif', category: 'clean' },
+  { id: 'raleway', name: 'Raleway', family: 'Raleway, sans-serif', category: 'elegant' },
+] as const;
+
+export type FontOption = typeof FONT_OPTIONS[number];
+
 interface FlyerVariation {
   style: FlyerStyle;
+  templateId: string;
+  template: FlyerTemplate;
   headline: string;
   tagline: string;
   cta: string;
@@ -33,6 +52,7 @@ interface UseFlyerGeneratorReturn {
 
   // Selection
   selectedStyle: FlyerStyle | null;
+  selectedTemplate: FlyerTemplate | null;
   format: FlyerFormat;
 
   // Customization
@@ -41,6 +61,7 @@ interface UseFlyerGeneratorReturn {
   cta: string;
   colors: string[];
   selectedColor: string | null;
+  selectedFont: FontOption;
 
   // Processed image (with background removed)
   processedImage: string | null;
@@ -53,15 +74,27 @@ interface UseFlyerGeneratorReturn {
   setTagline: (value: string) => void;
   setCta: (value: string) => void;
   setSelectedColor: (color: string) => void;
+  setSelectedFont: (font: FontOption) => void;
   reset: () => void;
   goBack: () => void;
 }
 
-const DEFAULT_VARIATIONS: FlyerVariation[] = [
-  { style: 'minimal', headline: 'New Arrival', tagline: 'Quality you can trust', cta: 'Shop Now' },
-  { style: 'bold', headline: 'Hot Deal!', tagline: "Don't miss out on this offer", cta: 'Get Yours' },
-  { style: 'elegant', headline: 'Premium Pick', tagline: 'Elevate your style today', cta: 'Discover' },
-];
+// Generate default variations using random templates
+function generateDefaultVariations(): FlyerVariation[] {
+  const randomTemplates = getRandomTemplates(3);
+  const defaultCopy = [
+    { headline: 'New Arrival', tagline: 'Quality you can trust', cta: 'Shop Now' },
+    { headline: 'Hot Deal!', tagline: "Don't miss out on this offer", cta: 'Get Yours' },
+    { headline: 'Premium Pick', tagline: 'Elevate your style today', cta: 'Discover' },
+  ];
+
+  return randomTemplates.map((template, index) => ({
+    style: template.style,
+    templateId: template.id,
+    template,
+    ...defaultCopy[index % defaultCopy.length],
+  }));
+}
 
 export function useFlyerGenerator({
   productName,
@@ -76,11 +109,12 @@ export function useFlyerGenerator({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // AI-generated variations
-  const [variations, setVariations] = useState<FlyerVariation[]>(DEFAULT_VARIATIONS);
+  // AI-generated variations (initialize with random templates)
+  const [variations, setVariations] = useState<FlyerVariation[]>(() => generateDefaultVariations());
 
   // Selection state
   const [selectedStyle, setSelectedStyle] = useState<FlyerStyle | null>(null);
+  const [selectedTemplate, setSelectedTemplate] = useState<FlyerTemplate | null>(null);
   const [format, setFormat] = useState<FlyerFormat>('square');
 
   // Customization state
@@ -89,6 +123,7 @@ export function useFlyerGenerator({
   const [cta, setCta] = useState('');
   const [colors, setColors] = useState<string[]>(getDefaultPalette());
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
+  const [selectedFont, setSelectedFont] = useState<FontOption>(FONT_OPTIONS[0]);
 
   // Image processing
   const [processedImage, setProcessedImage] = useState<string | null>(null);
@@ -185,6 +220,7 @@ export function useFlyerGenerator({
     // Find the variation for this style
     const variation = variations.find(v => v.style === style);
     if (variation) {
+      setSelectedTemplate(variation.template);
       setHeadline(variation.headline);
       setTagline(variation.tagline);
       setCta(variation.cta);
@@ -197,6 +233,7 @@ export function useFlyerGenerator({
   const goBack = useCallback(() => {
     setStep('picking');
     setSelectedStyle(null);
+    setSelectedTemplate(null);
   }, []);
 
   // Reset everything
@@ -205,11 +242,14 @@ export function useFlyerGenerator({
     setLoading(true);
     setError(null);
     setSelectedStyle(null);
+    setSelectedTemplate(null);
     setFormat('square');
     setHeadline('');
     setTagline('');
     setCta('');
     setSelectedColor(null);
+    setSelectedFont(FONT_OPTIONS[0]);
+    setVariations(generateDefaultVariations());
   }, []);
 
   return {
@@ -218,12 +258,14 @@ export function useFlyerGenerator({
     error,
     variations,
     selectedStyle,
+    selectedTemplate,
     format,
     headline,
     tagline,
     cta,
     colors,
     selectedColor,
+    selectedFont,
     processedImage,
     imageProcessing,
     selectStyle,
@@ -232,6 +274,7 @@ export function useFlyerGenerator({
     setTagline,
     setCta,
     setSelectedColor,
+    setSelectedFont,
     reset,
     goBack,
   };

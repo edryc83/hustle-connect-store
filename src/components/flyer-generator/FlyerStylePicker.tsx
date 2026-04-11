@@ -1,10 +1,12 @@
 import { Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import FlyerCanvas from './FlyerCanvas';
-import { getAllTemplates, type FlyerStyle, type FlyerTemplate } from './templates';
+import type { FlyerStyle, FlyerTemplate } from './templates';
 
 interface FlyerVariation {
   style: FlyerStyle;
+  templateId: string;
+  template: FlyerTemplate;
   headline: string;
   tagline: string;
   cta: string;
@@ -27,12 +29,6 @@ export default function FlyerStylePicker({
   price,
   storeName,
 }: FlyerStylePickerProps) {
-  const templates = getAllTemplates();
-
-  const getVariationForStyle = (style: FlyerStyle): FlyerVariation | undefined => {
-    return variations.find(v => v.style === style);
-  };
-
   return (
     <div className="space-y-4">
       <div className="text-center space-y-1">
@@ -43,14 +39,13 @@ export default function FlyerStylePicker({
       </div>
 
       <div className="grid grid-cols-3 gap-3">
-        {templates.map((template) => {
-          const variation = getVariationForStyle(template.style);
-          const isSelected = selectedStyle === template.style;
+        {variations.map((variation) => {
+          const isSelected = selectedStyle === variation.style;
 
           return (
             <button
-              key={template.id}
-              onClick={() => onSelect(template.style)}
+              key={variation.templateId}
+              onClick={() => onSelect(variation.style)}
               className={cn(
                 'relative rounded-xl overflow-hidden transition-all duration-200',
                 'focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2',
@@ -68,13 +63,13 @@ export default function FlyerStylePicker({
               {/* Preview canvas */}
               <div className="pointer-events-none">
                 <FlyerCanvas
-                  template={template}
+                  template={variation.template}
                   format="square"
                   productImage={productImage}
-                  headline={variation?.headline || template.name}
-                  tagline={variation?.tagline || 'Quality you can trust'}
+                  headline={variation.headline}
+                  tagline={variation.tagline}
                   price={price}
-                  cta={variation?.cta || 'Shop Now'}
+                  cta={variation.cta}
                   storeName={storeName}
                   isPreview
                 />
@@ -86,7 +81,7 @@ export default function FlyerStylePicker({
                 'bg-gradient-to-t from-black/80 to-transparent'
               )}>
                 <span className="text-xs font-medium text-white">
-                  {template.name}
+                  {variation.template.name}
                 </span>
               </div>
             </button>

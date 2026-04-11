@@ -73,7 +73,7 @@ const DashboardOverview = () => {
 
   const greeting = getGreeting();
 
-  const storeUrl = `${window.location.origin}/${storeSlug}`;
+  const storeUrl = `https://afristall.com/${storeSlug}`;
 
   const dismissBanner = () => {
     setBannerDismissed(true);

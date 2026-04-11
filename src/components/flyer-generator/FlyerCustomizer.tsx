@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Square, RectangleVertical, Palette, Type, Check } from 'lucide-react';
+import { Square, RectangleVertical, Palette, Type, Check, ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,7 +9,14 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from '@/components/ui/collapsible';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 import type { FlyerFormat } from './templates';
+import { FONT_OPTIONS, type FontOption } from '@/hooks/useFlyerGenerator';
 
 interface FlyerCustomizerProps {
   format: FlyerFormat;
@@ -17,6 +24,8 @@ interface FlyerCustomizerProps {
   colors: string[];
   selectedColor: string | null;
   onColorSelect: (color: string) => void;
+  selectedFont: FontOption;
+  onFontChange: (font: FontOption) => void;
   headline: string;
   tagline: string;
   cta: string;
@@ -31,6 +40,8 @@ export default function FlyerCustomizer({
   colors,
   selectedColor,
   onColorSelect,
+  selectedFont,
+  onFontChange,
   headline,
   tagline,
   cta,
@@ -107,6 +118,54 @@ export default function FlyerCustomizer({
         </div>
         <p className="text-[10px] text-muted-foreground">
           Colors extracted from your product image
+        </p>
+      </div>
+
+      {/* Font Selection */}
+      <div className="space-y-2">
+        <Label className="text-xs text-muted-foreground uppercase tracking-wide flex items-center gap-1.5">
+          <Type className="h-3 w-3" />
+          Font Style
+        </Label>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="outline"
+              size="sm"
+              className="w-full justify-between h-10"
+            >
+              <span style={{ fontFamily: selectedFont.family }} className="truncate">
+                {selectedFont.name}
+              </span>
+              <ChevronDown className="h-4 w-4 opacity-50 shrink-0" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent className="w-56 max-h-64 overflow-y-auto">
+            {FONT_OPTIONS.map((font) => (
+              <DropdownMenuItem
+                key={font.id}
+                onClick={() => onFontChange(font)}
+                className={cn(
+                  'cursor-pointer',
+                  selectedFont.id === font.id && 'bg-accent'
+                )}
+              >
+                <span style={{ fontFamily: font.family }} className="flex-1">
+                  {font.name}
+                </span>
+                {selectedFont.id === font.id && (
+                  <Check className="h-4 w-4 ml-2" />
+                )}
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+        <p className="text-[10px] text-muted-foreground">
+          {selectedFont.category === 'modern' && 'Clean modern look'}
+          {selectedFont.category === 'elegant' && 'Sophisticated & elegant'}
+          {selectedFont.category === 'script' && 'Handwritten & personal'}
+          {selectedFont.category === 'bold' && 'Bold & impactful'}
+          {selectedFont.category === 'clean' && 'Simple & professional'}
         </p>
       </div>
 

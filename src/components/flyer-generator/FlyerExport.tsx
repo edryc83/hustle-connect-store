@@ -2,6 +2,9 @@ import { useState } from 'react';
 import { Download, Share2, MessageCircle, Loader2, Check, Copy } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
+import { Capacitor } from '@capacitor/core';
+import { Filesystem, Directory } from '@capacitor/filesystem';
+import { Share } from '@capacitor/share';
 
 interface FlyerExportProps {
   onExport: () => Promise<Blob | null>;
@@ -35,22 +38,66 @@ export default function FlyerExport({
         return;
       }
 
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `flyer-${sanitizeFileName(productName)}.png`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
+      const fileName = `flyer-${sanitizeFileName(productName)}.png`;
 
-      toast.success('Flyer downloaded!');
+      // Check if running on native mobile (iOS/Android)
+      if (Capacitor.isNativePlatform()) {
+        try {
+          // Convert blob to base64
+          const reader = new FileReader();
+          const base64 = await new Promise<string>((resolve, reject) => {
+            reader.onload = () => {
+              const result = reader.result as string;
+              // Remove the data URL prefix to get pure base64
+              resolve(result.split(',')[1]);
+            };
+            reader.onerror = reject;
+            reader.readAsDataURL(blob);
+          });
+
+          // Save to device's photo library / gallery
+          const savedFile = await Filesystem.writeFile({
+            path: fileName,
+            data: base64,
+            directory: Directory.Cache,
+          });
+
+          // Share to save to Photos (this triggers "Save Image" on iOS)
+          await Share.share({
+            title: 'Save Flyer',
+            text: `${productName} flyer`,
+            url: savedFile.uri,
+            dialogTitle: 'Save your flyer',
+          });
+
+          toast.success('Flyer ready! Tap "Save Image" to add to Photos');
+        } catch (nativeError) {
+          console.error('Native save error:', nativeError);
+          // Fallback to web download
+          downloadViaLink(blob, fileName);
+        }
+      } else {
+        // Web browser download
+        downloadViaLink(blob, fileName);
+      }
     } catch (error) {
       console.error('Download error:', error);
       toast.error('Download failed');
     } finally {
       setDownloading(false);
     }
+  };
+
+  const downloadViaLink = (blob: Blob, fileName: string) => {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = fileName;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast.success('Flyer downloaded!');
   };
 
   const handleShareWhatsApp = async () => {
@@ -62,17 +109,53 @@ export default function FlyerExport({
         return;
       }
 
-      // Try native share first (works better on mobile)
-      if (navigator.share && navigator.canShare) {
-        const file = new File([blob], `flyer-${sanitizeFileName(productName)}.png`, {
-          type: 'image/png',
-        });
+      const fileName = `flyer-${sanitizeFileName(productName)}.png`;
 
-        const shareData = {
-          files: [file],
-          title: productName,
-          text: `Check out ${productName}!`,
-        };
+      // Check if running on native mobile (iOS/Android)
+      if (Capacitor.isNativePlatform()) {
+        try {
+          // Convert blob to base64
+          const reader = new FileReader();
+          const base64 = await new Promise<string>((resolve, reject) => {
+            reader.onload = () => {
+              const result = reader.result as string;
+              resolve(result.split(',')[1]);
+            };
+            reader.onerror = reject;
+            reader.readAsDataURL(blob);
+          });
+
+          // Save to cache first
+          const savedFile = await Filesystem.writeFile({
+            path: fileName,
+            data: base64,
+            directory: Directory.Cache,
+          });
+
+          // Share using native share (will show WhatsApp option)
+          await Share.share({
+            title: productName,
+            text: `Check out ${productName}!`,
+            url: savedFile.uri,
+            dialogTitle: 'Share to WhatsApp',
+          });
+
+          toast.success('Shared successfully!');
+          return;
+        } catch (nativeError: any) {
+          if (nativeError?.message?.includes('cancel')) {
+            // User cancelled
+            return;
+          }
+          console.error('Native share error:', nativeError);
+          // Fall through to web share
+        }
+      }
+
+      // Try web share API
+      if (navigator.share && navigator.canShare) {
+        const file = new File([blob], fileName, { type: 'image/png' });
+        const shareData = { files: [file], title: productName, text: `Check out ${productName}!` };
 
         if (navigator.canShare(shareData)) {
           await navigator.share(shareData);
@@ -82,15 +165,7 @@ export default function FlyerExport({
       }
 
       // Fallback: Download and prompt to share manually
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `flyer-${sanitizeFileName(productName)}.png`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-
+      downloadViaLink(blob, fileName);
       toast.success('Flyer saved! Share it on WhatsApp Status');
     } catch (error) {
       // User cancelled share or error

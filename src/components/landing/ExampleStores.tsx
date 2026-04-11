@@ -44,7 +44,7 @@ const ExampleStores = () => {
   }, []);
 
   return (
-    <section ref={sectionRef} className="py-12 sm:py-24 bg-secondary/30">
+    <section ref={sectionRef} className="py-8 sm:py-16 bg-secondary/30">
       <div className="mx-auto max-w-6xl px-4 sm:px-6">
         <div className={`transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
           <h2 className="text-xl font-bold sm:text-3xl text-foreground">

@@ -22,7 +22,7 @@ const InstagramIcon = ({ className }: { className?: string }) => (
 );
 
 const HeroSection = () => (
-  <section className="relative overflow-hidden py-16 sm:py-28 lg:py-36">
+  <section className="relative overflow-hidden py-12 sm:py-20 lg:py-24">
     <EmojiGrid />
 
     <div className="pointer-events-none absolute -top-40 -left-20 h-[500px] w-[500px] rounded-full bg-primary/8 blur-[100px]" />

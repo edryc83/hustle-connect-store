@@ -47,5 +47,11 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<true/>
+	<key>NSCameraUsageDescription</key>
+	<string>Afristall needs camera access to take photos of your products for your store listings.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Afristall needs photo library access to select images for your product listings.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Afristall needs permission to save photos to your library.</string>
 </dict>
 </plist>

@@ -1,6 +1,7 @@
 import { minimalTemplate } from './minimal';
 import { boldTemplate } from './bold';
 import { elegantTemplate } from './elegant';
+import { collectionTemplates } from './collection';
 
 export type FlyerStyle = 'minimal' | 'bold' | 'elegant';
 export type FlyerFormat = 'square' | 'story';
@@ -83,21 +84,63 @@ export const FORMAT_DIMENSIONS: Record<FlyerFormat, { width: number; height: num
   story: { width: 1080, height: 1920 },
 };
 
-// All available templates
-export const templates: Record<FlyerStyle, FlyerTemplate> = {
+// Core templates (original 3)
+export const coreTemplates: Record<FlyerStyle, FlyerTemplate> = {
   minimal: minimalTemplate,
   bold: boldTemplate,
   elegant: elegantTemplate,
 };
 
-// Get template by style
+// All available templates (core + collection)
+export const allTemplates: FlyerTemplate[] = [
+  minimalTemplate,
+  boldTemplate,
+  elegantTemplate,
+  ...collectionTemplates,
+];
+
+// Get template by style (for backward compatibility)
 export function getTemplate(style: FlyerStyle): FlyerTemplate {
-  return templates[style];
+  return coreTemplates[style];
+}
+
+// Get template by ID
+export function getTemplateById(id: string): FlyerTemplate | undefined {
+  return allTemplates.find(t => t.id === id);
 }
 
 // Get all templates as array
 export function getAllTemplates(): FlyerTemplate[] {
-  return Object.values(templates);
+  return allTemplates;
+}
+
+// Get 3 random templates (one from each style category for variety)
+export function getRandomTemplates(count: number = 3): FlyerTemplate[] {
+  // Shuffle all templates
+  const shuffled = [...allTemplates].sort(() => Math.random() - 0.5);
+
+  // Try to get variety by style
+  const result: FlyerTemplate[] = [];
+  const usedStyles = new Set<FlyerStyle>();
+
+  // First pass: get one of each style
+  for (const template of shuffled) {
+    if (!usedStyles.has(template.style) && result.length < count) {
+      result.push(template);
+      usedStyles.add(template.style);
+    }
+    if (result.length >= count) break;
+  }
+
+  // Second pass: fill remaining slots with any templates
+  for (const template of shuffled) {
+    if (!result.includes(template) && result.length < count) {
+      result.push(template);
+    }
+    if (result.length >= count) break;
+  }
+
+  return result;
 }
 
 // Adjust template positions for different formats

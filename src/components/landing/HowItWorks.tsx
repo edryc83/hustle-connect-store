@@ -58,7 +58,7 @@ const HowItWorks = () => {
   }, []);
 
   return (
-    <section ref={sectionRef} className="relative py-12 sm:py-24 overflow-hidden">
+    <section ref={sectionRef} className="relative py-8 sm:py-16 overflow-hidden">
       <div className="relative z-10 mx-auto max-w-6xl px-4 sm:px-6">
         <div className={`transition-all duration-700 ${isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
           <h2 className="text-xl font-bold sm:text-3xl text-foreground">

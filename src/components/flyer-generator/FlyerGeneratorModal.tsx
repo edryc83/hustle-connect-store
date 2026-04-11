@@ -8,7 +8,6 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { useFlyerGenerator } from '@/hooks/useFlyerGenerator';
-import { getTemplate } from './templates';
 import FlyerCanvas, { type FlyerCanvasRef } from './FlyerCanvas';
 import FlyerStylePicker from './FlyerStylePicker';
 import FlyerCustomizer from './FlyerCustomizer';
@@ -54,12 +53,14 @@ export default function FlyerGeneratorModal({
     loading,
     variations,
     selectedStyle,
+    selectedTemplate,
     format,
     headline,
     tagline,
     cta,
     colors,
     selectedColor,
+    selectedFont,
     processedImage,
     imageProcessing,
     selectStyle,
@@ -68,6 +69,7 @@ export default function FlyerGeneratorModal({
     setTagline,
     setCta,
     setSelectedColor,
+    setSelectedFont,
     goBack,
   } = useFlyerGenerator({
     productName: product.name,
@@ -83,7 +85,7 @@ export default function FlyerGeneratorModal({
     return canvasRef.current.exportImage('png');
   };
 
-  const selectedTemplate = selectedStyle ? getTemplate(selectedStyle) : null;
+  // selectedTemplate is now provided by the hook
 
   return (
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
@@ -166,6 +168,7 @@ export default function FlyerGeneratorModal({
                 cta={cta}
                 storeName={storeName}
                 primaryColor={selectedColor || undefined}
+                fontFamily={selectedFont.family}
                 isPreview={false}
               />
 
@@ -176,6 +179,8 @@ export default function FlyerGeneratorModal({
                 colors={colors}
                 selectedColor={selectedColor}
                 onColorSelect={setSelectedColor}
+                selectedFont={selectedFont}
+                onFontChange={setSelectedFont}
                 headline={headline}
                 tagline={tagline}
                 cta={cta}
