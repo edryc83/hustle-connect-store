@@ -91,11 +91,8 @@ export const coreTemplates: Record<FlyerStyle, FlyerTemplate> = {
   elegant: elegantTemplate,
 };
 
-// All available templates (core + collection)
+// All available templates (NEW designs only - removed old ugly ones)
 export const allTemplates: FlyerTemplate[] = [
-  minimalTemplate,
-  boldTemplate,
-  elegantTemplate,
   ...collectionTemplates,
 ];
 
