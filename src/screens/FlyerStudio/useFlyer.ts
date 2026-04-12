@@ -102,6 +102,9 @@ const DEFAULT_FLYER: FlyerState = {
   productImage: null,
   additionalImages: [],
   layerOffsets: {},
+  fontSizeOverrides: {},
+  deletedLayerIds: [],
+  selectedLayerId: null,
   isGenerating: true,
   generationStep: 0,
 };
@@ -297,6 +300,36 @@ export function useFlyer({ product, store }: UseFlyerProps): UseFlyerReturn {
     }));
   }, []);
 
+  // Font size override for individual text elements
+  const setFontSizeOverride = useCallback((layerId: string, size: number) => {
+    setFlyer((prev) => ({
+      ...prev,
+      fontSizeOverrides: { ...prev.fontSizeOverrides, [layerId]: size },
+    }));
+  }, []);
+
+  // Delete a layer
+  const deleteLayer = useCallback((layerId: string) => {
+    setFlyer((prev) => ({
+      ...prev,
+      deletedLayerIds: [...prev.deletedLayerIds, layerId],
+      selectedLayerId: null,
+    }));
+  }, []);
+
+  // Restore all deleted layers
+  const restoreDeletedLayers = useCallback(() => {
+    setFlyer((prev) => ({
+      ...prev,
+      deletedLayerIds: [],
+    }));
+  }, []);
+
+  // Select a layer
+  const selectLayer = useCallback((layerId: string | null) => {
+    setFlyer((prev) => ({ ...prev, selectedLayerId: layerId }));
+  }, []);
+
   // Additional images (logos, etc)
   const addImage = useCallback((url: string) => {
     const newImage: AdditionalImage = {
@@ -355,6 +388,10 @@ export function useFlyer({ product, store }: UseFlyerProps): UseFlyerReturn {
     setFontSize,
     setProductImage,
     setLayerOffset,
+    setFontSizeOverride,
+    deleteLayer,
+    restoreDeletedLayers,
+    selectLayer,
     addImage,
     updateImage,
     removeImage,

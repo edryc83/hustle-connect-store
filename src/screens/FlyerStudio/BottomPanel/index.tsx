@@ -17,12 +17,18 @@ interface Tab {
 }
 
 const TABS: Tab[] = [
-  { id: 'templates', label: 'Style', icon: <Layout className="w-5 h-5" /> },
-  { id: 'photo', label: 'Photo', icon: <ImageIcon className="w-5 h-5" /> },
+  { id: 'templates', label: 'Templates', icon: <Layout className="w-5 h-5" /> },
   { id: 'colors', label: 'Colors', icon: <Palette className="w-5 h-5" /> },
   { id: 'text', label: 'Text', icon: <Type className="w-5 h-5" /> },
   { id: 'fonts', label: 'Fonts', icon: <LetterText className="w-5 h-5" /> },
+  { id: 'photo', label: 'Media', icon: <ImageIcon className="w-5 h-5" /> },
 ];
+
+interface SelectedLayer {
+  id: string;
+  type: string;
+  fontSize?: number;
+}
 
 interface BottomPanelProps {
   flyer: FlyerState;
@@ -30,6 +36,8 @@ interface BottomPanelProps {
   extractedColors: string[];
   originalImageUrl: string | null;
   isRemovingBg: boolean;
+  templateJson: any;
+  selectedLayer?: SelectedLayer | null;
   onSelectTemplate: (id: string) => void;
   onTitleChange: (v: string) => void;
   onTaglineChange: (v: string) => void;
@@ -41,6 +49,8 @@ interface BottomPanelProps {
   onAccentColorChange: (v: string) => void;
   onFontChange: (v: string) => void;
   onFontSizeChange: (size: number) => void;
+  onFontSizeOverride: (layerId: string, size: number) => void;
+  onDeleteLayer: (layerId: string) => void;
   onImageChange: (url: string) => void;
   onRemoveBackground: () => void;
   onAddImage: (url: string) => void;
@@ -53,6 +63,8 @@ export default function BottomPanel({
   extractedColors,
   originalImageUrl,
   isRemovingBg,
+  templateJson,
+  selectedLayer,
   onSelectTemplate,
   onTitleChange,
   onTaglineChange,
@@ -64,6 +76,8 @@ export default function BottomPanel({
   onAccentColorChange,
   onFontChange,
   onFontSizeChange,
+  onFontSizeOverride,
+  onDeleteLayer,
   onImageChange,
   onRemoveBackground,
   onAddImage,
@@ -177,6 +191,8 @@ export default function BottomPanel({
                 phone={flyer.phone}
                 address={flyer.address}
                 fontSize={flyer.fontSize}
+                selectedLayer={selectedLayer}
+                fontSizeOverrides={flyer.fontSizeOverrides}
                 onTitleChange={onTitleChange}
                 onTaglineChange={onTaglineChange}
                 onBadgeChange={onBadgeChange}
@@ -184,6 +200,8 @@ export default function BottomPanel({
                 onPhoneChange={onPhoneChange}
                 onAddressChange={onAddressChange}
                 onFontSizeChange={onFontSizeChange}
+                onFontSizeOverride={onFontSizeOverride}
+                onDeleteLayer={onDeleteLayer}
               />
             </motion.div>
           )}

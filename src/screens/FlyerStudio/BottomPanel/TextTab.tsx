@@ -1,5 +1,11 @@
 import React from 'react';
-import { Type, Minus, Plus, X } from 'lucide-react';
+import { Type, Minus, Plus, X, Trash2 } from 'lucide-react';
+
+interface SelectedLayer {
+  id: string;
+  type: string;
+  fontSize?: number;
+}
 
 interface TextTabProps {
   title: string;
@@ -9,6 +15,8 @@ interface TextTabProps {
   phone: string;
   address: string;
   fontSize: number;
+  selectedLayer?: SelectedLayer | null;
+  fontSizeOverrides?: Record<string, number>;
   onTitleChange: (v: string) => void;
   onTaglineChange: (v: string) => void;
   onBadgeChange: (v: string) => void;
@@ -16,6 +24,8 @@ interface TextTabProps {
   onPhoneChange: (v: string) => void;
   onAddressChange: (v: string) => void;
   onFontSizeChange: (size: number) => void;
+  onFontSizeOverride?: (layerId: string, size: number) => void;
+  onDeleteLayer?: (layerId: string) => void;
 }
 
 function TextInput({
@@ -62,11 +72,15 @@ export default function TextTab({
   badge,
   cta,
   fontSize,
+  selectedLayer,
+  fontSizeOverrides,
   onTitleChange,
   onTaglineChange,
   onBadgeChange,
   onCtaChange,
   onFontSizeChange,
+  onFontSizeOverride,
+  onDeleteLayer,
 }: TextTabProps) {
   const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     onFontSizeChange(parseFloat(e.target.value));
@@ -76,13 +90,54 @@ export default function TextTab({
   const increase = () => onFontSizeChange(Math.min(1.5, fontSize + 0.1));
   const percentage = Math.round(fontSize * 100);
 
+  // Handle selected layer font size
+  const selectedLayerFontSize = selectedLayer?.fontSize
+    ? (fontSizeOverrides?.[selectedLayer.id] ?? selectedLayer.fontSize)
+    : null;
+
+  const handleLayerSizeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (selectedLayer && onFontSizeOverride) {
+      onFontSizeOverride(selectedLayer.id, parseFloat(e.target.value));
+    }
+  };
+
   return (
     <div className="px-4 py-2 h-full overflow-y-auto">
-      {/* Font Size Slider */}
+      {/* Selected Layer Controls */}
+      {selectedLayer?.type === 'text' && selectedLayerFontSize && (
+        <div className="flex items-center gap-2 pb-2 mb-2 border-b border-purple-200 bg-purple-50 -mx-4 px-4 py-2">
+          <div className="flex-1 flex items-center gap-2">
+            <div className="flex items-center gap-1 text-[10px] text-purple-600 font-medium">
+              <Type className="w-3 h-3" />
+              <span>Selected</span>
+            </div>
+            <input
+              type="range"
+              min={selectedLayerFontSize * 0.5}
+              max={selectedLayerFontSize * 2}
+              step="1"
+              value={fontSizeOverrides?.[selectedLayer.id] ?? selectedLayerFontSize}
+              onChange={handleLayerSizeChange}
+              className="flex-1 h-1.5 bg-purple-200 rounded-lg appearance-none cursor-pointer accent-purple-500"
+            />
+            <span className="text-[10px] font-medium text-purple-600 w-10">
+              {Math.round(fontSizeOverrides?.[selectedLayer.id] ?? selectedLayerFontSize)}px
+            </span>
+          </div>
+          <button
+            onClick={() => onDeleteLayer?.(selectedLayer.id)}
+            className="w-7 h-7 rounded-lg bg-red-100 flex items-center justify-center text-red-500 hover:bg-red-200"
+          >
+            <Trash2 className="w-4 h-4" />
+          </button>
+        </div>
+      )}
+
+      {/* Global Font Size Slider */}
       <div className="flex items-center gap-2 pb-2 mb-2 border-b border-gray-100">
         <div className="flex items-center gap-1 text-[10px] text-gray-500 font-medium">
           <Type className="w-3 h-3" />
-          <span>Size</span>
+          <span>All Text</span>
         </div>
         <button
           onClick={decrease}

@@ -31,6 +31,9 @@ export interface FlyerState {
   productImage: string | null;
   additionalImages: AdditionalImage[]; // logos, extra images
   layerOffsets: Record<string, LayerOffset>; // layer id -> offset
+  fontSizeOverrides: Record<string, number>; // layer id -> font size override
+  deletedLayerIds: string[]; // IDs of deleted layers
+  selectedLayerId: string | null; // Currently selected layer for editing
   isGenerating: boolean;
   generationStep: number;
 }

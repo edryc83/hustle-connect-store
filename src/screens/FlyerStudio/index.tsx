@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useRef, useMemo } from 'react';
 import { motion } from 'framer-motion';
 import { X, RefreshCw } from 'lucide-react';
 import { useFlyer, type ProductData, type StoreData } from './useFlyer';
@@ -33,6 +33,11 @@ export default function FlyerStudio({ product, store, onClose }: FlyerStudioProp
     setFont,
     setFontSize,
     setProductImage,
+    setLayerOffset,
+    setFontSizeOverride,
+    deleteLayer,
+    restoreDeletedLayers,
+    selectLayer,
     addImage,
     updateImage,
     removeImage,
@@ -40,6 +45,18 @@ export default function FlyerStudio({ product, store, onClose }: FlyerStudioProp
     isRemovingBg,
     regenerate,
   } = useFlyer({ product, store });
+
+  // Compute selected layer info for the bottom panel
+  const selectedLayer = useMemo(() => {
+    if (!flyer.selectedLayerId || !templateJson) return null;
+    const layer = templateJson.layers.find((l: any) => l.id === flyer.selectedLayerId);
+    if (!layer) return null;
+    return {
+      id: layer.id,
+      type: layer.type,
+      fontSize: layer.fontSize,
+    };
+  }, [flyer.selectedLayerId, templateJson]);
 
   return (
     <div className="fixed inset-0 z-50 bg-gray-100 flex flex-col h-screen">
@@ -88,6 +105,8 @@ export default function FlyerStudio({ product, store, onClose }: FlyerStudioProp
               flyer={flyer}
               width={200}
               onImageUpdate={updateImage}
+              onLayerMove={setLayerOffset}
+              onLayerSelect={selectLayer}
               className="mx-auto shadow-xl"
             />
           </motion.div>
@@ -103,6 +122,8 @@ export default function FlyerStudio({ product, store, onClose }: FlyerStudioProp
             extractedColors={extractedColors}
             originalImageUrl={product.imageUrl}
             isRemovingBg={isRemovingBg}
+            templateJson={templateJson}
+            selectedLayer={selectedLayer}
             onSelectTemplate={selectTemplate}
             onTitleChange={setTitle}
             onTaglineChange={setTagline}
@@ -114,6 +135,8 @@ export default function FlyerStudio({ product, store, onClose }: FlyerStudioProp
             onAccentColorChange={setAccentColor}
             onFontChange={setFont}
             onFontSizeChange={setFontSize}
+            onFontSizeOverride={setFontSizeOverride}
+            onDeleteLayer={deleteLayer}
             onImageChange={setProductImage}
             onRemoveBackground={removeBackground}
             onAddImage={addImage}
@@ -121,7 +144,7 @@ export default function FlyerStudio({ product, store, onClose }: FlyerStudioProp
           />
 
           {/* Action buttons - ALWAYS visible with prominent styling */}
-          <div className="px-4 pb-2 pt-1 bg-white border-t border-gray-100">
+          <div className="px-4 pb-3 pt-2 bg-white border-t border-gray-200">
             <ActionBar
               canvasRef={canvasRef}
               storeName={store.name}

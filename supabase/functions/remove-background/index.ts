@@ -21,7 +21,7 @@ serve(async (req) => {
     console.log("Processing image for bg removal:", image_url.substring(0, 80));
 
     // Try remove.bg API first (best for transparent backgrounds)
-    const REMOVE_BG_API_KEY = Deno.env.get("REMOVE_BG_API_KEY");
+    const REMOVE_BG_API_KEY = Deno.env.get("REMOVEBG_API_KEY");
 
     if (REMOVE_BG_API_KEY) {
       const formData = new FormData();
