@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Square, RectangleVertical, Palette, Type, Check, ChevronDown } from 'lucide-react';
+import { Square, RectangleVertical, Palette, Type, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,14 +9,7 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from '@/components/ui/collapsible';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import type { FlyerFormat } from './templates';
-import { FONT_OPTIONS, type FontOption } from '@/hooks/useFlyerGenerator';
+import type { FlyerFormat } from '@/hooks/useFlyerGenerator';
 
 interface FlyerCustomizerProps {
   format: FlyerFormat;
@@ -24,14 +17,10 @@ interface FlyerCustomizerProps {
   colors: string[];
   selectedColor: string | null;
   onColorSelect: (color: string) => void;
-  selectedFont: FontOption;
-  onFontChange: (font: FontOption) => void;
   headline: string;
   tagline: string;
-  cta: string;
   onHeadlineChange: (value: string) => void;
   onTaglineChange: (value: string) => void;
-  onCtaChange: (value: string) => void;
 }
 
 export default function FlyerCustomizer({
@@ -40,14 +29,10 @@ export default function FlyerCustomizer({
   colors,
   selectedColor,
   onColorSelect,
-  selectedFont,
-  onFontChange,
   headline,
   tagline,
-  cta,
   onHeadlineChange,
   onTaglineChange,
-  onCtaChange,
 }: FlyerCustomizerProps) {
   const [textOpen, setTextOpen] = useState(false);
 
@@ -84,90 +69,44 @@ export default function FlyerCustomizer({
       </div>
 
       {/* Color Selection */}
-      <div className="space-y-2">
-        <Label className="text-xs text-muted-foreground uppercase tracking-wide flex items-center gap-1.5">
-          <Palette className="h-3 w-3" />
-          Accent Color
-        </Label>
-        <div className="flex gap-2 flex-wrap">
-          {colors.map((color, index) => (
-            <button
-              key={index}
-              onClick={() => onColorSelect(color)}
-              className={cn(
-                'w-8 h-8 rounded-full transition-all duration-200',
-                'hover:scale-110 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary',
-                'border-2',
-                selectedColor === color
-                  ? 'border-foreground scale-110'
-                  : 'border-transparent'
-              )}
-              style={{ backgroundColor: color }}
-              title={color}
-            >
-              {selectedColor === color && (
-                <Check
-                  className="h-4 w-4 mx-auto"
-                  style={{
-                    color: isLightColor(color) ? '#000' : '#fff',
-                  }}
-                />
-              )}
-            </button>
-          ))}
-        </div>
-        <p className="text-[10px] text-muted-foreground">
-          Colors extracted from your product image
-        </p>
-      </div>
-
-      {/* Font Selection */}
-      <div className="space-y-2">
-        <Label className="text-xs text-muted-foreground uppercase tracking-wide flex items-center gap-1.5">
-          <Type className="h-3 w-3" />
-          Font Style
-        </Label>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="outline"
-              size="sm"
-              className="w-full justify-between h-10"
-            >
-              <span style={{ fontFamily: selectedFont.family }} className="truncate">
-                {selectedFont.name}
-              </span>
-              <ChevronDown className="h-4 w-4 opacity-50 shrink-0" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent className="w-56 max-h-64 overflow-y-auto">
-            {FONT_OPTIONS.map((font) => (
-              <DropdownMenuItem
-                key={font.id}
-                onClick={() => onFontChange(font)}
+      {colors.length > 0 && (
+        <div className="space-y-2">
+          <Label className="text-xs text-muted-foreground uppercase tracking-wide flex items-center gap-1.5">
+            <Palette className="h-3 w-3" />
+            Accent Color
+          </Label>
+          <div className="flex gap-2 flex-wrap">
+            {colors.map((color, index) => (
+              <button
+                key={index}
+                onClick={() => onColorSelect(color)}
                 className={cn(
-                  'cursor-pointer',
-                  selectedFont.id === font.id && 'bg-accent'
+                  'w-8 h-8 rounded-full transition-all duration-200',
+                  'hover:scale-110 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary',
+                  'border-2',
+                  selectedColor === color
+                    ? 'border-foreground scale-110'
+                    : 'border-transparent'
                 )}
+                style={{ backgroundColor: color }}
+                title={color}
               >
-                <span style={{ fontFamily: font.family }} className="flex-1">
-                  {font.name}
-                </span>
-                {selectedFont.id === font.id && (
-                  <Check className="h-4 w-4 ml-2" />
+                {selectedColor === color && (
+                  <Check
+                    className="h-4 w-4 mx-auto"
+                    style={{
+                      color: isLightColor(color) ? '#000' : '#fff',
+                    }}
+                  />
                 )}
-              </DropdownMenuItem>
+              </button>
             ))}
-          </DropdownMenuContent>
-        </DropdownMenu>
-        <p className="text-[10px] text-muted-foreground">
-          {selectedFont.category === 'modern' && 'Clean modern look'}
-          {selectedFont.category === 'elegant' && 'Sophisticated & elegant'}
-          {selectedFont.category === 'script' && 'Handwritten & personal'}
-          {selectedFont.category === 'bold' && 'Bold & impactful'}
-          {selectedFont.category === 'clean' && 'Simple & professional'}
-        </p>
-      </div>
+          </div>
+          <p className="text-[10px] text-muted-foreground">
+            Colors extracted from your product image
+          </p>
+        </div>
+      )}
 
       {/* Text Editing */}
       <Collapsible open={textOpen} onOpenChange={setTextOpen}>
@@ -193,7 +132,7 @@ export default function FlyerCustomizer({
               onChange={(e) => onHeadlineChange(e.target.value)}
               placeholder="e.g., Hot Deal!"
               className="h-9 text-sm"
-              maxLength={30}
+              maxLength={40}
             />
           </div>
           <div className="space-y-1.5">
@@ -206,20 +145,7 @@ export default function FlyerCustomizer({
               onChange={(e) => onTaglineChange(e.target.value)}
               placeholder="e.g., Don't miss out"
               className="h-9 text-sm"
-              maxLength={50}
-            />
-          </div>
-          <div className="space-y-1.5">
-            <Label htmlFor="cta" className="text-xs">
-              Call to Action
-            </Label>
-            <Input
-              id="cta"
-              value={cta}
-              onChange={(e) => onCtaChange(e.target.value)}
-              placeholder="e.g., Shop Now"
-              className="h-9 text-sm"
-              maxLength={20}
+              maxLength={60}
             />
           </div>
         </CollapsibleContent>

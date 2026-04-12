@@ -8,11 +8,12 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { useFlyerGenerator } from '@/hooks/useFlyerGenerator';
-import FlyerCanvas, { type FlyerCanvasRef } from './FlyerCanvas';
-import FlyerStylePicker from './FlyerStylePicker';
+import FlyerHTMLRenderer, { type FlyerHTMLRendererRef } from './FlyerHTMLRenderer';
+import FlyerTemplatePicker from './FlyerTemplatePicker';
 import FlyerCustomizer from './FlyerCustomizer';
 import FlyerExport from './FlyerExport';
 import { formatPrice } from '@/lib/currency';
+import type { FlyerData } from './templates/html-templates';
 
 interface Product {
   id: string;
@@ -29,6 +30,7 @@ interface FlyerGeneratorModalProps {
   storeName: string;
   storeSlug: string;
   currency: string;
+  whatsappNumber?: string;
   open: boolean;
   onClose: () => void;
 }
@@ -38,10 +40,11 @@ export default function FlyerGeneratorModal({
   storeName,
   storeSlug,
   currency,
+  whatsappNumber,
   open,
   onClose,
 }: FlyerGeneratorModalProps) {
-  const canvasRef = useRef<FlyerCanvasRef>(null);
+  const rendererRef = useRef<FlyerHTMLRendererRef>(null);
 
   const displayPrice = formatPrice(
     product.discount_price ?? product.price,
@@ -52,24 +55,19 @@ export default function FlyerGeneratorModal({
     step,
     loading,
     variations,
-    selectedStyle,
     selectedTemplate,
     format,
     headline,
     tagline,
-    cta,
     colors,
     selectedColor,
-    selectedFont,
     processedImage,
     imageProcessing,
-    selectStyle,
+    selectTemplate,
     setFormat,
     setHeadline,
     setTagline,
-    setCta,
     setSelectedColor,
-    setSelectedFont,
     goBack,
   } = useFlyerGenerator({
     productName: product.name,
@@ -77,15 +75,28 @@ export default function FlyerGeneratorModal({
     description: product.description || undefined,
     category: product.category || undefined,
     storeName,
+    storeSlug,
     productImageUrl: product.image_url || null,
+    whatsappNumber,
   });
 
   const handleExport = async () => {
-    if (!canvasRef.current) return null;
-    return canvasRef.current.exportImage('png');
+    if (!rendererRef.current) return null;
+    return rendererRef.current.exportImage('png');
   };
 
-  // selectedTemplate is now provided by the hook
+  // Build flyer data for the renderer
+  const flyerData: FlyerData = {
+    productImage: processedImage,
+    productName: product.name,
+    headline,
+    tagline,
+    price: displayPrice,
+    storeName,
+    storeSlug,
+    whatsappNumber,
+    accentColor: selectedColor || undefined,
+  };
 
   return (
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
@@ -105,7 +116,7 @@ export default function FlyerGeneratorModal({
             <DialogTitle className="flex-1 flex items-center gap-2 text-base">
               <Sparkles className="h-4 w-4 text-primary" />
               {step === 'loading' && 'Creating Your Flyer...'}
-              {step === 'picking' && 'Pick Your Style'}
+              {step === 'picking' && 'Pick Your Design'}
               {step === 'customizing' && 'Customize & Share'}
             </DialogTitle>
             <Button
@@ -134,22 +145,24 @@ export default function FlyerGeneratorModal({
                 <p className="text-sm text-muted-foreground">
                   {imageProcessing
                     ? 'Removing background...'
-                    : 'Generating 3 unique styles...'}
+                    : 'Generating professional designs...'}
                 </p>
               </div>
               <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
             </div>
           )}
 
-          {/* Style Picker */}
+          {/* Template Picker */}
           {step === 'picking' && (
-            <FlyerStylePicker
+            <FlyerTemplatePicker
               variations={variations}
-              selectedStyle={selectedStyle}
-              onSelect={selectStyle}
-              productImage={processedImage}
-              price={displayPrice}
-              storeName={storeName}
+              selectedTemplate={selectedTemplate}
+              onSelect={selectTemplate}
+              flyerData={{
+                ...flyerData,
+                headline: '', // Use variation headline in picker
+                tagline: '',
+              }}
             />
           )}
 
@@ -157,19 +170,12 @@ export default function FlyerGeneratorModal({
           {step === 'customizing' && selectedTemplate && (
             <div className="space-y-4">
               {/* Live Preview */}
-              <FlyerCanvas
-                ref={canvasRef}
+              <FlyerHTMLRenderer
+                ref={rendererRef}
                 template={selectedTemplate}
+                data={flyerData}
                 format={format}
-                productImage={processedImage}
-                headline={headline}
-                tagline={tagline}
-                price={displayPrice}
-                cta={cta}
-                storeName={storeName}
-                primaryColor={selectedColor || undefined}
-                fontFamily={selectedFont.family}
-                isPreview={false}
+                isPreview
               />
 
               {/* Customizer */}
@@ -179,14 +185,10 @@ export default function FlyerGeneratorModal({
                 colors={colors}
                 selectedColor={selectedColor}
                 onColorSelect={setSelectedColor}
-                selectedFont={selectedFont}
-                onFontChange={setSelectedFont}
                 headline={headline}
                 tagline={tagline}
-                cta={cta}
                 onHeadlineChange={setHeadline}
                 onTaglineChange={setTagline}
-                onCtaChange={setCta}
               />
 
               {/* Export */}

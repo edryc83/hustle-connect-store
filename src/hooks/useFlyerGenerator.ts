@@ -2,10 +2,10 @@ import { useState, useCallback, useEffect } from 'react';
 import { removeBackground } from '@imgly/background-removal';
 import { supabase } from '@/integrations/supabase/client';
 import { extractColors, getDefaultPalette } from '@/lib/colorExtractor';
-import type { FlyerStyle, FlyerFormat } from '@/components/flyer-generator/templates';
-import { getRandomTemplates, type FlyerTemplate } from '@/components/flyer-generator/templates';
+import { htmlTemplates, getRandomHTMLTemplates, type HTMLTemplate } from '@/components/flyer-generator/templates/html-templates';
 
 export type FlyerStep = 'loading' | 'picking' | 'customizing';
+export type FlyerFormat = 'square' | 'story';
 
 // Available font options
 export const FONT_OPTIONS = [
@@ -24,12 +24,9 @@ export const FONT_OPTIONS = [
 export type FontOption = typeof FONT_OPTIONS[number];
 
 interface FlyerVariation {
-  style: FlyerStyle;
-  templateId: string;
-  template: FlyerTemplate;
+  template: HTMLTemplate;
   headline: string;
   tagline: string;
-  cta: string;
 }
 
 interface UseFlyerGeneratorProps {
@@ -38,7 +35,9 @@ interface UseFlyerGeneratorProps {
   description?: string;
   category?: string;
   storeName: string;
+  storeSlug: string;
   productImageUrl: string | null;
+  whatsappNumber?: string;
 }
 
 interface UseFlyerGeneratorReturn {
@@ -47,54 +46,45 @@ interface UseFlyerGeneratorReturn {
   loading: boolean;
   error: string | null;
 
-  // Variations
+  // Variations (templates to pick from)
   variations: FlyerVariation[];
 
   // Selection
-  selectedStyle: FlyerStyle | null;
-  selectedTemplate: FlyerTemplate | null;
+  selectedTemplate: HTMLTemplate | null;
   format: FlyerFormat;
 
   // Customization
   headline: string;
   tagline: string;
-  cta: string;
   colors: string[];
   selectedColor: string | null;
-  selectedFont: FontOption;
 
   // Processed image (with background removed)
   processedImage: string | null;
   imageProcessing: boolean;
 
+  // Product info
+  productName: string;
+  price: string;
+  storeName: string;
+  storeSlug: string;
+  whatsappNumber?: string;
+
   // Actions
-  selectStyle: (style: FlyerStyle) => void;
+  selectTemplate: (template: HTMLTemplate) => void;
   setFormat: (format: FlyerFormat) => void;
   setHeadline: (value: string) => void;
   setTagline: (value: string) => void;
-  setCta: (value: string) => void;
   setSelectedColor: (color: string) => void;
-  setSelectedFont: (font: FontOption) => void;
-  reset: () => void;
   goBack: () => void;
 }
 
-// Generate default variations using random templates
-function generateDefaultVariations(): FlyerVariation[] {
-  const randomTemplates = getRandomTemplates(3);
-  const defaultCopy = [
-    { headline: 'New Arrival', tagline: 'Quality you can trust', cta: 'Shop Now' },
-    { headline: 'Hot Deal!', tagline: "Don't miss out on this offer", cta: 'Get Yours' },
-    { headline: 'Premium Pick', tagline: 'Elevate your style today', cta: 'Discover' },
-  ];
-
-  return randomTemplates.map((template, index) => ({
-    style: template.style,
-    templateId: template.id,
-    template,
-    ...defaultCopy[index % defaultCopy.length],
-  }));
-}
+// Default copy for each template
+const defaultCopy = [
+  { headline: 'Hot Deal Alert!', tagline: 'Quality you can trust at prices you\'ll love' },
+  { headline: 'Premium Quality', tagline: 'Shop now and save big on your favorites' },
+  { headline: 'New Arrival', tagline: 'Be the first to get the best products' },
+];
 
 export function useFlyerGenerator({
   productName,
@@ -102,28 +92,33 @@ export function useFlyerGenerator({
   description,
   category,
   storeName,
+  storeSlug,
   productImageUrl,
+  whatsappNumber,
 }: UseFlyerGeneratorProps): UseFlyerGeneratorReturn {
   // Core state
   const [step, setStep] = useState<FlyerStep>('loading');
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // AI-generated variations (initialize with random templates)
-  const [variations, setVariations] = useState<FlyerVariation[]>(() => generateDefaultVariations());
+  // Template variations
+  const [variations, setVariations] = useState<FlyerVariation[]>(() => {
+    const templates = getRandomHTMLTemplates(3);
+    return templates.map((template, index) => ({
+      template,
+      ...defaultCopy[index % defaultCopy.length],
+    }));
+  });
 
   // Selection state
-  const [selectedStyle, setSelectedStyle] = useState<FlyerStyle | null>(null);
-  const [selectedTemplate, setSelectedTemplate] = useState<FlyerTemplate | null>(null);
+  const [selectedTemplate, setSelectedTemplate] = useState<HTMLTemplate | null>(null);
   const [format, setFormat] = useState<FlyerFormat>('square');
 
   // Customization state
   const [headline, setHeadline] = useState('');
   const [tagline, setTagline] = useState('');
-  const [cta, setCta] = useState('');
   const [colors, setColors] = useState<string[]>(getDefaultPalette());
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
-  const [selectedFont, setSelectedFont] = useState<FontOption>(FONT_OPTIONS[0]);
 
   // Image processing
   const [processedImage, setProcessedImage] = useState<string | null>(null);
@@ -165,7 +160,13 @@ export function useFlyerGenerator({
 
         if (data?.variations && Array.isArray(data.variations)) {
           if (!cancelled) {
-            setVariations(data.variations);
+            // Map AI variations to our template variations
+            const templates = getRandomHTMLTemplates(3);
+            setVariations(templates.map((template, index) => ({
+              template,
+              headline: data.variations[index]?.headline || defaultCopy[index].headline,
+              tagline: data.variations[index]?.tagline || defaultCopy[index].tagline,
+            })));
           }
         }
       } catch (err) {
@@ -213,17 +214,15 @@ export function useFlyerGenerator({
     };
   }, [productName, price, description, category, storeName, productImageUrl]);
 
-  // Select a style and populate content
-  const selectStyle = useCallback((style: FlyerStyle) => {
-    setSelectedStyle(style);
+  // Select a template and populate content
+  const selectTemplate = useCallback((template: HTMLTemplate) => {
+    setSelectedTemplate(template);
 
-    // Find the variation for this style
-    const variation = variations.find(v => v.style === style);
+    // Find the variation for this template
+    const variation = variations.find(v => v.template.id === template.id);
     if (variation) {
-      setSelectedTemplate(variation.template);
       setHeadline(variation.headline);
       setTagline(variation.tagline);
-      setCta(variation.cta);
     }
 
     setStep('customizing');
@@ -232,24 +231,7 @@ export function useFlyerGenerator({
   // Go back to style picker
   const goBack = useCallback(() => {
     setStep('picking');
-    setSelectedStyle(null);
     setSelectedTemplate(null);
-  }, []);
-
-  // Reset everything
-  const reset = useCallback(() => {
-    setStep('loading');
-    setLoading(true);
-    setError(null);
-    setSelectedStyle(null);
-    setSelectedTemplate(null);
-    setFormat('square');
-    setHeadline('');
-    setTagline('');
-    setCta('');
-    setSelectedColor(null);
-    setSelectedFont(FONT_OPTIONS[0]);
-    setVariations(generateDefaultVariations());
   }, []);
 
   return {
@@ -257,25 +239,24 @@ export function useFlyerGenerator({
     loading,
     error,
     variations,
-    selectedStyle,
     selectedTemplate,
     format,
     headline,
     tagline,
-    cta,
     colors,
     selectedColor,
-    selectedFont,
     processedImage,
     imageProcessing,
-    selectStyle,
+    productName,
+    price,
+    storeName,
+    storeSlug,
+    whatsappNumber,
+    selectTemplate,
     setFormat,
     setHeadline,
     setTagline,
-    setCta,
     setSelectedColor,
-    setSelectedFont,
-    reset,
     goBack,
   };
 }
