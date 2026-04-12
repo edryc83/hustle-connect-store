@@ -117,8 +117,8 @@ export default function BottomPanel({
         })}
       </div>
 
-      {/* Tab content - reduced height to ensure buttons visible */}
-      <div className="h-[140px] overflow-y-auto">
+      {/* Tab content - compact height to ensure action buttons always visible */}
+      <div className="h-[120px] overflow-y-auto">
         <AnimatePresence mode="wait">
           {activeTab === 'templates' && (
             <motion.div

@@ -93,7 +93,7 @@ export default function FlyerStudio({ product, store, onClose }: FlyerStudioProp
         </button>
       </header>
 
-      {/* Canvas preview - takes remaining space, larger for better visibility */}
+      {/* Canvas preview - takes available space */}
       <div className="flex-1 min-h-0 flex items-center justify-center p-2 overflow-hidden">
         {templateJson && !flyer.isGenerating && (
           <motion.div
@@ -116,7 +116,7 @@ export default function FlyerStudio({ product, store, onClose }: FlyerStudioProp
         )}
       </div>
 
-      {/* Bottom section - fixed at bottom with proper stacking */}
+      {/* Bottom section - fixed at bottom */}
       {!flyer.isGenerating && (
         <div className="flex-none bg-white border-t border-gray-200 shadow-[0_-4px_20px_rgba(0,0,0,0.1)]">
           <BottomPanel

@@ -39,7 +39,13 @@ function DraggableLayer({
   const isSelected = flyer.selectedLayerId === layer.id;
 
   // Text, image, rect, and circle layers are draggable (for buttons, badges, etc.)
-  const isDraggable = layer.type === 'text' || layer.type === 'image' || layer.type === 'rect' || layer.type === 'circle';
+  // But NOT the background layer or decorative elements like light rays, flowers, podium
+  const isBackground = layer.id === 'background' ||
+    layer.id.startsWith('light-ray') ||
+    layer.id.startsWith('flower') ||
+    layer.id.startsWith('podium') ||
+    layer.id.startsWith('icon-');
+  const isDraggable = !isBackground && (layer.type === 'text' || layer.type === 'image' || layer.type === 'rect' || layer.type === 'circle');
 
   const handlePointerDown = (e: React.PointerEvent) => {
     if (!isDraggable || (!onMove && !onGroupMove)) return;
