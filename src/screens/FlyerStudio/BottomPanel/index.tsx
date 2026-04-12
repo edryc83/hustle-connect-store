@@ -28,6 +28,7 @@ interface SelectedLayer {
   id: string;
   type: string;
   fontSize?: number;
+  color?: string;
 }
 
 interface BottomPanelProps {
@@ -47,9 +48,11 @@ interface BottomPanelProps {
   onAddressChange: (v: string) => void;
   onBgColorChange: (v: string) => void;
   onAccentColorChange: (v: string) => void;
+  onTextColorChange: (v: string) => void;
   onFontChange: (v: string) => void;
   onFontSizeChange: (size: number) => void;
   onFontSizeOverride: (layerId: string, size: number) => void;
+  onTextColorOverride: (layerId: string, color: string) => void;
   onDeleteLayer: (layerId: string) => void;
   onImageChange: (url: string) => void;
   onRemoveBackground: () => void;
@@ -74,9 +77,11 @@ export default function BottomPanel({
   onAddressChange,
   onBgColorChange,
   onAccentColorChange,
+  onTextColorChange,
   onFontChange,
   onFontSizeChange,
   onFontSizeOverride,
+  onTextColorOverride,
   onDeleteLayer,
   onImageChange,
   onRemoveBackground,
@@ -112,8 +117,8 @@ export default function BottomPanel({
         })}
       </div>
 
-      {/* Tab content - proper height for usability */}
-      <div className="h-[160px] overflow-y-auto">
+      {/* Tab content - reduced height to ensure buttons visible */}
+      <div className="h-[140px] overflow-y-auto">
         <AnimatePresence mode="wait">
           {activeTab === 'templates' && (
             <motion.div
@@ -191,8 +196,10 @@ export default function BottomPanel({
                 phone={flyer.phone}
                 address={flyer.address}
                 fontSize={flyer.fontSize}
+                textColor={flyer.textColor}
                 selectedLayer={selectedLayer}
                 fontSizeOverrides={flyer.fontSizeOverrides}
+                textColorOverrides={flyer.textColorOverrides}
                 onTitleChange={onTitleChange}
                 onTaglineChange={onTaglineChange}
                 onBadgeChange={onBadgeChange}
@@ -200,7 +207,9 @@ export default function BottomPanel({
                 onPhoneChange={onPhoneChange}
                 onAddressChange={onAddressChange}
                 onFontSizeChange={onFontSizeChange}
+                onTextColorChange={onTextColorChange}
                 onFontSizeOverride={onFontSizeOverride}
+                onTextColorOverride={onTextColorOverride}
                 onDeleteLayer={onDeleteLayer}
               />
             </motion.div>

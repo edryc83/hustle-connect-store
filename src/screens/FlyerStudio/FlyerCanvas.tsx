@@ -16,16 +16,20 @@ interface FlyerCanvasProps {
 // Draggable wrapper for any layer
 function DraggableLayer({
   layer,
+  allLayers,
   flyer,
   scale,
   onMove,
+  onGroupMove,
   onSelect,
   children,
 }: {
   layer: TemplateLayer;
+  allLayers: TemplateLayer[];
   flyer: FlyerState;
   scale: number;
   onMove?: (offset: LayerOffset) => void;
+  onGroupMove?: (groupId: string, offset: LayerOffset) => void;
   onSelect?: () => void;
   children: React.ReactNode;
 }) {
@@ -34,11 +38,11 @@ function DraggableLayer({
   const offset = flyer.layerOffsets[layer.id] || { x: 0, y: 0 };
   const isSelected = flyer.selectedLayerId === layer.id;
 
-  // Only text and image layers are draggable (not background, decorations)
-  const isDraggable = layer.type === 'text' || layer.type === 'image';
+  // Text, image, rect, and circle layers are draggable (for buttons, badges, etc.)
+  const isDraggable = layer.type === 'text' || layer.type === 'image' || layer.type === 'rect' || layer.type === 'circle';
 
   const handlePointerDown = (e: React.PointerEvent) => {
-    if (!isDraggable || !onMove) return;
+    if (!isDraggable || (!onMove && !onGroupMove)) return;
     e.stopPropagation();
     onSelect?.();
     setIsDragging(true);
@@ -52,14 +56,21 @@ function DraggableLayer({
   };
 
   const handlePointerMove = (e: React.PointerEvent) => {
-    if (!isDragging || !dragStartRef.current || !onMove) return;
+    if (!isDragging || !dragStartRef.current) return;
     e.preventDefault();
     const dx = (e.clientX - dragStartRef.current.x) / scale;
     const dy = (e.clientY - dragStartRef.current.y) / scale;
-    onMove({
+    const newOffset = {
       x: dragStartRef.current.offsetX + dx,
       y: dragStartRef.current.offsetY + dy,
-    });
+    };
+
+    // If layer has a group, move all grouped elements
+    if (layer.group && onGroupMove) {
+      onGroupMove(layer.group, newOffset);
+    } else if (onMove) {
+      onMove(newOffset);
+    }
   };
 
   const handlePointerUp = (e: React.PointerEvent) => {
@@ -182,6 +193,17 @@ const FlyerCanvas = forwardRef<HTMLDivElement, FlyerCanvasProps>(
       onLayerSelect?.(null);
     };
 
+    // Handle moving all layers in a group together
+    const handleGroupMove = (groupId: string, offset: LayerOffset) => {
+      if (!onLayerMove) return;
+      // Find all layers in this group and move them
+      templateJson.layers.forEach((layer) => {
+        if (layer.group === groupId) {
+          onLayerMove(layer.id, offset);
+        }
+      });
+    };
+
     return (
       <div
         ref={ref}
@@ -210,9 +232,11 @@ const FlyerCanvas = forwardRef<HTMLDivElement, FlyerCanvasProps>(
             <DraggableLayer
               key={layer.id}
               layer={layer}
+              allLayers={templateJson.layers}
               flyer={flyer}
               scale={scale}
               onMove={onLayerMove ? (offset) => onLayerMove(layer.id, offset) : undefined}
+              onGroupMove={onLayerMove ? handleGroupMove : undefined}
               onSelect={onLayerSelect ? () => onLayerSelect(layer.id) : undefined}
             >
               <RenderLayer layer={layer} flyer={flyer} />

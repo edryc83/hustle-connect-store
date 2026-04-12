@@ -108,7 +108,11 @@ export default function RenderLayer({ layer, flyer }: RenderLayerProps) {
 
     case 'text': {
       const baseFontSize = layer.fontSize ?? 24;
-      const scaledFontSize = Math.round(baseFontSize * fontScale);
+      // Check for font size override
+      const overriddenFontSize = flyer.fontSizeOverrides[layer.id];
+      const scaledFontSize = overriddenFontSize ?? Math.round(baseFontSize * fontScale);
+      // Check for text color override
+      const textColor = flyer.textColorOverrides[layer.id] ?? r(layer.color ?? '#ffffff');
 
       return (
         <text
@@ -123,7 +127,7 @@ export default function RenderLayer({ layer, flyer }: RenderLayerProps) {
               : layer.fontFamily
           }
           fontStyle={layer.fontStyle ?? 'normal'}
-          fill={r(layer.color ?? '#ffffff')}
+          fill={textColor}
           opacity={layer.opacity ?? 1}
           textAnchor={layer.textAnchor ?? 'start'}
           letterSpacing={layer.letterSpacing ?? 0}

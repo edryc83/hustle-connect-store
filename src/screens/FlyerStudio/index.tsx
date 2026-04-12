@@ -35,6 +35,8 @@ export default function FlyerStudio({ product, store, onClose }: FlyerStudioProp
     setProductImage,
     setLayerOffset,
     setFontSizeOverride,
+    setTextColor,
+    setTextColorOverride,
     deleteLayer,
     restoreDeletedLayers,
     selectLayer,
@@ -55,6 +57,7 @@ export default function FlyerStudio({ product, store, onClose }: FlyerStudioProp
       id: layer.id,
       type: layer.type,
       fontSize: layer.fontSize,
+      color: layer.color,
     };
   }, [flyer.selectedLayerId, templateJson]);
 
@@ -90,20 +93,20 @@ export default function FlyerStudio({ product, store, onClose }: FlyerStudioProp
         </button>
       </header>
 
-      {/* Canvas preview - takes remaining space but not too much */}
-      <div className="flex-1 min-h-0 flex items-center justify-center p-3 overflow-hidden">
+      {/* Canvas preview - takes remaining space, larger for better visibility */}
+      <div className="flex-1 min-h-0 flex items-center justify-center p-2 overflow-hidden">
         {templateJson && !flyer.isGenerating && (
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.15 }}
-            className="max-w-[200px] w-full"
+            className="max-w-[280px] w-full"
           >
             <FlyerCanvas
               ref={canvasRef}
               templateJson={templateJson}
               flyer={flyer}
-              width={200}
+              width={280}
               onImageUpdate={updateImage}
               onLayerMove={setLayerOffset}
               onLayerSelect={selectLayer}
@@ -133,9 +136,11 @@ export default function FlyerStudio({ product, store, onClose }: FlyerStudioProp
             onAddressChange={setAddress}
             onBgColorChange={setBgColor}
             onAccentColorChange={setAccentColor}
+            onTextColorChange={setTextColor}
             onFontChange={setFont}
             onFontSizeChange={setFontSize}
             onFontSizeOverride={setFontSizeOverride}
+            onTextColorOverride={setTextColorOverride}
             onDeleteLayer={deleteLayer}
             onImageChange={setProductImage}
             onRemoveBackground={removeBackground}

@@ -1,10 +1,12 @@
 import React from 'react';
-import { Type, Minus, Plus, X, Trash2 } from 'lucide-react';
+import { Type, Minus, Plus, X, Trash2, Palette } from 'lucide-react';
+import { TEXT_COLORS } from '../flyerTypes';
 
 interface SelectedLayer {
   id: string;
   type: string;
   fontSize?: number;
+  color?: string;
 }
 
 interface TextTabProps {
@@ -15,8 +17,10 @@ interface TextTabProps {
   phone: string;
   address: string;
   fontSize: number;
+  textColor: string;
   selectedLayer?: SelectedLayer | null;
   fontSizeOverrides?: Record<string, number>;
+  textColorOverrides?: Record<string, string>;
   onTitleChange: (v: string) => void;
   onTaglineChange: (v: string) => void;
   onBadgeChange: (v: string) => void;
@@ -24,7 +28,9 @@ interface TextTabProps {
   onPhoneChange: (v: string) => void;
   onAddressChange: (v: string) => void;
   onFontSizeChange: (size: number) => void;
+  onTextColorChange: (color: string) => void;
   onFontSizeOverride?: (layerId: string, size: number) => void;
+  onTextColorOverride?: (layerId: string, color: string) => void;
   onDeleteLayer?: (layerId: string) => void;
 }
 
@@ -72,14 +78,18 @@ export default function TextTab({
   badge,
   cta,
   fontSize,
+  textColor,
   selectedLayer,
   fontSizeOverrides,
+  textColorOverrides,
   onTitleChange,
   onTaglineChange,
   onBadgeChange,
   onCtaChange,
   onFontSizeChange,
+  onTextColorChange,
   onFontSizeOverride,
+  onTextColorOverride,
   onDeleteLayer,
 }: TextTabProps) {
   const handleSliderChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -95,41 +105,76 @@ export default function TextTab({
     ? (fontSizeOverrides?.[selectedLayer.id] ?? selectedLayer.fontSize)
     : null;
 
+  const selectedLayerColor = selectedLayer?.id
+    ? (textColorOverrides?.[selectedLayer.id] ?? selectedLayer.color ?? '#ffffff')
+    : '#ffffff';
+
   const handleLayerSizeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (selectedLayer && onFontSizeOverride) {
       onFontSizeOverride(selectedLayer.id, parseFloat(e.target.value));
     }
   };
 
+  const handleLayerColorChange = (color: string) => {
+    if (selectedLayer && onTextColorOverride) {
+      onTextColorOverride(selectedLayer.id, color);
+    }
+  };
+
   return (
     <div className="px-4 py-2 h-full overflow-y-auto">
       {/* Selected Layer Controls */}
-      {selectedLayer?.type === 'text' && selectedLayerFontSize && (
-        <div className="flex items-center gap-2 pb-2 mb-2 border-b border-purple-200 bg-purple-50 -mx-4 px-4 py-2">
-          <div className="flex-1 flex items-center gap-2">
+      {selectedLayer?.type === 'text' && (
+        <div className="pb-2 mb-2 border-b border-purple-200 bg-purple-50 -mx-4 px-4 py-2 space-y-2">
+          <div className="flex items-center gap-2">
             <div className="flex items-center gap-1 text-[10px] text-purple-600 font-medium">
               <Type className="w-3 h-3" />
-              <span>Selected</span>
+              <span>Selected Text</span>
             </div>
-            <input
-              type="range"
-              min={selectedLayerFontSize * 0.5}
-              max={selectedLayerFontSize * 2}
-              step="1"
-              value={fontSizeOverrides?.[selectedLayer.id] ?? selectedLayerFontSize}
-              onChange={handleLayerSizeChange}
-              className="flex-1 h-1.5 bg-purple-200 rounded-lg appearance-none cursor-pointer accent-purple-500"
-            />
-            <span className="text-[10px] font-medium text-purple-600 w-10">
-              {Math.round(fontSizeOverrides?.[selectedLayer.id] ?? selectedLayerFontSize)}px
-            </span>
+            {selectedLayerFontSize && (
+              <>
+                <input
+                  type="range"
+                  min={selectedLayerFontSize * 0.5}
+                  max={selectedLayerFontSize * 2}
+                  step="1"
+                  value={fontSizeOverrides?.[selectedLayer.id] ?? selectedLayerFontSize}
+                  onChange={handleLayerSizeChange}
+                  className="flex-1 h-1.5 bg-purple-200 rounded-lg appearance-none cursor-pointer accent-purple-500"
+                />
+                <span className="text-[10px] font-medium text-purple-600 w-10">
+                  {Math.round(fontSizeOverrides?.[selectedLayer.id] ?? selectedLayerFontSize)}px
+                </span>
+              </>
+            )}
+            <button
+              onClick={() => onDeleteLayer?.(selectedLayer.id)}
+              className="w-7 h-7 rounded-lg bg-red-100 flex items-center justify-center text-red-500 hover:bg-red-200"
+            >
+              <Trash2 className="w-4 h-4" />
+            </button>
           </div>
-          <button
-            onClick={() => onDeleteLayer?.(selectedLayer.id)}
-            className="w-7 h-7 rounded-lg bg-red-100 flex items-center justify-center text-red-500 hover:bg-red-200"
-          >
-            <Trash2 className="w-4 h-4" />
-          </button>
+          {/* Color picker for selected text */}
+          <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1 text-[10px] text-purple-600 font-medium">
+              <Palette className="w-3 h-3" />
+              <span>Color</span>
+            </div>
+            <div className="flex gap-1 flex-1">
+              {TEXT_COLORS.map((color) => (
+                <button
+                  key={color}
+                  onClick={() => handleLayerColorChange(color)}
+                  className={`w-6 h-6 rounded-full border-2 transition-all ${
+                    selectedLayerColor === color
+                      ? 'border-purple-500 scale-110'
+                      : 'border-gray-200'
+                  }`}
+                  style={{ backgroundColor: color }}
+                />
+              ))}
+            </div>
+          </div>
         </div>
       )}
 

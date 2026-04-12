@@ -26,12 +26,14 @@ export interface FlyerState {
   productPrice: string;
   bgColor: string;
   accentColor: string;
+  textColor: string; // Global text color override
   font: string;
   fontSize: number; // 0.5 to 1.5 scale factor
   productImage: string | null;
   additionalImages: AdditionalImage[]; // logos, extra images
   layerOffsets: Record<string, LayerOffset>; // layer id -> offset
   fontSizeOverrides: Record<string, number>; // layer id -> font size override
+  textColorOverrides: Record<string, string>; // layer id -> text color override
   deletedLayerIds: string[]; // IDs of deleted layers
   selectedLayerId: string | null; // Currently selected layer for editing
   isGenerating: boolean;
@@ -41,6 +43,7 @@ export interface FlyerState {
 export interface TemplateLayer {
   id: string;
   type: 'rect' | 'circle' | 'ellipse' | 'polygon' | 'svg-path' | 'image' | 'text';
+  group?: string; // Group ID - elements with same group move together
   // rect
   x?: number;
   y?: number;
@@ -119,6 +122,17 @@ export const BG_COLORS = [
   '#f5f0e8',
   '#0a1628',
   '#1a0a2e',
+];
+
+export const TEXT_COLORS = [
+  '#ffffff',
+  '#000000',
+  '#f5f5f5',
+  '#333333',
+  '#ffd700',
+  '#ff4d6d',
+  '#00b4d8',
+  '#a0e020',
 ];
 
 export const FONT_OPTIONS = [

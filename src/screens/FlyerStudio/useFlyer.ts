@@ -43,9 +43,16 @@ interface UseFlyerReturn {
   setAddress: (v: string) => void;
   setBgColor: (v: string) => void;
   setAccentColor: (v: string) => void;
+  setTextColor: (v: string) => void;
   setFont: (v: string) => void;
   setFontSize: (size: number) => void;
   setProductImage: (url: string) => void;
+  setLayerOffset: (layerId: string, offset: LayerOffset) => void;
+  setFontSizeOverride: (layerId: string, size: number) => void;
+  setTextColorOverride: (layerId: string, color: string) => void;
+  deleteLayer: (layerId: string) => void;
+  restoreDeletedLayers: () => void;
+  selectLayer: (layerId: string | null) => void;
   addImage: (url: string) => void;
   updateImage: (id: string, updates: Partial<AdditionalImage>) => void;
   removeImage: (id: string) => void;
@@ -97,12 +104,14 @@ const DEFAULT_FLYER: FlyerState = {
   productPrice: '',
   bgColor: '#9b59b6',
   accentColor: '#8B2FC9',
+  textColor: '#ffffff',
   font: 'Inter',
   fontSize: 1.0,
   productImage: null,
   additionalImages: [],
   layerOffsets: {},
   fontSizeOverrides: {},
+  textColorOverrides: {},
   deletedLayerIds: [],
   selectedLayerId: null,
   isGenerating: true,
@@ -290,6 +299,7 @@ export function useFlyer({ product, store }: UseFlyerProps): UseFlyerReturn {
   const setAddress = useCallback((v: string) => setFlyer((prev) => ({ ...prev, address: v })), []);
   const setBgColor = useCallback((v: string) => setFlyer((prev) => ({ ...prev, bgColor: v })), []);
   const setAccentColor = useCallback((v: string) => setFlyer((prev) => ({ ...prev, accentColor: v })), []);
+  const setTextColor = useCallback((v: string) => setFlyer((prev) => ({ ...prev, textColor: v })), []);
   const setFont = useCallback((v: string) => setFlyer((prev) => ({ ...prev, font: v })), []);
   const setFontSize = useCallback((size: number) => setFlyer((prev) => ({ ...prev, fontSize: size })), []);
   const setProductImage = useCallback((url: string) => setFlyer((prev) => ({ ...prev, productImage: url })), []);
@@ -305,6 +315,14 @@ export function useFlyer({ product, store }: UseFlyerProps): UseFlyerReturn {
     setFlyer((prev) => ({
       ...prev,
       fontSizeOverrides: { ...prev.fontSizeOverrides, [layerId]: size },
+    }));
+  }, []);
+
+  // Text color override for individual text elements
+  const setTextColorOverride = useCallback((layerId: string, color: string) => {
+    setFlyer((prev) => ({
+      ...prev,
+      textColorOverrides: { ...prev.textColorOverrides, [layerId]: color },
     }));
   }, []);
 
@@ -384,11 +402,13 @@ export function useFlyer({ product, store }: UseFlyerProps): UseFlyerReturn {
     setAddress,
     setBgColor,
     setAccentColor,
+    setTextColor,
     setFont,
     setFontSize,
     setProductImage,
     setLayerOffset,
     setFontSizeOverride,
+    setTextColorOverride,
     deleteLayer,
     restoreDeletedLayers,
     selectLayer,

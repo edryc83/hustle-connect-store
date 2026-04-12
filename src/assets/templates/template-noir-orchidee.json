@@ -332,6 +332,7 @@
     {
       "id": "cta-bg",
       "type": "rect",
+      "group": "cta-button",
       "x": 660, "y": 1020,
       "width": 300, "height": 76,
       "rx": 38,
@@ -340,6 +341,7 @@
     {
       "id": "cta-text",
       "type": "text",
+      "group": "cta-button",
       "value": "PLACEHOLDER_CTA",
       "x": 810, "y": 1067,
       "fontSize": 40, "fontWeight": "800",
