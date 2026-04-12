@@ -22,6 +22,7 @@ export default defineConfig(({ mode }) => ({
         globPatterns: ["**/*.{js,css,html,ico,png,svg,jpeg,jpg,webp,woff2}"],
         navigateFallbackDenylist: [/^\/~oauth/],
         importScripts: ["/push-sw.js"],
+        maximumFileSizeToCacheInBytes: 5 * 1024 * 1024, // 5 MB
         runtimeCaching: [
           {
             // Auth endpoints must NEVER be cached — prevents stale tokens causing logouts
