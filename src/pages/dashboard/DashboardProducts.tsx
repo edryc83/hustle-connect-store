@@ -22,7 +22,7 @@ import { formatPrice } from "@/lib/currency";
 import whatsappIcon from "@/assets/whatsapp-icon.png";
 import { Badge } from "@/components/ui/badge";
 import type { Tables } from "@/integrations/supabase/types";
-import FlyerGeneratorModal from "@/components/flyer-generator/FlyerGeneratorModal";
+import FlyerStudio from "@/screens/FlyerStudio";
 import { ProductAttributeForm } from "@/components/dashboard/ProductAttributeForm";
 import type { AiAttributeSuggestion } from "@/lib/attributeLibrary";
 import { aiSlugToCategory } from "@/lib/categoryMapping";
@@ -637,14 +637,21 @@ const DashboardProducts = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Flyer Generator Modal */}
+      {/* Flyer Studio */}
       {flyerProduct && profile && (
-        <FlyerGeneratorModal
-          product={flyerProduct}
-          storeName={profile.store_name ?? "Store"}
-          storeSlug={profile.store_slug ?? ""}
-          currency={currency}
-          open={!!flyerProduct}
+        <FlyerStudio
+          product={{
+            id: flyerProduct.id,
+            name: flyerProduct.name,
+            price: String((flyerProduct as any).discount_price ?? flyerProduct.price),
+            description: flyerProduct.description ?? undefined,
+            category: (flyerProduct as any).category ?? undefined,
+            imageUrl: productImages[flyerProduct.id]?.[0] || flyerProduct.image_url,
+          }}
+          store={{
+            name: profile.store_name ?? "Store",
+            slug: profile.store_slug ?? "",
+          }}
           onClose={() => setFlyerProduct(null)}
         />
       )}

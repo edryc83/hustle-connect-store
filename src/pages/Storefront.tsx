@@ -19,7 +19,7 @@ import { BuyerAttributePicker, ChatOnlyBanner } from "@/components/storefront/Bu
 import { getAttributeSummary, getSelectableKeys, buildAttributeLines } from "@/lib/attributeLibrary";
 import { StorefrontFilters, applyFilters, type FilterState } from "@/components/storefront/StorefrontFilters";
 import { StoreAssistantButton } from "@/components/storefront/StoreAssistant";
-import FlyerGeneratorModal from "@/components/flyer-generator/FlyerGeneratorModal";
+import FlyerStudio from "@/screens/FlyerStudio";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -612,13 +612,22 @@ function ProductDetailView({
         visitorName={visitorName}
       />
 
-      {isOwner && (
-        <FlyerGeneratorModal
-          product={product}
-          storeName={profile.store_name ?? "Store"}
-          storeSlug={storeSlug}
-          currency={currency}
-          open={flyerModalOpen}
+      {isOwner && flyerModalOpen && (
+        <FlyerStudio
+          product={{
+            id: product.id,
+            name: product.name,
+            price: String(product.discount_price ?? product.price),
+            description: product.description ?? undefined,
+            category: (product as any).category ?? undefined,
+            imageUrl: images[0] || product.image_url,
+          }}
+          store={{
+            name: profile.store_name ?? "Store",
+            slug: storeSlug,
+            phone: profile.whatsapp_number ?? undefined,
+            address: (profile as any).address ?? undefined,
+          }}
           onClose={() => setFlyerModalOpen(false)}
         />
       )}
