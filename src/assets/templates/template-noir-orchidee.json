@@ -1,0 +1,370 @@
+{
+  "id": "noir-orchidee",
+  "name": "Noir Orchidée",
+  "category": "beauty",
+  "canvas": { "width": 1080, "height": 1350 },
+  "colors": {
+    "bg": "#9b59b6",
+    "accent": "#8B2FC9"
+  },
+  "layers": [
+    {
+      "id": "background",
+      "type": "rect",
+      "x": 0, "y": 0,
+      "width": 1080, "height": 1350,
+      "fill": "PLACEHOLDER_BG_COLOR"
+    },
+    {
+      "id": "light-ray-1",
+      "type": "polygon",
+      "points": "540,0 1080,0 1080,600",
+      "fill": "#ffffff",
+      "opacity": 0.18
+    },
+    {
+      "id": "light-ray-2",
+      "type": "polygon",
+      "points": "600,0 1080,0 1080,400",
+      "fill": "#ffffff",
+      "opacity": 0.10
+    },
+    {
+      "id": "light-ray-3",
+      "type": "polygon",
+      "points": "680,0 1080,120 1080,0",
+      "fill": "#ffffff",
+      "opacity": 0.06
+    },
+    {
+      "id": "podium-top",
+      "type": "ellipse",
+      "cx": 540, "cy": 990,
+      "rx": 360, "ry": 50,
+      "fill": "#c490d8"
+    },
+    {
+      "id": "podium-body",
+      "type": "rect",
+      "x": 180, "y": 990,
+      "width": 720, "height": 60,
+      "fill": "#7d3c98"
+    },
+    {
+      "id": "flower-left-1",
+      "type": "ellipse",
+      "cx": 160, "cy": 1150,
+      "rx": 90, "ry": 60,
+      "fill": "PLACEHOLDER_ACCENT_COLOR",
+      "opacity": 0.85,
+      "rotate": -20,
+      "rotateCx": 160, "rotateCy": 1150
+    },
+    {
+      "id": "flower-left-1-center",
+      "type": "ellipse",
+      "cx": 160, "cy": 1150,
+      "rx": 30, "ry": 20,
+      "fill": "#FFD700", "opacity": 0.8,
+      "rotate": -20,
+      "rotateCx": 160, "rotateCy": 1150
+    },
+    {
+      "id": "flower-left-2",
+      "type": "ellipse",
+      "cx": 80, "cy": 1220,
+      "rx": 80, "ry": 55,
+      "fill": "PLACEHOLDER_ACCENT_COLOR",
+      "opacity": 0.9,
+      "rotate": 10,
+      "rotateCx": 80, "rotateCy": 1220
+    },
+    {
+      "id": "flower-left-2-center",
+      "type": "ellipse",
+      "cx": 80, "cy": 1220,
+      "rx": 26, "ry": 18,
+      "fill": "#FFD700", "opacity": 0.8,
+      "rotate": 10,
+      "rotateCx": 80, "rotateCy": 1220
+    },
+    {
+      "id": "flower-left-3",
+      "type": "ellipse",
+      "cx": 240, "cy": 1200,
+      "rx": 70, "ry": 48,
+      "fill": "PLACEHOLDER_ACCENT_COLOR",
+      "opacity": 0.75,
+      "rotate": -5,
+      "rotateCx": 240, "rotateCy": 1200
+    },
+    {
+      "id": "flower-left-3-center",
+      "type": "ellipse",
+      "cx": 240, "cy": 1200,
+      "rx": 22, "ry": 15,
+      "fill": "#FFD700", "opacity": 0.8,
+      "rotate": -5,
+      "rotateCx": 240, "rotateCy": 1200
+    },
+    {
+      "id": "flower-right-1",
+      "type": "ellipse",
+      "cx": 850, "cy": 1160,
+      "rx": 85, "ry": 58,
+      "fill": "PLACEHOLDER_ACCENT_COLOR",
+      "opacity": 0.85,
+      "rotate": 15,
+      "rotateCx": 850, "rotateCy": 1160
+    },
+    {
+      "id": "flower-right-1-center",
+      "type": "ellipse",
+      "cx": 850, "cy": 1160,
+      "rx": 28, "ry": 19,
+      "fill": "#FFD700", "opacity": 0.8,
+      "rotate": 15,
+      "rotateCx": 850, "rotateCy": 1160
+    },
+    {
+      "id": "flower-right-2",
+      "type": "ellipse",
+      "cx": 960, "cy": 1220,
+      "rx": 75, "ry": 52,
+      "fill": "PLACEHOLDER_ACCENT_COLOR",
+      "opacity": 0.85,
+      "rotate": -10,
+      "rotateCx": 960, "rotateCy": 1220
+    },
+    {
+      "id": "flower-right-2-center",
+      "type": "ellipse",
+      "cx": 960, "cy": 1220,
+      "rx": 24, "ry": 16,
+      "fill": "#FFD700", "opacity": 0.8,
+      "rotate": -10,
+      "rotateCx": 960, "rotateCy": 1220
+    },
+    {
+      "id": "flower-right-3",
+      "type": "ellipse",
+      "cx": 780, "cy": 1240,
+      "rx": 65, "ry": 44,
+      "fill": "PLACEHOLDER_ACCENT_COLOR",
+      "opacity": 0.8,
+      "rotate": 5,
+      "rotateCx": 780, "rotateCy": 1240
+    },
+    {
+      "id": "flower-right-3-center",
+      "type": "ellipse",
+      "cx": 780, "cy": 1240,
+      "rx": 21, "ry": 14,
+      "fill": "#FFD700", "opacity": 0.75,
+      "rotate": 5,
+      "rotateCx": 780, "rotateCy": 1240
+    },
+    {
+      "id": "flower-bottom-left",
+      "type": "ellipse",
+      "cx": 340, "cy": 1280,
+      "rx": 60, "ry": 42,
+      "fill": "PLACEHOLDER_ACCENT_COLOR",
+      "opacity": 0.65,
+      "rotate": -15,
+      "rotateCx": 340, "rotateCy": 1280
+    },
+    {
+      "id": "flower-bottom-right",
+      "type": "ellipse",
+      "cx": 720, "cy": 1300,
+      "rx": 55, "ry": 38,
+      "fill": "PLACEHOLDER_ACCENT_COLOR",
+      "opacity": 0.65,
+      "rotate": 8,
+      "rotateCx": 720, "rotateCy": 1300
+    },
+    {
+      "id": "product-image",
+      "type": "image",
+      "src": "PLACEHOLDER_IMAGE",
+      "x": 300, "y": 300,
+      "width": 480, "height": 720,
+      "fit": "contain",
+      "preserveAspectRatio": "xMidYMid meet"
+    },
+    {
+      "id": "store-name",
+      "type": "text",
+      "value": "PLACEHOLDER_STORE",
+      "x": 60, "y": 80,
+      "fontSize": 34, "fontWeight": "400",
+      "fontFamily": "PLACEHOLDER_FONT",
+      "color": "#ffffff", "opacity": 0.9
+    },
+    {
+      "id": "year-label",
+      "type": "text",
+      "value": "2025",
+      "x": 1020, "y": 80,
+      "fontSize": 34, "fontWeight": "400",
+      "fontFamily": "PLACEHOLDER_FONT",
+      "color": "#ffffff", "opacity": 0.9,
+      "textAnchor": "end"
+    },
+    {
+      "id": "headline",
+      "type": "text",
+      "value": "PLACEHOLDER_TITLE",
+      "x": 540, "y": 190,
+      "fontSize": 148, "fontWeight": "900",
+      "fontFamily": "PLACEHOLDER_FONT",
+      "color": "#ffffff",
+      "textAnchor": "middle",
+      "letterSpacing": 8
+    },
+    {
+      "id": "new-arrival-line1",
+      "type": "text",
+      "value": "NEW",
+      "x": 310, "y": 255,
+      "fontSize": 28, "fontWeight": "300",
+      "fontFamily": "PLACEHOLDER_FONT",
+      "color": "#ffffff", "opacity": 0.85,
+      "letterSpacing": 6
+    },
+    {
+      "id": "new-arrival-line2",
+      "type": "text",
+      "value": "ARRIVAL",
+      "x": 310, "y": 288,
+      "fontSize": 28, "fontWeight": "300",
+      "fontFamily": "PLACEHOLDER_FONT",
+      "color": "#ffffff", "opacity": 0.85,
+      "letterSpacing": 6
+    },
+    {
+      "id": "tagline",
+      "type": "text",
+      "value": "PLACEHOLDER_TAGLINE",
+      "x": 460, "y": 295,
+      "fontSize": 88, "fontWeight": "400",
+      "fontFamily": "Playfair Display",
+      "fontStyle": "italic",
+      "color": "#ffffff"
+    },
+    {
+      "id": "sub-headline-1",
+      "type": "text",
+      "value": "where elegance",
+      "x": 60, "y": 870,
+      "fontSize": 34, "fontWeight": "300",
+      "fontFamily": "PLACEHOLDER_FONT",
+      "color": "#ffffff", "opacity": 0.85
+    },
+    {
+      "id": "sub-headline-2",
+      "type": "text",
+      "value": "MEETS ALLURE",
+      "x": 60, "y": 916,
+      "fontSize": 44, "fontWeight": "800",
+      "fontFamily": "PLACEHOLDER_FONT",
+      "color": "#ffffff"
+    },
+    {
+      "id": "icon-phone-bg",
+      "type": "circle",
+      "cx": 80, "cy": 990, "r": 36,
+      "fill": "#ffffff", "opacity": 0.2
+    },
+    {
+      "id": "icon-phone",
+      "type": "svg-path",
+      "d": "M68 978 Q72 970 80 968 Q88 970 92 978 L90 998 Q80 1006 70 998 Z",
+      "fill": "#ffffff"
+    },
+    {
+      "id": "icon-web-bg",
+      "type": "circle",
+      "cx": 172, "cy": 990, "r": 36,
+      "fill": "#ffffff", "opacity": 0.2
+    },
+    {
+      "id": "icon-web-outer",
+      "type": "circle",
+      "cx": 172, "cy": 990, "r": 22,
+      "fill": "none", "stroke": "#ffffff", "strokeWidth": 4
+    },
+    {
+      "id": "icon-web-inner",
+      "type": "circle",
+      "cx": 172, "cy": 990, "r": 8,
+      "fill": "none", "stroke": "#ffffff", "strokeWidth": 3
+    },
+    {
+      "id": "icon-location-bg",
+      "type": "circle",
+      "cx": 264, "cy": 990, "r": 36,
+      "fill": "#ffffff", "opacity": 0.2
+    },
+    {
+      "id": "icon-location",
+      "type": "svg-path",
+      "d": "M264 970 Q278 970 282 982 Q286 994 264 1014 Q242 994 246 982 Q250 970 264 970 Z",
+      "fill": "#ffffff"
+    },
+    {
+      "id": "icon-location-dot",
+      "type": "circle",
+      "cx": 264, "cy": 984, "r": 5,
+      "fill": "PLACEHOLDER_BG_COLOR"
+    },
+    {
+      "id": "badge-text",
+      "type": "text",
+      "value": "PLACEHOLDER_BADGE",
+      "x": 820, "y": 970,
+      "fontSize": 72, "fontWeight": "800",
+      "fontFamily": "PLACEHOLDER_FONT",
+      "color": "#ffffff", "opacity": 0.85,
+      "textAnchor": "middle"
+    },
+    {
+      "id": "cta-bg",
+      "type": "rect",
+      "x": 660, "y": 1020,
+      "width": 300, "height": 76,
+      "rx": 38,
+      "fill": "#ffffff", "opacity": 0.25
+    },
+    {
+      "id": "cta-text",
+      "type": "text",
+      "value": "PLACEHOLDER_CTA",
+      "x": 810, "y": 1067,
+      "fontSize": 40, "fontWeight": "800",
+      "fontFamily": "PLACEHOLDER_FONT",
+      "color": "#ffffff",
+      "textAnchor": "middle",
+      "letterSpacing": 3
+    },
+    {
+      "id": "phone",
+      "type": "text",
+      "value": "PLACEHOLDER_PHONE",
+      "x": 60, "y": 1220,
+      "fontSize": 32, "fontWeight": "400",
+      "fontFamily": "PLACEHOLDER_FONT",
+      "color": "#ffffff", "opacity": 0.8
+    },
+    {
+      "id": "address",
+      "type": "text",
+      "value": "PLACEHOLDER_ADDRESS",
+      "x": 60, "y": 1265,
+      "fontSize": 28, "fontWeight": "300",
+      "fontFamily": "PLACEHOLDER_FONT",
+      "color": "#ffffff", "opacity": 0.7
+    }
+  ]
+}

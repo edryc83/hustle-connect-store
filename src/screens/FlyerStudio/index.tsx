@@ -1,0 +1,141 @@
+import React, { useRef } from 'react';
+import { motion } from 'framer-motion';
+import { X, RefreshCw } from 'lucide-react';
+import { useFlyer, type ProductData, type StoreData } from './useFlyer';
+import FlyerCanvas from './FlyerCanvas';
+import GeneratingOverlay from './GeneratingOverlay';
+import BottomPanel from './BottomPanel';
+import ActionBar from './ActionBar';
+
+interface FlyerStudioProps {
+  product: ProductData;
+  store: StoreData;
+  onClose: () => void;
+}
+
+export default function FlyerStudio({ product, store, onClose }: FlyerStudioProps) {
+  const canvasRef = useRef<HTMLDivElement>(null);
+
+  const {
+    flyer,
+    templateJson,
+    templates,
+    extractedColors,
+    selectTemplate,
+    setTitle,
+    setTagline,
+    setBadge,
+    setCta,
+    setPhone,
+    setAddress,
+    setBgColor,
+    setAccentColor,
+    setFont,
+    setFontSize,
+    setProductImage,
+    addImage,
+    updateImage,
+    removeImage,
+    removeBackground,
+    isRemovingBg,
+    regenerate,
+  } = useFlyer({ product, store });
+
+  return (
+    <div className="fixed inset-0 z-50 bg-gray-100 flex flex-col h-screen">
+      {/* Loading overlay */}
+      <GeneratingOverlay
+        isVisible={flyer.isGenerating}
+        currentStep={flyer.generationStep}
+        productName={product.name}
+      />
+
+      {/* Header */}
+      <header
+        className="flex-none flex items-center justify-between px-4 py-2 bg-white border-b border-gray-200"
+        style={{ paddingTop: 'max(8px, env(safe-area-inset-top))' }}
+      >
+        <button
+          onClick={onClose}
+          className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-gray-100 active:bg-gray-200"
+        >
+          <X className="w-5 h-5 text-gray-600" />
+        </button>
+
+        <h1 className="text-sm font-semibold text-gray-900">Flyer Studio</h1>
+
+        <button
+          onClick={regenerate}
+          disabled={flyer.isGenerating}
+          className="w-9 h-9 flex items-center justify-center rounded-full hover:bg-gray-100 active:bg-gray-200 disabled:opacity-50"
+        >
+          <RefreshCw className={`w-5 h-5 text-gray-600 ${flyer.isGenerating ? 'animate-spin' : ''}`} />
+        </button>
+      </header>
+
+      {/* Canvas preview - takes remaining space but not too much */}
+      <div className="flex-1 min-h-0 flex items-center justify-center p-3 overflow-hidden">
+        {templateJson && !flyer.isGenerating && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.15 }}
+            className="max-w-[200px] w-full"
+          >
+            <FlyerCanvas
+              ref={canvasRef}
+              templateJson={templateJson}
+              flyer={flyer}
+              width={200}
+              onImageUpdate={updateImage}
+              className="mx-auto shadow-xl"
+            />
+          </motion.div>
+        )}
+      </div>
+
+      {/* Bottom section - fixed at bottom with proper stacking */}
+      {!flyer.isGenerating && (
+        <div className="flex-none bg-white border-t border-gray-200 shadow-[0_-4px_20px_rgba(0,0,0,0.1)]">
+          <BottomPanel
+            flyer={flyer}
+            templates={templates}
+            extractedColors={extractedColors}
+            originalImageUrl={product.imageUrl}
+            isRemovingBg={isRemovingBg}
+            onSelectTemplate={selectTemplate}
+            onTitleChange={setTitle}
+            onTaglineChange={setTagline}
+            onBadgeChange={setBadge}
+            onCtaChange={setCta}
+            onPhoneChange={setPhone}
+            onAddressChange={setAddress}
+            onBgColorChange={setBgColor}
+            onAccentColorChange={setAccentColor}
+            onFontChange={setFont}
+            onFontSizeChange={setFontSize}
+            onImageChange={setProductImage}
+            onRemoveBackground={removeBackground}
+            onAddImage={addImage}
+            onRemoveImage={removeImage}
+          />
+
+          {/* Action buttons - ALWAYS visible with prominent styling */}
+          <div className="px-4 pb-2 pt-1 bg-white border-t border-gray-100">
+            <ActionBar
+              canvasRef={canvasRef}
+              storeName={store.name}
+              productName={product.name}
+            />
+          </div>
+
+          {/* Safe area bottom */}
+          <div style={{ height: 'env(safe-area-inset-bottom)' }} className="bg-white" />
+        </div>
+      )}
+    </div>
+  );
+}
+
+// Re-export types for consumers
+export type { ProductData, StoreData } from './useFlyer';
