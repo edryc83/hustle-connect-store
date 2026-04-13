@@ -62,7 +62,7 @@ export default function FlyerStudio({ product, store, onClose }: FlyerStudioProp
   }, [flyer.selectedLayerId, templateJson]);
 
   return (
-    <div className="fixed inset-0 z-50 bg-gray-100 flex flex-col h-screen">
+    <div className="fixed inset-0 z-[100] bg-gray-100 flex flex-col h-screen">
       {/* Loading overlay */}
       <GeneratingOverlay
         isVisible={flyer.isGenerating}

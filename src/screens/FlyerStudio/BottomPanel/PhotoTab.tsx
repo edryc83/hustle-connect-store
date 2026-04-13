@@ -66,9 +66,18 @@ export default function PhotoTab({
 
       {/* Current product image preview */}
       <div className="flex gap-3 mb-3">
-        <div className="w-16 h-16 rounded-xl overflow-hidden bg-gray-100 border-2 border-gray-200 flex-shrink-0">
+        {/* Checkered pattern background to show transparency */}
+        <div
+          className="w-16 h-16 rounded-xl overflow-hidden border-2 border-gray-200 flex-shrink-0"
+          style={{
+            backgroundImage: 'linear-gradient(45deg, #e5e7eb 25%, transparent 25%), linear-gradient(-45deg, #e5e7eb 25%, transparent 25%), linear-gradient(45deg, transparent 75%, #e5e7eb 75%), linear-gradient(-45deg, transparent 75%, #e5e7eb 75%)',
+            backgroundSize: '8px 8px',
+            backgroundPosition: '0 0, 0 4px, 4px -4px, -4px 0px',
+            backgroundColor: '#f9fafb',
+          }}
+        >
           {currentImage ? (
-            <img src={currentImage} alt="Current" className="w-full h-full object-cover" />
+            <img src={currentImage} alt="Current" className="w-full h-full object-contain" />
           ) : (
             <div className="w-full h-full flex items-center justify-center">
               <Camera className="w-5 h-5 text-gray-400" />
