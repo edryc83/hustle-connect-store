@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Download, Share2, Loader2, Check } from 'lucide-react';
+import { Download, Loader2, Check } from 'lucide-react';
 import { Capacitor } from '@capacitor/core';
 import { Filesystem, Directory } from '@capacitor/filesystem';
 import { Share } from '@capacitor/share';
@@ -22,12 +22,66 @@ export default function ActionBar({ canvasRef, storeName, productName }: ActionB
     if (!canvasRef.current) return null;
 
     try {
-      const canvas = await html2canvas(canvasRef.current, {
+      // Clone the element to avoid modifying the original
+      const element = canvasRef.current;
+
+      // Pre-load all images as base64 to avoid CORS issues
+      const images = element.querySelectorAll('image');
+      const imagePromises = Array.from(images).map(async (img) => {
+        const href = img.getAttribute('href') || img.getAttribute('xlink:href');
+        if (href && href.startsWith('http')) {
+          try {
+            // Fetch image and convert to base64
+            const response = await fetch(href, { mode: 'cors' });
+            const blob = await response.blob();
+            return new Promise<{element: Element, dataUrl: string}>((resolve) => {
+              const reader = new FileReader();
+              reader.onloadend = () => {
+                resolve({ element: img, dataUrl: reader.result as string });
+              };
+              reader.readAsDataURL(blob);
+            });
+          } catch {
+            // If CORS fails, try with a proxy or skip
+            console.log('Could not fetch image:', href);
+            return null;
+          }
+        }
+        return null;
+      });
+
+      // Wait for all images to be converted
+      const imageResults = await Promise.all(imagePromises);
+
+      // Temporarily replace image hrefs with base64
+      const originalHrefs: {element: Element, href: string}[] = [];
+      imageResults.forEach((result) => {
+        if (result) {
+          const originalHref = result.element.getAttribute('href') || result.element.getAttribute('xlink:href') || '';
+          originalHrefs.push({ element: result.element, href: originalHref });
+          result.element.setAttribute('href', result.dataUrl);
+        }
+      });
+
+      const canvas = await html2canvas(element, {
         scale: 3, // Higher quality
         useCORS: true,
-        allowTaint: true,
-        backgroundColor: null, // Transparent background
+        allowTaint: false, // Don't allow tainted canvas
+        backgroundColor: null,
         logging: false,
+        imageTimeout: 15000,
+        onclone: (clonedDoc) => {
+          // Ensure SVG images have crossorigin
+          const svgImages = clonedDoc.querySelectorAll('image');
+          svgImages.forEach((img) => {
+            img.setAttribute('crossorigin', 'anonymous');
+          });
+        },
+      });
+
+      // Restore original hrefs
+      originalHrefs.forEach(({ element, href }) => {
+        element.setAttribute('href', href);
       });
 
       return canvas.toDataURL('image/png');
@@ -50,11 +104,19 @@ export default function ActionBar({ canvasRef, storeName, productName }: ActionB
       const fileName = `flyer-${storeName.replace(/\s+/g, '-')}-${Date.now()}.png`;
 
       if (Capacitor.isNativePlatform()) {
-        // Native: save to device
-        await Filesystem.writeFile({
+        // On iOS, use Share to allow saving to Photos
+        const result = await Filesystem.writeFile({
           path: fileName,
           data: base64Data,
-          directory: Directory.Documents,
+          directory: Directory.Cache,
+        });
+
+        // Open share sheet so user can save to Photos
+        await Share.share({
+          title: 'Save Flyer',
+          text: 'Tap "Save Image" to save to your Photos',
+          url: result.uri,
+          dialogTitle: 'Save Flyer',
         });
       } else {
         // Web: download via link
@@ -97,9 +159,8 @@ export default function ActionBar({ canvasRef, storeName, productName }: ActionB
 
         await Share.share({
           title: `${productName} - ${storeName}`,
-          text: `Check out ${productName} from ${storeName}!`,
           url: result.uri,
-          dialogTitle: 'Share Flyer',
+          dialogTitle: 'Share to WhatsApp Status',
         });
       } else {
         // Web fallback: try native share or copy to clipboard
@@ -109,7 +170,6 @@ export default function ActionBar({ canvasRef, storeName, productName }: ActionB
 
           await navigator.share({
             title: `${productName} - ${storeName}`,
-            text: `Check out ${productName} from ${storeName}!`,
             files: [file],
           });
         } else {

@@ -148,17 +148,14 @@ export default function FlyerStudio({ product, store, onClose }: FlyerStudioProp
             onRemoveImage={removeImage}
           />
 
-          {/* Action buttons - ALWAYS visible with prominent styling */}
-          <div className="px-4 pb-3 pt-2 bg-white border-t border-gray-200">
+          {/* Action buttons - ALWAYS visible above safe area */}
+          <div className="px-4 pt-2 pb-4 bg-white border-t border-gray-200" style={{ paddingBottom: 'max(16px, calc(env(safe-area-inset-bottom) + 12px))' }}>
             <ActionBar
               canvasRef={canvasRef}
               storeName={store.name}
               productName={product.name}
             />
           </div>
-
-          {/* Safe area bottom */}
-          <div style={{ height: 'env(safe-area-inset-bottom)' }} className="bg-white" />
         </div>
       )}
     </div>
