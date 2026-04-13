@@ -101,8 +101,7 @@ export default function RenderLayer({ layer, flyer }: RenderLayerProps) {
           href={r(layer.src)}
           preserveAspectRatio={layer.preserveAspectRatio ?? 'xMidYMid meet'}
           opacity={layer.opacity ?? 1}
-          style={{ pointerEvents: 'none', userSelect: 'none', background: 'transparent' }}
-          draggable={false}
+          style={{ pointerEvents: 'none', userSelect: 'none' }}
           crossOrigin="anonymous"
         />
       );

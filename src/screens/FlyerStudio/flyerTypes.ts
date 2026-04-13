@@ -44,19 +44,17 @@ export interface TemplateLayer {
   id: string;
   type: 'rect' | 'circle' | 'ellipse' | 'polygon' | 'svg-path' | 'image' | 'text';
   group?: string; // Group ID - elements with same group move together
-  // rect
+  // rect / shared
   x?: number;
   y?: number;
   width?: number;
   height?: number;
-  rx?: number;
+  rx?: number; // rect corner radius OR ellipse rx
+  ry?: number; // ellipse ry
   // circle
   cx?: number;
   cy?: number;
   r?: number;
-  // ellipse
-  rx?: number;
-  ry?: number;
   rotate?: number;
   rotateCx?: number;
   rotateCy?: number;
