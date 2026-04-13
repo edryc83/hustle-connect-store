@@ -17,6 +17,11 @@ html {
   padding-bottom: env(safe-area-inset-bottom);
 }
 
+/* Hide bottom nav when FlyerStudio is open */
+body.flyer-studio-open .mobile-bottom-nav {
+  display: none !important;
+}
+
 @layer base {
   :root {
     --background: 30 33% 94%;

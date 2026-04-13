@@ -14,19 +14,15 @@ interface FlyerStudioProps {
 }
 
 export default function FlyerStudio({ product, store, onClose }: FlyerStudioProps) {
+  const canvasRef = useRef<HTMLDivElement>(null);
+
   // Hide bottom navigation when FlyerStudio is open
   useEffect(() => {
-    const bottomNav = document.querySelector('.mobile-bottom-nav') as HTMLElement | null;
-    if (bottomNav) {
-      bottomNav.style.display = 'none';
-    }
+    document.body.classList.add('flyer-studio-open');
     return () => {
-      if (bottomNav) {
-        bottomNav.style.display = '';
-      }
+      document.body.classList.remove('flyer-studio-open');
     };
   }, []);
-  const canvasRef = useRef<HTMLDivElement>(null);
 
   const {
     flyer,
