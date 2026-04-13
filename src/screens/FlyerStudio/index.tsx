@@ -1,4 +1,5 @@
 import React, { useRef, useMemo, useEffect } from 'react';
+import { createPortal } from 'react-dom';
 import { motion } from 'framer-motion';
 import { X, RefreshCw } from 'lucide-react';
 import { useFlyer, type ProductData, type StoreData } from './useFlyer';
@@ -71,8 +72,9 @@ export default function FlyerStudio({ product, store, onClose }: FlyerStudioProp
     };
   }, [flyer.selectedLayerId, templateJson]);
 
-  return (
-    <div className="fixed inset-0 z-[100] bg-gray-100 flex flex-col h-screen">
+  // Use portal to render at document root - guarantees we cover everything
+  return createPortal(
+    <div className="fixed inset-0 z-[9999] bg-gray-100 flex flex-col h-screen">
       {/* Loading overlay */}
       <GeneratingOverlay
         isVisible={flyer.isGenerating}
@@ -168,7 +170,8 @@ export default function FlyerStudio({ product, store, onClose }: FlyerStudioProp
           </div>
         </div>
       )}
-    </div>
+    </div>,
+    document.body
   );
 }
 
