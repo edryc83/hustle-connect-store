@@ -6,6 +6,7 @@ import FlyerCanvas from './FlyerCanvas';
 import GeneratingOverlay from './GeneratingOverlay';
 import BottomPanel from './BottomPanel';
 import ActionBar from './ActionBar';
+import { useFlyerStudio } from '@/contexts/FlyerStudioContext';
 
 interface FlyerStudioProps {
   product: ProductData;
@@ -15,14 +16,15 @@ interface FlyerStudioProps {
 
 export default function FlyerStudio({ product, store, onClose }: FlyerStudioProps) {
   const canvasRef = useRef<HTMLDivElement>(null);
+  const { setIsOpen } = useFlyerStudio();
 
   // Hide bottom navigation when FlyerStudio is open
   useEffect(() => {
-    document.body.classList.add('flyer-studio-open');
+    setIsOpen(true);
     return () => {
-      document.body.classList.remove('flyer-studio-open');
+      setIsOpen(false);
     };
-  }, []);
+  }, [setIsOpen]);
 
   const {
     flyer,

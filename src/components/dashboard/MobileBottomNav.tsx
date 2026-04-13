@@ -5,12 +5,17 @@ import { useBusinessTerms } from "@/hooks/useBusinessTerms";
 import { useAuth } from "@/hooks/useAuth";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import { useFlyerStudio } from "@/contexts/FlyerStudioContext";
 
 export function MobileBottomNav() {
+  const { isOpen: flyerStudioOpen } = useFlyerStudio();
   const terms = useBusinessTerms();
   const { pathname } = useLocation();
   const isProfileActive = pathname === "/dashboard/profile";
   const { user } = useAuth();
+
+  // Hide bottom nav when FlyerStudio is open
+  if (flyerStudioOpen) return null;
 
   const { data: profilePic } = useQuery({
     queryKey: ["profile-pic", user?.id],
