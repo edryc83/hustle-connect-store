@@ -269,7 +269,11 @@ export function useFlyer({ product, store }: UseFlyerProps): UseFlyerReturn {
         const newUrl = data.url + (data.url.includes('?') ? '&' : '?') + 't=' + Date.now();
         setFlyer((prev) => ({ ...prev, productImage: newUrl }));
 
-        if (data.hasTransparency === false) {
+        // Show warning if AI fallback was used (imperfect transparency)
+        if (data.method === 'ai-fallback') {
+          console.warn('Background removed via AI fallback - transparency may not be perfect');
+          alert('Background removed. Note: AI processing was used, so edges may not be perfectly transparent.');
+        } else if (data.hasTransparency === false) {
           console.warn('Image may not have full transparency');
         }
       } else if (data?.error) {

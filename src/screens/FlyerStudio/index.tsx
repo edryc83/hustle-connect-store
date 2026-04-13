@@ -1,4 +1,4 @@
-import React, { useRef, useMemo } from 'react';
+import React, { useRef, useMemo, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { X, RefreshCw } from 'lucide-react';
 import { useFlyer, type ProductData, type StoreData } from './useFlyer';
@@ -14,6 +14,18 @@ interface FlyerStudioProps {
 }
 
 export default function FlyerStudio({ product, store, onClose }: FlyerStudioProps) {
+  // Hide bottom navigation when FlyerStudio is open
+  useEffect(() => {
+    const bottomNav = document.querySelector('.mobile-bottom-nav') as HTMLElement | null;
+    if (bottomNav) {
+      bottomNav.style.display = 'none';
+    }
+    return () => {
+      if (bottomNav) {
+        bottomNav.style.display = '';
+      }
+    };
+  }, []);
   const canvasRef = useRef<HTMLDivElement>(null);
 
   const {

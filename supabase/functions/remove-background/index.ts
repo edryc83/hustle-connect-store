@@ -29,6 +29,10 @@ serve(async (req) => {
       formData.append("size", "auto");
       formData.append("format", "png");
       formData.append("channels", "rgba"); // Explicitly request RGBA for transparency
+      formData.append("type", "product"); // Better detection for product images
+      formData.append("type_level", "2"); // More accurate foreground detection
+      formData.append("add_shadow", "false"); // No shadow
+      formData.append("semitransparency", "true"); // Preserve semi-transparent edges
 
       const removeBgRes = await fetch("https://api.remove.bg/v1.0/removebg", {
         method: "POST",
@@ -38,10 +42,25 @@ serve(async (req) => {
         body: formData,
       });
 
+      console.log("remove.bg response status:", removeBgRes.status);
+
       if (removeBgRes.ok) {
+        // Get the content type from the response to verify it's PNG
+        const contentType = removeBgRes.headers.get("content-type");
+        console.log("remove.bg response content-type:", contentType);
+
         const imageBlob = await removeBgRes.blob();
         const arrayBuffer = await imageBlob.arrayBuffer();
         const uint8Array = new Uint8Array(arrayBuffer);
+
+        // Verify PNG signature (first 8 bytes of PNG: 137 80 78 71 13 10 26 10)
+        const pngSignature = [137, 80, 78, 71, 13, 10, 26, 10];
+        const isPng = pngSignature.every((byte, i) => uint8Array[i] === byte);
+        console.log("Is valid PNG:", isPng, "Size:", uint8Array.length, "bytes");
+
+        if (!isPng) {
+          console.warn("remove.bg didn't return a valid PNG, response might be an error");
+        }
 
         const supabase = createClient(
           Deno.env.get("SUPABASE_URL")!,
@@ -56,14 +75,17 @@ serve(async (req) => {
         if (uploadError) throw uploadError;
 
         const { data: urlData } = supabase.storage.from("ad-images").getPublicUrl(path);
-        console.log("Background removed successfully via remove.bg");
+        console.log("Background removed successfully via remove.bg:", urlData.publicUrl);
 
-        return new Response(JSON.stringify({ url: urlData.publicUrl, hasTransparency: true }), {
+        return new Response(JSON.stringify({ url: urlData.publicUrl, hasTransparency: true, method: "removebg" }), {
           headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
       } else {
-        console.warn("remove.bg API failed, trying fallback:", removeBgRes.status);
+        const errorText = await removeBgRes.text();
+        console.warn("remove.bg API failed:", removeBgRes.status, errorText);
       }
+    } else {
+      console.warn("REMOVEBG_API_KEY not set, skipping remove.bg");
     }
 
     // Fallback: Use Lovable AI gateway
@@ -142,7 +164,15 @@ serve(async (req) => {
 
     const { data: urlData } = supabase.storage.from("ad-images").getPublicUrl(path);
 
-    return new Response(JSON.stringify({ url: urlData.publicUrl }), {
+    // Note: AI fallback may not produce truly transparent backgrounds
+    console.log("Background removed via AI fallback (may have imperfect transparency):", urlData.publicUrl);
+
+    return new Response(JSON.stringify({
+      url: urlData.publicUrl,
+      hasTransparency: false, // AI may not produce perfect transparency
+      method: "ai-fallback",
+      warning: "AI-generated background removal may not be perfectly transparent. For best results, ensure REMOVEBG_API_KEY is configured."
+    }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   } catch (e) {
