@@ -143,8 +143,8 @@ export const FONT_OPTIONS = [
 
 export const CATEGORY_FILTERS = [
   { id: 'all', label: 'All' },
-  { id: 'electronics', label: 'Electronics' },
   { id: 'beauty', label: 'Beauty' },
+  { id: 'tech', label: 'Tech' },
   { id: 'fashion', label: 'Fashion' },
   { id: 'promo', label: 'Promo' },
 ];
