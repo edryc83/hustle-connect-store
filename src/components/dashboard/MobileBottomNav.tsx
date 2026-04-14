@@ -14,9 +14,6 @@ export function MobileBottomNav() {
   const isProfileActive = pathname === "/dashboard/profile";
   const { user } = useAuth();
 
-  // Hide bottom nav when FlyerStudio is open
-  if (flyerStudioOpen) return null;
-
   const { data: profilePic } = useQuery({
     queryKey: ["profile-pic", user?.id],
     queryFn: async () => {
@@ -31,6 +28,9 @@ export function MobileBottomNav() {
     enabled: !!user,
     staleTime: 5 * 60 * 1000,
   });
+
+  // Hide bottom nav when FlyerStudio is open - MUST be after all hooks
+  if (flyerStudioOpen) return null;
 
   const navItems = [
     { title: "Home", url: "/dashboard", icon: Home },
