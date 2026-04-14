@@ -1,0 +1,160 @@
+{
+  "id": "template_09",
+  "name": "Roséva – Luxury Perfume",
+  "category": "beauty",
+  "canvas": { "width": 1080, "height": 1350 },
+  "colors": {
+    "bg": "#E8707A",
+    "accent": "#C03040",
+    "text_primary": "#FFFFFF",
+    "button_outline": "#FFFFFF"
+  },
+  "layers": [
+    {
+      "id": "bg_pink_gradient",
+      "type": "rect",
+      "x": 0, "y": 0,
+      "width": 1080, "height": 1350,
+      "fill": "#E8707A",
+      "gradient": {
+        "type": "radial",
+        "colors": ["#F5A0A8", "#E8707A", "#C03040"],
+        "positions": [0, 0.5, 1]
+      },
+      "editable": true
+    },
+    {
+      "id": "floral_bg",
+      "type": "image",
+      "label": "Background floral bokeh – pink flowers",
+      "x": 0, "y": 0,
+      "width": 1080, "height": 1350,
+      "src": "assets/pink_flower_bokeh.png",
+      "opacity": 0.7,
+      "editable": true
+    },
+    {
+      "id": "brand_name",
+      "type": "text",
+      "label": "Brand name headline",
+      "x": 50, "y": 50,
+      "width": 980, "height": 160,
+      "text": "ROSÉVA",
+      "fontSize": 150,
+      "fontFamily": "Playfair Display",
+      "fontWeight": "400",
+      "color": "#FFFFFF",
+      "align": "center",
+      "editable": true
+    },
+    {
+      "id": "brand_subtitle",
+      "type": "text",
+      "label": "Brand subtitle",
+      "x": 50, "y": 210,
+      "width": 980, "height": 50,
+      "text": "LUXURY PERFUME",
+      "fontSize": 28,
+      "fontFamily": "Inter",
+      "fontWeight": "300",
+      "color": "#FFFFFF",
+      "align": "center",
+      "letterSpacing": 8,
+      "editable": true
+    },
+    {
+      "id": "product_image",
+      "type": "image",
+      "label": "Product image – perfume bottle",
+      "x": 240, "y": 280,
+      "width": 600, "height": 680,
+      "src": "assets/product_perfume_roseva.png",
+      "editable": true
+    },
+    {
+      "id": "website_watermark",
+      "type": "text",
+      "label": "Website watermark",
+      "x": 60, "y": 760,
+      "width": 300, "height": 30,
+      "text": "rosevaluxury.com",
+      "fontSize": 16,
+      "fontFamily": "Inter",
+      "fontWeight": "400",
+      "color": "#FFFFFF",
+      "opacity": 0.6,
+      "align": "left",
+      "editable": true
+    },
+    {
+      "id": "discount_number",
+      "type": "text",
+      "label": "Discount percentage",
+      "x": 50, "y": 950,
+      "width": 980, "height": 130,
+      "text": "30%OFF",
+      "fontSize": 120,
+      "fontFamily": "Playfair Display",
+      "fontWeight": "900",
+      "color": "#FFFFFF",
+      "align": "center",
+      "editable": true
+    },
+    {
+      "id": "discount_sublabel",
+      "type": "text",
+      "label": "Discount sub-label",
+      "x": 50, "y": 1080,
+      "width": 980, "height": 40,
+      "text": "Organic Natural",
+      "fontSize": 26,
+      "fontFamily": "Inter",
+      "fontWeight": "300",
+      "color": "#FFFFFF",
+      "align": "center",
+      "editable": true
+    },
+    {
+      "id": "description_text",
+      "type": "text",
+      "label": "Product description",
+      "x": 80, "y": 1130,
+      "width": 920, "height": 80,
+      "text": "A delicate fragrance inspired by blooming flowers bringing elegance\nfreshness and confidence to every moment.",
+      "fontSize": 22,
+      "fontFamily": "Inter",
+      "fontWeight": "400",
+      "color": "#FFFFFF",
+      "align": "center",
+      "lineHeight": 1.6,
+      "editable": true
+    },
+    {
+      "id": "cta_pill_bg",
+      "type": "rect",
+      "label": "Order Now button background",
+      "x": 340, "y": 1230,
+      "width": 400, "height": 70,
+      "fill": "transparent",
+      "stroke": "#FFFFFF",
+      "strokeWidth": 2,
+      "borderRadius": 35,
+      "editable": true
+    },
+    {
+      "id": "cta_pill_text",
+      "type": "text",
+      "label": "Order Now button text",
+      "x": 340, "y": 1248,
+      "width": 400, "height": 34,
+      "text": "ORDER NOW",
+      "fontSize": 24,
+      "fontFamily": "Inter",
+      "fontWeight": "700",
+      "color": "#FFFFFF",
+      "align": "center",
+      "letterSpacing": 3,
+      "editable": true
+    }
+  ]
+}

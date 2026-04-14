@@ -1,0 +1,186 @@
+{
+  "id": "template_19",
+  "name": "Alla Haji Phone Store",
+  "category": "electronics",
+  "canvas": { "width": 1080, "height": 1080 },
+  "colors": {
+    "bg_top": "#0A7A30",
+    "bg_bottom": "#FFFFFF",
+    "accent": "#00FF88",
+    "text_primary": "#FFFFFF",
+    "text_dark": "#1A1A1A",
+    "phone_pill": "#1A4A1A"
+  },
+  "layers": [
+    {
+      "id": "bg_top_green",
+      "type": "rect",
+      "x": 0, "y": 0,
+      "width": 1080, "height": 700,
+      "fill": "#0A7A30",
+      "editable": false
+    },
+    {
+      "id": "bg_bottom_white",
+      "type": "rect",
+      "x": 0, "y": 600,
+      "width": 1080, "height": 480,
+      "fill": "#FFFFFF",
+      "editable": false
+    },
+    {
+      "id": "wave_divider",
+      "type": "image",
+      "label": "Wave/curve divider between green and white sections",
+      "x": 0, "y": 560,
+      "width": 1080, "height": 160,
+      "src": "assets/wave_green_white.png",
+      "editable": false
+    },
+    {
+      "id": "product_phones",
+      "type": "image",
+      "label": "Product image – iPhones and Samsung Galaxy background",
+      "x": 0, "y": 0,
+      "width": 600, "height": 650,
+      "src": "assets/product_phones_bg.png",
+      "editable": true
+    },
+    {
+      "id": "logo_pill_bg",
+      "type": "rect",
+      "label": "Logo pill background (neon green glow effect)",
+      "x": 560, "y": 60,
+      "width": 460, "height": 200,
+      "fill": "#0A5A20",
+      "borderRadius": 20,
+      "stroke": "#00FF88",
+      "strokeWidth": 2,
+      "editable": false
+    },
+    {
+      "id": "logo_phone_icon",
+      "type": "image",
+      "label": "Phone icon in logo",
+      "x": 570, "y": 70,
+      "width": 50, "height": 50,
+      "src": "assets/icon_phone_neon.png",
+      "editable": false
+    },
+    {
+      "id": "brand_name_line1",
+      "type": "text",
+      "label": "Brand name line 1",
+      "x": 560, "y": 70,
+      "width": 460, "height": 70,
+      "text": "ALLA\nHAJI",
+      "fontSize": 64,
+      "fontFamily": "Inter",
+      "fontWeight": "900",
+      "color": "#FFFFFF",
+      "align": "center",
+      "editable": true
+    },
+    {
+      "id": "brand_subtitle",
+      "type": "text",
+      "label": "Brand subtitle",
+      "x": 560, "y": 200,
+      "width": 460, "height": 50,
+      "text": "PHONE STORE",
+      "fontSize": 24,
+      "fontFamily": "Inter",
+      "fontWeight": "700",
+      "color": "#00FF88",
+      "align": "center",
+      "letterSpacing": 3,
+      "editable": true
+    },
+    {
+      "id": "tagline",
+      "type": "text",
+      "label": "Tagline",
+      "x": 560, "y": 270,
+      "width": 460, "height": 60,
+      "text": "Deal with all kind of phones\n& original accessories",
+      "fontSize": 18,
+      "fontFamily": "Inter",
+      "fontWeight": "400",
+      "color": "#CCFFCC",
+      "align": "center",
+      "lineHeight": 1.5,
+      "editable": true
+    },
+    {
+      "id": "product_accessories",
+      "type": "image",
+      "label": "Product accessories – AirPods, JBL speaker",
+      "x": 0, "y": 400,
+      "width": 1080, "height": 400,
+      "src": "assets/product_accessories_group.png",
+      "editable": true
+    },
+    {
+      "id": "we_sell_label",
+      "type": "text",
+      "label": "We Sell label",
+      "x": 50, "y": 650,
+      "width": 300, "height": 50,
+      "text": "WE SELL",
+      "fontSize": 28,
+      "fontFamily": "Inter",
+      "fontWeight": "800",
+      "color": "#0A7A30",
+      "align": "left",
+      "editable": true
+    },
+    {
+      "id": "services_list",
+      "type": "text",
+      "label": "Services bullet list",
+      "x": 50, "y": 710,
+      "width": 540, "height": 160,
+      "text": "• Original phone screens\n• Original phone chargers / cables\n• Batteries, smart watches / sound players",
+      "fontSize": 22,
+      "fontFamily": "Inter",
+      "fontWeight": "400",
+      "color": "#1A1A1A",
+      "align": "left",
+      "lineHeight": 1.7,
+      "editable": true
+    },
+    {
+      "id": "phone_pill_bg",
+      "type": "rect",
+      "label": "Phone number pill background",
+      "x": 50, "y": 900,
+      "width": 980, "height": 80,
+      "fill": "#0A7A30",
+      "borderRadius": 40,
+      "editable": false
+    },
+    {
+      "id": "phone_icon",
+      "type": "image",
+      "label": "Phone ring icon",
+      "x": 80, "y": 918,
+      "width": 44, "height": 44,
+      "src": "assets/icon_phone_ring.png",
+      "editable": false
+    },
+    {
+      "id": "phone_numbers",
+      "type": "text",
+      "label": "Phone numbers",
+      "x": 134, "y": 916,
+      "width": 860, "height": 48,
+      "text": "0591182446 / 0508620252",
+      "fontSize": 36,
+      "fontFamily": "Inter",
+      "fontWeight": "700",
+      "color": "#FFFFFF",
+      "align": "center",
+      "editable": true
+    }
+  ]
+}

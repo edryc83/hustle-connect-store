@@ -1,0 +1,221 @@
+{
+  "id": "template_16",
+  "name": "Richie Gadgets Outlet – Time For An Upgrade",
+  "category": "electronics",
+  "canvas": { "width": 1080, "height": 1350 },
+  "colors": {
+    "bg": "#0A1A4A",
+    "accent": "#00CFFF",
+    "text_primary": "#FFFFFF",
+    "text_accent": "#00CFFF",
+    "footer_bg": "#FFFFFF"
+  },
+  "layers": [
+    {
+      "id": "bg_dark_navy",
+      "type": "rect",
+      "x": 0, "y": 0,
+      "width": 1080, "height": 1350,
+      "fill": "#0A1A4A",
+      "gradient": {
+        "type": "radial",
+        "colors": ["#1A3A8A", "#0A1A4A", "#040D24"],
+        "positions": [0, 0.5, 1]
+      },
+      "editable": true
+    },
+    {
+      "id": "logo_icon",
+      "type": "image",
+      "label": "Richie Gadgets Outlet logo",
+      "x": 50, "y": 44,
+      "width": 80, "height": 80,
+      "src": "assets/richie_logo.png",
+      "editable": true
+    },
+    {
+      "id": "logo_text",
+      "type": "text",
+      "label": "Brand name",
+      "x": 140, "y": 52,
+      "width": 340, "height": 64,
+      "text": "RICHIE\nGADGETS OUTLET",
+      "fontSize": 20,
+      "fontFamily": "Inter",
+      "fontWeight": "700",
+      "color": "#FFFFFF",
+      "align": "left",
+      "letterSpacing": 1,
+      "editable": true
+    },
+    {
+      "id": "tagline_top_right",
+      "type": "text",
+      "label": "Top right tagline",
+      "x": 500, "y": 70,
+      "width": 530, "height": 30,
+      "text": "...your one stop gadget shop",
+      "fontSize": 18,
+      "fontFamily": "Inter",
+      "fontWeight": "300",
+      "color": "#AACCFF",
+      "align": "right",
+      "editable": true
+    },
+    {
+      "id": "headline_line1",
+      "type": "text",
+      "label": "Headline line 1",
+      "x": 50, "y": 180,
+      "width": 980, "height": 110,
+      "text": "It's time for",
+      "fontSize": 90,
+      "fontFamily": "Inter",
+      "fontWeight": "800",
+      "color": "#FFFFFF",
+      "align": "center",
+      "editable": true
+    },
+    {
+      "id": "headline_line2",
+      "type": "text",
+      "label": "Headline line 2",
+      "x": 50, "y": 290,
+      "width": 980, "height": 110,
+      "text": "an upgrade!",
+      "fontSize": 90,
+      "fontFamily": "Inter",
+      "fontWeight": "800",
+      "color": "#FFFFFF",
+      "align": "center",
+      "editable": true
+    },
+    {
+      "id": "subheadline",
+      "type": "text",
+      "label": "Subheadline",
+      "x": 50, "y": 420,
+      "width": 980, "height": 70,
+      "text": "Do you have a gadget that meets up to your\nstandard or you want something better?",
+      "fontSize": 24,
+      "fontFamily": "Inter",
+      "fontWeight": "400",
+      "color": "#CCDDFF",
+      "align": "center",
+      "lineHeight": 1.5,
+      "editable": true,
+      "spans": [
+        { "text": "Do you have a gadget that meets up to your standard or you want ", "color": "#CCDDFF" },
+        { "text": "something better?", "color": "#00CFFF" }
+      ]
+    },
+    {
+      "id": "swap_watermark",
+      "type": "text",
+      "label": "SWAP watermark text",
+      "x": 50, "y": 600,
+      "width": 980, "height": 300,
+      "text": "SWAP",
+      "fontSize": 300,
+      "fontFamily": "Inter",
+      "fontWeight": "900",
+      "color": "#1A3A8A",
+      "align": "center",
+      "opacity": 0.4,
+      "editable": false
+    },
+    {
+      "id": "product_image",
+      "type": "image",
+      "label": "Product image – two hands swapping phones (orange and blue iPhone)",
+      "x": 40, "y": 520,
+      "width": 1000, "height": 600,
+      "src": "assets/product_phone_swap.png",
+      "editable": true
+    },
+    {
+      "id": "swap_arrow_icon",
+      "type": "image",
+      "label": "Swap arrows icon between phones",
+      "x": 460, "y": 760,
+      "width": 120, "height": 120,
+      "src": "assets/icon_swap_arrows.png",
+      "editable": false
+    },
+    {
+      "id": "footer_bg",
+      "type": "rect",
+      "x": 0, "y": 1170,
+      "width": 1080, "height": 180,
+      "fill": "#FFFFFF",
+      "editable": false
+    },
+    {
+      "id": "footer_address_label",
+      "type": "text",
+      "label": "Location label",
+      "x": 50, "y": 1190,
+      "width": 200, "height": 30,
+      "text": "Location:",
+      "fontSize": 20,
+      "fontFamily": "Inter",
+      "fontWeight": "700",
+      "color": "#1A1A1A",
+      "align": "left",
+      "editable": false
+    },
+    {
+      "id": "footer_address",
+      "type": "text",
+      "label": "Address",
+      "x": 50, "y": 1224,
+      "width": 480, "height": 110,
+      "text": "No. 122 Aba Road, Garrison\nJunction, Port-Harcourt,\nRivers State.",
+      "fontSize": 20,
+      "fontFamily": "Inter",
+      "fontWeight": "400",
+      "color": "#333333",
+      "align": "left",
+      "lineHeight": 1.5,
+      "editable": true
+    },
+    {
+      "id": "footer_contact_pill",
+      "type": "rect",
+      "label": "Contact pill background",
+      "x": 580, "y": 1194,
+      "width": 460, "height": 130,
+      "fill": "#F0F0F0",
+      "borderRadius": 16,
+      "editable": false
+    },
+    {
+      "id": "footer_phone",
+      "type": "text",
+      "label": "Phone number",
+      "x": 600, "y": 1210,
+      "width": 420, "height": 44,
+      "text": "+2340810290814",
+      "fontSize": 26,
+      "fontFamily": "Inter",
+      "fontWeight": "700",
+      "color": "#1A1A1A",
+      "align": "left",
+      "editable": true
+    },
+    {
+      "id": "footer_ig_fb",
+      "type": "text",
+      "label": "Social handle",
+      "x": 600, "y": 1260,
+      "width": 420, "height": 40,
+      "text": "Richie Gadgets Outlet",
+      "fontSize": 22,
+      "fontFamily": "Inter",
+      "fontWeight": "500",
+      "color": "#333333",
+      "align": "left",
+      "editable": true
+    }
+  ]
+}

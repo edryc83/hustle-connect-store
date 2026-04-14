@@ -1,0 +1,158 @@
+{
+  "id": "template_10",
+  "name": "Sandra's Luxury Bags",
+  "category": "fashion",
+  "canvas": { "width": 1080, "height": 1350 },
+  "colors": {
+    "bg": "#F0EAE0",
+    "accent": "#C9A84C",
+    "text_primary": "#1A1A1A",
+    "footer_bg": "#FFFFFF"
+  },
+  "layers": [
+    {
+      "id": "bg_product_photo",
+      "type": "image",
+      "label": "Full-bleed background – hand holding beige bag",
+      "x": 0, "y": 0,
+      "width": 1080, "height": 1350,
+      "src": "assets/bg_bag_lifestyle.png",
+      "editable": true
+    },
+    {
+      "id": "right_overlay",
+      "type": "rect",
+      "label": "Right white overlay panel",
+      "x": 560, "y": 0,
+      "width": 520, "height": 1200,
+      "fill": "#FFFFFF",
+      "opacity": 0.92,
+      "editable": false
+    },
+    {
+      "id": "qr_code",
+      "type": "image",
+      "label": "QR code top left",
+      "x": 30, "y": 30,
+      "width": 110, "height": 110,
+      "src": "assets/qr_code.png",
+      "editable": true
+    },
+    {
+      "id": "brand_name",
+      "type": "text",
+      "label": "Brand name",
+      "x": 580, "y": 80,
+      "width": 460, "height": 100,
+      "text": "Sandra's",
+      "fontSize": 80,
+      "fontFamily": "Playfair Display",
+      "fontWeight": "700",
+      "color": "#C9A84C",
+      "align": "left",
+      "editable": true
+    },
+    {
+      "id": "brand_subtitle_line",
+      "type": "rect",
+      "label": "Decorative horizontal line",
+      "x": 580, "y": 182,
+      "width": 460, "height": 2,
+      "fill": "#C9A84C",
+      "editable": false
+    },
+    {
+      "id": "brand_subtitle",
+      "type": "text",
+      "label": "Brand subtitle",
+      "x": 580, "y": 192,
+      "width": 460, "height": 50,
+      "text": "LUXURY BAGS",
+      "fontSize": 28,
+      "fontFamily": "Inter",
+      "fontWeight": "700",
+      "color": "#1A1A1A",
+      "align": "center",
+      "letterSpacing": 4,
+      "editable": true
+    },
+    {
+      "id": "tagline",
+      "type": "text",
+      "label": "Tagline",
+      "x": 580, "y": 262,
+      "width": 460, "height": 70,
+      "text": "DEALS ON HIGH QUALITY LUXURY\nBAGS AT AFFORDABLE PRICE.",
+      "fontSize": 18,
+      "fontFamily": "Inter",
+      "fontWeight": "700",
+      "color": "#1A1A1A",
+      "align": "center",
+      "lineHeight": 1.5,
+      "editable": true
+    },
+    {
+      "id": "product_image",
+      "type": "image",
+      "label": "Product image – luxury bags set",
+      "x": 0, "y": 260,
+      "width": 1080, "height": 900,
+      "src": "assets/product_luxury_bags.png",
+      "editable": true
+    },
+    {
+      "id": "footer_bg",
+      "type": "rect",
+      "x": 0, "y": 1210,
+      "width": 1080, "height": 140,
+      "fill": "#FFFFFF",
+      "editable": false
+    },
+    {
+      "id": "footer_phone_icon",
+      "type": "image",
+      "label": "Phone/WhatsApp icon",
+      "x": 40, "y": 1242,
+      "width": 40, "height": 40,
+      "src": "assets/icon_phone_whatsapp.png",
+      "editable": false
+    },
+    {
+      "id": "footer_phone",
+      "type": "text",
+      "label": "Phone number",
+      "x": 90, "y": 1244,
+      "width": 380, "height": 42,
+      "text": "09014435135",
+      "fontSize": 32,
+      "fontFamily": "Inter",
+      "fontWeight": "700",
+      "color": "#1A1A1A",
+      "align": "left",
+      "editable": true
+    },
+    {
+      "id": "footer_instagram_icon",
+      "type": "image",
+      "label": "Instagram icon",
+      "x": 590, "y": 1242,
+      "width": 40, "height": 40,
+      "src": "assets/icon_instagram.png",
+      "editable": false
+    },
+    {
+      "id": "footer_instagram",
+      "type": "text",
+      "label": "Instagram handle",
+      "x": 642, "y": 1244,
+      "width": 400, "height": 42,
+      "text": "sandraluxury_bags",
+      "fontSize": 28,
+      "fontFamily": "Inter",
+      "fontWeight": "500",
+      "color": "#1A1A1A",
+      "align": "left",
+      "editable": true
+    }
+  ]
+}
