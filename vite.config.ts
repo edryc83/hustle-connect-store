@@ -30,7 +30,12 @@ export default defineConfig(({ mode }) => ({
             handler: "NetworkOnly",
           },
           {
-            // Other Supabase API calls (storage, rest, etc.) can use NetworkFirst
+            // Storage/images must NOT be cached - causes issues with transparent PNGs
+            urlPattern: /^https:\/\/.*supabase\.co\/storage\/.*/i,
+            handler: "NetworkOnly",
+          },
+          {
+            // Other Supabase API calls (rest, etc.) can use NetworkFirst
             urlPattern: /^https:\/\/.*supabase\.co\/.*/i,
             handler: "NetworkFirst",
             options: { cacheName: "supabase-api", expiration: { maxEntries: 50, maxAgeSeconds: 300 } },
