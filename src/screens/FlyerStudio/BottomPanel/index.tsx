@@ -6,7 +6,7 @@ import ColorsTab from './ColorsTab';
 import TextTab from './TextTab';
 import FontsTab from './FontsTab';
 import PhotoTab from './PhotoTab';
-import type { FlyerState, TemplateEntry, AdditionalImage } from '../flyerTypes';
+import type { FlyerState, TemplateEntry, AdditionalImage, LayerOffset } from '../flyerTypes';
 
 type TabId = 'templates' | 'photo' | 'colors' | 'text' | 'fonts';
 
@@ -58,6 +58,8 @@ interface BottomPanelProps {
   onRemoveBackground: () => void;
   onAddImage: (url: string) => void;
   onRemoveImage: (id: string) => void;
+  onProductImageScaleChange?: (scale: number) => void;
+  onProductImageOffsetChange?: (offset: LayerOffset) => void;
 }
 
 export default function BottomPanel({
@@ -87,6 +89,8 @@ export default function BottomPanel({
   onRemoveBackground,
   onAddImage,
   onRemoveImage,
+  onProductImageScaleChange,
+  onProductImageOffsetChange,
 }: BottomPanelProps) {
   const [activeTab, setActiveTab] = useState<TabId>('templates');
 
@@ -152,10 +156,14 @@ export default function BottomPanel({
                 originalImage={originalImageUrl}
                 additionalImages={flyer.additionalImages}
                 isRemovingBg={isRemovingBg}
+                productImageScale={flyer.productImageScale}
+                productImageOffset={flyer.productImageOffset}
                 onImageChange={onImageChange}
                 onRemoveBackground={onRemoveBackground}
                 onAddImage={onAddImage}
                 onRemoveImage={onRemoveImage}
+                onProductImageScaleChange={onProductImageScaleChange || (() => {})}
+                onProductImageOffsetChange={onProductImageOffsetChange || (() => {})}
               />
             </motion.div>
           )}

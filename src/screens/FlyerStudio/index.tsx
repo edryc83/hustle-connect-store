@@ -56,6 +56,8 @@ export default function FlyerStudio({ product, store, onClose }: FlyerStudioProp
     removeBackground,
     isRemovingBg,
     regenerate,
+    setProductImageScale,
+    setProductImageOffset,
   } = useFlyer({ product, store });
 
   // Compute selected layer info for the bottom panel
@@ -156,6 +158,8 @@ export default function FlyerStudio({ product, store, onClose }: FlyerStudioProp
             onRemoveBackground={removeBackground}
             onAddImage={addImage}
             onRemoveImage={removeImage}
+            onProductImageScaleChange={setProductImageScale}
+            onProductImageOffsetChange={setProductImageOffset}
           />
 
           {/* Action buttons - ALWAYS visible above safe area */}

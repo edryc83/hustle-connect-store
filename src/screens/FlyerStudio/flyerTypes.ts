@@ -30,6 +30,8 @@ export interface FlyerState {
   font: string;
   fontSize: number; // 0.5 to 1.5 scale factor
   productImage: string | null;
+  productImageScale: number; // 0.5 to 2.0 scale factor for product image
+  productImageOffset: LayerOffset; // x, y offset for product image position
   additionalImages: AdditionalImage[]; // logos, extra images
   layerOffsets: Record<string, LayerOffset>; // layer id -> offset
   fontSizeOverrides: Record<string, number>; // layer id -> font size override

@@ -172,6 +172,7 @@ function DraggableImage({
       height={image.height}
       preserveAspectRatio="xMidYMid meet"
       style={{ cursor: 'move', touchAction: 'none' }}
+      crossOrigin="anonymous"
       onPointerDown={handlePointerDown}
       onPointerMove={handlePointerMove}
       onPointerUp={handlePointerUp}

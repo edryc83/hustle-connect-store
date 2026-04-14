@@ -89,15 +89,31 @@ export default function RenderLayer({ layer, flyer }: RenderLayerProps) {
         />
       );
 
-    case 'image':
+    case 'image': {
       if (!flyer.productImage) return null;
+      const baseX = layer.x ?? 0;
+      const baseY = layer.y ?? 0;
+      const baseWidth = layer.width ?? 300;
+      const baseHeight = layer.height ?? 300;
+      const scale = flyer.productImageScale ?? 1;
+      const offset = flyer.productImageOffset ?? { x: 0, y: 0 };
+
+      // Calculate scaled dimensions and centered position
+      const scaledWidth = baseWidth * scale;
+      const scaledHeight = baseHeight * scale;
+      // Adjust position to keep image centered when scaling
+      const centerX = baseX + baseWidth / 2;
+      const centerY = baseY + baseHeight / 2;
+      const scaledX = centerX - scaledWidth / 2 + offset.x;
+      const scaledY = centerY - scaledHeight / 2 + offset.y;
+
       return (
         <image
           key={layer.id}
-          x={layer.x ?? 0}
-          y={layer.y ?? 0}
-          width={layer.width}
-          height={layer.height}
+          x={scaledX}
+          y={scaledY}
+          width={scaledWidth}
+          height={scaledHeight}
           href={r(layer.src)}
           preserveAspectRatio={layer.preserveAspectRatio ?? 'xMidYMid meet'}
           opacity={layer.opacity ?? 1}
@@ -105,6 +121,7 @@ export default function RenderLayer({ layer, flyer }: RenderLayerProps) {
           crossOrigin="anonymous"
         />
       );
+    }
 
     case 'text': {
       const baseFontSize = layer.fontSize ?? 24;

@@ -1,17 +1,21 @@
 import React, { useRef } from 'react';
 import { motion } from 'framer-motion';
-import { Camera, Upload, Eraser, RotateCcw, Loader2, Plus, X } from 'lucide-react';
-import type { AdditionalImage } from '../flyerTypes';
+import { Camera, Upload, Eraser, RotateCcw, Loader2, Plus, X, ZoomIn, Move, ArrowUp, ArrowDown, ArrowLeft, ArrowRight } from 'lucide-react';
+import type { AdditionalImage, LayerOffset } from '../flyerTypes';
 
 interface PhotoTabProps {
   currentImage: string | null;
   originalImage: string | null;
   additionalImages: AdditionalImage[];
   isRemovingBg: boolean;
+  productImageScale: number;
+  productImageOffset: LayerOffset;
   onImageChange: (url: string) => void;
   onRemoveBackground: () => void;
   onAddImage: (url: string) => void;
   onRemoveImage: (id: string) => void;
+  onProductImageScaleChange: (scale: number) => void;
+  onProductImageOffsetChange: (offset: LayerOffset) => void;
 }
 
 export default function PhotoTab({
@@ -19,10 +23,14 @@ export default function PhotoTab({
   originalImage,
   additionalImages,
   isRemovingBg,
+  productImageScale,
+  productImageOffset,
   onImageChange,
   onRemoveBackground,
   onAddImage,
   onRemoveImage,
+  onProductImageScaleChange,
+  onProductImageOffsetChange,
 }: PhotoTabProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const logoInputRef = useRef<HTMLInputElement>(null);
@@ -34,11 +42,22 @@ export default function PhotoTab({
     onImageChange(url);
   };
 
-  const handleLogoSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleLogoSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const url = URL.createObjectURL(file);
-    onAddImage(url);
+
+    // Convert to base64 immediately for reliable export
+    const reader = new FileReader();
+    reader.onload = () => {
+      const base64Url = reader.result as string;
+      onAddImage(base64Url);
+    };
+    reader.onerror = () => {
+      // Fallback to blob URL if base64 conversion fails
+      const url = URL.createObjectURL(file);
+      onAddImage(url);
+    };
+    reader.readAsDataURL(file);
   };
 
   const handleRestoreOriginal = () => {
@@ -136,6 +155,85 @@ export default function PhotoTab({
           <span className="text-[10px] font-medium text-green-700">Add Logo</span>
         </motion.button>
       </div>
+
+      {/* Photo Size & Position Controls */}
+      {currentImage && (
+        <div className="border-t border-gray-100 pt-3 mb-3">
+          {/* Size Slider */}
+          <div className="mb-3">
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-xs font-medium text-gray-700 flex items-center gap-1">
+                <ZoomIn className="w-3 h-3" /> Size
+              </span>
+              <span className="text-[10px] text-gray-500">{Math.round(productImageScale * 100)}%</span>
+            </div>
+            <input
+              type="range"
+              min="50"
+              max="200"
+              value={productImageScale * 100}
+              onChange={(e) => onProductImageScaleChange(Number(e.target.value) / 100)}
+              className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-purple-600"
+            />
+          </div>
+
+          {/* Position Controls */}
+          <div>
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs font-medium text-gray-700 flex items-center gap-1">
+                <Move className="w-3 h-3" /> Position
+              </span>
+              <button
+                onClick={() => onProductImageOffsetChange({ x: 0, y: 0 })}
+                className="text-[10px] text-purple-600 font-medium"
+              >
+                Reset
+              </button>
+            </div>
+            <div className="flex items-center justify-center gap-1">
+              <div className="grid grid-cols-3 gap-1">
+                <div />
+                <motion.button
+                  whileTap={{ scale: 0.9 }}
+                  onClick={() => onProductImageOffsetChange({ ...productImageOffset, y: productImageOffset.y - 10 })}
+                  className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center hover:bg-gray-200"
+                >
+                  <ArrowUp className="w-4 h-4 text-gray-700" />
+                </motion.button>
+                <div />
+                <motion.button
+                  whileTap={{ scale: 0.9 }}
+                  onClick={() => onProductImageOffsetChange({ ...productImageOffset, x: productImageOffset.x - 10 })}
+                  className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center hover:bg-gray-200"
+                >
+                  <ArrowLeft className="w-4 h-4 text-gray-700" />
+                </motion.button>
+                <div className="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center">
+                  <span className="text-[8px] text-gray-400">
+                    {Math.round(productImageOffset.x)},{Math.round(productImageOffset.y)}
+                  </span>
+                </div>
+                <motion.button
+                  whileTap={{ scale: 0.9 }}
+                  onClick={() => onProductImageOffsetChange({ ...productImageOffset, x: productImageOffset.x + 10 })}
+                  className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center hover:bg-gray-200"
+                >
+                  <ArrowRight className="w-4 h-4 text-gray-700" />
+                </motion.button>
+                <div />
+                <motion.button
+                  whileTap={{ scale: 0.9 }}
+                  onClick={() => onProductImageOffsetChange({ ...productImageOffset, y: productImageOffset.y + 10 })}
+                  className="w-8 h-8 rounded-lg bg-gray-100 flex items-center justify-center hover:bg-gray-200"
+                >
+                  <ArrowDown className="w-4 h-4 text-gray-700" />
+                </motion.button>
+                <div />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Additional Images (Logos) */}
       {additionalImages.length > 0 && (

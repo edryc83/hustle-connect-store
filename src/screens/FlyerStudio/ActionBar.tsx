@@ -18,40 +18,102 @@ export default function ActionBar({ canvasRef, storeName, productName }: ActionB
   const [downloadSuccess, setDownloadSuccess] = useState(false);
   const [shareSuccess, setShareSuccess] = useState(false);
 
+  // Convert image URL to base64 using canvas
+  const imageToBase64 = (url: string): Promise<string | null> => {
+    return new Promise((resolve) => {
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.onload = () => {
+        try {
+          const canvas = document.createElement('canvas');
+          canvas.width = img.naturalWidth || img.width;
+          canvas.height = img.naturalHeight || img.height;
+          const ctx = canvas.getContext('2d');
+          if (ctx) {
+            ctx.drawImage(img, 0, 0);
+            resolve(canvas.toDataURL('image/png'));
+          } else {
+            resolve(null);
+          }
+        } catch (err) {
+          console.warn('Canvas conversion failed:', err);
+          resolve(null);
+        }
+      };
+      img.onerror = () => {
+        console.warn('Image load failed:', url?.substring(0, 50));
+        resolve(null);
+      };
+      img.src = url;
+    });
+  };
+
   const captureFlyer = async (): Promise<string | null> => {
     if (!canvasRef.current) return null;
 
     try {
-      // Clone the element to avoid modifying the original
       const element = canvasRef.current;
 
-      // Pre-load all images as base64 to avoid CORS issues
+      // Pre-load ALL images (product image + logos) as base64 to avoid CORS issues
       const images = element.querySelectorAll('image');
+      console.log('Found images to convert:', images.length);
+
       const imagePromises = Array.from(images).map(async (img) => {
         const href = img.getAttribute('href') || img.getAttribute('xlink:href');
-        if (href && href.startsWith('http')) {
+        console.log('Processing image:', href?.substring(0, 80));
+
+        if (!href) return null;
+
+        // Skip if already base64
+        if (href.startsWith('data:')) {
+          console.log('Already base64, skipping');
+          return null;
+        }
+
+        // Handle blob URLs - use Image API directly (more reliable)
+        if (href.startsWith('blob:')) {
+          console.log('Converting blob URL to base64...');
+          const dataUrl = await imageToBase64(href);
+          if (dataUrl) {
+            return { element: img, dataUrl };
+          }
+          return null;
+        }
+
+        // Handle HTTP URLs
+        if (href.startsWith('http')) {
+          console.log('Converting HTTP URL to base64...');
+          // Try fetch first
           try {
-            // Fetch image and convert to base64
-            const response = await fetch(href, { mode: 'cors' });
+            const response = await fetch(href, { mode: 'cors', credentials: 'omit' });
+            if (!response.ok) throw new Error(`HTTP ${response.status}`);
             const blob = await response.blob();
-            return new Promise<{element: Element, dataUrl: string}>((resolve) => {
+            return new Promise<{element: Element, dataUrl: string} | null>((resolve) => {
               const reader = new FileReader();
               reader.onloadend = () => {
+                console.log('Converted HTTP image to base64');
                 resolve({ element: img, dataUrl: reader.result as string });
               };
+              reader.onerror = () => resolve(null);
               reader.readAsDataURL(blob);
             });
-          } catch {
-            // If CORS fails, try with a proxy or skip
-            console.log('Could not fetch image:', href);
+          } catch (err) {
+            console.warn('Fetch failed, trying Image API:', err);
+            // Fallback to Image API
+            const dataUrl = await imageToBase64(href);
+            if (dataUrl) {
+              return { element: img, dataUrl };
+            }
             return null;
           }
         }
+
         return null;
       });
 
       // Wait for all images to be converted
       const imageResults = await Promise.all(imagePromises);
+      console.log('Image conversion results:', imageResults.filter(Boolean).length, 'of', images.length, 'converted');
 
       // Temporarily replace image hrefs with base64
       const originalHrefs: {element: Element, href: string}[] = [];
@@ -60,28 +122,38 @@ export default function ActionBar({ canvasRef, storeName, productName }: ActionB
           const originalHref = result.element.getAttribute('href') || result.element.getAttribute('xlink:href') || '';
           originalHrefs.push({ element: result.element, href: originalHref });
           result.element.setAttribute('href', result.dataUrl);
+          // Also set xlink:href for SVG compatibility
+          result.element.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', result.dataUrl);
+          console.log('Replaced href with base64 for export');
         }
       });
+
+      // Wait for DOM to update with new base64 images
+      await new Promise(resolve => setTimeout(resolve, 100));
 
       const canvas = await html2canvas(element, {
         scale: 3, // Higher quality
         useCORS: true,
-        allowTaint: false, // Don't allow tainted canvas
+        allowTaint: true, // Allow tainted canvas since we've converted to base64
         backgroundColor: null,
         logging: false,
         imageTimeout: 15000,
         onclone: (clonedDoc) => {
           // Ensure SVG images have crossorigin
           const svgImages = clonedDoc.querySelectorAll('image');
-          svgImages.forEach((img) => {
-            img.setAttribute('crossorigin', 'anonymous');
+          svgImages.forEach((svgImg) => {
+            svgImg.setAttribute('crossorigin', 'anonymous');
           });
         },
       });
 
       // Restore original hrefs
-      originalHrefs.forEach(({ element, href }) => {
-        element.setAttribute('href', href);
+      originalHrefs.forEach(({ element: el, href }) => {
+        el.setAttribute('href', href);
+        // Also restore xlink:href
+        if (href) {
+          el.setAttributeNS('http://www.w3.org/1999/xlink', 'xlink:href', href);
+        }
       });
 
       return canvas.toDataURL('image/png');

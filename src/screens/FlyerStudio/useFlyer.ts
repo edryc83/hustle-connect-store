@@ -47,6 +47,8 @@ interface UseFlyerReturn {
   setFont: (v: string) => void;
   setFontSize: (size: number) => void;
   setProductImage: (url: string) => void;
+  setProductImageScale: (scale: number) => void;
+  setProductImageOffset: (offset: LayerOffset) => void;
   setLayerOffset: (layerId: string, offset: LayerOffset) => void;
   setFontSizeOverride: (layerId: string, size: number) => void;
   setTextColorOverride: (layerId: string, color: string) => void;
@@ -108,6 +110,8 @@ const DEFAULT_FLYER: FlyerState = {
   font: 'Inter',
   fontSize: 1.0,
   productImage: null,
+  productImageScale: 1.0,
+  productImageOffset: { x: 0, y: 0 },
   additionalImages: [],
   layerOffsets: {},
   fontSizeOverrides: {},
@@ -243,7 +247,12 @@ export function useFlyer({ product, store }: UseFlyerProps): UseFlyerReturn {
   // Remove background using remove.bg API (server-side)
   const removeBackgroundFn = useCallback(async () => {
     const imageUrl = flyer.productImage;
-    if (!imageUrl || isRemovingBg) return;
+    console.log('removeBackground called, imageUrl:', imageUrl, 'isRemovingBg:', isRemovingBg);
+
+    if (!imageUrl || isRemovingBg) {
+      console.log('Skipping - no image or already removing');
+      return;
+    }
 
     // Skip if already processed (check for bg-removed in URL)
     if (imageUrl.includes('bg-removed')) {
@@ -252,11 +261,13 @@ export function useFlyer({ product, store }: UseFlyerProps): UseFlyerReturn {
     }
 
     setIsRemovingBg(true);
+    console.log('Calling remove-background edge function...');
 
     try {
       const { data, error } = await supabase.functions.invoke('remove-background', {
         body: { image_url: imageUrl },
       });
+      console.log('remove-background response:', { data, error });
 
       if (error) {
         console.error('Background removal error:', error);
@@ -307,6 +318,8 @@ export function useFlyer({ product, store }: UseFlyerProps): UseFlyerReturn {
   const setFont = useCallback((v: string) => setFlyer((prev) => ({ ...prev, font: v })), []);
   const setFontSize = useCallback((size: number) => setFlyer((prev) => ({ ...prev, fontSize: size })), []);
   const setProductImage = useCallback((url: string) => setFlyer((prev) => ({ ...prev, productImage: url })), []);
+  const setProductImageScale = useCallback((scale: number) => setFlyer((prev) => ({ ...prev, productImageScale: scale })), []);
+  const setProductImageOffset = useCallback((offset: LayerOffset) => setFlyer((prev) => ({ ...prev, productImageOffset: offset })), []);
   const setLayerOffset = useCallback((layerId: string, offset: LayerOffset) => {
     setFlyer((prev) => ({
       ...prev,
@@ -410,6 +423,8 @@ export function useFlyer({ product, store }: UseFlyerProps): UseFlyerReturn {
     setFont,
     setFontSize,
     setProductImage,
+    setProductImageScale,
+    setProductImageOffset,
     setLayerOffset,
     setFontSizeOverride,
     setTextColorOverride,
