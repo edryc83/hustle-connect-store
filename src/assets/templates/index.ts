@@ -1,8 +1,10 @@
 import noirOrchidee from './template-noir-orchidee.json';
+import laptopElectronicsPromo from './template-laptop-electronics-promo.json';
 import type { TemplateEntry } from '@/screens/FlyerStudio/flyerTypes';
 
 export const TEMPLATES: TemplateEntry[] = [
   { id: 'noir-orchidee', name: 'Noir Orchidée', category: 'beauty', data: noirOrchidee as any },
+  { id: 'laptop-electronics-promo', name: 'Laptop Pro', category: 'electronics', data: laptopElectronicsPromo as any },
 ];
 
 export const getTemplateById = (id: string): TemplateEntry | undefined => {

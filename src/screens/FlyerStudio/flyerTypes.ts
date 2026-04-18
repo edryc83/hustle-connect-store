@@ -42,10 +42,38 @@ export interface FlyerState {
   generationStep: number;
 }
 
+export interface GradientStop {
+  offset: string;
+  color: string;
+  opacity?: number;
+}
+
+export interface LinearGradient {
+  type: 'linearGradient';
+  id: string;
+  x1: string;
+  y1: string;
+  x2: string;
+  y2: string;
+  stops: GradientStop[];
+}
+
+export interface RadialGradient {
+  type: 'radialGradient';
+  id: string;
+  cx: string;
+  cy: string;
+  r: string;
+  stops: GradientStop[];
+}
+
+export type GradientFill = LinearGradient | RadialGradient;
+
 export interface TemplateLayer {
   id: string;
   type: 'rect' | 'circle' | 'ellipse' | 'polygon' | 'svg-path' | 'image' | 'text';
   group?: string; // Group ID - elements with same group move together
+  visible?: boolean; // Whether layer is visible (default true)
   // rect / shared
   x?: number;
   y?: number;
@@ -68,8 +96,9 @@ export interface TemplateLayer {
   src?: string;
   fit?: string;
   preserveAspectRatio?: string;
-  // text
+  // text - support both 'value' and 'content' for compatibility
   value?: string;
+  content?: string;
   fontSize?: number;
   fontWeight?: string | number;
   fontFamily?: string;
@@ -77,9 +106,11 @@ export interface TemplateLayer {
   letterSpacing?: number;
   textAnchor?: 'start' | 'middle' | 'end';
   // shared
-  fill?: string;
+  fill?: string | GradientFill;
+  fillOpacity?: number;
   stroke?: string;
   strokeWidth?: number;
+  strokeOpacity?: number;
   strokeLinecap?: 'butt' | 'round' | 'square';
   color?: string;
   opacity?: number;
@@ -144,7 +175,7 @@ export const FONT_OPTIONS = [
 export const CATEGORY_FILTERS = [
   { id: 'all', label: 'All' },
   { id: 'beauty', label: 'Beauty' },
-  { id: 'tech', label: 'Tech' },
+  { id: 'electronics', label: 'Electronics' },
   { id: 'fashion', label: 'Fashion' },
   { id: 'promo', label: 'Promo' },
 ];
