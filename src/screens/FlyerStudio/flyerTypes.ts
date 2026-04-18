@@ -1,128 +1,19 @@
-export interface LayerOffset {
-  x: number;
-  y: number;
-}
+// New simplified types for string-injection renderer
 
-export interface AdditionalImage {
-  id: string;
-  url: string;
-  x: number;
-  y: number;
-  width: number;
-  height: number;
-}
-
-export interface FlyerState {
-  template: string;
-  title: string;
-  tagline: string;
-  badge: string;
-  cta: string;
-  bodyText: string;
-  phone: string;
-  address: string;
-  storeName: string;
-  productName: string;
-  productPrice: string;
-  bgColor: string;
-  accentColor: string;
-  textColor: string; // Global text color override
-  font: string;
-  fontSize: number; // 0.5 to 1.5 scale factor
-  productImage: string | null;
-  productImageScale: number; // 0.5 to 2.0 scale factor for product image
-  productImageOffset: LayerOffset; // x, y offset for product image position
-  additionalImages: AdditionalImage[]; // logos, extra images
-  layerOffsets: Record<string, LayerOffset>; // layer id -> offset
-  fontSizeOverrides: Record<string, number>; // layer id -> font size override
-  textColorOverrides: Record<string, string>; // layer id -> text color override
-  deletedLayerIds: string[]; // IDs of deleted layers
-  selectedLayerId: string | null; // Currently selected layer for editing
-  isGenerating: boolean;
-  generationStep: number;
-}
-
-export interface GradientStop {
-  offset: string;
-  color: string;
-  opacity?: number;
-}
-
-export interface LinearGradient {
-  type: 'linearGradient';
-  id: string;
-  x1: string;
-  y1: string;
-  x2: string;
-  y2: string;
-  stops: GradientStop[];
-}
-
-export interface RadialGradient {
-  type: 'radialGradient';
-  id: string;
-  cx: string;
-  cy: string;
-  r: string;
-  stops: GradientStop[];
-}
-
-export type GradientFill = LinearGradient | RadialGradient;
-
-export interface TemplateLayer {
-  id: string;
-  type: 'rect' | 'circle' | 'ellipse' | 'polygon' | 'svg-path' | 'image' | 'text';
-  group?: string; // Group ID - elements with same group move together
-  visible?: boolean; // Whether layer is visible (default true)
-  // rect / shared
-  x?: number;
-  y?: number;
-  width?: number;
-  height?: number;
-  rx?: number; // rect corner radius OR ellipse rx
-  ry?: number; // ellipse ry
-  // circle
-  cx?: number;
-  cy?: number;
-  r?: number;
-  rotate?: number;
-  rotateCx?: number;
-  rotateCy?: number;
-  // polygon
-  points?: string;
-  // path
-  d?: string;
-  // image
-  src?: string;
-  fit?: string;
-  preserveAspectRatio?: string;
-  // text - support both 'value' and 'content' for compatibility
-  value?: string;
-  content?: string;
-  fontSize?: number;
-  fontWeight?: string | number;
-  fontFamily?: string;
-  fontStyle?: string;
-  letterSpacing?: number;
-  textAnchor?: 'start' | 'middle' | 'end';
-  // shared
-  fill?: string | GradientFill;
-  fillOpacity?: number;
-  stroke?: string;
-  strokeWidth?: number;
-  strokeOpacity?: number;
-  strokeLinecap?: 'butt' | 'round' | 'square';
-  color?: string;
-  opacity?: number;
+export interface TokenConfig {
+  type: 'text' | 'color' | 'image' | 'font';
+  label: string;
+  default: string;
 }
 
 export interface TemplateJSON {
   id: string;
   name: string;
   category: string;
+  thumbnail?: string;
   canvas: { width: number; height: number };
-  colors: Record<string, string>;
-  layers: TemplateLayer[];
+  svg: string;
+  tokens: Record<string, TokenConfig>;
 }
 
 export interface TemplateEntry {
@@ -132,46 +23,10 @@ export interface TemplateEntry {
   data: TemplateJSON;
 }
 
-export const ACCENT_COLORS = [
-  '#a0e020',
-  '#6c63ff',
-  '#ff4d6d',
-  '#ffd60a',
-  '#00b4d8',
-  '#ff6d00',
-  '#2ec4b6',
-  '#e91e8c',
-  '#9b59b6',
-];
+// User state is just a map of token keys to current values
+export type UserState = Record<string, string>;
 
-export const BG_COLORS = [
-  '#9b59b6',
-  '#1a1a2e',
-  '#2d3a1e',
-  '#0d1117',
-  '#ffffff',
-  '#f5f0e8',
-  '#0a1628',
-  '#1a0a2e',
-];
-
-export const TEXT_COLORS = [
-  '#ffffff',
-  '#000000',
-  '#f5f5f5',
-  '#333333',
-  '#ffd700',
-  '#ff4d6d',
-  '#00b4d8',
-  '#a0e020',
-];
-
-export const FONT_OPTIONS = [
-  { id: 'modern', name: 'Modern', family: 'Inter' },
-  { id: 'bold', name: 'Bold', family: 'Montserrat' },
-  { id: 'elegant', name: 'Elegant', family: 'Playfair Display' },
-];
-
+// Categories for filtering templates
 export const CATEGORY_FILTERS = [
   { id: 'all', label: 'All' },
   { id: 'beauty', label: 'Beauty' },
@@ -180,9 +35,17 @@ export const CATEGORY_FILTERS = [
   { id: 'promo', label: 'Promo' },
 ];
 
+// Available fonts
+export const FONT_OPTIONS = [
+  { id: 'syne', name: 'Syne', family: 'Syne' },
+  { id: 'inter', name: 'Inter', family: 'Inter' },
+  { id: 'montserrat', name: 'Montserrat', family: 'Montserrat' },
+  { id: 'playfair', name: 'Playfair Display', family: 'Playfair Display' },
+];
+
+// Generation steps for loading overlay
 export const GENERATION_STEPS = [
-  'Reading product details...',
-  'Writing your copy...',
-  'Removing background...',
-  'Composing your flyer...',
+  'Loading template...',
+  'Preparing editor...',
+  'Ready!',
 ];

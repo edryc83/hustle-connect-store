@@ -1,27 +1,34 @@
 import React, { memo, useState } from 'react';
 import { motion } from 'framer-motion';
-import type { TemplateEntry, FlyerState } from '../flyerTypes';
+import type { TemplateEntry, TemplateJSON, UserState } from '../flyerTypes';
 import { CATEGORY_FILTERS } from '../flyerTypes';
 import FlyerCanvas from '../FlyerCanvas';
 
 interface TemplatesTabProps {
   templates: TemplateEntry[];
   selectedId: string;
-  flyer: FlyerState;
+  userState: UserState;
+  currentTemplate: TemplateJSON;
   onSelect: (id: string) => void;
 }
 
 const TemplateThumbnail = memo(function TemplateThumbnail({
   template,
   isSelected,
-  flyer,
+  userState,
   onSelect,
 }: {
   template: TemplateEntry;
   isSelected: boolean;
-  flyer: FlyerState;
+  userState: UserState;
   onSelect: () => void;
 }) {
+  // Use template defaults for preview
+  const previewState: UserState = {};
+  for (const [key, config] of Object.entries(template.data.tokens)) {
+    previewState[key] = config.default;
+  }
+
   return (
     <motion.button
       whileTap={{ scale: 0.95 }}
@@ -31,10 +38,9 @@ const TemplateThumbnail = memo(function TemplateThumbnail({
       }`}
     >
       <FlyerCanvas
-        templateJson={template.data}
-        flyer={{ ...flyer, template: template.id }}
+        template={template.data}
+        userState={previewState}
         width={96}
-        height={120}
         className="pointer-events-none"
       />
       {isSelected && (
@@ -56,7 +62,7 @@ const TemplateThumbnail = memo(function TemplateThumbnail({
   );
 });
 
-export default function TemplatesTab({ templates, selectedId, flyer, onSelect }: TemplatesTabProps) {
+export default function TemplatesTab({ templates, selectedId, userState, currentTemplate, onSelect }: TemplatesTabProps) {
   const [category, setCategory] = useState('all');
 
   const filtered = category === 'all'
@@ -89,7 +95,7 @@ export default function TemplatesTab({ templates, selectedId, flyer, onSelect }:
             key={template.id}
             template={template}
             isSelected={template.id === selectedId}
-            flyer={flyer}
+            userState={userState}
             onSelect={() => onSelect(template.id)}
           />
         ))}

@@ -1,14 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Layout, Palette, Type, LetterText, ImageIcon } from 'lucide-react';
+import { Layout, Palette, Type, ImageIcon } from 'lucide-react';
 import TemplatesTab from './TemplatesTab';
-import ColorsTab from './ColorsTab';
-import TextTab from './TextTab';
-import FontsTab from './FontsTab';
-import PhotoTab from './PhotoTab';
-import type { FlyerState, TemplateEntry, AdditionalImage, LayerOffset } from '../flyerTypes';
+import type { TemplateJSON, TemplateEntry, UserState } from '../flyerTypes';
 
-type TabId = 'templates' | 'photo' | 'colors' | 'text' | 'fonts';
+type TabId = 'templates' | 'content' | 'colors' | 'media';
 
 interface Tab {
   id: TabId;
@@ -18,81 +14,53 @@ interface Tab {
 
 const TABS: Tab[] = [
   { id: 'templates', label: 'Templates', icon: <Layout className="w-5 h-5" /> },
+  { id: 'content', label: 'Text', icon: <Type className="w-5 h-5" /> },
   { id: 'colors', label: 'Colors', icon: <Palette className="w-5 h-5" /> },
-  { id: 'text', label: 'Text', icon: <Type className="w-5 h-5" /> },
-  { id: 'fonts', label: 'Fonts', icon: <LetterText className="w-5 h-5" /> },
-  { id: 'photo', label: 'Media', icon: <ImageIcon className="w-5 h-5" /> },
+  { id: 'media', label: 'Media', icon: <ImageIcon className="w-5 h-5" /> },
 ];
 
-interface SelectedLayer {
-  id: string;
-  type: string;
-  fontSize?: number;
-  color?: string;
-}
-
 interface BottomPanelProps {
-  flyer: FlyerState;
+  template: TemplateJSON;
   templates: TemplateEntry[];
-  extractedColors: string[];
-  originalImageUrl: string | null;
-  isRemovingBg: boolean;
-  templateJson: any;
-  selectedLayer?: SelectedLayer | null;
+  userState: UserState;
   onSelectTemplate: (id: string) => void;
-  onTitleChange: (v: string) => void;
-  onTaglineChange: (v: string) => void;
-  onBadgeChange: (v: string) => void;
-  onCtaChange: (v: string) => void;
-  onPhoneChange: (v: string) => void;
-  onAddressChange: (v: string) => void;
-  onBgColorChange: (v: string) => void;
-  onAccentColorChange: (v: string) => void;
-  onTextColorChange: (v: string) => void;
-  onFontChange: (v: string) => void;
-  onFontSizeChange: (size: number) => void;
-  onFontSizeOverride: (layerId: string, size: number) => void;
-  onTextColorOverride: (layerId: string, color: string) => void;
-  onDeleteLayer: (layerId: string) => void;
-  onImageChange: (url: string) => void;
-  onRemoveBackground: () => void;
-  onAddImage: (url: string) => void;
-  onRemoveImage: (id: string) => void;
-  onProductImageScaleChange?: (scale: number) => void;
-  onProductImageOffsetChange?: (offset: LayerOffset) => void;
+  onUpdateToken: (key: string, value: string) => void;
 }
 
 export default function BottomPanel({
-  flyer,
+  template,
   templates,
-  extractedColors,
-  originalImageUrl,
-  isRemovingBg,
-  templateJson,
-  selectedLayer,
+  userState,
   onSelectTemplate,
-  onTitleChange,
-  onTaglineChange,
-  onBadgeChange,
-  onCtaChange,
-  onPhoneChange,
-  onAddressChange,
-  onBgColorChange,
-  onAccentColorChange,
-  onTextColorChange,
-  onFontChange,
-  onFontSizeChange,
-  onFontSizeOverride,
-  onTextColorOverride,
-  onDeleteLayer,
-  onImageChange,
-  onRemoveBackground,
-  onAddImage,
-  onRemoveImage,
-  onProductImageScaleChange,
-  onProductImageOffsetChange,
+  onUpdateToken,
 }: BottomPanelProps) {
   const [activeTab, setActiveTab] = useState<TabId>('templates');
+
+  // Group tokens by type
+  const groupedTokens = useMemo(() => {
+    const text: [string, { type: string; label: string; default: string }][] = [];
+    const color: [string, { type: string; label: string; default: string }][] = [];
+    const image: [string, { type: string; label: string; default: string }][] = [];
+    const font: [string, { type: string; label: string; default: string }][] = [];
+
+    for (const [key, config] of Object.entries(template.tokens)) {
+      if (config.type === 'text') text.push([key, config]);
+      else if (config.type === 'color') color.push([key, config]);
+      else if (config.type === 'image') image.push([key, config]);
+      else if (config.type === 'font') font.push([key, config]);
+    }
+
+    return { text, color, image, font };
+  }, [template.tokens]);
+
+  // Handle image upload
+  const handleImageUpload = (key: string, file: File) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      onUpdateToken(key, e.target?.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
 
   return (
     <div className="bg-white">
@@ -121,7 +89,7 @@ export default function BottomPanel({
         })}
       </div>
 
-      {/* Tab content - compact height to ensure action buttons always visible */}
+      {/* Tab content */}
       <div className="h-[120px] overflow-y-auto">
         <AnimatePresence mode="wait">
           {activeTab === 'templates' && (
@@ -135,36 +103,39 @@ export default function BottomPanel({
             >
               <TemplatesTab
                 templates={templates}
-                selectedId={flyer.template}
-                flyer={flyer}
+                selectedId={template.id}
+                userState={userState}
+                currentTemplate={template}
                 onSelect={onSelectTemplate}
               />
             </motion.div>
           )}
 
-          {activeTab === 'photo' && (
+          {activeTab === 'content' && (
             <motion.div
-              key="photo"
+              key="content"
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 10 }}
               transition={{ duration: 0.15 }}
-              className="h-full"
+              className="h-full p-3 space-y-2"
             >
-              <PhotoTab
-                currentImage={flyer.productImage}
-                originalImage={originalImageUrl}
-                additionalImages={flyer.additionalImages}
-                isRemovingBg={isRemovingBg}
-                productImageScale={flyer.productImageScale}
-                productImageOffset={flyer.productImageOffset}
-                onImageChange={onImageChange}
-                onRemoveBackground={onRemoveBackground}
-                onAddImage={onAddImage}
-                onRemoveImage={onRemoveImage}
-                onProductImageScaleChange={onProductImageScaleChange || (() => {})}
-                onProductImageOffsetChange={onProductImageOffsetChange || (() => {})}
-              />
+              {groupedTokens.text.length === 0 ? (
+                <p className="text-sm text-gray-400 text-center py-4">No text fields</p>
+              ) : (
+                groupedTokens.text.map(([key, config]) => (
+                  <div key={key} className="flex items-center gap-2">
+                    <label className="text-xs text-gray-500 w-20 truncate">{config.label}</label>
+                    <input
+                      type="text"
+                      value={userState[key] || ''}
+                      onChange={(e) => onUpdateToken(key, e.target.value)}
+                      placeholder={config.default}
+                      className="flex-1 text-sm px-2 py-1.5 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-purple-500"
+                    />
+                  </div>
+                ))
+              )}
             </motion.div>
           )}
 
@@ -175,67 +146,68 @@ export default function BottomPanel({
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 10 }}
               transition={{ duration: 0.15 }}
-              className="h-full overflow-y-auto"
+              className="h-full p-3"
             >
-              <ColorsTab
-                bgColor={flyer.bgColor}
-                accentColor={flyer.accentColor}
-                extractedColors={extractedColors}
-                onBgColorChange={onBgColorChange}
-                onAccentColorChange={onAccentColorChange}
-              />
+              {groupedTokens.color.length === 0 ? (
+                <p className="text-sm text-gray-400 text-center py-4">No color options</p>
+              ) : (
+                <div className="grid grid-cols-2 gap-3">
+                  {groupedTokens.color.map(([key, config]) => (
+                    <div key={key} className="flex items-center gap-2">
+                      <input
+                        type="color"
+                        value={userState[key] || config.default}
+                        onChange={(e) => onUpdateToken(key, e.target.value)}
+                        className="w-8 h-8 rounded-lg border border-gray-200 cursor-pointer"
+                      />
+                      <span className="text-xs text-gray-600 truncate">{config.label}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
             </motion.div>
           )}
 
-          {activeTab === 'text' && (
+          {activeTab === 'media' && (
             <motion.div
-              key="text"
+              key="media"
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 10 }}
               transition={{ duration: 0.15 }}
-              className="h-full overflow-y-auto"
+              className="h-full p-3"
             >
-              <TextTab
-                title={flyer.title}
-                tagline={flyer.tagline}
-                badge={flyer.badge}
-                cta={flyer.cta}
-                phone={flyer.phone}
-                address={flyer.address}
-                fontSize={flyer.fontSize}
-                textColor={flyer.textColor}
-                selectedLayer={selectedLayer}
-                fontSizeOverrides={flyer.fontSizeOverrides}
-                textColorOverrides={flyer.textColorOverrides}
-                onTitleChange={onTitleChange}
-                onTaglineChange={onTaglineChange}
-                onBadgeChange={onBadgeChange}
-                onCtaChange={onCtaChange}
-                onPhoneChange={onPhoneChange}
-                onAddressChange={onAddressChange}
-                onFontSizeChange={onFontSizeChange}
-                onTextColorChange={onTextColorChange}
-                onFontSizeOverride={onFontSizeOverride}
-                onTextColorOverride={onTextColorOverride}
-                onDeleteLayer={onDeleteLayer}
-              />
-            </motion.div>
-          )}
-
-          {activeTab === 'fonts' && (
-            <motion.div
-              key="fonts"
-              initial={{ opacity: 0, x: -10 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: 10 }}
-              transition={{ duration: 0.15 }}
-              className="h-full"
-            >
-              <FontsTab
-                selectedFont={flyer.font}
-                onFontChange={onFontChange}
-              />
+              {groupedTokens.image.length === 0 ? (
+                <p className="text-sm text-gray-400 text-center py-4">No image fields</p>
+              ) : (
+                <div className="flex gap-3 overflow-x-auto">
+                  {groupedTokens.image.map(([key, config]) => (
+                    <div key={key} className="flex-shrink-0">
+                      <label className="text-xs text-gray-500 mb-1 block">{config.label}</label>
+                      <label className="relative w-20 h-20 bg-gray-100 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center cursor-pointer hover:border-purple-400 transition-colors overflow-hidden">
+                        {userState[key] ? (
+                          <img
+                            src={userState[key]}
+                            alt={config.label}
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <ImageIcon className="w-6 h-6 text-gray-400" />
+                        )}
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => {
+                            const file = e.target.files?.[0];
+                            if (file) handleImageUpload(key, file);
+                          }}
+                          className="absolute inset-0 opacity-0 cursor-pointer"
+                        />
+                      </label>
+                    </div>
+                  ))}
+                </div>
+              )}
             </motion.div>
           )}
         </AnimatePresence>

@@ -1,0 +1,156 @@
+{
+  "id": "laptop-electronics-promo",
+  "name": "Laptop Pro – Electronics Promo Flyer",
+  "category": "electronics",
+  "thumbnail": "laptop-electronics-promo.png",
+  "canvas": {
+    "width": 1080,
+    "height": 1350
+  },
+  "fonts": [
+    "https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Inter:wght@300;400;500&display=swap"
+  ],
+  "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" viewBox=\"0 0 1080 1350\" width=\"1080\" height=\"1350\">\n  <defs>\n    <linearGradient id=\"lp-grad-bg\" x1=\"0\" y1=\"0\" x2=\"1080\" y2=\"1350\" gradientUnits=\"userSpaceOnUse\">\n      <stop offset=\"0%\" stop-color=\"PLACEHOLDER_COLOR_BG_START\"/>\n      <stop offset=\"60%\" stop-color=\"PLACEHOLDER_COLOR_BG_MID\"/>\n      <stop offset=\"100%\" stop-color=\"PLACEHOLDER_COLOR_BG_END\"/>\n    </linearGradient>\n    <linearGradient id=\"lp-grad-cta\" x1=\"404\" y1=\"0\" x2=\"1022\" y2=\"0\" gradientUnits=\"userSpaceOnUse\">\n      <stop offset=\"0%\" stop-color=\"PLACEHOLDER_COLOR_ACCENT\"/>\n      <stop offset=\"100%\" stop-color=\"PLACEHOLDER_COLOR_ACCENT_ALT\"/>\n    </linearGradient>\n    <linearGradient id=\"lp-grad-img-fade\" x1=\"0\" y1=\"508\" x2=\"0\" y2=\"808\" gradientUnits=\"userSpaceOnUse\">\n      <stop offset=\"0%\" stop-color=\"PLACEHOLDER_COLOR_BG_START\" stop-opacity=\"0\"/>\n      <stop offset=\"100%\" stop-color=\"PLACEHOLDER_COLOR_BG_START\" stop-opacity=\"0.92\"/>\n    </linearGradient>\n    <radialGradient id=\"lp-grad-orb1\" cx=\"540\" cy=\"520\" r=\"560\" gradientUnits=\"userSpaceOnUse\">\n      <stop offset=\"0%\" stop-color=\"PLACEHOLDER_COLOR_ACCENT\" stop-opacity=\"0.08\"/>\n      <stop offset=\"100%\" stop-color=\"PLACEHOLDER_COLOR_ACCENT\" stop-opacity=\"0\"/>\n    </radialGradient>\n    <radialGradient id=\"lp-grad-orb2\" cx=\"900\" cy=\"1200\" r=\"280\" gradientUnits=\"userSpaceOnUse\">\n      <stop offset=\"0%\" stop-color=\"PLACEHOLDER_COLOR_ACCENT\" stop-opacity=\"0.04\"/>\n      <stop offset=\"100%\" stop-color=\"PLACEHOLDER_COLOR_ACCENT\" stop-opacity=\"0\"/>\n    </radialGradient>\n    <clipPath id=\"lp-img-clip\">\n      <rect x=\"140\" y=\"148\" width=\"800\" height=\"660\" rx=\"20\"/>\n    </clipPath>\n  </defs>\n\n  <!-- ── LAYER 1: background ── -->\n  <rect width=\"1080\" height=\"1350\" fill=\"url(#lp-grad-bg)\"/>\n\n  <!-- ── LAYER 2: atmosphere orbs ── -->\n  <ellipse cx=\"540\" cy=\"520\" rx=\"560\" ry=\"460\" fill=\"url(#lp-grad-orb1)\"/>\n  <ellipse cx=\"900\" cy=\"1200\" rx=\"280\" ry=\"220\" fill=\"url(#lp-grad-orb2)\"/>\n\n  <!-- ── LAYER 3: diagonal accent rays ── -->\n  <polygon points=\"0,0 480,0 0,380\" fill=\"#FFFFFF\" fill-opacity=\"0.025\"/>\n  <polygon points=\"1080,0 1080,500 640,0\" fill=\"PLACEHOLDER_COLOR_ACCENT\" fill-opacity=\"0.04\"/>\n  <polygon points=\"0,1350 0,1020 280,1350\" fill=\"PLACEHOLDER_COLOR_ACCENT\" fill-opacity=\"0.035\"/>\n\n  <!-- ── LAYER 4: subtle grid lines ── -->\n  <line x1=\"0\" y1=\"270\" x2=\"1080\" y2=\"270\" stroke=\"PLACEHOLDER_COLOR_ACCENT\" stroke-width=\"0.5\" opacity=\"0.07\"/>\n  <line x1=\"0\" y1=\"810\" x2=\"1080\" y2=\"810\" stroke=\"PLACEHOLDER_COLOR_ACCENT\" stroke-width=\"0.5\" opacity=\"0.05\"/>\n  <line x1=\"360\" y1=\"0\" x2=\"360\" y2=\"1350\" stroke=\"PLACEHOLDER_COLOR_ACCENT\" stroke-width=\"0.5\" opacity=\"0.05\"/>\n  <line x1=\"720\" y1=\"0\" x2=\"720\" y2=\"1350\" stroke=\"PLACEHOLDER_COLOR_ACCENT\" stroke-width=\"0.5\" opacity=\"0.05\"/>\n\n  <!-- ── LAYER 5: product image zone ── -->\n  <rect x=\"140\" y=\"148\" width=\"800\" height=\"660\" rx=\"20\" fill=\"#1A1A1A\" stroke=\"PLACEHOLDER_COLOR_ACCENT\" stroke-width=\"1\" stroke-opacity=\"0.15\"/>\n  <g clip-path=\"url(#lp-img-clip)\">\n    <image href=\"PLACEHOLDER_PRODUCT_IMAGE\" x=\"140\" y=\"148\" width=\"800\" height=\"660\" preserveAspectRatio=\"xMidYMid meet\"/>\n  </g>\n  <rect x=\"140\" y=\"508\" width=\"800\" height=\"300\" fill=\"url(#lp-grad-img-fade)\"/>\n\n  <!-- ── LAYER 6: brand logo block ── -->\n  <rect x=\"58\" y=\"52\" width=\"56\" height=\"56\" rx=\"14\" fill=\"PLACEHOLDER_COLOR_ACCENT\"/>\n  <text x=\"86\" y=\"88\" font-family=\"PLACEHOLDER_FONT_DISPLAY, sans-serif\" font-size=\"28\" font-weight=\"800\" fill=\"PLACEHOLDER_COLOR_ON_ACCENT\" text-anchor=\"middle\">PLACEHOLDER_BRAND_INITIAL</text>\n\n  <!-- ── LAYER 7: store name pill ── -->\n  <rect x=\"130\" y=\"62\" width=\"180\" height=\"36\" rx=\"8\" fill=\"#1C1C1C\" stroke=\"PLACEHOLDER_COLOR_ACCENT\" stroke-width=\"0.8\" stroke-opacity=\"0.4\"/>\n  <text x=\"220\" y=\"85\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\" font-size=\"15\" font-weight=\"500\" fill=\"PLACEHOLDER_COLOR_ACCENT\" fill-opacity=\"0.9\" text-anchor=\"middle\" letter-spacing=\"1.5\">PLACEHOLDER_STORE_NAME</text>\n\n  <!-- ── LAYER 8: badge pill top-right ── -->\n  <rect x=\"862\" y=\"54\" width=\"178\" height=\"52\" rx=\"26\" fill=\"PLACEHOLDER_COLOR_ACCENT\" fill-opacity=\"0.12\" stroke=\"PLACEHOLDER_COLOR_ACCENT\" stroke-width=\"1\" stroke-opacity=\"0.4\"/>\n  <text x=\"951\" y=\"85\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\" font-size=\"17\" font-weight=\"500\" fill=\"PLACEHOLDER_COLOR_ACCENT\" text-anchor=\"middle\" letter-spacing=\"1\">PLACEHOLDER_BADGE_TEXT</text>\n\n  <!-- ── LAYER 9: main title ── -->\n  <text x=\"68\" y=\"898\" font-family=\"PLACEHOLDER_FONT_DISPLAY, sans-serif\" font-size=\"108\" font-weight=\"800\" fill=\"PLACEHOLDER_COLOR_TITLE\" text-anchor=\"start\" letter-spacing=\"-2\">PLACEHOLDER_TITLE_LINE1</text>\n  <text x=\"68\" y=\"1002\" font-family=\"PLACEHOLDER_FONT_DISPLAY, sans-serif\" font-size=\"108\" font-weight=\"800\" fill=\"PLACEHOLDER_COLOR_TITLE\" text-anchor=\"start\" letter-spacing=\"-2\">PLACEHOLDER_TITLE_LINE2</text>\n\n  <!-- ── LAYER 10: accent divider ── -->\n  <line x1=\"68\" y1=\"1028\" x2=\"500\" y2=\"1028\" stroke=\"PLACEHOLDER_COLOR_ACCENT\" stroke-width=\"1.5\" opacity=\"0.5\"/>\n\n  <!-- ── LAYER 11: tagline ── -->\n  <text x=\"68\" y=\"1070\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\" font-size=\"36\" font-weight=\"300\" fill=\"PLACEHOLDER_COLOR_ACCENT\" text-anchor=\"start\" letter-spacing=\"2\">PLACEHOLDER_TAGLINE_TEXT</text>\n\n  <!-- ── LAYER 12: spec chips ── -->\n  <rect x=\"68\" y=\"1102\" width=\"148\" height=\"54\" rx=\"27\" fill=\"#1E1E1E\" stroke=\"PLACEHOLDER_COLOR_ACCENT\" stroke-width=\"0.8\" stroke-opacity=\"0.3\"/>\n  <text x=\"142\" y=\"1127\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\" font-size=\"13\" font-weight=\"500\" fill=\"PLACEHOLDER_COLOR_ACCENT\" fill-opacity=\"0.7\" text-anchor=\"middle\" letter-spacing=\"1\">PLACEHOLDER_SPEC1_LABEL</text>\n  <text x=\"142\" y=\"1148\" font-family=\"PLACEHOLDER_FONT_DISPLAY, sans-serif\" font-size=\"16\" font-weight=\"700\" fill=\"#FFFFFF\" text-anchor=\"middle\">PLACEHOLDER_SPEC1_VALUE</text>\n\n  <rect x=\"232\" y=\"1102\" width=\"148\" height=\"54\" rx=\"27\" fill=\"#1E1E1E\" stroke=\"PLACEHOLDER_COLOR_ACCENT\" stroke-width=\"0.8\" stroke-opacity=\"0.3\"/>\n  <text x=\"306\" y=\"1127\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\" font-size=\"13\" font-weight=\"500\" fill=\"PLACEHOLDER_COLOR_ACCENT\" fill-opacity=\"0.7\" text-anchor=\"middle\" letter-spacing=\"1\">PLACEHOLDER_SPEC2_LABEL</text>\n  <text x=\"306\" y=\"1148\" font-family=\"PLACEHOLDER_FONT_DISPLAY, sans-serif\" font-size=\"16\" font-weight=\"700\" fill=\"#FFFFFF\" text-anchor=\"middle\">PLACEHOLDER_SPEC2_VALUE</text>\n\n  <rect x=\"396\" y=\"1102\" width=\"148\" height=\"54\" rx=\"27\" fill=\"#1E1E1E\" stroke=\"PLACEHOLDER_COLOR_ACCENT\" stroke-width=\"0.8\" stroke-opacity=\"0.3\"/>\n  <text x=\"470\" y=\"1127\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\" font-size=\"13\" font-weight=\"500\" fill=\"PLACEHOLDER_COLOR_ACCENT\" fill-opacity=\"0.7\" text-anchor=\"middle\" letter-spacing=\"1\">PLACEHOLDER_SPEC3_LABEL</text>\n  <text x=\"470\" y=\"1148\" font-family=\"PLACEHOLDER_FONT_DISPLAY, sans-serif\" font-size=\"16\" font-weight=\"700\" fill=\"#FFFFFF\" text-anchor=\"middle\">PLACEHOLDER_SPEC3_VALUE</text>\n\n  <rect x=\"560\" y=\"1102\" width=\"148\" height=\"54\" rx=\"27\" fill=\"#1E1E1E\" stroke=\"PLACEHOLDER_COLOR_ACCENT\" stroke-width=\"0.8\" stroke-opacity=\"0.3\"/>\n  <text x=\"634\" y=\"1127\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\" font-size=\"13\" font-weight=\"500\" fill=\"PLACEHOLDER_COLOR_ACCENT\" fill-opacity=\"0.7\" text-anchor=\"middle\" letter-spacing=\"1\">PLACEHOLDER_SPEC4_LABEL</text>\n  <text x=\"634\" y=\"1148\" font-family=\"PLACEHOLDER_FONT_DISPLAY, sans-serif\" font-size=\"16\" font-weight=\"700\" fill=\"#FFFFFF\" text-anchor=\"middle\">PLACEHOLDER_SPEC4_VALUE</text>\n\n  <!-- ── LAYER 13: price tab ── -->\n  <rect x=\"58\" y=\"1188\" width=\"310\" height=\"114\" rx=\"57\" fill=\"#0A0A0A\" stroke=\"PLACEHOLDER_COLOR_ACCENT\" stroke-width=\"1.8\"/>\n  <text x=\"213\" y=\"1228\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\" font-size=\"15\" font-weight=\"500\" fill=\"PLACEHOLDER_COLOR_ACCENT\" fill-opacity=\"0.65\" text-anchor=\"middle\" letter-spacing=\"2\">PLACEHOLDER_PRICE_LABEL</text>\n  <text x=\"213\" y=\"1278\" font-family=\"PLACEHOLDER_FONT_DISPLAY, sans-serif\" font-size=\"46\" font-weight=\"800\" fill=\"#FFFFFF\" text-anchor=\"middle\">PLACEHOLDER_PRICE_VALUE</text>\n\n  <!-- ── LAYER 14: CTA button ── -->\n  <rect x=\"404\" y=\"1192\" width=\"618\" height=\"106\" rx=\"53\" fill=\"url(#lp-grad-cta)\"/>\n  <text x=\"713\" y=\"1254\" font-family=\"PLACEHOLDER_FONT_DISPLAY, sans-serif\" font-size=\"40\" font-weight=\"800\" fill=\"PLACEHOLDER_COLOR_ON_ACCENT\" text-anchor=\"middle\" letter-spacing=\"3\">PLACEHOLDER_CTA_TEXT</text>\n\n  <!-- ── LAYER 15: footer ── -->\n  <text x=\"540\" y=\"1325\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\" font-size=\"15\" font-weight=\"400\" fill=\"#FFFFFF\" fill-opacity=\"0.2\" text-anchor=\"middle\" letter-spacing=\"2\">PLACEHOLDER_FOOTER_TEXT</text>\n\n  <!-- ── LAYER 16: top accent line ── -->\n  <line x1=\"0\" y1=\"2\" x2=\"1080\" y2=\"2\" stroke=\"PLACEHOLDER_COLOR_ACCENT\" stroke-width=\"3\" opacity=\"0.7\"/>\n\n  <!-- ── LAYER 17: corner marks ── -->\n  <path d=\"M0 88 L0 0 L88 0\" fill=\"none\" stroke=\"PLACEHOLDER_COLOR_ACCENT\" stroke-width=\"2\" opacity=\"0.4\"/>\n  <path d=\"M1080 88 L1080 0 L992 0\" fill=\"none\" stroke=\"PLACEHOLDER_COLOR_ACCENT\" stroke-width=\"2\" opacity=\"0.4\"/>\n  <path d=\"M0 1262 L0 1350 L88 1350\" fill=\"none\" stroke=\"PLACEHOLDER_COLOR_ACCENT\" stroke-width=\"2\" opacity=\"0.4\"/>\n  <path d=\"M1080 1262 L1080 1350 L992 1350\" fill=\"none\" stroke=\"PLACEHOLDER_COLOR_ACCENT\" stroke-width=\"2\" opacity=\"0.4\"/>\n</svg>",
+  "tokens": {
+    "PLACEHOLDER_PRODUCT_IMAGE": {
+      "type": "image",
+      "label": "Product photo",
+      "default": ""
+    },
+    "PLACEHOLDER_BRAND_INITIAL": {
+      "type": "text",
+      "label": "Brand initial",
+      "default": "T"
+    },
+    "PLACEHOLDER_STORE_NAME": {
+      "type": "text",
+      "label": "Store name",
+      "default": "TECH STORE"
+    },
+    "PLACEHOLDER_BADGE_TEXT": {
+      "type": "text",
+      "label": "Badge",
+      "default": "NEW ARRIVAL"
+    },
+    "PLACEHOLDER_TITLE_LINE1": {
+      "type": "text",
+      "label": "Title line 1",
+      "default": "PRO"
+    },
+    "PLACEHOLDER_TITLE_LINE2": {
+      "type": "text",
+      "label": "Title line 2",
+      "default": "LAPTOP"
+    },
+    "PLACEHOLDER_TAGLINE_TEXT": {
+      "type": "text",
+      "label": "Tagline",
+      "default": "Power. Portability. Performance."
+    },
+    "PLACEHOLDER_SPEC1_LABEL": {
+      "type": "text",
+      "label": "Spec 1 label",
+      "default": "PROCESSOR"
+    },
+    "PLACEHOLDER_SPEC1_VALUE": {
+      "type": "text",
+      "label": "Spec 1 value",
+      "default": "Intel i9"
+    },
+    "PLACEHOLDER_SPEC2_LABEL": {
+      "type": "text",
+      "label": "Spec 2 label",
+      "default": "MEMORY"
+    },
+    "PLACEHOLDER_SPEC2_VALUE": {
+      "type": "text",
+      "label": "Spec 2 value",
+      "default": "32GB RAM"
+    },
+    "PLACEHOLDER_SPEC3_LABEL": {
+      "type": "text",
+      "label": "Spec 3 label",
+      "default": "STORAGE"
+    },
+    "PLACEHOLDER_SPEC3_VALUE": {
+      "type": "text",
+      "label": "Spec 3 value",
+      "default": "1TB SSD"
+    },
+    "PLACEHOLDER_SPEC4_LABEL": {
+      "type": "text",
+      "label": "Spec 4 label",
+      "default": "DISPLAY"
+    },
+    "PLACEHOLDER_SPEC4_VALUE": {
+      "type": "text",
+      "label": "Spec 4 value",
+      "default": "15.6\" 4K"
+    },
+    "PLACEHOLDER_PRICE_LABEL": {
+      "type": "text",
+      "label": "Price label",
+      "default": "STARTING AT"
+    },
+    "PLACEHOLDER_PRICE_VALUE": {
+      "type": "text",
+      "label": "Price",
+      "default": "UGX 2,400,000"
+    },
+    "PLACEHOLDER_CTA_TEXT": {
+      "type": "text",
+      "label": "CTA button",
+      "default": "BUY NOW"
+    },
+    "PLACEHOLDER_FOOTER_TEXT": {
+      "type": "text",
+      "label": "Footer",
+      "default": "techstore.com  ·  Free delivery  ·  1-year warranty"
+    },
+    "PLACEHOLDER_COLOR_BG_START": {
+      "type": "color",
+      "label": "Background",
+      "default": "#0F0F0F"
+    },
+    "PLACEHOLDER_COLOR_BG_MID": {
+      "type": "color",
+      "label": "Background mid",
+      "default": "#141414"
+    },
+    "PLACEHOLDER_COLOR_BG_END": {
+      "type": "color",
+      "label": "Background end",
+      "default": "#0A0A0A"
+    },
+    "PLACEHOLDER_COLOR_ACCENT": {
+      "type": "color",
+      "label": "Accent",
+      "default": "#F5A623"
+    },
+    "PLACEHOLDER_COLOR_ACCENT_ALT": {
+      "type": "color",
+      "label": "Accent highlight",
+      "default": "#F8C46A"
+    },
+    "PLACEHOLDER_COLOR_TITLE": {
+      "type": "color",
+      "label": "Title color",
+      "default": "#FFFFFF"
+    },
+    "PLACEHOLDER_COLOR_ON_ACCENT": {
+      "type": "color",
+      "label": "Text on accent",
+      "default": "#0A0A0A"
+    },
+    "PLACEHOLDER_FONT_DISPLAY": {
+      "type": "font",
+      "label": "Display font",
+      "default": "Syne"
+    },
+    "PLACEHOLDER_FONT_BODY": {
+      "type": "font",
+      "label": "Body font",
+      "default": "Inter"
+    }
+  }
+}
