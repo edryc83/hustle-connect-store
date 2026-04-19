@@ -48,9 +48,10 @@ function applyTextOverrides(
     const posOffset = textOverrides.position[tokenKey];
 
     // Find text element containing this token and apply overrides
-    // Match: <text ... >TOKEN</text> or <text ...>TOKEN</text>
+    // Match: <text ... >TOKEN</text> with possible whitespace
+    const escapedToken = tokenKey.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     const textRegex = new RegExp(
-      `(<text[^>]*)(>)(${tokenKey.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})(</text>)`,
+      `(<text[^>]*)(>)\\s*(${escapedToken})\\s*(</text>)`,
       'g'
     );
 
@@ -83,10 +84,12 @@ function applyTextOverrides(
         }
       }
 
-      // Always add data attribute for drag detection (even without overrides)
+      // Always add data attribute and styles for drag detection
+      // pointer-events:all ensures touch/click events work on text
+      const dragStyles = 'cursor:move;-webkit-user-select:none;user-select:none;pointer-events:all;-webkit-tap-highlight-color:transparent';
       modifiedOpenTag = modifiedOpenTag.replace(
         '<text',
-        `<text data-token="${tokenKey}" style="cursor:move;-webkit-user-select:none;user-select:none"`
+        `<text data-token="${tokenKey}" style="${dragStyles}"`
       );
 
       return modifiedOpenTag + openTagEnd + content + closeTag;
@@ -202,10 +205,16 @@ const FlyerCanvas = forwardRef<HTMLDivElement, FlyerCanvasProps>(
         };
       };
 
+      const findTextElement = (target: Element): Element | null => {
+        // Check if target is a text element (case-insensitive for SVG)
+        if (target.tagName.toLowerCase() === 'text') return target;
+        // Check ancestors
+        return target.closest('text');
+      };
+
       const handlePointerDown = (e: PointerEvent) => {
         const target = e.target as Element;
-        // Check if target is a text element or inside one
-        const textEl = target.tagName === 'text' ? target : target.closest('text');
+        const textEl = findTextElement(target);
         if (!textEl) return;
 
         const tokenKey = textEl.getAttribute('data-token');
@@ -216,9 +225,14 @@ const FlyerCanvas = forwardRef<HTMLDivElement, FlyerCanvasProps>(
 
         // Capture pointer for smooth dragging
         try {
-          container.setPointerCapture(e.pointerId);
+          (target as HTMLElement).setPointerCapture(e.pointerId);
         } catch (err) {
-          // Ignore capture errors
+          // Fallback to container capture
+          try {
+            container.setPointerCapture(e.pointerId);
+          } catch {
+            // Ignore capture errors
+          }
         }
 
         const currentOffset = textOverrides.position[tokenKey] || { x: 0, y: 0 };
@@ -249,9 +263,13 @@ const FlyerCanvas = forwardRef<HTMLDivElement, FlyerCanvasProps>(
       const handlePointerUp = (e: PointerEvent) => {
         if (dragStateRef.current) {
           try {
-            container.releasePointerCapture(e.pointerId);
-          } catch (err) {
-            // Ignore release errors
+            (e.target as HTMLElement).releasePointerCapture(e.pointerId);
+          } catch {
+            try {
+              container.releasePointerCapture(e.pointerId);
+            } catch {
+              // Ignore release errors
+            }
           }
         }
         dragStateRef.current = null;
@@ -262,6 +280,9 @@ const FlyerCanvas = forwardRef<HTMLDivElement, FlyerCanvasProps>(
       container.addEventListener('pointermove', handlePointerMove, { capture: true });
       container.addEventListener('pointerup', handlePointerUp, { capture: true });
       container.addEventListener('pointercancel', handlePointerUp, { capture: true });
+
+      // Also add touch-action to prevent scroll interference
+      container.style.touchAction = 'none';
 
       return () => {
         container.removeEventListener('pointerdown', handlePointerDown, { capture: true });
