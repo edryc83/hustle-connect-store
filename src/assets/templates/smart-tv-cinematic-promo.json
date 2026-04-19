@@ -1,0 +1,156 @@
+{
+  "id": "smart-tv-cinematic-promo",
+  "name": "Smart TV – Cinematic Room Scene Promo Flyer",
+  "category": "electronics",
+  "thumbnail": "smart-tv-cinematic-promo.png",
+  "canvas": {
+    "width": 1080,
+    "height": 1350
+  },
+  "fonts": [
+    "https://fonts.googleapis.com/css2?family=Montserrat:wght@200;400;700;900&family=Space+Mono:wght@400;700&display=swap"
+  ],
+  "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" viewBox=\"0 0 1080 1350\" width=\"1080\" height=\"1350\">\n  <defs>\n    <linearGradient id=\"tv-room-bg\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1350\" gradientUnits=\"userSpaceOnUse\">\n      <stop offset=\"0%\"   stop-color=\"PLACEHOLDER_COLOR_BG_TOP\"/>\n      <stop offset=\"40%\"  stop-color=\"PLACEHOLDER_COLOR_BG_MID\"/>\n      <stop offset=\"100%\" stop-color=\"PLACEHOLDER_COLOR_BG_BOTTOM\"/>\n    </linearGradient>\n    <linearGradient id=\"tv-floor-fade\" x1=\"0\" y1=\"900\" x2=\"0\" y2=\"1080\" gradientUnits=\"userSpaceOnUse\">\n      <stop offset=\"0%\"   stop-color=\"#1A1408\" stop-opacity=\"0\"/>\n      <stop offset=\"100%\" stop-color=\"#1A1408\" stop-opacity=\"0.6\"/>\n    </linearGradient>\n    <linearGradient id=\"tv-bottom-band\" x1=\"0\" y1=\"1060\" x2=\"0\" y2=\"1350\" gradientUnits=\"userSpaceOnUse\">\n      <stop offset=\"0%\"   stop-color=\"PLACEHOLDER_COLOR_BAND_TOP\"/>\n      <stop offset=\"100%\" stop-color=\"PLACEHOLDER_COLOR_BAND_BOTTOM\"/>\n    </linearGradient>\n    <linearGradient id=\"tv-cta-grad\" x1=\"748\" y1=\"0\" x2=\"1026\" y2=\"0\" gradientUnits=\"userSpaceOnUse\">\n      <stop offset=\"0%\"   stop-color=\"PLACEHOLDER_COLOR_ACCENT\"/>\n      <stop offset=\"100%\" stop-color=\"PLACEHOLDER_COLOR_ACCENT_ALT\"/>\n    </linearGradient>\n    <radialGradient id=\"tv-ambient\" cx=\"540\" cy=\"500\" r=\"500\" gradientUnits=\"userSpaceOnUse\">\n      <stop offset=\"0%\"   stop-color=\"PLACEHOLDER_COLOR_SCREEN_GLOW\" stop-opacity=\"0.06\"/>\n      <stop offset=\"100%\" stop-color=\"PLACEHOLDER_COLOR_SCREEN_GLOW\" stop-opacity=\"0\"/>\n    </radialGradient>\n    <radialGradient id=\"tv-floor-light\" cx=\"540\" cy=\"960\" r=\"360\" gradientUnits=\"userSpaceOnUse\">\n      <stop offset=\"0%\"   stop-color=\"PLACEHOLDER_COLOR_ACCENT\" stop-opacity=\"0.07\"/>\n      <stop offset=\"100%\" stop-color=\"PLACEHOLDER_COLOR_ACCENT\" stop-opacity=\"0\"/>\n    </radialGradient>\n    <radialGradient id=\"tv-screen-radial\" cx=\"540\" cy=\"520\" r=\"460\" gradientUnits=\"userSpaceOnUse\">\n      <stop offset=\"0%\"   stop-color=\"#FFFFFF\" stop-opacity=\"0.06\"/>\n      <stop offset=\"100%\" stop-color=\"#FFFFFF\" stop-opacity=\"0\"/>\n    </radialGradient>\n    <clipPath id=\"tv-screen-clip\">\n      <rect x=\"188\" y=\"212\" width=\"704\" height=\"396\" rx=\"6\"/>\n    </clipPath>\n  </defs>\n\n  <!-- LAYER 1: deep room background -->\n  <rect width=\"1080\" height=\"1350\" fill=\"url(#tv-room-bg)\"/>\n\n  <!-- LAYER 2: ambient screen glow on walls -->\n  <ellipse cx=\"540\" cy=\"500\" rx=\"500\" ry=\"400\" fill=\"url(#tv-ambient)\"/>\n\n  <!-- LAYER 3: warm floor light -->\n  <ellipse cx=\"540\" cy=\"960\" rx=\"360\" ry=\"120\" fill=\"url(#tv-floor-light)\"/>\n\n  <!-- LAYER 4: floor plane suggestion -->\n  <rect x=\"0\" y=\"880\" width=\"1080\" height=\"200\" fill=\"url(#tv-floor-fade)\"/>\n\n  <!-- LAYER 5: faint wall lines -->\n  <line x1=\"0\"   y1=\"78\"  x2=\"1080\" y2=\"78\"  stroke=\"#FFFFFF\" stroke-width=\"0.4\" opacity=\"0.04\"/>\n  <line x1=\"200\" y1=\"0\"   x2=\"200\"  y2=\"900\" stroke=\"#FFFFFF\" stroke-width=\"0.4\" opacity=\"0.025\"/>\n  <line x1=\"880\" y1=\"0\"   x2=\"880\"  y2=\"900\" stroke=\"#FFFFFF\" stroke-width=\"0.4\" opacity=\"0.025\"/>\n\n  <!-- LAYER 6: TV stand / pedestal -->\n  <rect x=\"492\" y=\"826\" width=\"96\" height=\"56\" rx=\"4\" fill=\"#1A1A1E\" stroke=\"#2A2A30\" stroke-width=\"0.8\"/>\n  <rect x=\"440\" y=\"878\" width=\"200\" height=\"10\" rx=\"5\" fill=\"#1C1C20\" stroke=\"#2A2A30\" stroke-width=\"0.8\"/>\n  <ellipse cx=\"540\" cy=\"892\" rx=\"120\" ry=\"8\" fill=\"PLACEHOLDER_COLOR_ACCENT\" fill-opacity=\"0.06\"/>\n\n  <!-- LAYER 7: TV outer bezel -->\n  <rect x=\"148\" y=\"188\" width=\"784\" height=\"644\" rx=\"18\" fill=\"#111115\"/>\n  <rect x=\"148\" y=\"188\" width=\"784\" height=\"644\" rx=\"18\" fill=\"none\" stroke=\"#252530\" stroke-width=\"1.5\"/>\n\n  <!-- LAYER 8: TV inner body -->\n  <rect x=\"166\" y=\"200\" width=\"748\" height=\"620\" rx=\"14\" fill=\"#0D0D12\"/>\n\n  <!-- LAYER 9: screen dark bezel -->\n  <rect x=\"182\" y=\"208\" width=\"716\" height=\"412\" rx=\"8\" fill=\"#090910\"/>\n\n  <!-- LAYER 10: screen base -->\n  <rect x=\"188\" y=\"212\" width=\"704\" height=\"396\" rx=\"6\" fill=\"#0A1628\"/>\n\n  <!-- LAYER 11: product image / screen content (clipped) -->\n  <g clip-path=\"url(#tv-screen-clip)\">\n    <image href=\"PLACEHOLDER_PRODUCT_IMAGE\" x=\"188\" y=\"212\" width=\"704\" height=\"396\" preserveAspectRatio=\"xMidYMid meet\"/>\n  </g>\n\n  <!-- LAYER 12: screen reflective sheen -->\n  <rect x=\"188\" y=\"212\" width=\"704\" height=\"396\" fill=\"url(#tv-screen-radial)\"/>\n\n  <!-- LAYER 13: screen edge glow -->\n  <rect x=\"188\" y=\"212\" width=\"704\" height=\"396\" rx=\"6\" fill=\"none\" stroke=\"PLACEHOLDER_COLOR_SCREEN_GLOW\" stroke-width=\"0.8\" opacity=\"0.2\"/>\n\n  <!-- LAYER 14: TV brand name on bezel -->\n  <text x=\"540\" y=\"757\" text-anchor=\"middle\" font-family=\"PLACEHOLDER_FONT_DISPLAY, sans-serif\" font-size=\"13\" font-weight=\"700\" fill=\"#FFFFFF\" fill-opacity=\"0.25\" letter-spacing=\"5\">PLACEHOLDER_TV_BRAND</text>\n  <circle cx=\"432\" cy=\"757\" r=\"4\" fill=\"PLACEHOLDER_COLOR_ACCENT\" fill-opacity=\"0.6\"/>\n\n  <!-- LAYER 15: store name top-left -->\n  <text x=\"54\" y=\"56\" font-family=\"PLACEHOLDER_FONT_DISPLAY, sans-serif\" font-size=\"13\" font-weight=\"700\" fill=\"#FFFFFF\" fill-opacity=\"0.5\" letter-spacing=\"5\">PLACEHOLDER_STORE_NAME</text>\n\n  <!-- LAYER 16: launch badge top-right -->\n  <rect x=\"820\" y=\"34\" width=\"206\" height=\"42\" rx=\"4\" fill=\"PLACEHOLDER_COLOR_ACCENT\" fill-opacity=\"0.15\" stroke=\"PLACEHOLDER_COLOR_ACCENT\" stroke-width=\"0.8\" stroke-opacity=\"0.5\"/>\n  <text x=\"923\" y=\"60\" text-anchor=\"middle\" font-family=\"PLACEHOLDER_FONT_DISPLAY, sans-serif\" font-size=\"13\" font-weight=\"700\" fill=\"PLACEHOLDER_COLOR_ACCENT_ALT\" letter-spacing=\"2\">PLACEHOLDER_BADGE_TEXT</text>\n\n  <!-- LAYER 17: giant ghost price overlaid on room scene -->\n  <text x=\"540\" y=\"1020\" text-anchor=\"middle\" font-family=\"PLACEHOLDER_FONT_DISPLAY, sans-serif\" font-size=\"168\" font-weight=\"900\" fill=\"#FFFFFF\" fill-opacity=\"0.04\" letter-spacing=\"-6\">PLACEHOLDER_GHOST_PRICE</text>\n\n  <!-- LAYER 18: bottom information band -->\n  <rect x=\"0\" y=\"1060\" width=\"1080\" height=\"290\" fill=\"url(#tv-bottom-band)\"/>\n  <line x1=\"0\" y1=\"1060\" x2=\"1080\" y2=\"1060\" stroke=\"PLACEHOLDER_COLOR_ACCENT\" stroke-width=\"1.5\" opacity=\"0.6\"/>\n\n  <!-- LAYER 19: product title in band -->\n  <text x=\"54\" y=\"1130\" font-family=\"PLACEHOLDER_FONT_DISPLAY, sans-serif\" font-size=\"56\" font-weight=\"900\" fill=\"#FFFFFF\" letter-spacing=\"-1\">PLACEHOLDER_TITLE_LINE1</text>\n  <text x=\"54\" y=\"1168\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\"    font-size=\"22\" font-weight=\"200\" fill=\"#FFFFFF\" fill-opacity=\"0.45\" letter-spacing=\"8\">PLACEHOLDER_TITLE_LINE2</text>\n\n  <!-- LAYER 20: band divider -->\n  <line x1=\"54\" y1=\"1192\" x2=\"1026\" y2=\"1192\" stroke=\"#FFFFFF\" stroke-width=\"0.5\" opacity=\"0.1\"/>\n\n  <!-- LAYER 21: 4-column feature rows with accent bar -->\n  <rect x=\"54\"  y=\"1210\" width=\"2\" height=\"52\" fill=\"PLACEHOLDER_COLOR_ACCENT\" opacity=\"0.8\"/>\n  <text x=\"68\"  y=\"1228\" font-family=\"PLACEHOLDER_FONT_DISPLAY, sans-serif\" font-size=\"11\" font-weight=\"700\" fill=\"PLACEHOLDER_COLOR_ACCENT_ALT\" letter-spacing=\"2\">PLACEHOLDER_FEAT1_LABEL</text>\n  <text x=\"68\"  y=\"1252\" font-family=\"PLACEHOLDER_FONT_DISPLAY, sans-serif\" font-size=\"20\" font-weight=\"700\" fill=\"#FFFFFF\">PLACEHOLDER_FEAT1_VALUE</text>\n\n  <rect x=\"288\" y=\"1210\" width=\"2\" height=\"52\" fill=\"PLACEHOLDER_COLOR_ACCENT\" opacity=\"0.8\"/>\n  <text x=\"302\" y=\"1228\" font-family=\"PLACEHOLDER_FONT_DISPLAY, sans-serif\" font-size=\"11\" font-weight=\"700\" fill=\"PLACEHOLDER_COLOR_ACCENT_ALT\" letter-spacing=\"2\">PLACEHOLDER_FEAT2_LABEL</text>\n  <text x=\"302\" y=\"1252\" font-family=\"PLACEHOLDER_FONT_DISPLAY, sans-serif\" font-size=\"20\" font-weight=\"700\" fill=\"#FFFFFF\">PLACEHOLDER_FEAT2_VALUE</text>\n\n  <rect x=\"554\" y=\"1210\" width=\"2\" height=\"52\" fill=\"PLACEHOLDER_COLOR_ACCENT\" opacity=\"0.8\"/>\n  <text x=\"568\" y=\"1228\" font-family=\"PLACEHOLDER_FONT_DISPLAY, sans-serif\" font-size=\"11\" font-weight=\"700\" fill=\"PLACEHOLDER_COLOR_ACCENT_ALT\" letter-spacing=\"2\">PLACEHOLDER_FEAT3_LABEL</text>\n  <text x=\"568\" y=\"1252\" font-family=\"PLACEHOLDER_FONT_DISPLAY, sans-serif\" font-size=\"20\" font-weight=\"700\" fill=\"#FFFFFF\">PLACEHOLDER_FEAT3_VALUE</text>\n\n  <rect x=\"800\" y=\"1210\" width=\"2\" height=\"52\" fill=\"PLACEHOLDER_COLOR_ACCENT\" opacity=\"0.8\"/>\n  <text x=\"814\" y=\"1228\" font-family=\"PLACEHOLDER_FONT_DISPLAY, sans-serif\" font-size=\"11\" font-weight=\"700\" fill=\"PLACEHOLDER_COLOR_ACCENT_ALT\" letter-spacing=\"2\">PLACEHOLDER_FEAT4_LABEL</text>\n  <text x=\"814\" y=\"1252\" font-family=\"PLACEHOLDER_FONT_DISPLAY, sans-serif\" font-size=\"20\" font-weight=\"700\" fill=\"#FFFFFF\">PLACEHOLDER_FEAT4_VALUE</text>\n\n  <!-- LAYER 22: price + CTA bottom row -->\n  <line x1=\"54\" y1=\"1278\" x2=\"1026\" y2=\"1278\" stroke=\"#FFFFFF\" stroke-width=\"0.5\" opacity=\"0.08\"/>\n\n  <text x=\"54\" y=\"1326\" font-family=\"PLACEHOLDER_FONT_MONO, monospace\" font-size=\"44\" font-weight=\"700\" fill=\"#FFFFFF\" letter-spacing=\"-1\">PLACEHOLDER_PRICE_VALUE</text>\n\n  <rect x=\"748\" y=\"1286\" width=\"278\" height=\"58\" rx=\"4\" fill=\"url(#tv-cta-grad)\"/>\n  <text x=\"887\" y=\"1323\" text-anchor=\"middle\" font-family=\"PLACEHOLDER_FONT_DISPLAY, sans-serif\" font-size=\"22\" font-weight=\"900\" fill=\"#FFFFFF\" letter-spacing=\"3\">PLACEHOLDER_CTA_TEXT</text>\n\n  <!-- LAYER 23: bottom accent strip -->\n  <rect x=\"0\" y=\"1344\" width=\"1080\" height=\"6\" fill=\"PLACEHOLDER_COLOR_ACCENT\" fill-opacity=\"0.7\"/>\n</svg>",
+  "tokens": {
+    "PLACEHOLDER_PRODUCT_IMAGE": {
+      "type": "image",
+      "label": "Screen content / product image",
+      "default": ""
+    },
+    "PLACEHOLDER_STORE_NAME": {
+      "type": "text",
+      "label": "Store name",
+      "default": "VISIO TECH"
+    },
+    "PLACEHOLDER_TV_BRAND": {
+      "type": "text",
+      "label": "TV brand (bezel label)",
+      "default": "VISIO"
+    },
+    "PLACEHOLDER_BADGE_TEXT": {
+      "type": "text",
+      "label": "Badge",
+      "default": "NEW LAUNCH"
+    },
+    "PLACEHOLDER_GHOST_PRICE": {
+      "type": "text",
+      "label": "Ghost overlay text",
+      "default": "UGX 2.8M"
+    },
+    "PLACEHOLDER_TITLE_LINE1": {
+      "type": "text",
+      "label": "Product name",
+      "default": "VISIO X9 PRO"
+    },
+    "PLACEHOLDER_TITLE_LINE2": {
+      "type": "text",
+      "label": "Product subtitle",
+      "default": "85\" QLED SMART TV"
+    },
+    "PLACEHOLDER_FEAT1_LABEL": {
+      "type": "text",
+      "label": "Feature 1 label",
+      "default": "RESOLUTION"
+    },
+    "PLACEHOLDER_FEAT1_VALUE": {
+      "type": "text",
+      "label": "Feature 1 value",
+      "default": "4K 144Hz"
+    },
+    "PLACEHOLDER_FEAT2_LABEL": {
+      "type": "text",
+      "label": "Feature 2 label",
+      "default": "SOUND"
+    },
+    "PLACEHOLDER_FEAT2_VALUE": {
+      "type": "text",
+      "label": "Feature 2 value",
+      "default": "Dolby Atmos"
+    },
+    "PLACEHOLDER_FEAT3_LABEL": {
+      "type": "text",
+      "label": "Feature 3 label",
+      "default": "OS"
+    },
+    "PLACEHOLDER_FEAT3_VALUE": {
+      "type": "text",
+      "label": "Feature 3 value",
+      "default": "Google TV"
+    },
+    "PLACEHOLDER_FEAT4_LABEL": {
+      "type": "text",
+      "label": "Feature 4 label",
+      "default": "HDR"
+    },
+    "PLACEHOLDER_FEAT4_VALUE": {
+      "type": "text",
+      "label": "Feature 4 value",
+      "default": "Dolby Vision"
+    },
+    "PLACEHOLDER_PRICE_VALUE": {
+      "type": "text",
+      "label": "Price",
+      "default": "UGX 2,800,000"
+    },
+    "PLACEHOLDER_CTA_TEXT": {
+      "type": "text",
+      "label": "CTA button",
+      "default": "ORDER NOW"
+    },
+    "PLACEHOLDER_COLOR_BG_TOP": {
+      "type": "color",
+      "label": "Background top",
+      "default": "#0C0C0C"
+    },
+    "PLACEHOLDER_COLOR_BG_MID": {
+      "type": "color",
+      "label": "Background mid",
+      "default": "#111318"
+    },
+    "PLACEHOLDER_COLOR_BG_BOTTOM": {
+      "type": "color",
+      "label": "Background bottom",
+      "default": "#0A0B10"
+    },
+    "PLACEHOLDER_COLOR_BAND_TOP": {
+      "type": "color",
+      "label": "Info band top",
+      "default": "#0D0D0D"
+    },
+    "PLACEHOLDER_COLOR_BAND_BOTTOM": {
+      "type": "color",
+      "label": "Info band bottom",
+      "default": "#080808"
+    },
+    "PLACEHOLDER_COLOR_ACCENT": {
+      "type": "color",
+      "label": "Accent color",
+      "default": "#FF6B00"
+    },
+    "PLACEHOLDER_COLOR_ACCENT_ALT": {
+      "type": "color",
+      "label": "Accent highlight",
+      "default": "#FF9500"
+    },
+    "PLACEHOLDER_COLOR_SCREEN_GLOW": {
+      "type": "color",
+      "label": "Screen ambient glow",
+      "default": "#3060FF"
+    },
+    "PLACEHOLDER_FONT_DISPLAY": {
+      "type": "font",
+      "label": "Display font",
+      "default": "Montserrat"
+    },
+    "PLACEHOLDER_FONT_BODY": {
+      "type": "font",
+      "label": "Body font",
+      "default": "Montserrat"
+    },
+    "PLACEHOLDER_FONT_MONO": {
+      "type": "font",
+      "label": "Mono font (price)",
+      "default": "Space Mono"
+    }
+  }
+}

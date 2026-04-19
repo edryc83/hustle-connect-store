@@ -1,0 +1,241 @@
+{
+  "id": "tablet-grid-promo",
+  "name": "Tablet – Bold Grid Promo Flyer",
+  "category": "electronics",
+  "thumbnail": "tablet-grid-promo.png",
+  "canvas": {
+    "width": 1080,
+    "height": 1350
+  },
+  "fonts": [
+    "https://fonts.googleapis.com/css2?family=Unbounded:wght@300;400;700;900&family=IBM+Plex+Sans:wght@300;400;500&display=swap"
+  ],
+  "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" viewBox=\"0 0 1080 1350\" width=\"1080\" height=\"1350\">\n  <defs>\n    <clipPath id=\"tab-img-clip\">\n      <rect x=\"440\" y=\"0\" width=\"640\" height=\"860\"/>\n    </clipPath>\n  </defs>\n\n  <!-- LAYER 1: full background -->\n  <rect width=\"1080\" height=\"1350\" fill=\"PLACEHOLDER_COLOR_BG\"/>\n\n  <!-- LAYER 2: top-right image zone bg -->\n  <rect x=\"440\" y=\"0\" width=\"640\" height=\"860\" fill=\"PLACEHOLDER_COLOR_IMG_ZONE\"/>\n\n  <!-- LAYER 3: product image clipped to top-right zone -->\n  <g clip-path=\"url(#tab-img-clip)\">\n    <image href=\"PLACEHOLDER_PRODUCT_IMAGE\" x=\"440\" y=\"0\" width=\"640\" height=\"860\" preserveAspectRatio=\"xMidYMid meet\"/>\n  </g>\n\n  <!-- LAYER 4: image zone border -->\n  <rect x=\"440\" y=\"0\" width=\"640\" height=\"860\" fill=\"none\" stroke=\"PLACEHOLDER_COLOR_ACCENT\" stroke-width=\"2\" stroke-opacity=\"0.15\"/>\n\n  <!-- LAYER 5: top-left brand block — solid accent fill -->\n  <rect x=\"0\" y=\"0\" width=\"440\" height=\"260\" fill=\"PLACEHOLDER_COLOR_ACCENT\"/>\n  <text x=\"30\" y=\"90\"  font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\"    font-size=\"13\" font-weight=\"500\" fill=\"PLACEHOLDER_COLOR_BG\" fill-opacity=\"0.7\" letter-spacing=\"4\">PLACEHOLDER_META_LABEL</text>\n  <text x=\"30\" y=\"185\" font-family=\"PLACEHOLDER_FONT_DISPLAY, sans-serif\" font-size=\"22\" font-weight=\"700\" fill=\"PLACEHOLDER_COLOR_BG\" letter-spacing=\"0\">PLACEHOLDER_STORE_NAME</text>\n  <text x=\"30\" y=\"218\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\"    font-size=\"13\" font-weight=\"300\" fill=\"PLACEHOLDER_COLOR_BG\" fill-opacity=\"0.6\" letter-spacing=\"2\">PLACEHOLDER_STORE_URL</text>\n\n  <!-- LAYER 6: mid-left product title block — dark bg -->\n  <rect x=\"0\" y=\"260\" width=\"440\" height=\"380\" fill=\"PLACEHOLDER_COLOR_BG\"/>\n  <rect x=\"0\" y=\"260\" width=\"440\" height=\"380\" fill=\"none\" stroke=\"PLACEHOLDER_COLOR_ACCENT\" stroke-width=\"1\" stroke-opacity=\"0.12\"/>\n  <text x=\"30\" y=\"342\" font-family=\"PLACEHOLDER_FONT_DISPLAY, sans-serif\" font-size=\"62\" font-weight=\"900\" fill=\"PLACEHOLDER_COLOR_TEXT\"   letter-spacing=\"-2\">PLACEHOLDER_TITLE_LINE1</text>\n  <text x=\"30\" y=\"414\" font-family=\"PLACEHOLDER_FONT_DISPLAY, sans-serif\" font-size=\"62\" font-weight=\"900\" fill=\"PLACEHOLDER_COLOR_TEXT\"   letter-spacing=\"-2\">PLACEHOLDER_TITLE_LINE2</text>\n  <text x=\"30\" y=\"486\" font-family=\"PLACEHOLDER_FONT_DISPLAY, sans-serif\" font-size=\"62\" font-weight=\"900\" fill=\"PLACEHOLDER_COLOR_ACCENT\" letter-spacing=\"-2\">PLACEHOLDER_TITLE_LINE3</text>\n  <line x1=\"30\" y1=\"510\" x2=\"410\" y2=\"510\" stroke=\"PLACEHOLDER_COLOR_ACCENT\" stroke-width=\"1\" opacity=\"0.25\"/>\n  <text x=\"30\" y=\"546\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\" font-size=\"18\" font-weight=\"300\" fill=\"PLACEHOLDER_COLOR_TEXT\" fill-opacity=\"0.55\" letter-spacing=\"1\">PLACEHOLDER_TAGLINE_LINE1</text>\n  <text x=\"30\" y=\"572\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\" font-size=\"18\" font-weight=\"300\" fill=\"PLACEHOLDER_COLOR_TEXT\" fill-opacity=\"0.55\" letter-spacing=\"1\">PLACEHOLDER_TAGLINE_LINE2</text>\n  <rect x=\"30\" y=\"598\" width=\"156\" height=\"34\" rx=\"0\" fill=\"PLACEHOLDER_COLOR_ACCENT\"/>\n  <text x=\"108\" y=\"620\" text-anchor=\"middle\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\" font-size=\"12\" font-weight=\"500\" fill=\"PLACEHOLDER_COLOR_BG\" letter-spacing=\"3\">PLACEHOLDER_BADGE_TEXT</text>\n\n  <!-- LAYER 7: bottom-left price block — solid accent fill -->\n  <rect x=\"0\" y=\"640\" width=\"440\" height=\"220\" fill=\"PLACEHOLDER_COLOR_ACCENT\"/>\n  <text x=\"30\" y=\"698\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\"    font-size=\"13\" font-weight=\"500\" fill=\"PLACEHOLDER_COLOR_BG\" fill-opacity=\"0.6\" letter-spacing=\"4\">PLACEHOLDER_PRICE_LABEL</text>\n  <text x=\"30\" y=\"782\" font-family=\"PLACEHOLDER_FONT_DISPLAY, sans-serif\" font-size=\"68\" font-weight=\"900\" fill=\"PLACEHOLDER_COLOR_BG\"   letter-spacing=\"-3\">PLACEHOLDER_PRICE_SHORT</text>\n  <text x=\"30\" y=\"820\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\"    font-size=\"16\" font-weight=\"300\" fill=\"PLACEHOLDER_COLOR_BG\" fill-opacity=\"0.6\" letter-spacing=\"1\">PLACEHOLDER_PRICE_SUB</text>\n\n  <!-- LAYER 8: horizontal divider -->\n  <line x1=\"0\" y1=\"860\" x2=\"1080\" y2=\"860\" stroke=\"PLACEHOLDER_COLOR_ACCENT\" stroke-width=\"1.5\" opacity=\"0.5\"/>\n\n  <!-- LAYER 9: spec tile 1 -->\n  <rect x=\"0\"   y=\"860\" width=\"270\" height=\"220\" fill=\"PLACEHOLDER_COLOR_TILE_A\"/>\n  <rect x=\"0\"   y=\"860\" width=\"270\" height=\"220\" fill=\"none\" stroke=\"PLACEHOLDER_COLOR_ACCENT\" stroke-width=\"0.5\" stroke-opacity=\"0.15\"/>\n  <text x=\"24\"  y=\"944\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\"    font-size=\"11\" font-weight=\"500\" fill=\"PLACEHOLDER_COLOR_ACCENT\" fill-opacity=\"0.55\" letter-spacing=\"3\">PLACEHOLDER_SPEC1_LABEL</text>\n  <text x=\"24\"  y=\"984\" font-family=\"PLACEHOLDER_FONT_DISPLAY, sans-serif\" font-size=\"30\" font-weight=\"700\" fill=\"PLACEHOLDER_COLOR_TEXT\"   letter-spacing=\"-1\">PLACEHOLDER_SPEC1_VALUE</text>\n  <text x=\"24\"  y=\"1014\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\"   font-size=\"14\" font-weight=\"300\" fill=\"PLACEHOLDER_COLOR_TEXT\" fill-opacity=\"0.4\">PLACEHOLDER_SPEC1_SUB</text>\n  <rect x=\"0\"   y=\"1060\" width=\"270\" height=\"3\" fill=\"PLACEHOLDER_COLOR_ACCENT\" fill-opacity=\"0.4\"/>\n\n  <!-- LAYER 10: spec tile 2 -->\n  <rect x=\"270\" y=\"860\" width=\"270\" height=\"220\" fill=\"PLACEHOLDER_COLOR_BG\"/>\n  <rect x=\"270\" y=\"860\" width=\"270\" height=\"220\" fill=\"none\" stroke=\"PLACEHOLDER_COLOR_ACCENT\" stroke-width=\"0.5\" stroke-opacity=\"0.15\"/>\n  <text x=\"294\" y=\"944\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\"    font-size=\"11\" font-weight=\"500\" fill=\"PLACEHOLDER_COLOR_ACCENT\" fill-opacity=\"0.55\" letter-spacing=\"3\">PLACEHOLDER_SPEC2_LABEL</text>\n  <text x=\"294\" y=\"984\" font-family=\"PLACEHOLDER_FONT_DISPLAY, sans-serif\" font-size=\"30\" font-weight=\"700\" fill=\"PLACEHOLDER_COLOR_TEXT\"   letter-spacing=\"-1\">PLACEHOLDER_SPEC2_VALUE</text>\n  <text x=\"294\" y=\"1014\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\"   font-size=\"14\" font-weight=\"300\" fill=\"PLACEHOLDER_COLOR_TEXT\" fill-opacity=\"0.4\">PLACEHOLDER_SPEC2_SUB</text>\n  <rect x=\"270\" y=\"1060\" width=\"270\" height=\"3\" fill=\"PLACEHOLDER_COLOR_ACCENT\" fill-opacity=\"0.2\"/>\n\n  <!-- LAYER 11: spec tile 3 -->\n  <rect x=\"540\" y=\"860\" width=\"270\" height=\"220\" fill=\"PLACEHOLDER_COLOR_TILE_A\"/>\n  <rect x=\"540\" y=\"860\" width=\"270\" height=\"220\" fill=\"none\" stroke=\"PLACEHOLDER_COLOR_ACCENT\" stroke-width=\"0.5\" stroke-opacity=\"0.15\"/>\n  <text x=\"564\" y=\"944\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\"    font-size=\"11\" font-weight=\"500\" fill=\"PLACEHOLDER_COLOR_ACCENT\" fill-opacity=\"0.55\" letter-spacing=\"3\">PLACEHOLDER_SPEC3_LABEL</text>\n  <text x=\"564\" y=\"984\" font-family=\"PLACEHOLDER_FONT_DISPLAY, sans-serif\" font-size=\"30\" font-weight=\"700\" fill=\"PLACEHOLDER_COLOR_TEXT\"   letter-spacing=\"-1\">PLACEHOLDER_SPEC3_VALUE</text>\n  <text x=\"564\" y=\"1014\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\"   font-size=\"14\" font-weight=\"300\" fill=\"PLACEHOLDER_COLOR_TEXT\" fill-opacity=\"0.4\">PLACEHOLDER_SPEC3_SUB</text>\n  <rect x=\"540\" y=\"1060\" width=\"270\" height=\"3\" fill=\"PLACEHOLDER_COLOR_ACCENT\" fill-opacity=\"0.4\"/>\n\n  <!-- LAYER 12: spec tile 4 -->\n  <rect x=\"810\" y=\"860\" width=\"270\" height=\"220\" fill=\"PLACEHOLDER_COLOR_BG\"/>\n  <rect x=\"810\" y=\"860\" width=\"270\" height=\"220\" fill=\"none\" stroke=\"PLACEHOLDER_COLOR_ACCENT\" stroke-width=\"0.5\" stroke-opacity=\"0.15\"/>\n  <text x=\"834\" y=\"944\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\"    font-size=\"11\" font-weight=\"500\" fill=\"PLACEHOLDER_COLOR_ACCENT\" fill-opacity=\"0.55\" letter-spacing=\"3\">PLACEHOLDER_SPEC4_LABEL</text>\n  <text x=\"834\" y=\"984\" font-family=\"PLACEHOLDER_FONT_DISPLAY, sans-serif\" font-size=\"30\" font-weight=\"700\" fill=\"PLACEHOLDER_COLOR_TEXT\"   letter-spacing=\"-1\">PLACEHOLDER_SPEC4_VALUE</text>\n  <text x=\"834\" y=\"1014\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\"   font-size=\"14\" font-weight=\"300\" fill=\"PLACEHOLDER_COLOR_TEXT\" fill-opacity=\"0.4\">PLACEHOLDER_SPEC4_SUB</text>\n  <rect x=\"810\" y=\"1060\" width=\"270\" height=\"3\" fill=\"PLACEHOLDER_COLOR_ACCENT\" fill-opacity=\"0.2\"/>\n\n  <!-- LAYER 13: secondary divider -->\n  <line x1=\"0\" y1=\"1080\" x2=\"1080\" y2=\"1080\" stroke=\"PLACEHOLDER_COLOR_ACCENT\" stroke-width=\"1\" opacity=\"0.2\"/>\n\n  <!-- LAYER 14: bottom-left color swatch zone -->\n  <rect x=\"0\" y=\"1080\" width=\"440\" height=\"270\" fill=\"PLACEHOLDER_COLOR_BG\"/>\n  <text x=\"30\" y=\"1140\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\" font-size=\"12\" font-weight=\"500\" fill=\"PLACEHOLDER_COLOR_ACCENT\" fill-opacity=\"0.5\" letter-spacing=\"4\">PLACEHOLDER_COLORS_LABEL</text>\n  <circle cx=\"54\"  cy=\"1202\" r=\"28\" fill=\"PLACEHOLDER_COLOR_SWATCH1\"/>\n  <circle cx=\"54\"  cy=\"1202\" r=\"28\" fill=\"none\" stroke=\"PLACEHOLDER_COLOR_ACCENT\" stroke-width=\"1.5\" stroke-opacity=\"0.5\"/>\n  <circle cx=\"130\" cy=\"1202\" r=\"28\" fill=\"PLACEHOLDER_COLOR_SWATCH2\"/>\n  <circle cx=\"130\" cy=\"1202\" r=\"28\" fill=\"none\" stroke=\"PLACEHOLDER_COLOR_ACCENT\" stroke-width=\"0.5\" stroke-opacity=\"0.2\"/>\n  <circle cx=\"206\" cy=\"1202\" r=\"28\" fill=\"PLACEHOLDER_COLOR_SWATCH3\"/>\n  <circle cx=\"206\" cy=\"1202\" r=\"28\" fill=\"none\" stroke=\"PLACEHOLDER_COLOR_ACCENT\" stroke-width=\"0.5\" stroke-opacity=\"0.2\"/>\n  <circle cx=\"282\" cy=\"1202\" r=\"28\" fill=\"PLACEHOLDER_COLOR_SWATCH4\"/>\n  <circle cx=\"282\" cy=\"1202\" r=\"28\" fill=\"none\" stroke=\"PLACEHOLDER_COLOR_ACCENT\" stroke-width=\"0.5\" stroke-opacity=\"0.2\"/>\n  <text x=\"54\"  y=\"1252\" text-anchor=\"middle\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\" font-size=\"11\" fill=\"PLACEHOLDER_COLOR_TEXT\" fill-opacity=\"0.35\">PLACEHOLDER_SWATCH1_NAME</text>\n  <text x=\"130\" y=\"1252\" text-anchor=\"middle\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\" font-size=\"11\" fill=\"PLACEHOLDER_COLOR_TEXT\" fill-opacity=\"0.35\">PLACEHOLDER_SWATCH2_NAME</text>\n  <text x=\"206\" y=\"1252\" text-anchor=\"middle\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\" font-size=\"11\" fill=\"PLACEHOLDER_COLOR_TEXT\" fill-opacity=\"0.35\">PLACEHOLDER_SWATCH3_NAME</text>\n  <text x=\"282\" y=\"1252\" text-anchor=\"middle\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\" font-size=\"11\" fill=\"PLACEHOLDER_COLOR_TEXT\" fill-opacity=\"0.35\">PLACEHOLDER_SWATCH4_NAME</text>\n  <text x=\"30\"  y=\"1314\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\" font-size=\"13\" fill=\"PLACEHOLDER_COLOR_TEXT\" fill-opacity=\"0.2\" letter-spacing=\"2\">PLACEHOLDER_FOOTER_TEXT</text>\n\n  <!-- LAYER 15: bottom-right CTA block — solid accent fill -->\n  <rect x=\"440\" y=\"1080\" width=\"640\" height=\"270\" fill=\"PLACEHOLDER_COLOR_ACCENT\"/>\n  <text x=\"760\" y=\"1196\" text-anchor=\"middle\" font-family=\"PLACEHOLDER_FONT_DISPLAY, sans-serif\" font-size=\"52\" font-weight=\"900\" fill=\"PLACEHOLDER_COLOR_BG\" letter-spacing=\"-2\">PLACEHOLDER_CTA_LINE1</text>\n  <text x=\"760\" y=\"1260\" text-anchor=\"middle\" font-family=\"PLACEHOLDER_FONT_DISPLAY, sans-serif\" font-size=\"52\" font-weight=\"900\" fill=\"PLACEHOLDER_COLOR_BG\" letter-spacing=\"-2\">PLACEHOLDER_CTA_LINE2</text>\n  <line x1=\"460\" y1=\"1310\" x2=\"1060\" y2=\"1310\" stroke=\"PLACEHOLDER_COLOR_BG\" stroke-width=\"0.8\" opacity=\"0.2\"/>\n  <text x=\"760\" y=\"1334\" text-anchor=\"middle\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\" font-size=\"14\" font-weight=\"400\" fill=\"PLACEHOLDER_COLOR_BG\" fill-opacity=\"0.5\" letter-spacing=\"2\">PLACEHOLDER_CTA_CONTACT</text>\n\n  <!-- LAYER 16: corner marks -->\n  <path d=\"M0 60 L0 0 L60 0\"         fill=\"none\" stroke=\"PLACEHOLDER_COLOR_ACCENT\" stroke-width=\"2\" opacity=\"0.5\"/>\n  <path d=\"M1080 60 L1080 0 L1020 0\" fill=\"none\" stroke=\"PLACEHOLDER_COLOR_ACCENT\" stroke-width=\"2\" opacity=\"0.5\"/>\n</svg>",
+  "tokens": {
+    "PLACEHOLDER_PRODUCT_IMAGE": {
+      "type": "image",
+      "label": "Product photo",
+      "default": ""
+    },
+    "PLACEHOLDER_META_LABEL": {
+      "type": "text",
+      "label": "Meta / edition label",
+      "default": "TEMPLATE · 2025"
+    },
+    "PLACEHOLDER_STORE_NAME": {
+      "type": "text",
+      "label": "Store name",
+      "default": "PIXEL STORE"
+    },
+    "PLACEHOLDER_STORE_URL": {
+      "type": "text",
+      "label": "Store URL",
+      "default": "pixelstore.ug"
+    },
+    "PLACEHOLDER_TITLE_LINE1": {
+      "type": "text",
+      "label": "Title line 1",
+      "default": "PIXEL"
+    },
+    "PLACEHOLDER_TITLE_LINE2": {
+      "type": "text",
+      "label": "Title line 2",
+      "default": "PAD"
+    },
+    "PLACEHOLDER_TITLE_LINE3": {
+      "type": "text",
+      "label": "Title line 3 (accent)",
+      "default": "PRO X"
+    },
+    "PLACEHOLDER_TAGLINE_LINE1": {
+      "type": "text",
+      "label": "Tagline line 1",
+      "default": "Create without limits."
+    },
+    "PLACEHOLDER_TAGLINE_LINE2": {
+      "type": "text",
+      "label": "Tagline line 2",
+      "default": "Work without boundaries."
+    },
+    "PLACEHOLDER_BADGE_TEXT": {
+      "type": "text",
+      "label": "Badge",
+      "default": "IN STOCK NOW"
+    },
+    "PLACEHOLDER_PRICE_LABEL": {
+      "type": "text",
+      "label": "Price label",
+      "default": "STARTING AT"
+    },
+    "PLACEHOLDER_PRICE_SHORT": {
+      "type": "text",
+      "label": "Price short (large)",
+      "default": "2.1M"
+    },
+    "PLACEHOLDER_PRICE_SUB": {
+      "type": "text",
+      "label": "Price sub-line",
+      "default": "UGX  ·  Free delivery"
+    },
+    "PLACEHOLDER_SPEC1_LABEL": {
+      "type": "text",
+      "label": "Spec 1 label",
+      "default": "DISPLAY"
+    },
+    "PLACEHOLDER_SPEC1_VALUE": {
+      "type": "text",
+      "label": "Spec 1 value",
+      "default": "12.9\""
+    },
+    "PLACEHOLDER_SPEC1_SUB": {
+      "type": "text",
+      "label": "Spec 1 sub",
+      "default": "Liquid Retina XDR"
+    },
+    "PLACEHOLDER_SPEC2_LABEL": {
+      "type": "text",
+      "label": "Spec 2 label",
+      "default": "CHIP"
+    },
+    "PLACEHOLDER_SPEC2_VALUE": {
+      "type": "text",
+      "label": "Spec 2 value",
+      "default": "M3 Pro"
+    },
+    "PLACEHOLDER_SPEC2_SUB": {
+      "type": "text",
+      "label": "Spec 2 sub",
+      "default": "12-core Neural"
+    },
+    "PLACEHOLDER_SPEC3_LABEL": {
+      "type": "text",
+      "label": "Spec 3 label",
+      "default": "STORAGE"
+    },
+    "PLACEHOLDER_SPEC3_VALUE": {
+      "type": "text",
+      "label": "Spec 3 value",
+      "default": "512 GB"
+    },
+    "PLACEHOLDER_SPEC3_SUB": {
+      "type": "text",
+      "label": "Spec 3 sub",
+      "default": "NVMe · expandable"
+    },
+    "PLACEHOLDER_SPEC4_LABEL": {
+      "type": "text",
+      "label": "Spec 4 label",
+      "default": "BATTERY"
+    },
+    "PLACEHOLDER_SPEC4_VALUE": {
+      "type": "text",
+      "label": "Spec 4 value",
+      "default": "12 HRS"
+    },
+    "PLACEHOLDER_SPEC4_SUB": {
+      "type": "text",
+      "label": "Spec 4 sub",
+      "default": "Fast charge 30W"
+    },
+    "PLACEHOLDER_COLORS_LABEL": {
+      "type": "text",
+      "label": "Colors section label",
+      "default": "AVAILABLE COLORS"
+    },
+    "PLACEHOLDER_SWATCH1_NAME": {
+      "type": "text",
+      "label": "Color 1 name",
+      "default": "Space"
+    },
+    "PLACEHOLDER_SWATCH2_NAME": {
+      "type": "text",
+      "label": "Color 2 name",
+      "default": "Silver"
+    },
+    "PLACEHOLDER_SWATCH3_NAME": {
+      "type": "text",
+      "label": "Color 3 name",
+      "default": "Ocean"
+    },
+    "PLACEHOLDER_SWATCH4_NAME": {
+      "type": "text",
+      "label": "Color 4 name",
+      "default": "Crimson"
+    },
+    "PLACEHOLDER_FOOTER_TEXT": {
+      "type": "text",
+      "label": "Footer text",
+      "default": "pixelstore.ug  ·  1-year warranty"
+    },
+    "PLACEHOLDER_CTA_LINE1": {
+      "type": "text",
+      "label": "CTA line 1",
+      "default": "ORDER"
+    },
+    "PLACEHOLDER_CTA_LINE2": {
+      "type": "text",
+      "label": "CTA line 2",
+      "default": "TODAY"
+    },
+    "PLACEHOLDER_CTA_CONTACT": {
+      "type": "text",
+      "label": "CTA contact / sub",
+      "default": "+256 700 000 000  ·  Chat with us"
+    },
+    "PLACEHOLDER_COLOR_BG": {
+      "type": "color",
+      "label": "Background",
+      "default": "#0D1F0F"
+    },
+    "PLACEHOLDER_COLOR_IMG_ZONE": {
+      "type": "color",
+      "label": "Image zone bg",
+      "default": "#122214"
+    },
+    "PLACEHOLDER_COLOR_TILE_A": {
+      "type": "color",
+      "label": "Spec tile alt bg",
+      "default": "#122214"
+    },
+    "PLACEHOLDER_COLOR_ACCENT": {
+      "type": "color",
+      "label": "Accent color",
+      "default": "#E8FF4A"
+    },
+    "PLACEHOLDER_COLOR_TEXT": {
+      "type": "color",
+      "label": "Body text color",
+      "default": "#FFFFFF"
+    },
+    "PLACEHOLDER_COLOR_SWATCH1": {
+      "type": "color",
+      "label": "Color swatch 1",
+      "default": "#1A1A1A"
+    },
+    "PLACEHOLDER_COLOR_SWATCH2": {
+      "type": "color",
+      "label": "Color swatch 2",
+      "default": "#F5F5F0"
+    },
+    "PLACEHOLDER_COLOR_SWATCH3": {
+      "type": "color",
+      "label": "Color swatch 3",
+      "default": "#2D4A6B"
+    },
+    "PLACEHOLDER_COLOR_SWATCH4": {
+      "type": "color",
+      "label": "Color swatch 4",
+      "default": "#8B3A3A"
+    },
+    "PLACEHOLDER_FONT_DISPLAY": {
+      "type": "font",
+      "label": "Display font",
+      "default": "Unbounded"
+    },
+    "PLACEHOLDER_FONT_BODY": {
+      "type": "font",
+      "label": "Body font",
+      "default": "IBM Plex Sans"
+    }
+  }
+}

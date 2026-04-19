@@ -1,0 +1,176 @@
+{
+  "id": "blender-explosion-promo",
+  "name": "Blender / Juicer – Explosive Wedge Promo Flyer",
+  "category": "electronics",
+  "thumbnail": "blender-explosion-promo.png",
+  "canvas": {
+    "width": 1080,
+    "height": 1350
+  },
+  "fonts": [
+    "https://fonts.googleapis.com/css2?family=Righteous&family=Plus+Jakarta+Sans:wght@300;400;500;600&display=swap"
+  ],
+  "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" viewBox=\"0 0 1080 1350\" width=\"1080\" height=\"1350\">\n  <defs>\n    <linearGradient id=\"bl-wedge1\" x1=\"0\" y1=\"0\" x2=\"1\" y2=\"1\" gradientUnits=\"objectBoundingBox\">\n      <stop offset=\"0%\"   stop-color=\"PLACEHOLDER_COLOR_WEDGE1_START\"/>\n      <stop offset=\"100%\" stop-color=\"PLACEHOLDER_COLOR_WEDGE1_END\"/>\n    </linearGradient>\n    <linearGradient id=\"bl-wedge2\" x1=\"1\" y1=\"0\" x2=\"0\" y2=\"1\" gradientUnits=\"objectBoundingBox\">\n      <stop offset=\"0%\"   stop-color=\"PLACEHOLDER_COLOR_WEDGE2_START\"/>\n      <stop offset=\"100%\" stop-color=\"PLACEHOLDER_COLOR_WEDGE2_END\"/>\n    </linearGradient>\n    <linearGradient id=\"bl-wedge3\" x1=\"0\" y1=\"1\" x2=\"1\" y2=\"0\" gradientUnits=\"objectBoundingBox\">\n      <stop offset=\"0%\"   stop-color=\"PLACEHOLDER_COLOR_WEDGE3_START\"/>\n      <stop offset=\"100%\" stop-color=\"PLACEHOLDER_COLOR_WEDGE3_END\"/>\n    </linearGradient>\n    <linearGradient id=\"bl-wedge4\" x1=\"1\" y1=\"1\" x2=\"0\" y2=\"0\" gradientUnits=\"objectBoundingBox\">\n      <stop offset=\"0%\"   stop-color=\"PLACEHOLDER_COLOR_WEDGE4_START\"/>\n      <stop offset=\"100%\" stop-color=\"PLACEHOLDER_COLOR_WEDGE4_END\"/>\n    </linearGradient>\n    <linearGradient id=\"bl-center\" x1=\"0\" y1=\"0\" x2=\"1\" y2=\"1\" gradientUnits=\"objectBoundingBox\">\n      <stop offset=\"0%\"   stop-color=\"PLACEHOLDER_COLOR_CIRCLE_TOP\"/>\n      <stop offset=\"100%\" stop-color=\"PLACEHOLDER_COLOR_CIRCLE_BOTTOM\"/>\n    </linearGradient>\n    <linearGradient id=\"bl-bottom\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\" gradientUnits=\"objectBoundingBox\">\n      <stop offset=\"0%\"   stop-color=\"PLACEHOLDER_COLOR_BAND_TOP\"/>\n      <stop offset=\"100%\" stop-color=\"PLACEHOLDER_COLOR_BAND_BOTTOM\"/>\n    </linearGradient>\n    <clipPath id=\"bl-img-clip\">\n      <circle cx=\"540\" cy=\"580\" r=\"310\"/>\n    </clipPath>\n    <clipPath id=\"bl-canvas\">\n      <rect width=\"1080\" height=\"1350\"/>\n    </clipPath>\n  </defs>\n\n  <g clip-path=\"url(#bl-canvas)\">\n\n  <!-- LAYER 1: 4 explosive color wedges radiating from centre (540,580) -->\n  <polygon points=\"540,580 0,0 720,0 0,440\"        fill=\"url(#bl-wedge1)\"/>\n  <polygon points=\"540,580 720,0 1080,0 1080,520\"  fill=\"url(#bl-wedge2)\"/>\n  <polygon points=\"540,580 0,440 0,1080 400,1080\"  fill=\"url(#bl-wedge3)\"/>\n  <polygon points=\"540,580 1080,520 1080,1080 400,1080\" fill=\"url(#bl-wedge4)\"/>\n\n  <!-- LAYER 2: bottom dark band -->\n  <rect x=\"0\" y=\"1080\" width=\"1080\" height=\"270\" fill=\"url(#bl-bottom)\"/>\n  <line x1=\"0\" y1=\"1080\" x2=\"1080\" y2=\"1080\" stroke=\"#FFFFFF\" stroke-width=\"1\" opacity=\"0.08\"/>\n\n  <!-- LAYER 3: spec stamps inside wedges -->\n  <!-- wedge 1 top-left -->\n  <text x=\"80\"  y=\"160\" font-family=\"PLACEHOLDER_FONT_DISPLAY, sans-serif\" font-size=\"100\" fill=\"#FFFFFF\" fill-opacity=\"0.18\" letter-spacing=\"-3\">PLACEHOLDER_SPEC1_VALUE</text>\n  <text x=\"80\"  y=\"248\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\"    font-size=\"12\"  fill=\"#FFFFFF\" fill-opacity=\"0.7\"  letter-spacing=\"4\">PLACEHOLDER_SPEC1_LABEL</text>\n  <!-- wedge 2 top-right -->\n  <text x=\"680\" y=\"160\" font-family=\"PLACEHOLDER_FONT_DISPLAY, sans-serif\" font-size=\"100\" fill=\"#FFFFFF\" fill-opacity=\"0.18\" letter-spacing=\"-3\">PLACEHOLDER_SPEC2_VALUE</text>\n  <text x=\"680\" y=\"248\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\"    font-size=\"12\"  fill=\"#FFFFFF\" fill-opacity=\"0.7\"  letter-spacing=\"4\">PLACEHOLDER_SPEC2_LABEL</text>\n  <!-- wedge 3 bottom-left -->\n  <text x=\"40\"  y=\"900\" font-family=\"PLACEHOLDER_FONT_DISPLAY, sans-serif\" font-size=\"100\" fill=\"#FFFFFF\" fill-opacity=\"0.18\" letter-spacing=\"-3\">PLACEHOLDER_SPEC3_VALUE</text>\n  <text x=\"40\"  y=\"988\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\"    font-size=\"12\"  fill=\"#FFFFFF\" fill-opacity=\"0.7\"  letter-spacing=\"4\">PLACEHOLDER_SPEC3_LABEL</text>\n  <!-- wedge 4 bottom-right -->\n  <text x=\"660\" y=\"900\" font-family=\"PLACEHOLDER_FONT_DISPLAY, sans-serif\" font-size=\"100\" fill=\"#FFFFFF\" fill-opacity=\"0.18\" letter-spacing=\"-3\">PLACEHOLDER_SPEC4_VALUE</text>\n  <text x=\"660\" y=\"988\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\"    font-size=\"12\"  fill=\"#FFFFFF\" fill-opacity=\"0.7\"  letter-spacing=\"4\">PLACEHOLDER_SPEC4_LABEL</text>\n\n  <!-- LAYER 4: outer glow ring behind circle -->\n  <circle cx=\"540\" cy=\"580\" r=\"340\" fill=\"PLACEHOLDER_COLOR_BAND_TOP\" fill-opacity=\"0.3\"/>\n\n  <!-- LAYER 5: dark product circle -->\n  <circle cx=\"540\" cy=\"580\" r=\"310\" fill=\"url(#bl-center)\"/>\n\n  <!-- LAYER 6: product image clipped to circle -->\n  <g clip-path=\"url(#bl-img-clip)\">\n    <image href=\"PLACEHOLDER_PRODUCT_IMAGE\" x=\"230\" y=\"270\" width=\"620\" height=\"620\" preserveAspectRatio=\"xMidYMid meet\"/>\n  </g>\n\n  <!-- LAYER 7: circle border -->\n  <circle cx=\"540\" cy=\"580\" r=\"310\" fill=\"none\" stroke=\"#FFFFFF\" stroke-width=\"2\" stroke-opacity=\"0.12\"/>\n\n  <!-- LAYER 8: store name — vertical left spine -->\n  <line x1=\"58\" y1=\"60\" x2=\"58\" y2=\"1060\" stroke=\"#FFFFFF\" stroke-width=\"0.5\" opacity=\"0.15\"/>\n  <text x=\"38\" y=\"680\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\" font-size=\"13\" font-weight=\"600\" fill=\"#FFFFFF\" fill-opacity=\"0.9\" letter-spacing=\"8\" text-anchor=\"middle\" transform=\"rotate(-90 38 680)\">PLACEHOLDER_STORE_NAME</text>\n\n  <!-- LAYER 9: price tag — rotated stamp in top-right wedge -->\n  <g transform=\"rotate(-8 860 120)\">\n    <rect x=\"750\" y=\"52\" width=\"296\" height=\"130\" rx=\"4\" fill=\"#FFFFFF\" fill-opacity=\"0.92\"/>\n    <text x=\"898\" y=\"104\" text-anchor=\"middle\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\"    font-size=\"12\" font-weight=\"600\" fill=\"PLACEHOLDER_COLOR_WEDGE2_END\" letter-spacing=\"3\">PLACEHOLDER_PRICE_LABEL</text>\n    <text x=\"898\" y=\"158\" text-anchor=\"middle\" font-family=\"PLACEHOLDER_FONT_DISPLAY, sans-serif\" font-size=\"56\" fill=\"PLACEHOLDER_COLOR_BAND_TOP\" letter-spacing=\"-2\">PLACEHOLDER_PRICE_VALUE</text>\n  </g>\n\n  <!-- LAYER 10: product name in bottom band -->\n  <text x=\"72\" y=\"1168\" font-family=\"PLACEHOLDER_FONT_DISPLAY, sans-serif\" font-size=\"88\" fill=\"#FFFFFF\"                        letter-spacing=\"-2\">PLACEHOLDER_TITLE_LINE1</text>\n  <text x=\"72\" y=\"1256\" font-family=\"PLACEHOLDER_FONT_DISPLAY, sans-serif\" font-size=\"88\" fill=\"PLACEHOLDER_COLOR_WEDGE1_START\" letter-spacing=\"-2\">PLACEHOLDER_TITLE_LINE2</text>\n\n  <!-- LAYER 11: tagline right side of band -->\n  <text x=\"1042\" y=\"1148\" text-anchor=\"end\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\" font-size=\"16\" font-weight=\"300\" fill=\"#FFFFFF\" fill-opacity=\"0.4\" letter-spacing=\"1\">PLACEHOLDER_TAGLINE_LINE1</text>\n  <text x=\"1042\" y=\"1176\" text-anchor=\"end\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\" font-size=\"16\" font-weight=\"300\" fill=\"#FFFFFF\" fill-opacity=\"0.4\" letter-spacing=\"1\">PLACEHOLDER_TAGLINE_LINE2</text>\n\n  <!-- LAYER 12: bottom divider -->\n  <line x1=\"72\" y1=\"1272\" x2=\"1042\" y2=\"1272\" stroke=\"#FFFFFF\" stroke-width=\"0.5\" opacity=\"0.1\"/>\n\n  <!-- LAYER 13: CTA strip + social handle -->\n  <rect x=\"72\" y=\"1290\" width=\"560\" height=\"48\" rx=\"0\" fill=\"#FFFFFF\" fill-opacity=\"0.06\" stroke=\"#FFFFFF\" stroke-width=\"0.5\" stroke-opacity=\"0.12\"/>\n  <text x=\"352\" y=\"1322\" text-anchor=\"middle\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\" font-size=\"15\" font-weight=\"500\" fill=\"#FFFFFF\" letter-spacing=\"4\">PLACEHOLDER_CTA_TEXT</text>\n  <text x=\"1042\" y=\"1322\" text-anchor=\"end\"   font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\" font-size=\"15\" font-weight=\"400\" fill=\"#FFFFFF\" fill-opacity=\"0.3\" letter-spacing=\"2\">PLACEHOLDER_SOCIAL_HANDLE</text>\n\n  </g>\n</svg>",
+  "tokens": {
+    "PLACEHOLDER_PRODUCT_IMAGE": {
+      "type": "image",
+      "label": "Product photo",
+      "default": ""
+    },
+    "PLACEHOLDER_STORE_NAME": {
+      "type": "text",
+      "label": "Store name (vertical spine)",
+      "default": "BLEND KING STORE  ·  KAMPALA"
+    },
+    "PLACEHOLDER_PRICE_LABEL": {
+      "type": "text",
+      "label": "Price label (on tag)",
+      "default": "STARTING AT"
+    },
+    "PLACEHOLDER_PRICE_VALUE": {
+      "type": "text",
+      "label": "Price (on tag)",
+      "default": "UGX 480K"
+    },
+    "PLACEHOLDER_SPEC1_VALUE": {
+      "type": "text",
+      "label": "Wedge 1 spec value",
+      "default": "28K"
+    },
+    "PLACEHOLDER_SPEC1_LABEL": {
+      "type": "text",
+      "label": "Wedge 1 spec label",
+      "default": "RPM SPEED"
+    },
+    "PLACEHOLDER_SPEC2_VALUE": {
+      "type": "text",
+      "label": "Wedge 2 spec value",
+      "default": "2HP"
+    },
+    "PLACEHOLDER_SPEC2_LABEL": {
+      "type": "text",
+      "label": "Wedge 2 spec label",
+      "default": "MOTOR POWER"
+    },
+    "PLACEHOLDER_SPEC3_VALUE": {
+      "type": "text",
+      "label": "Wedge 3 spec value",
+      "default": "2.5L"
+    },
+    "PLACEHOLDER_SPEC3_LABEL": {
+      "type": "text",
+      "label": "Wedge 3 spec label",
+      "default": "CAPACITY"
+    },
+    "PLACEHOLDER_SPEC4_VALUE": {
+      "type": "text",
+      "label": "Wedge 4 spec value",
+      "default": "6X"
+    },
+    "PLACEHOLDER_SPEC4_LABEL": {
+      "type": "text",
+      "label": "Wedge 4 spec label",
+      "default": "BLADE SYSTEM"
+    },
+    "PLACEHOLDER_TITLE_LINE1": {
+      "type": "text",
+      "label": "Title line 1",
+      "default": "VORTEX"
+    },
+    "PLACEHOLDER_TITLE_LINE2": {
+      "type": "text",
+      "label": "Title line 2 (accent color)",
+      "default": "PRO X"
+    },
+    "PLACEHOLDER_TAGLINE_LINE1": {
+      "type": "text",
+      "label": "Tagline line 1",
+      "default": "Crush anything."
+    },
+    "PLACEHOLDER_TAGLINE_LINE2": {
+      "type": "text",
+      "label": "Tagline line 2",
+      "default": "Blend everything."
+    },
+    "PLACEHOLDER_CTA_TEXT": {
+      "type": "text",
+      "label": "CTA text",
+      "default": "ORDER NOW · blendking.ug"
+    },
+    "PLACEHOLDER_SOCIAL_HANDLE": {
+      "type": "text",
+      "label": "Social handle",
+      "default": "@blendkingug"
+    },
+    "PLACEHOLDER_COLOR_WEDGE1_START": {
+      "type": "color",
+      "label": "Wedge 1 color start",
+      "default": "#FF3D57"
+    },
+    "PLACEHOLDER_COLOR_WEDGE1_END": {
+      "type": "color",
+      "label": "Wedge 1 color end",
+      "default": "#FF6B35"
+    },
+    "PLACEHOLDER_COLOR_WEDGE2_START": {
+      "type": "color",
+      "label": "Wedge 2 color start",
+      "default": "#FFCC00"
+    },
+    "PLACEHOLDER_COLOR_WEDGE2_END": {
+      "type": "color",
+      "label": "Wedge 2 color end",
+      "default": "#FF9500"
+    },
+    "PLACEHOLDER_COLOR_WEDGE3_START": {
+      "type": "color",
+      "label": "Wedge 3 color start",
+      "default": "#00D4AA"
+    },
+    "PLACEHOLDER_COLOR_WEDGE3_END": {
+      "type": "color",
+      "label": "Wedge 3 color end",
+      "default": "#00B4D8"
+    },
+    "PLACEHOLDER_COLOR_WEDGE4_START": {
+      "type": "color",
+      "label": "Wedge 4 color start",
+      "default": "#7B2FBE"
+    },
+    "PLACEHOLDER_COLOR_WEDGE4_END": {
+      "type": "color",
+      "label": "Wedge 4 color end",
+      "default": "#A855F7"
+    },
+    "PLACEHOLDER_COLOR_CIRCLE_TOP": {
+      "type": "color",
+      "label": "Product circle top",
+      "default": "#0F0F0F"
+    },
+    "PLACEHOLDER_COLOR_CIRCLE_BOTTOM": {
+      "type": "color",
+      "label": "Product circle bottom",
+      "default": "#1A1A1A"
+    },
+    "PLACEHOLDER_COLOR_BAND_TOP": {
+      "type": "color",
+      "label": "Bottom band top",
+      "default": "#0F0F0F"
+    },
+    "PLACEHOLDER_COLOR_BAND_BOTTOM": {
+      "type": "color",
+      "label": "Bottom band bottom",
+      "default": "#161616"
+    },
+    "PLACEHOLDER_FONT_DISPLAY": {
+      "type": "font",
+      "label": "Display font",
+      "default": "Righteous"
+    },
+    "PLACEHOLDER_FONT_BODY": {
+      "type": "font",
+      "label": "Body font",
+      "default": "Plus Jakarta Sans"
+    }
+  }
+}
