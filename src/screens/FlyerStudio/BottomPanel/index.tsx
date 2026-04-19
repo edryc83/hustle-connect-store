@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Layout, Palette, Type, ImageIcon, Wand2, Plus, X, Loader2, ZoomIn, ZoomOut, ArrowUp, ArrowDown, ArrowLeft, ArrowRight, ALargeSmall } from 'lucide-react';
+import { Layout, Palette, Type, ImageIcon, Wand2, Plus, X, Loader2, ZoomIn, ZoomOut, ArrowUp, ArrowDown, ArrowLeft, ArrowRight, ALargeSmall, Sparkles } from 'lucide-react';
 import TemplatesTab from './TemplatesTab';
 import type { TemplateJSON, TemplateEntry, UserState } from '../flyerTypes';
 import { FONT_OPTIONS } from '../flyerTypes';
@@ -28,6 +28,7 @@ interface BottomPanelProps {
   userState: UserState;
   isRemovingBg: boolean;
   isRemovingLogoBg: boolean;
+  isGeneratingAI: boolean;
   additionalImages: AdditionalImage[];
   productImageScale: number;
   productImageOffset: { x: number; y: number };
@@ -35,6 +36,7 @@ interface BottomPanelProps {
   onSelectTemplate: (id: string) => void;
   onUpdateToken: (key: string, value: string) => void;
   onRemoveBackground: () => void;
+  onGenerateAIContent: () => void;
   onAddLogo: (url: string) => void;
   onRemoveLogo: (id: string) => void;
   onSetProductImageScale: (scale: number) => void;
@@ -48,6 +50,7 @@ export default function BottomPanel({
   userState,
   isRemovingBg,
   isRemovingLogoBg,
+  isGeneratingAI,
   additionalImages,
   productImageScale,
   productImageOffset,
@@ -55,6 +58,7 @@ export default function BottomPanel({
   onSelectTemplate,
   onUpdateToken,
   onRemoveBackground,
+  onGenerateAIContent,
   onAddLogo,
   onRemoveLogo,
   onSetProductImageScale,
@@ -159,6 +163,25 @@ export default function BottomPanel({
               transition={{ duration: 0.1 }}
               className="h-full p-3 space-y-2 overflow-y-auto"
             >
+              {/* AI Generate Button */}
+              <button
+                onClick={onGenerateAIContent}
+                disabled={isGeneratingAI}
+                className="w-full flex items-center justify-center gap-2 py-2 px-4 bg-gradient-to-r from-purple-500 to-indigo-500 text-white rounded-lg font-medium text-sm hover:from-purple-600 hover:to-indigo-600 disabled:opacity-60 transition-all shadow-sm"
+              >
+                {isGeneratingAI ? (
+                  <>
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    <span>Generating...</span>
+                  </>
+                ) : (
+                  <>
+                    <Sparkles className="w-4 h-4" />
+                    <span>Auto-Generate with AI</span>
+                  </>
+                )}
+              </button>
+
               {/* Selected text font size control */}
               {selectedTextKey && (
                 <div className="flex items-center gap-2 p-2 bg-purple-50 rounded-lg mb-2">
@@ -185,7 +208,7 @@ export default function BottomPanel({
                 </div>
               )}
 
-              <p className="text-[9px] text-gray-400 italic">Tip: Tap a field to adjust its font size. Drag text on canvas to move.</p>
+              <p className="text-[9px] text-gray-400 italic">Tip: Tap a field to adjust size. Drag text on flyer to reposition.</p>
 
               {groupedTokens.text.map(([key, config]) => (
                 <div

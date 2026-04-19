@@ -3,6 +3,12 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type, x-supabase-client-platform, x-supabase-client-platform-version, x-supabase-client-runtime, x-supabase-client-runtime-version',
 };
 
+interface TokenConfig {
+  type: string;
+  label: string;
+  default: string;
+}
+
 Deno.serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -12,50 +18,68 @@ Deno.serve(async (req) => {
     const ANTHROPIC_API_KEY = Deno.env.get('ANTHROPIC_API_KEY');
     if (!ANTHROPIC_API_KEY) throw new Error('ANTHROPIC_API_KEY is not configured');
 
-    const { productName, price, description, category, storeName } = await req.json();
+    const { product, store, tokens } = await req.json();
 
-    if (!productName || !price) {
+    if (!product?.name || !tokens) {
       return new Response(
-        JSON.stringify({ error: 'productName and price are required' }),
+        JSON.stringify({ error: 'product and tokens are required' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    const systemPrompt = `You are a creative copywriter for African small business product flyers. Generate compelling, short marketing copy for product flyers. Your copy should be:
+    // Filter to only text tokens that need AI content
+    const textTokens: Record<string, TokenConfig> = {};
+    for (const [key, config] of Object.entries(tokens as Record<string, TokenConfig>)) {
+      if (config.type === 'text') {
+        textTokens[key] = config;
+      }
+    }
+
+    // Build token descriptions for the AI
+    const tokenDescriptions = Object.entries(textTokens)
+      .map(([key, config]) => `- "${key}": ${config.label} (example: "${config.default}")`)
+      .join('\n');
+
+    const systemPrompt = `You are a creative copywriter for African small business product flyers. Generate compelling, short marketing copy that fits the exact fields provided. Your copy should be:
 - Punchy and attention-grabbing
 - Suitable for social media/WhatsApp sharing
-- Culturally relevant for African markets
+- Culturally relevant for African markets (use UGX for Uganda, KES for Kenya, etc.)
 - Professional but approachable
+- CONCISE - match the length of the example defaults
 
-Always return valid JSON only, no markdown formatting.`;
+Return ONLY valid JSON with the exact token keys provided. No markdown, no explanation.`;
 
-    const userPrompt = `Generate flyer copy for this product in 3 different styles:
+    const userPrompt = `Generate flyer content for this product:
 
-Product: ${productName}
-Price: ${price}
-${description ? `Description: ${description}` : ''}
-${category ? `Category: ${category}` : ''}
-Store: ${storeName || 'Shop'}
+PRODUCT DETAILS:
+- Name: ${product.name}
+- Price: ${product.price || 'Not specified'}
+- Description: ${product.description || 'No description'}
+- Category: ${product.category || 'General'}
 
-Create 3 variations:
+STORE DETAILS:
+- Store Name: ${store?.name || 'Shop'}
+- Store URL: ${store?.slug ? `${store.slug}.afristall.com` : 'shop.afristall.com'}
 
-1. MINIMAL style - Clean, simple, elegant
-   - Headline: 2-4 words, sophisticated
-   - Tagline: 5-8 words, understated elegance
-   - CTA: 2-3 words, subtle
+Generate creative content for these fields:
+${tokenDescriptions}
 
-2. BOLD style - Energetic, urgent, eye-catching
-   - Headline: 2-4 words, powerful/exciting
-   - Tagline: 5-8 words, creates urgency
-   - CTA: 2-3 words, action-oriented
+IMPORTANT RULES:
+1. TITLE fields should be 1-3 words max, often split across LINE1 and LINE2
+2. TAGLINE should be catchy, 4-8 words
+3. CTA (call-to-action) should be 2-3 words like "Shop Now", "Order Today"
+4. BADGE should be 1-2 words like "NEW", "HOT DEAL", "BEST SELLER"
+5. SPEC fields should highlight key features briefly
+6. PRICE fields should use the actual price provided
+7. STORE_NAME should use the actual store name
+8. Keep text SHORT - it must fit on a flyer
 
-3. ELEGANT style - Premium, refined, luxurious
-   - Headline: 2-4 words, sophisticated/premium feel
-   - Tagline: 5-8 words, emphasizes quality
-   - CTA: 2-3 words, refined
-
-Return ONLY this JSON structure:
-{"variations":[{"style":"minimal","headline":"...","tagline":"...","cta":"..."},{"style":"bold","headline":"...","tagline":"...","cta":"..."},{"style":"elegant","headline":"...","tagline":"...","cta":"..."}]}`;
+Return ONLY a JSON object with the token keys and generated values:
+{
+  "PLACEHOLDER_TITLE_LINE1": "...",
+  "PLACEHOLDER_TITLE_LINE2": "...",
+  ...
+}`;
 
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -66,7 +90,7 @@ Return ONLY this JSON structure:
       },
       body: JSON.stringify({
         model: 'claude-sonnet-4-20250514',
-        max_tokens: 512,
+        max_tokens: 1024,
         system: systemPrompt,
         messages: [
           { role: 'user', content: userPrompt },
@@ -94,23 +118,34 @@ Return ONLY this JSON structure:
 
     const parsed = JSON.parse(content);
 
-    return new Response(JSON.stringify(parsed), {
+    // Ensure we have all required tokens, fill in defaults if missing
+    const result: Record<string, string> = {};
+    for (const [key, config] of Object.entries(textTokens)) {
+      if (parsed[key]) {
+        result[key] = parsed[key];
+      } else {
+        // Use smart defaults based on key patterns
+        if (key.includes('STORE_NAME')) {
+          result[key] = store?.name?.toUpperCase() || config.default;
+        } else if (key.includes('PRICE_VALUE')) {
+          result[key] = product.price || config.default;
+        } else if (key.includes('BRAND_INITIAL')) {
+          result[key] = (store?.name?.[0] || 'S').toUpperCase();
+        } else {
+          result[key] = config.default;
+        }
+      }
+    }
+
+    return new Response(JSON.stringify({ content: result }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
   } catch (error) {
     console.error('Flyer content generation error:', error);
 
-    // Return fallback content if AI fails
-    const fallback = {
-      variations: [
-        { style: 'minimal', headline: 'New Arrival', tagline: 'Quality you can trust', cta: 'Shop Now' },
-        { style: 'bold', headline: 'Hot Deal!', tagline: 'Don\'t miss out on this offer', cta: 'Get Yours' },
-        { style: 'elegant', headline: 'Premium Pick', tagline: 'Elevate your style today', cta: 'Discover' },
-      ],
-    };
-
-    return new Response(JSON.stringify(fallback), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+    return new Response(
+      JSON.stringify({ error: 'Failed to generate content. Please try again.' }),
+      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+    );
   }
 });

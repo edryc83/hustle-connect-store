@@ -37,6 +37,7 @@ interface UseFlyerReturn {
   isLoading: boolean;
   isRemovingBg: boolean;
   isRemovingLogoBg: boolean;
+  isGeneratingAI: boolean;
   additionalImages: AdditionalImage[];
   productImageScale: number;
   productImageOffset: { x: number; y: number };
@@ -47,6 +48,7 @@ interface UseFlyerReturn {
   updateToken: (key: string, value: string) => void;
   resetToDefaults: () => void;
   removeBackground: () => Promise<void>;
+  generateAIContent: () => Promise<void>;
   addLogo: (url: string) => void;
   removeLogo: (id: string) => void;
   setProductImageScale: (scale: number) => void;
@@ -98,6 +100,7 @@ export function useFlyer({ product, store }: UseFlyerProps): UseFlyerReturn {
   const [isLoading, setIsLoading] = useState(true);
   const [isRemovingBg, setIsRemovingBg] = useState(false);
   const [isRemovingLogoBg, setIsRemovingLogoBg] = useState(false);
+  const [isGeneratingAI, setIsGeneratingAI] = useState(false);
   const [additionalImages, setAdditionalImages] = useState<AdditionalImage[]>([]);
   const [productImageScale, setProductImageScale] = useState(1);
   const [productImageOffset, setProductImageOffset] = useState({ x: 0, y: 0 });
@@ -196,6 +199,58 @@ export function useFlyer({ product, store }: UseFlyerProps): UseFlyerReturn {
     }
   }, [userState, isRemovingBg]);
 
+  // Generate AI content for the flyer
+  const generateAIContent = useCallback(async () => {
+    if (!template || isGeneratingAI) return;
+
+    setIsGeneratingAI(true);
+
+    try {
+      const { data, error } = await supabase.functions.invoke('generate-flyer-content', {
+        body: {
+          product: {
+            name: product.name,
+            price: product.price,
+            description: product.description,
+            category: product.category,
+          },
+          store: {
+            name: store.name,
+            slug: store.slug,
+          },
+          tokens: template.tokens,
+        },
+      });
+
+      if (error) {
+        console.error('AI generation error:', error);
+        alert('Failed to generate content. Please try again.');
+        return;
+      }
+
+      if (data?.content) {
+        // Merge AI content with existing state (preserve image tokens)
+        setUserState(prev => {
+          const newState = { ...prev };
+          for (const [key, value] of Object.entries(data.content)) {
+            // Only update text tokens, preserve images
+            if (template.tokens[key]?.type === 'text') {
+              newState[key] = value as string;
+            }
+          }
+          return newState;
+        });
+      } else if (data?.error) {
+        alert(data.error);
+      }
+    } catch (err) {
+      console.error('AI generation failed:', err);
+      alert('Failed to generate content. Please check your connection.');
+    } finally {
+      setIsGeneratingAI(false);
+    }
+  }, [template, product, store, isGeneratingAI]);
+
   // Add logo with auto background removal
   const addLogo = useCallback(async (url: string) => {
     const logoId = `logo-${Date.now()}`;
@@ -245,6 +300,7 @@ export function useFlyer({ product, store }: UseFlyerProps): UseFlyerReturn {
     isLoading,
     isRemovingBg,
     isRemovingLogoBg,
+    isGeneratingAI,
     additionalImages,
     productImageScale,
     productImageOffset,
@@ -253,6 +309,7 @@ export function useFlyer({ product, store }: UseFlyerProps): UseFlyerReturn {
     updateToken,
     resetToDefaults,
     removeBackground,
+    generateAIContent,
     addLogo,
     removeLogo,
     setProductImageScale,

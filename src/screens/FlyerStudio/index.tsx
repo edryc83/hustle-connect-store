@@ -30,6 +30,7 @@ export default function FlyerStudio({ product, store, onClose }: FlyerStudioProp
     isLoading,
     isRemovingBg,
     isRemovingLogoBg,
+    isGeneratingAI,
     additionalImages,
     productImageScale,
     productImageOffset,
@@ -38,6 +39,7 @@ export default function FlyerStudio({ product, store, onClose }: FlyerStudioProp
     updateToken,
     resetToDefaults,
     removeBackground,
+    generateAIContent,
     addLogo,
     removeLogo,
     setProductImageScale,
@@ -115,6 +117,7 @@ export default function FlyerStudio({ product, store, onClose }: FlyerStudioProp
             userState={userState}
             isRemovingBg={isRemovingBg}
             isRemovingLogoBg={isRemovingLogoBg}
+            isGeneratingAI={isGeneratingAI}
             additionalImages={additionalImages}
             productImageScale={productImageScale}
             productImageOffset={productImageOffset}
@@ -122,6 +125,7 @@ export default function FlyerStudio({ product, store, onClose }: FlyerStudioProp
             onSelectTemplate={selectTemplate}
             onUpdateToken={updateToken}
             onRemoveBackground={removeBackground}
+            onGenerateAIContent={generateAIContent}
             onAddLogo={addLogo}
             onRemoveLogo={removeLogo}
             onSetProductImageScale={setProductImageScale}
