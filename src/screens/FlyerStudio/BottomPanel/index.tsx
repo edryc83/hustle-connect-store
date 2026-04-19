@@ -61,7 +61,7 @@ export default function BottomPanel({
   onSetProductImageOffset,
   onSetTextFontScale,
 }: BottomPanelProps) {
-  const [activeTab, setActiveTab] = useState<TabId>('text');
+  const [activeTab, setActiveTab] = useState<TabId>('templates');
   const [selectedTextKey, setSelectedTextKey] = useState<string | null>(null);
 
   // Group tokens by type

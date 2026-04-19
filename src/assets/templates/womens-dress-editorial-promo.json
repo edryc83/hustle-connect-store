@@ -1,0 +1,181 @@
+{
+  "id": "womens-dress-editorial-promo",
+  "name": "Women's Dress – Fashion Editorial Promo Flyer",
+  "category": "fashion",
+  "thumbnail": "womens-dress-editorial-promo.png",
+  "canvas": {
+    "width": 1080,
+    "height": 1350
+  },
+  "fonts": [
+    "https://fonts.googleapis.com/css2?family=Bodoni+Moda:ital,wght@0,400;0,600;0,900;1,400;1,600&family=Karla:wght@200;300;400&display=swap"
+  ],
+  "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" viewBox=\"0 0 1080 1350\" width=\"1080\" height=\"1350\">\n  <defs>\n    <linearGradient id=\"wd-right\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1350\" gradientUnits=\"userSpaceOnUse\">\n      <stop offset=\"0%\"   stop-color=\"PLACEHOLDER_COLOR_PANEL_TOP\"/>\n      <stop offset=\"100%\" stop-color=\"PLACEHOLDER_COLOR_PANEL_BOTTOM\"/>\n    </linearGradient>\n    <linearGradient id=\"wd-img-fade\" x1=\"680\" y1=\"0\" x2=\"860\" y2=\"0\" gradientUnits=\"userSpaceOnUse\">\n      <stop offset=\"0%\"   stop-color=\"PLACEHOLDER_COLOR_PANEL_BOTTOM\" stop-opacity=\"0\"/>\n      <stop offset=\"100%\" stop-color=\"PLACEHOLDER_COLOR_PANEL_BOTTOM\" stop-opacity=\"1\"/>\n    </linearGradient>\n    <linearGradient id=\"wd-img-fade-b\" x1=\"0\" y1=\"1000\" x2=\"0\" y2=\"1350\" gradientUnits=\"userSpaceOnUse\">\n      <stop offset=\"0%\"   stop-color=\"PLACEHOLDER_COLOR_PANEL_BOTTOM\" stop-opacity=\"0\"/>\n      <stop offset=\"100%\" stop-color=\"PLACEHOLDER_COLOR_PANEL_BOTTOM\" stop-opacity=\"0.7\"/>\n    </linearGradient>\n    <linearGradient id=\"wd-cta\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\" gradientUnits=\"objectBoundingBox\">\n      <stop offset=\"0%\"   stop-color=\"PLACEHOLDER_COLOR_ACCENT\"/>\n      <stop offset=\"100%\" stop-color=\"PLACEHOLDER_COLOR_ACCENT_DARK\"/>\n    </linearGradient>\n    <radialGradient id=\"wd-img-vignette\" cx=\"40%\" cy=\"50%\" r=\"55%\">\n      <stop offset=\"50%\"  stop-color=\"PLACEHOLDER_COLOR_PANEL_BOTTOM\" stop-opacity=\"0\"/>\n      <stop offset=\"100%\" stop-color=\"PLACEHOLDER_COLOR_PANEL_BOTTOM\" stop-opacity=\"0.5\"/>\n    </radialGradient>\n    <clipPath id=\"wd-img-clip\">\n      <rect x=\"0\" y=\"0\" width=\"820\" height=\"1350\"/>\n    </clipPath>\n  </defs>\n\n  <!-- LAYER 1: dark background -->\n  <rect width=\"1080\" height=\"1350\" fill=\"PLACEHOLDER_COLOR_PANEL_BOTTOM\"/>\n\n  <!-- LAYER 2: right editorial panel -->\n  <rect x=\"820\" y=\"0\" width=\"260\" height=\"1350\" fill=\"url(#wd-right)\"/>\n  <line x1=\"820\" y1=\"0\" x2=\"820\" y2=\"1350\" stroke=\"PLACEHOLDER_COLOR_ACCENT\" stroke-width=\"0.8\" opacity=\"0.25\"/>\n\n  <!-- LAYER 3: product image full-bleed left -->\n  <g clip-path=\"url(#wd-img-clip)\">\n    <image href=\"PLACEHOLDER_PRODUCT_IMAGE\" x=\"0\" y=\"0\" width=\"820\" height=\"1350\" preserveAspectRatio=\"xMidYMid meet\"/>\n  </g>\n  <rect x=\"0\"   y=\"0\"    width=\"820\" height=\"1350\" fill=\"url(#wd-img-vignette)\"/>\n  <rect x=\"680\" y=\"0\"    width=\"140\" height=\"1350\" fill=\"url(#wd-img-fade)\"/>\n  <rect x=\"0\"   y=\"1000\" width=\"820\" height=\"350\"  fill=\"url(#wd-img-fade-b)\"/>\n\n  <!-- LAYER 4: vertical store name spine -->\n  <text x=\"950\" y=\"1240\" text-anchor=\"end\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\" font-size=\"12\" font-weight=\"200\" fill=\"#FFFFFF\" fill-opacity=\"0.4\" letter-spacing=\"8\" transform=\"rotate(-90 950 1240)\">PLACEHOLDER_STORE_SPINE</text>\n  <line x1=\"966\" y1=\"60\" x2=\"966\" y2=\"1290\" stroke=\"PLACEHOLDER_COLOR_ACCENT\" stroke-width=\"0.4\" opacity=\"0.2\"/>\n\n  <!-- LAYER 5: season / collection label -->\n  <text x=\"862\" y=\"96\"  font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\" font-size=\"10\" font-weight=\"300\" fill=\"PLACEHOLDER_COLOR_ACCENT\" fill-opacity=\"0.6\" letter-spacing=\"5\">PLACEHOLDER_SEASON</text>\n  <text x=\"862\" y=\"118\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\" font-size=\"10\" font-weight=\"300\" fill=\"#FFFFFF\" fill-opacity=\"0.2\" letter-spacing=\"5\">COLLECTION</text>\n  <line x1=\"836\" y1=\"134\" x2=\"1056\" y2=\"134\" stroke=\"PLACEHOLDER_COLOR_ACCENT\" stroke-width=\"0.4\" opacity=\"0.3\"/>\n\n  <!-- LAYER 6: collection name -->\n  <text x=\"862\" y=\"260\" font-family=\"PLACEHOLDER_FONT_DISPLAY, serif\" font-size=\"52\" font-weight=\"600\" fill=\"#FFFFFF\" letter-spacing=\"-1\">PLACEHOLDER_COLL_LINE1</text>\n  <text x=\"862\" y=\"322\" font-family=\"PLACEHOLDER_FONT_DISPLAY, serif\" font-size=\"52\" font-weight=\"600\" fill=\"#FFFFFF\" letter-spacing=\"-1\">PLACEHOLDER_COLL_LINE2</text>\n  <text x=\"862\" y=\"384\" font-family=\"PLACEHOLDER_FONT_DISPLAY, serif\" font-size=\"52\" font-weight=\"400\" fill=\"PLACEHOLDER_COLOR_ACCENT\" font-style=\"italic\" letter-spacing=\"-1\">PLACEHOLDER_COLL_LINE3</text>\n  <line x1=\"836\" y1=\"404\" x2=\"1056\" y2=\"404\" stroke=\"PLACEHOLDER_COLOR_ACCENT\" stroke-width=\"0.4\" opacity=\"0.2\"/>\n\n  <!-- LAYER 7: product detail rows -->\n  <text x=\"862\" y=\"444\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\" font-size=\"11\" font-weight=\"200\" fill=\"#FFFFFF\" fill-opacity=\"0.35\" letter-spacing=\"3\">PLACEHOLDER_DETAIL1_LABEL</text>\n  <text x=\"862\" y=\"466\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\" font-size=\"13\" font-weight=\"300\" fill=\"#FFFFFF\" fill-opacity=\"0.65\" letter-spacing=\"1\">PLACEHOLDER_DETAIL1_VALUE</text>\n  <line x1=\"836\" y1=\"484\" x2=\"1056\" y2=\"484\" stroke=\"PLACEHOLDER_COLOR_ACCENT\" stroke-width=\"0.3\" opacity=\"0.15\"/>\n\n  <text x=\"862\" y=\"516\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\" font-size=\"11\" font-weight=\"200\" fill=\"#FFFFFF\" fill-opacity=\"0.35\" letter-spacing=\"3\">PLACEHOLDER_DETAIL2_LABEL</text>\n  <text x=\"862\" y=\"538\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\" font-size=\"13\" font-weight=\"300\" fill=\"#FFFFFF\" fill-opacity=\"0.65\" letter-spacing=\"1\">PLACEHOLDER_DETAIL2_VALUE</text>\n  <line x1=\"836\" y1=\"556\" x2=\"1056\" y2=\"556\" stroke=\"PLACEHOLDER_COLOR_ACCENT\" stroke-width=\"0.3\" opacity=\"0.15\"/>\n\n  <text x=\"862\" y=\"588\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\" font-size=\"11\" font-weight=\"200\" fill=\"#FFFFFF\" fill-opacity=\"0.35\" letter-spacing=\"3\">PLACEHOLDER_DETAIL3_LABEL</text>\n  <text x=\"862\" y=\"610\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\" font-size=\"13\" font-weight=\"300\" fill=\"#FFFFFF\" fill-opacity=\"0.65\" letter-spacing=\"1\">PLACEHOLDER_DETAIL3_VALUE</text>\n\n  <!-- colour swatches -->\n  <circle cx=\"862\" cy=\"638\" r=\"10\" fill=\"PLACEHOLDER_COLOR_SWATCH1\" stroke=\"#FFFFFF\" stroke-width=\"0.8\" stroke-opacity=\"0.4\"/>\n  <circle cx=\"886\" cy=\"638\" r=\"10\" fill=\"PLACEHOLDER_COLOR_SWATCH2\" stroke=\"#FFFFFF\" stroke-width=\"0.8\" stroke-opacity=\"0.2\"/>\n  <circle cx=\"910\" cy=\"638\" r=\"10\" fill=\"PLACEHOLDER_COLOR_SWATCH3\" stroke=\"#FFFFFF\" stroke-width=\"0.8\" stroke-opacity=\"0.2\"/>\n  <line x1=\"836\" y1=\"660\" x2=\"1056\" y2=\"660\" stroke=\"PLACEHOLDER_COLOR_ACCENT\" stroke-width=\"0.3\" opacity=\"0.15\"/>\n\n  <text x=\"862\" y=\"692\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\" font-size=\"11\" font-weight=\"200\" fill=\"#FFFFFF\" fill-opacity=\"0.35\" letter-spacing=\"3\">PLACEHOLDER_DETAIL4_LABEL</text>\n  <text x=\"862\" y=\"714\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\" font-size=\"13\" font-weight=\"300\" fill=\"#FFFFFF\" fill-opacity=\"0.65\" letter-spacing=\"1\">PLACEHOLDER_DETAIL4_LINE1</text>\n  <text x=\"862\" y=\"734\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\" font-size=\"13\" font-weight=\"300\" fill=\"#FFFFFF\" fill-opacity=\"0.65\" letter-spacing=\"1\">PLACEHOLDER_DETAIL4_LINE2</text>\n  <line x1=\"836\" y1=\"754\" x2=\"1056\" y2=\"754\" stroke=\"PLACEHOLDER_COLOR_ACCENT\" stroke-width=\"0.4\" opacity=\"0.25\"/>\n\n  <!-- LAYER 8: price -->\n  <text x=\"862\" y=\"790\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\"    font-size=\"11\" font-weight=\"200\" fill=\"PLACEHOLDER_COLOR_ACCENT\" fill-opacity=\"0.7\" letter-spacing=\"5\">PRICE</text>\n  <text x=\"862\" y=\"862\" font-family=\"PLACEHOLDER_FONT_DISPLAY, serif\"      font-size=\"68\" font-weight=\"900\" fill=\"#FFFFFF\" letter-spacing=\"-2\">PLACEHOLDER_PRICE_VALUE</text>\n  <text x=\"862\" y=\"892\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\"    font-size=\"12\" font-weight=\"200\" fill=\"#FFFFFF\" fill-opacity=\"0.35\" letter-spacing=\"3\">PLACEHOLDER_PRICE_SUB</text>\n  <line x1=\"836\" y1=\"912\" x2=\"1056\" y2=\"912\" stroke=\"PLACEHOLDER_COLOR_ACCENT\" stroke-width=\"0.4\" opacity=\"0.25\"/>\n\n  <!-- LAYER 9: CTA + contact -->\n  <rect x=\"836\" y=\"932\" width=\"220\" height=\"56\" rx=\"0\" fill=\"url(#wd-cta)\"/>\n  <text x=\"946\" y=\"968\" text-anchor=\"middle\" font-family=\"PLACEHOLDER_FONT_DISPLAY, serif\" font-size=\"18\" font-weight=\"600\" fill=\"#FFFFFF\" letter-spacing=\"3\">PLACEHOLDER_CTA_TEXT</text>\n  <text x=\"862\" y=\"1010\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\" font-size=\"11\" font-weight=\"200\" fill=\"#FFFFFF\" fill-opacity=\"0.25\" letter-spacing=\"2\">PLACEHOLDER_STORE_URL</text>\n  <text x=\"862\" y=\"1030\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\" font-size=\"11\" font-weight=\"200\" fill=\"#FFFFFF\" fill-opacity=\"0.2\"  letter-spacing=\"2\">PLACEHOLDER_STORE_PHONE</text>\n\n  <!-- LAYER 10: bottom-left brand overlay on image -->\n  <text x=\"48\" y=\"1108\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\"    font-size=\"11\" font-weight=\"200\" fill=\"#FFFFFF\" fill-opacity=\"0.3\" letter-spacing=\"6\">PLACEHOLDER_NEW_IN_LABEL</text>\n  <text x=\"48\" y=\"1196\" font-family=\"PLACEHOLDER_FONT_DISPLAY, serif\"      font-size=\"112\" font-weight=\"900\" fill=\"#FFFFFF\" letter-spacing=\"-3\">PLACEHOLDER_BRAND_WORD1</text>\n  <text x=\"48\" y=\"1260\" font-family=\"PLACEHOLDER_FONT_DISPLAY, serif\"      font-size=\"46\"  font-weight=\"400\" fill=\"PLACEHOLDER_COLOR_ACCENT\" font-style=\"italic\" letter-spacing=\"2\">PLACEHOLDER_BRAND_WORD2</text>\n  <line x1=\"48\" y1=\"1284\" x2=\"420\" y2=\"1284\" stroke=\"PLACEHOLDER_COLOR_ACCENT\" stroke-width=\"0.4\" opacity=\"0.25\"/>\n  <text x=\"48\" y=\"1308\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\"    font-size=\"12\" font-weight=\"200\" fill=\"#FFFFFF\" fill-opacity=\"0.22\" letter-spacing=\"3\">PLACEHOLDER_BOTTOM_TAGLINE</text>\n</svg>",
+  "tokens": {
+    "PLACEHOLDER_PRODUCT_IMAGE": {
+      "type": "image",
+      "label": "Model / product photo",
+      "default": ""
+    },
+    "PLACEHOLDER_STORE_SPINE": {
+      "type": "text",
+      "label": "Store spine (vertical text)",
+      "default": "VELOUR BOUTIQUE  ·  KAMPALA  ·  velourboutique.ug"
+    },
+    "PLACEHOLDER_SEASON": {
+      "type": "text",
+      "label": "Season label",
+      "default": "SS 2025"
+    },
+    "PLACEHOLDER_COLL_LINE1": {
+      "type": "text",
+      "label": "Collection name line 1",
+      "default": "LA"
+    },
+    "PLACEHOLDER_COLL_LINE2": {
+      "type": "text",
+      "label": "Collection name line 2",
+      "default": "BELLE"
+    },
+    "PLACEHOLDER_COLL_LINE3": {
+      "type": "text",
+      "label": "Collection name line 3 (italic)",
+      "default": "Robe"
+    },
+    "PLACEHOLDER_DETAIL1_LABEL": {
+      "type": "text",
+      "label": "Detail 1 label",
+      "default": "MATERIAL"
+    },
+    "PLACEHOLDER_DETAIL1_VALUE": {
+      "type": "text",
+      "label": "Detail 1 value",
+      "default": "Silk Chiffon"
+    },
+    "PLACEHOLDER_DETAIL2_LABEL": {
+      "type": "text",
+      "label": "Detail 2 label",
+      "default": "SIZES"
+    },
+    "PLACEHOLDER_DETAIL2_VALUE": {
+      "type": "text",
+      "label": "Detail 2 value",
+      "default": "XS · S · M · L · XL"
+    },
+    "PLACEHOLDER_DETAIL3_LABEL": {
+      "type": "text",
+      "label": "Detail 3 label",
+      "default": "COLOUR"
+    },
+    "PLACEHOLDER_DETAIL3_VALUE": {
+      "type": "text",
+      "label": "Detail 3 value",
+      "default": "Rose · Ivory · Noir"
+    },
+    "PLACEHOLDER_DETAIL4_LABEL": {
+      "type": "text",
+      "label": "Detail 4 label",
+      "default": "OCCASION"
+    },
+    "PLACEHOLDER_DETAIL4_LINE1": {
+      "type": "text",
+      "label": "Detail 4 line 1",
+      "default": "Evening · Wedding"
+    },
+    "PLACEHOLDER_DETAIL4_LINE2": {
+      "type": "text",
+      "label": "Detail 4 line 2",
+      "default": "Cocktail · Gala"
+    },
+    "PLACEHOLDER_PRICE_VALUE": {
+      "type": "text",
+      "label": "Price (large)",
+      "default": "185K"
+    },
+    "PLACEHOLDER_PRICE_SUB": {
+      "type": "text",
+      "label": "Price sub-line",
+      "default": "UGX  ·  Free alterations"
+    },
+    "PLACEHOLDER_CTA_TEXT": {
+      "type": "text",
+      "label": "CTA button text",
+      "default": "Shop Now"
+    },
+    "PLACEHOLDER_STORE_URL": {
+      "type": "text",
+      "label": "Store URL",
+      "default": "velourboutique.ug"
+    },
+    "PLACEHOLDER_STORE_PHONE": {
+      "type": "text",
+      "label": "Store phone",
+      "default": "+256 700 000 000"
+    },
+    "PLACEHOLDER_NEW_IN_LABEL": {
+      "type": "text",
+      "label": "New in label (bottom left)",
+      "default": "NEW IN"
+    },
+    "PLACEHOLDER_BRAND_WORD1": {
+      "type": "text",
+      "label": "Brand word 1 (large)",
+      "default": "VELOUR"
+    },
+    "PLACEHOLDER_BRAND_WORD2": {
+      "type": "text",
+      "label": "Brand word 2 (italic accent)",
+      "default": "Boutique"
+    },
+    "PLACEHOLDER_BOTTOM_TAGLINE": {
+      "type": "text",
+      "label": "Bottom tagline",
+      "default": "Handcrafted in Uganda  ·  Limited pieces"
+    },
+    "PLACEHOLDER_COLOR_PANEL_TOP": {
+      "type": "color",
+      "label": "Panel bg top",
+      "default": "#1A0A10"
+    },
+    "PLACEHOLDER_COLOR_PANEL_BOTTOM": {
+      "type": "color",
+      "label": "Panel bg bottom / dark",
+      "default": "#0D0508"
+    },
+    "PLACEHOLDER_COLOR_ACCENT": {
+      "type": "color",
+      "label": "Accent / rose",
+      "default": "#D4447A"
+    },
+    "PLACEHOLDER_COLOR_ACCENT_DARK": {
+      "type": "color",
+      "label": "Accent dark",
+      "default": "#A8295C"
+    },
+    "PLACEHOLDER_COLOR_SWATCH1": {
+      "type": "color",
+      "label": "Colour swatch 1",
+      "default": "#D4447A"
+    },
+    "PLACEHOLDER_COLOR_SWATCH2": {
+      "type": "color",
+      "label": "Colour swatch 2",
+      "default": "#F5ECD7"
+    },
+    "PLACEHOLDER_COLOR_SWATCH3": {
+      "type": "color",
+      "label": "Colour swatch 3",
+      "default": "#1A1A1A"
+    },
+    "PLACEHOLDER_FONT_DISPLAY": {
+      "type": "font",
+      "label": "Display font (serif)",
+      "default": "Bodoni Moda"
+    },
+    "PLACEHOLDER_FONT_BODY": {
+      "type": "font",
+      "label": "Body font",
+      "default": "Karla"
+    }
+  }
+}

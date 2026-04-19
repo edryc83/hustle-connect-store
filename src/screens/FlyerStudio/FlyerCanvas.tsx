@@ -38,65 +38,57 @@ function applyTextOverrides(
   textOverrides: TextOverrides,
   tokens: Record<string, { type: string; label: string; default: string }>
 ): string {
-  let svg = svgString;
+  // Use DOMParser for reliable SVG manipulation
+  const parser = new DOMParser();
+  const doc = parser.parseFromString(svgString, 'image/svg+xml');
+  const svg = doc.documentElement;
 
   // Get all text tokens
   const textTokens = Object.entries(tokens).filter(([, config]) => config.type === 'text');
+  const textTokenKeys = textTokens.map(([key]) => key);
 
-  for (const [tokenKey] of textTokens) {
-    const fontScale = textOverrides.fontScale[tokenKey];
-    const posOffset = textOverrides.position[tokenKey];
+  // Find all text elements in the SVG
+  const textElements = svg.querySelectorAll('text');
 
-    // Find text element containing this token and apply overrides
-    // Match: <text ... >TOKEN</text> with possible whitespace
-    const escapedToken = tokenKey.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-    const textRegex = new RegExp(
-      `(<text[^>]*)(>)\\s*(${escapedToken})\\s*(</text>)`,
-      'g'
-    );
+  textElements.forEach((textEl) => {
+    const content = textEl.textContent?.trim() || '';
 
-    svg = svg.replace(textRegex, (match, openTagStart, openTagEnd, content, closeTag) => {
-      let modifiedOpenTag = openTagStart;
+    // Check if this text element contains any of our tokens
+    const matchedToken = textTokenKeys.find((key) => content.includes(key));
+    if (!matchedToken) return;
 
-      // Apply font scale
-      if (fontScale && fontScale !== 1) {
-        const fontSizeMatch = openTagStart.match(/font-size="([^"]*)"/);
-        if (fontSizeMatch) {
-          const originalSize = parseFloat(fontSizeMatch[1]);
-          const newSize = originalSize * fontScale;
-          modifiedOpenTag = modifiedOpenTag.replace(
-            /font-size="[^"]*"/,
-            `font-size="${newSize}"`
-          );
-        }
+    const fontScale = textOverrides.fontScale[matchedToken];
+    const posOffset = textOverrides.position[matchedToken];
+
+    // Add data-token attribute for drag detection
+    textEl.setAttribute('data-token', matchedToken);
+
+    // Add styles for dragging
+    const existingStyle = textEl.getAttribute('style') || '';
+    const dragStyles = 'cursor:move;-webkit-user-select:none;user-select:none;pointer-events:all;-webkit-tap-highlight-color:transparent;touch-action:none';
+    textEl.setAttribute('style', existingStyle + ';' + dragStyles);
+
+    // Apply font scale
+    if (fontScale && fontScale !== 1) {
+      const currentFontSize = textEl.getAttribute('font-size');
+      if (currentFontSize) {
+        const originalSize = parseFloat(currentFontSize);
+        const newSize = originalSize * fontScale;
+        textEl.setAttribute('font-size', String(newSize));
       }
+    }
 
-      // Apply position offset via transform
-      if (posOffset && (posOffset.x !== 0 || posOffset.y !== 0)) {
-        // Check if transform already exists
-        if (modifiedOpenTag.includes('transform="')) {
-          modifiedOpenTag = modifiedOpenTag.replace(
-            /transform="([^"]*)"/,
-            `transform="$1 translate(${posOffset.x}, ${posOffset.y})"`
-          );
-        } else {
-          modifiedOpenTag = modifiedOpenTag + ` transform="translate(${posOffset.x}, ${posOffset.y})"`;
-        }
-      }
+    // Apply position offset via transform
+    if (posOffset && (posOffset.x !== 0 || posOffset.y !== 0)) {
+      const existingTransform = textEl.getAttribute('transform') || '';
+      const translateStr = `translate(${posOffset.x}, ${posOffset.y})`;
+      textEl.setAttribute('transform', existingTransform ? `${existingTransform} ${translateStr}` : translateStr);
+    }
+  });
 
-      // Always add data attribute and styles for drag detection
-      // pointer-events:all ensures touch/click events work on text
-      const dragStyles = 'cursor:move;-webkit-user-select:none;user-select:none;pointer-events:all;-webkit-tap-highlight-color:transparent';
-      modifiedOpenTag = modifiedOpenTag.replace(
-        '<text',
-        `<text data-token="${tokenKey}" style="${dragStyles}"`
-      );
-
-      return modifiedOpenTag + openTagEnd + content + closeTag;
-    });
-  }
-
-  return svg;
+  // Serialize back to string
+  const serializer = new XMLSerializer();
+  return serializer.serializeToString(svg);
 }
 
 function resolveTemplate(svgString: string, userState: Record<string, string>): string {

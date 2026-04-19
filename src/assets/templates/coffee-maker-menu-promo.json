@@ -1,0 +1,111 @@
+{
+  "id": "coffee-maker-menu-promo",
+  "name": "Coffee Maker – Artisan Menu Promo Flyer",
+  "category": "home-kitchen",
+  "thumbnail": "coffee-maker-menu-promo.png",
+  "canvas": {
+    "width": 1080,
+    "height": 1350
+  },
+  "fonts": [
+    "https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Mulish:wght@200;300;400;500&display=swap"
+  ],
+  "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" viewBox=\"0 0 1080 1350\" width=\"1080\" height=\"1350\">\n  <defs>\n    <linearGradient id=\"cf-bg\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1350\" gradientUnits=\"userSpaceOnUse\">\n      <stop offset=\"0%\"   stop-color=\"PLACEHOLDER_COLOR_PAPER_TOP\"/>\n      <stop offset=\"100%\" stop-color=\"PLACEHOLDER_COLOR_PAPER_BOTTOM\"/>\n    </linearGradient>\n    <linearGradient id=\"cf-banner\" x1=\"0\" y1=\"0\" x2=\"1080\" y2=\"0\" gradientUnits=\"userSpaceOnUse\">\n      <stop offset=\"0%\"   stop-color=\"PLACEHOLDER_COLOR_DARK\"/>\n      <stop offset=\"50%\"  stop-color=\"PLACEHOLDER_COLOR_DARK_MID\"/>\n      <stop offset=\"100%\" stop-color=\"PLACEHOLDER_COLOR_DARK\"/>\n    </linearGradient>\n    <linearGradient id=\"cf-oval-bg\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\" gradientUnits=\"objectBoundingBox\">\n      <stop offset=\"0%\"   stop-color=\"PLACEHOLDER_COLOR_DARK_MID\"/>\n      <stop offset=\"100%\" stop-color=\"PLACEHOLDER_COLOR_DARK\"/>\n    </linearGradient>\n    <linearGradient id=\"cf-cta\" x1=\"0\" y1=\"0\" x2=\"400\" y2=\"0\" gradientUnits=\"userSpaceOnUse\">\n      <stop offset=\"0%\"   stop-color=\"PLACEHOLDER_COLOR_DARK\"/>\n      <stop offset=\"100%\" stop-color=\"PLACEHOLDER_COLOR_DARK_MID\"/>\n    </linearGradient>\n    <radialGradient id=\"cf-oval-glow\" cx=\"50%\" cy=\"40%\" r=\"50%\">\n      <stop offset=\"0%\"   stop-color=\"PLACEHOLDER_COLOR_ACCENT\" stop-opacity=\"0.15\"/>\n      <stop offset=\"100%\" stop-color=\"PLACEHOLDER_COLOR_ACCENT\" stop-opacity=\"0\"/>\n    </radialGradient>\n    <clipPath id=\"cf-oval-clip\">\n      <ellipse cx=\"540\" cy=\"610\" rx=\"310\" ry=\"370\"/>\n    </clipPath>\n  </defs>\n\n  <!-- LAYER 1: warm kraft paper background -->\n  <rect width=\"1080\" height=\"1350\" fill=\"url(#cf-bg)\"/>\n\n  <!-- LAYER 2: subtle horizontal paper lines -->\n  <line x1=\"0\" y1=\"180\" x2=\"1080\" y2=\"178\" stroke=\"PLACEHOLDER_COLOR_DARK\" stroke-width=\"0.3\" opacity=\"0.04\"/>\n  <line x1=\"0\" y1=\"360\" x2=\"1080\" y2=\"358\" stroke=\"PLACEHOLDER_COLOR_DARK\" stroke-width=\"0.3\" opacity=\"0.03\"/>\n  <line x1=\"0\" y1=\"540\" x2=\"1080\" y2=\"542\" stroke=\"PLACEHOLDER_COLOR_DARK\" stroke-width=\"0.3\" opacity=\"0.04\"/>\n  <line x1=\"0\" y1=\"720\" x2=\"1080\" y2=\"718\" stroke=\"PLACEHOLDER_COLOR_DARK\" stroke-width=\"0.3\" opacity=\"0.03\"/>\n  <line x1=\"0\" y1=\"900\" x2=\"1080\" y2=\"902\" stroke=\"PLACEHOLDER_COLOR_DARK\" stroke-width=\"0.3\" opacity=\"0.04\"/>\n\n  <!-- LAYER 3: outer ornamental border -->\n  <rect x=\"28\" y=\"28\" width=\"1024\" height=\"1294\" fill=\"none\" stroke=\"PLACEHOLDER_COLOR_DARK\" stroke-width=\"1.2\" opacity=\"0.25\"/>\n  <rect x=\"38\" y=\"38\" width=\"1004\" height=\"1274\" fill=\"none\" stroke=\"PLACEHOLDER_COLOR_DARK\" stroke-width=\"0.5\" opacity=\"0.15\"/>\n\n  <!-- LAYER 4: corner ornaments -->\n  <g fill=\"PLACEHOLDER_COLOR_DARK\" fill-opacity=\"0.35\">\n    <polygon points=\"28,28 48,38 38,48\"/>\n    <polygon points=\"1052,28 1032,38 1042,48\"/>\n    <polygon points=\"28,1322 48,1312 38,1302\"/>\n    <polygon points=\"1052,1322 1032,1312 1042,1302\"/>\n  </g>\n  <line x1=\"22\"   y1=\"28\"   x2=\"34\"   y2=\"28\"   stroke=\"PLACEHOLDER_COLOR_DARK\" stroke-width=\"1\" opacity=\"0.3\"/>\n  <line x1=\"28\"   y1=\"22\"   x2=\"28\"   y2=\"34\"   stroke=\"PLACEHOLDER_COLOR_DARK\" stroke-width=\"1\" opacity=\"0.3\"/>\n  <line x1=\"1046\" y1=\"28\"   x2=\"1058\" y2=\"28\"   stroke=\"PLACEHOLDER_COLOR_DARK\" stroke-width=\"1\" opacity=\"0.3\"/>\n  <line x1=\"1052\" y1=\"22\"   x2=\"1052\" y2=\"34\"   stroke=\"PLACEHOLDER_COLOR_DARK\" stroke-width=\"1\" opacity=\"0.3\"/>\n  <line x1=\"22\"   y1=\"1322\" x2=\"34\"   y2=\"1322\" stroke=\"PLACEHOLDER_COLOR_DARK\" stroke-width=\"1\" opacity=\"0.3\"/>\n  <line x1=\"28\"   y1=\"1316\" x2=\"28\"   y2=\"1328\" stroke=\"PLACEHOLDER_COLOR_DARK\" stroke-width=\"1\" opacity=\"0.3\"/>\n  <line x1=\"1046\" y1=\"1322\" x2=\"1058\" y2=\"1322\" stroke=\"PLACEHOLDER_COLOR_DARK\" stroke-width=\"1\" opacity=\"0.3\"/>\n  <line x1=\"1052\" y1=\"1316\" x2=\"1052\" y2=\"1328\" stroke=\"PLACEHOLDER_COLOR_DARK\" stroke-width=\"1\" opacity=\"0.3\"/>\n\n  <!-- LAYER 5: top arch banner -->\n  <rect x=\"0\" y=\"0\" width=\"1080\" height=\"148\" fill=\"url(#cf-banner)\"/>\n  <ellipse cx=\"540\" cy=\"148\" rx=\"200\" ry=\"40\" fill=\"url(#cf-banner)\"/>\n  <line x1=\"60\" y1=\"18\" x2=\"1020\" y2=\"18\" stroke=\"PLACEHOLDER_COLOR_ACCENT\" stroke-width=\"0.6\" opacity=\"0.4\"/>\n  <line x1=\"60\" y1=\"24\" x2=\"1020\" y2=\"24\" stroke=\"PLACEHOLDER_COLOR_ACCENT\" stroke-width=\"0.3\" opacity=\"0.25\"/>\n\n  <!-- LAYER 6: store name in banner -->\n  <text x=\"540\" y=\"88\"  text-anchor=\"middle\" font-family=\"PLACEHOLDER_FONT_DISPLAY, serif\"  font-size=\"42\" font-weight=\"700\" fill=\"PLACEHOLDER_COLOR_PAPER_TOP\" letter-spacing=\"8\">PLACEHOLDER_STORE_NAME</text>\n  <text x=\"540\" y=\"122\" text-anchor=\"middle\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\" font-size=\"13\" font-weight=\"200\" fill=\"PLACEHOLDER_COLOR_ACCENT\" letter-spacing=\"10\">PLACEHOLDER_STORE_TAGLINE</text>\n\n  <!-- LAYER 7: decorative divider below banner -->\n  <line x1=\"200\" y1=\"178\" x2=\"880\" y2=\"178\" stroke=\"PLACEHOLDER_COLOR_DARK\" stroke-width=\"0.8\" opacity=\"0.2\"/>\n  <circle cx=\"540\" cy=\"178\" r=\"5\" fill=\"PLACEHOLDER_COLOR_ACCENT\" fill-opacity=\"0.5\"/>\n  <circle cx=\"200\" cy=\"178\" r=\"3\" fill=\"PLACEHOLDER_COLOR_DARK\" fill-opacity=\"0.2\"/>\n  <circle cx=\"880\" cy=\"178\" r=\"3\" fill=\"PLACEHOLDER_COLOR_DARK\" fill-opacity=\"0.2\"/>\n  <line x1=\"200\" y1=\"188\" x2=\"880\" y2=\"188\" stroke=\"PLACEHOLDER_COLOR_DARK\" stroke-width=\"0.3\" opacity=\"0.1\"/>\n\n  <!-- LAYER 8: introducing label -->\n  <text x=\"540\" y=\"230\" text-anchor=\"middle\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\" font-size=\"12\" font-weight=\"300\" fill=\"PLACEHOLDER_COLOR_DARK\" fill-opacity=\"0.45\" letter-spacing=\"6\">PLACEHOLDER_INTRO_LABEL</text>\n\n  <!-- LAYER 9: oval ornamental rings -->\n  <ellipse cx=\"540\" cy=\"610\" rx=\"338\" ry=\"398\" fill=\"none\" stroke=\"PLACEHOLDER_COLOR_DARK\" stroke-width=\"0.5\" opacity=\"0.12\"/>\n  <ellipse cx=\"540\" cy=\"610\" rx=\"326\" ry=\"386\" fill=\"none\" stroke=\"PLACEHOLDER_COLOR_DARK\" stroke-width=\"0.8\" opacity=\"0.2\"/>\n  <ellipse cx=\"540\" cy=\"610\" rx=\"316\" ry=\"376\" fill=\"none\" stroke=\"PLACEHOLDER_COLOR_ACCENT\" stroke-width=\"1.2\" opacity=\"0.35\"/>\n\n  <!-- LAYER 10: dark oval bg + glow -->\n  <ellipse cx=\"540\" cy=\"610\" rx=\"310\" ry=\"370\" fill=\"url(#cf-oval-bg)\"/>\n  <ellipse cx=\"540\" cy=\"610\" rx=\"310\" ry=\"370\" fill=\"url(#cf-oval-glow)\"/>\n\n  <!-- LAYER 11: product image clipped to oval -->\n  <g clip-path=\"url(#cf-oval-clip)\">\n    <image href=\"PLACEHOLDER_PRODUCT_IMAGE\" x=\"230\" y=\"240\" width=\"620\" height=\"740\" preserveAspectRatio=\"xMidYMid meet\"/>\n  </g>\n\n  <!-- LAYER 12: oval top ornament -->\n  <line x1=\"390\" y1=\"244\" x2=\"690\" y2=\"244\" stroke=\"PLACEHOLDER_COLOR_DARK\" stroke-width=\"0.6\" opacity=\"0.15\"/>\n\n  <!-- LAYER 13: product name below oval -->\n  <text x=\"540\" y=\"1058\" text-anchor=\"middle\" font-family=\"PLACEHOLDER_FONT_DISPLAY, serif\"  font-size=\"62\" font-weight=\"700\" fill=\"PLACEHOLDER_COLOR_DARK\" letter-spacing=\"-1\">PLACEHOLDER_TITLE_LINE1</text>\n  <text x=\"540\" y=\"1108\" text-anchor=\"middle\" font-family=\"PLACEHOLDER_FONT_DISPLAY, serif\"  font-size=\"32\" font-weight=\"400\" fill=\"PLACEHOLDER_COLOR_DARK\" fill-opacity=\"0.55\" font-style=\"italic\" letter-spacing=\"2\">PLACEHOLDER_TITLE_LINE2</text>\n\n  <!-- LAYER 14: three-star ornamental divider -->\n  <line x1=\"200\" y1=\"1132\" x2=\"440\" y2=\"1132\" stroke=\"PLACEHOLDER_COLOR_DARK\" stroke-width=\"0.6\" opacity=\"0.2\"/>\n  <text x=\"540\" y=\"1137\" text-anchor=\"middle\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\" font-size=\"14\" fill=\"PLACEHOLDER_COLOR_ACCENT\" fill-opacity=\"0.7\">PLACEHOLDER_ORNAMENT</text>\n  <line x1=\"640\" y1=\"1132\" x2=\"880\" y2=\"1132\" stroke=\"PLACEHOLDER_COLOR_DARK\" stroke-width=\"0.6\" opacity=\"0.2\"/>\n\n  <!-- LAYER 15: feature line — menu description style -->\n  <text x=\"540\" y=\"1170\" text-anchor=\"middle\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\" font-size=\"14\" font-weight=\"300\" fill=\"PLACEHOLDER_COLOR_DARK\" fill-opacity=\"0.5\" letter-spacing=\"2\">PLACEHOLDER_FEATURES_LINE</text>\n\n  <!-- LAYER 16: price section -->\n  <line x1=\"60\" y1=\"1200\" x2=\"1020\" y2=\"1200\" stroke=\"PLACEHOLDER_COLOR_DARK\" stroke-width=\"0.5\" opacity=\"0.12\"/>\n  <text x=\"60\"  y=\"1262\" font-family=\"PLACEHOLDER_FONT_DISPLAY, serif\"  font-size=\"72\" font-weight=\"700\" fill=\"PLACEHOLDER_COLOR_DARK\" letter-spacing=\"-2\">PLACEHOLDER_PRICE_VALUE</text>\n  <text x=\"60\"  y=\"1292\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\" font-size=\"13\" font-weight=\"200\" fill=\"PLACEHOLDER_COLOR_DARK\" fill-opacity=\"0.4\" letter-spacing=\"3\">PLACEHOLDER_PRICE_SUB</text>\n  <line x1=\"60\" y1=\"1312\" x2=\"1020\" y2=\"1312\" stroke=\"PLACEHOLDER_COLOR_DARK\" stroke-width=\"0.5\" opacity=\"0.12\"/>\n\n  <!-- LAYER 17: CTA + contact -->\n  <rect x=\"60\" y=\"1324\" width=\"340\" height=\"50\" rx=\"0\" fill=\"url(#cf-cta)\"/>\n  <text x=\"230\" y=\"1355\" text-anchor=\"middle\" font-family=\"PLACEHOLDER_FONT_DISPLAY, serif\" font-size=\"20\" font-weight=\"700\" fill=\"PLACEHOLDER_COLOR_PAPER_TOP\" letter-spacing=\"2\">PLACEHOLDER_CTA_TEXT</text>\n  <text x=\"500\" y=\"1356\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\" font-size=\"14\" font-weight=\"300\" fill=\"PLACEHOLDER_COLOR_DARK\" fill-opacity=\"0.4\" letter-spacing=\"2\">PLACEHOLDER_FOOTER_TEXT</text>\n</svg>",
+  "tokens": {
+    "PLACEHOLDER_PRODUCT_IMAGE": {
+      "type": "image",
+      "label": "Product photo",
+      "default": ""
+    },
+    "PLACEHOLDER_STORE_NAME": {
+      "type": "text",
+      "label": "Store name (arch banner)",
+      "default": "BREW HAVEN"
+    },
+    "PLACEHOLDER_STORE_TAGLINE": {
+      "type": "text",
+      "label": "Store tagline (banner sub)",
+      "default": "EST. 2019  ·  KAMPALA"
+    },
+    "PLACEHOLDER_INTRO_LABEL": {
+      "type": "text",
+      "label": "Intro label above oval",
+      "default": "INTRODUCING"
+    },
+    "PLACEHOLDER_TITLE_LINE1": {
+      "type": "text",
+      "label": "Product name line 1",
+      "default": "Brew Haven"
+    },
+    "PLACEHOLDER_TITLE_LINE2": {
+      "type": "text",
+      "label": "Product name line 2 (italic)",
+      "default": "Pro Barista Edition"
+    },
+    "PLACEHOLDER_ORNAMENT": {
+      "type": "text",
+      "label": "Ornament divider",
+      "default": "✶ ✶ ✶"
+    },
+    "PLACEHOLDER_FEATURES_LINE": {
+      "type": "text",
+      "label": "Features (dot-separated)",
+      "default": "12-Cup  ·  Programmable  ·  Built-in Grinder  ·  Keep Warm"
+    },
+    "PLACEHOLDER_PRICE_VALUE": {
+      "type": "text",
+      "label": "Price",
+      "default": "UGX 680,000"
+    },
+    "PLACEHOLDER_PRICE_SUB": {
+      "type": "text",
+      "label": "Price sub-line",
+      "default": "Starting price  ·  Free delivery"
+    },
+    "PLACEHOLDER_CTA_TEXT": {
+      "type": "text",
+      "label": "CTA button text",
+      "default": "Order Now"
+    },
+    "PLACEHOLDER_FOOTER_TEXT": {
+      "type": "text",
+      "label": "Footer / contact",
+      "default": "brewhaven.ug  ·  1-year warranty  ·  +256 700 000 000"
+    },
+    "PLACEHOLDER_COLOR_PAPER_TOP": {
+      "type": "color",
+      "label": "Paper background top",
+      "default": "#F2E8D5"
+    },
+    "PLACEHOLDER_COLOR_PAPER_BOTTOM": {
+      "type": "color",
+      "label": "Paper background bottom",
+      "default": "#E8D9BE"
+    },
+    "PLACEHOLDER_COLOR_DARK": {
+      "type": "color",
+      "label": "Dark ink color",
+      "default": "#2C1A0E"
+    },
+    "PLACEHOLDER_COLOR_DARK_MID": {
+      "type": "color",
+      "label": "Dark mid tone",
+      "default": "#3D2410"
+    },
+    "PLACEHOLDER_COLOR_ACCENT": {
+      "type": "color",
+      "label": "Accent / gold",
+      "default": "#C87941"
+    },
+    "PLACEHOLDER_FONT_DISPLAY": {
+      "type": "font",
+      "label": "Display font (serif)",
+      "default": "Libre Baskerville"
+    },
+    "PLACEHOLDER_FONT_BODY": {
+      "type": "font",
+      "label": "Body font",
+      "default": "Mulish"
+    }
+  }
+}

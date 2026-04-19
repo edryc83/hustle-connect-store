@@ -1,0 +1,246 @@
+{
+  "id": "dinner-set-luxury-promo",
+  "name": "Dinner Set – Luxury Editorial Promo Flyer",
+  "category": "home-kitchen",
+  "thumbnail": "dinner-set-luxury-promo.png",
+  "canvas": {
+    "width": 1080,
+    "height": 1350
+  },
+  "fonts": [
+    "https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400;1,700&family=Lato:wght@200;300;400&display=swap"
+  ],
+  "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" viewBox=\"0 0 1080 1350\" width=\"1080\" height=\"1350\">\n  <defs>\n    <linearGradient id=\"ds-bg\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1350\" gradientUnits=\"userSpaceOnUse\">\n      <stop offset=\"0%\"   stop-color=\"PLACEHOLDER_COLOR_BG_TOP\"/>\n      <stop offset=\"100%\" stop-color=\"PLACEHOLDER_COLOR_BG_BOTTOM\"/>\n    </linearGradient>\n    <linearGradient id=\"ds-gold\" x1=\"0\" y1=\"0\" x2=\"1080\" y2=\"0\" gradientUnits=\"userSpaceOnUse\">\n      <stop offset=\"0%\"   stop-color=\"PLACEHOLDER_COLOR_GOLD_DARK\"/>\n      <stop offset=\"30%\"  stop-color=\"PLACEHOLDER_COLOR_GOLD\"/>\n      <stop offset=\"50%\"  stop-color=\"PLACEHOLDER_COLOR_GOLD_LIGHT\"/>\n      <stop offset=\"70%\"  stop-color=\"PLACEHOLDER_COLOR_GOLD\"/>\n      <stop offset=\"100%\" stop-color=\"PLACEHOLDER_COLOR_GOLD_DARK\"/>\n    </linearGradient>\n    <linearGradient id=\"ds-cta\" x1=\"0\" y1=\"0\" x2=\"360\" y2=\"0\" gradientUnits=\"userSpaceOnUse\">\n      <stop offset=\"0%\"   stop-color=\"PLACEHOLDER_COLOR_GOLD_DARK\"/>\n      <stop offset=\"100%\" stop-color=\"PLACEHOLDER_COLOR_GOLD\"/>\n    </linearGradient>\n    <linearGradient id=\"ds-tile-fade\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\" gradientUnits=\"objectBoundingBox\">\n      <stop offset=\"60%\"  stop-color=\"PLACEHOLDER_COLOR_BG_TOP\" stop-opacity=\"0\"/>\n      <stop offset=\"100%\" stop-color=\"PLACEHOLDER_COLOR_BG_TOP\" stop-opacity=\"0.6\"/>\n    </linearGradient>\n    <clipPath id=\"ds-t1\"><rect x=\"0\"   y=\"0\" width=\"356\" height=\"278\"/></clipPath>\n    <clipPath id=\"ds-t2\"><rect x=\"362\" y=\"0\" width=\"356\" height=\"278\"/></clipPath>\n    <clipPath id=\"ds-t3\"><rect x=\"724\" y=\"0\" width=\"356\" height=\"278\"/></clipPath>\n  </defs>\n\n  <!-- LAYER 1: deep navy bg -->\n  <rect width=\"1080\" height=\"1350\" fill=\"url(#ds-bg)\"/>\n\n  <!-- LAYER 2: 3-tile image mosaic -->\n  <rect x=\"0\"   y=\"0\" width=\"356\" height=\"278\" fill=\"PLACEHOLDER_COLOR_TILE_A\"/>\n  <g clip-path=\"url(#ds-t1)\">\n    <image href=\"PLACEHOLDER_PRODUCT_IMAGE_1\" x=\"0\"   y=\"0\" width=\"356\" height=\"278\" preserveAspectRatio=\"xMidYMid meet\"/>\n  </g>\n  <rect x=\"0\" y=\"0\" width=\"356\" height=\"278\" fill=\"url(#ds-tile-fade)\"/>\n\n  <rect x=\"362\" y=\"0\" width=\"356\" height=\"278\" fill=\"PLACEHOLDER_COLOR_TILE_B\"/>\n  <g clip-path=\"url(#ds-t2)\">\n    <image href=\"PLACEHOLDER_PRODUCT_IMAGE_2\" x=\"362\" y=\"0\" width=\"356\" height=\"278\" preserveAspectRatio=\"xMidYMid meet\"/>\n  </g>\n  <rect x=\"362\" y=\"0\" width=\"356\" height=\"278\" fill=\"url(#ds-tile-fade)\"/>\n\n  <rect x=\"724\" y=\"0\" width=\"356\" height=\"278\" fill=\"PLACEHOLDER_COLOR_TILE_A\"/>\n  <g clip-path=\"url(#ds-t3)\">\n    <image href=\"PLACEHOLDER_PRODUCT_IMAGE_3\" x=\"724\" y=\"0\" width=\"356\" height=\"278\" preserveAspectRatio=\"xMidYMid meet\"/>\n  </g>\n  <rect x=\"724\" y=\"0\" width=\"356\" height=\"278\" fill=\"url(#ds-tile-fade)\"/>\n\n  <!-- tile dividers -->\n  <line x1=\"356\" y1=\"0\" x2=\"356\" y2=\"278\" stroke=\"PLACEHOLDER_COLOR_GOLD\" stroke-width=\"1\" opacity=\"0.3\"/>\n  <line x1=\"724\" y1=\"0\" x2=\"724\" y2=\"278\" stroke=\"PLACEHOLDER_COLOR_GOLD\" stroke-width=\"1\" opacity=\"0.3\"/>\n\n  <!-- tile labels -->\n  <text x=\"178\" y=\"262\" text-anchor=\"middle\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\" font-size=\"11\" font-weight=\"300\" fill=\"PLACEHOLDER_COLOR_GOLD\" fill-opacity=\"0.55\" letter-spacing=\"3\">PLACEHOLDER_TILE1_LABEL</text>\n  <text x=\"540\" y=\"262\" text-anchor=\"middle\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\" font-size=\"11\" font-weight=\"300\" fill=\"PLACEHOLDER_COLOR_GOLD\" fill-opacity=\"0.55\" letter-spacing=\"3\">PLACEHOLDER_TILE2_LABEL</text>\n  <text x=\"902\" y=\"262\" text-anchor=\"middle\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\" font-size=\"11\" font-weight=\"300\" fill=\"PLACEHOLDER_COLOR_GOLD\" fill-opacity=\"0.55\" letter-spacing=\"3\">PLACEHOLDER_TILE3_LABEL</text>\n\n  <!-- LAYER 3: gold rule system -->\n  <rect x=\"0\" y=\"278\" width=\"1080\" height=\"2\"   fill=\"url(#ds-gold)\" opacity=\"0.9\"/>\n  <rect x=\"0\" y=\"282\" width=\"1080\" height=\"0.5\" fill=\"url(#ds-gold)\" opacity=\"0.25\"/>\n\n  <!-- LAYER 4: store info -->\n  <text x=\"56\"   y=\"346\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\" font-size=\"11\" font-weight=\"300\" fill=\"PLACEHOLDER_COLOR_GOLD\" fill-opacity=\"0.55\" letter-spacing=\"6\">PLACEHOLDER_STORE_NAME</text>\n  <text x=\"56\"   y=\"370\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\" font-size=\"11\" font-weight=\"200\" fill=\"#FFFFFF\" fill-opacity=\"0.25\" letter-spacing=\"4\">PLACEHOLDER_STORE_LOCATION</text>\n  <text x=\"1024\" y=\"346\" text-anchor=\"end\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\" font-size=\"11\" font-weight=\"300\" fill=\"PLACEHOLDER_COLOR_GOLD\" fill-opacity=\"0.55\" letter-spacing=\"4\">PLACEHOLDER_SET_INFO</text>\n  <text x=\"1024\" y=\"370\" text-anchor=\"end\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\" font-size=\"11\" font-weight=\"200\" fill=\"#FFFFFF\" fill-opacity=\"0.25\" letter-spacing=\"4\">PLACEHOLDER_SET_SUB</text>\n  <line x1=\"56\" y1=\"390\" x2=\"1024\" y2=\"390\" stroke=\"PLACEHOLDER_COLOR_GOLD\" stroke-width=\"0.4\" opacity=\"0.2\"/>\n\n  <!-- LAYER 5: central product name -->\n  <text x=\"540\" y=\"498\" text-anchor=\"middle\" font-family=\"PLACEHOLDER_FONT_DISPLAY, serif\" font-size=\"32\" font-weight=\"400\" fill=\"PLACEHOLDER_COLOR_GOLD\" fill-opacity=\"0.6\" font-style=\"italic\" letter-spacing=\"6\">PLACEHOLDER_COLLECTION_WORD</text>\n  <text x=\"540\" y=\"596\" text-anchor=\"middle\" font-family=\"PLACEHOLDER_FONT_DISPLAY, serif\" font-size=\"110\" font-weight=\"700\" fill=\"#FFFFFF\" letter-spacing=\"-2\">PLACEHOLDER_TITLE_MAIN</text>\n  <text x=\"540\" y=\"668\" text-anchor=\"middle\" font-family=\"PLACEHOLDER_FONT_DISPLAY, serif\" font-size=\"42\"  font-weight=\"400\" fill=\"#FFFFFF\" fill-opacity=\"0.4\" font-style=\"italic\" letter-spacing=\"4\">PLACEHOLDER_TITLE_SUB</text>\n\n  <!-- LAYER 6: decorative gold ornament -->\n  <line x1=\"200\" y1=\"698\" x2=\"432\" y2=\"698\" stroke=\"url(#ds-gold)\" stroke-width=\"0.8\" opacity=\"0.5\"/>\n  <ellipse cx=\"540\" cy=\"698\" rx=\"8\" ry=\"8\" fill=\"none\" stroke=\"PLACEHOLDER_COLOR_GOLD\" stroke-width=\"1\" opacity=\"0.6\"/>\n  <line x1=\"648\" y1=\"698\" x2=\"880\" y2=\"698\" stroke=\"url(#ds-gold)\" stroke-width=\"0.8\" opacity=\"0.5\"/>\n\n  <!-- LAYER 7: description -->\n  <text x=\"540\" y=\"742\" text-anchor=\"middle\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\" font-size=\"15\" font-weight=\"200\" fill=\"#FFFFFF\" fill-opacity=\"0.45\" letter-spacing=\"2\">PLACEHOLDER_DESC_LINE1</text>\n  <text x=\"540\" y=\"768\" text-anchor=\"middle\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\" font-size=\"15\" font-weight=\"200\" fill=\"#FFFFFF\" fill-opacity=\"0.45\" letter-spacing=\"2\">PLACEHOLDER_DESC_LINE2</text>\n\n  <!-- LAYER 8: piece count circles -->\n  <circle cx=\"270\" cy=\"836\" r=\"48\" fill=\"none\" stroke=\"PLACEHOLDER_COLOR_GOLD\" stroke-width=\"0.8\" opacity=\"0.3\"/>\n  <circle cx=\"270\" cy=\"836\" r=\"40\" fill=\"PLACEHOLDER_COLOR_GOLD\" fill-opacity=\"0.06\"/>\n  <text x=\"270\" y=\"826\" text-anchor=\"middle\" font-family=\"PLACEHOLDER_FONT_DISPLAY, serif\" font-size=\"28\" font-weight=\"700\" fill=\"PLACEHOLDER_COLOR_GOLD\">PLACEHOLDER_PC1_COUNT</text>\n  <text x=\"270\" y=\"856\" text-anchor=\"middle\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\" font-size=\"10\" font-weight=\"300\" fill=\"#FFFFFF\" fill-opacity=\"0.4\" letter-spacing=\"2\">PLACEHOLDER_PC1_LABEL</text>\n\n  <circle cx=\"430\" cy=\"836\" r=\"48\" fill=\"none\" stroke=\"PLACEHOLDER_COLOR_GOLD\" stroke-width=\"0.8\" opacity=\"0.3\"/>\n  <circle cx=\"430\" cy=\"836\" r=\"40\" fill=\"PLACEHOLDER_COLOR_GOLD\" fill-opacity=\"0.06\"/>\n  <text x=\"430\" y=\"826\" text-anchor=\"middle\" font-family=\"PLACEHOLDER_FONT_DISPLAY, serif\" font-size=\"28\" font-weight=\"700\" fill=\"PLACEHOLDER_COLOR_GOLD\">PLACEHOLDER_PC2_COUNT</text>\n  <text x=\"430\" y=\"856\" text-anchor=\"middle\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\" font-size=\"10\" font-weight=\"300\" fill=\"#FFFFFF\" fill-opacity=\"0.4\" letter-spacing=\"2\">PLACEHOLDER_PC2_LABEL</text>\n\n  <circle cx=\"590\" cy=\"836\" r=\"48\" fill=\"none\" stroke=\"PLACEHOLDER_COLOR_GOLD\" stroke-width=\"0.8\" opacity=\"0.3\"/>\n  <circle cx=\"590\" cy=\"836\" r=\"40\" fill=\"PLACEHOLDER_COLOR_GOLD\" fill-opacity=\"0.06\"/>\n  <text x=\"590\" y=\"826\" text-anchor=\"middle\" font-family=\"PLACEHOLDER_FONT_DISPLAY, serif\" font-size=\"28\" font-weight=\"700\" fill=\"PLACEHOLDER_COLOR_GOLD\">PLACEHOLDER_PC3_COUNT</text>\n  <text x=\"590\" y=\"856\" text-anchor=\"middle\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\" font-size=\"10\" font-weight=\"300\" fill=\"#FFFFFF\" fill-opacity=\"0.4\" letter-spacing=\"2\">PLACEHOLDER_PC3_LABEL</text>\n\n  <circle cx=\"750\" cy=\"836\" r=\"48\" fill=\"none\" stroke=\"PLACEHOLDER_COLOR_GOLD\" stroke-width=\"0.8\" opacity=\"0.3\"/>\n  <circle cx=\"750\" cy=\"836\" r=\"40\" fill=\"PLACEHOLDER_COLOR_GOLD\" fill-opacity=\"0.06\"/>\n  <text x=\"750\" y=\"826\" text-anchor=\"middle\" font-family=\"PLACEHOLDER_FONT_DISPLAY, serif\" font-size=\"28\" font-weight=\"700\" fill=\"PLACEHOLDER_COLOR_GOLD\">PLACEHOLDER_PC4_COUNT</text>\n  <text x=\"750\" y=\"856\" text-anchor=\"middle\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\" font-size=\"10\" font-weight=\"300\" fill=\"#FFFFFF\" fill-opacity=\"0.4\" letter-spacing=\"2\">PLACEHOLDER_PC4_LABEL</text>\n\n  <circle cx=\"910\" cy=\"836\" r=\"48\" fill=\"none\" stroke=\"PLACEHOLDER_COLOR_GOLD\" stroke-width=\"0.8\" opacity=\"0.3\"/>\n  <circle cx=\"910\" cy=\"836\" r=\"40\" fill=\"PLACEHOLDER_COLOR_GOLD\" fill-opacity=\"0.06\"/>\n  <text x=\"910\" y=\"826\" text-anchor=\"middle\" font-family=\"PLACEHOLDER_FONT_DISPLAY, serif\" font-size=\"28\" font-weight=\"700\" fill=\"PLACEHOLDER_COLOR_GOLD\">PLACEHOLDER_PC5_COUNT</text>\n  <text x=\"910\" y=\"856\" text-anchor=\"middle\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\" font-size=\"10\" font-weight=\"300\" fill=\"#FFFFFF\" fill-opacity=\"0.4\" letter-spacing=\"2\">PLACEHOLDER_PC5_LABEL</text>\n\n  <!-- LAYER 9: gold rule -->\n  <rect x=\"0\" y=\"900\" width=\"1080\" height=\"1.5\" fill=\"url(#ds-gold)\" opacity=\"0.7\"/>\n  <rect x=\"0\" y=\"903\" width=\"1080\" height=\"0.5\" fill=\"url(#ds-gold)\" opacity=\"0.2\"/>\n\n  <!-- LAYER 10: 5-tile detail strip -->\n  <rect x=\"0\"   y=\"905\" width=\"212\" height=\"195\" fill=\"PLACEHOLDER_COLOR_TILE_A\"/>\n  <rect x=\"218\" y=\"905\" width=\"212\" height=\"195\" fill=\"PLACEHOLDER_COLOR_TILE_B\"/>\n  <rect x=\"436\" y=\"905\" width=\"212\" height=\"195\" fill=\"PLACEHOLDER_COLOR_TILE_A\"/>\n  <rect x=\"654\" y=\"905\" width=\"212\" height=\"195\" fill=\"PLACEHOLDER_COLOR_TILE_B\"/>\n  <rect x=\"872\" y=\"905\" width=\"208\" height=\"195\" fill=\"PLACEHOLDER_COLOR_TILE_A\"/>\n  <line x1=\"216\" y1=\"905\" x2=\"216\" y2=\"1100\" stroke=\"PLACEHOLDER_COLOR_GOLD\" stroke-width=\"0.5\" opacity=\"0.2\"/>\n  <line x1=\"434\" y1=\"905\" x2=\"434\" y2=\"1100\" stroke=\"PLACEHOLDER_COLOR_GOLD\" stroke-width=\"0.5\" opacity=\"0.2\"/>\n  <line x1=\"652\" y1=\"905\" x2=\"652\" y2=\"1100\" stroke=\"PLACEHOLDER_COLOR_GOLD\" stroke-width=\"0.5\" opacity=\"0.2\"/>\n  <line x1=\"870\" y1=\"905\" x2=\"870\" y2=\"1100\" stroke=\"PLACEHOLDER_COLOR_GOLD\" stroke-width=\"0.5\" opacity=\"0.2\"/>\n\n  <text x=\"106\" y=\"1076\"  text-anchor=\"middle\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\" font-size=\"10\" font-weight=\"300\" fill=\"PLACEHOLDER_COLOR_GOLD\" fill-opacity=\"0.5\" letter-spacing=\"2\">PLACEHOLDER_DT1_LABEL</text>\n  <text x=\"324\" y=\"1076\"  text-anchor=\"middle\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\" font-size=\"10\" font-weight=\"300\" fill=\"PLACEHOLDER_COLOR_GOLD\" fill-opacity=\"0.5\" letter-spacing=\"2\">PLACEHOLDER_DT2_LABEL</text>\n  <text x=\"542\" y=\"1076\"  text-anchor=\"middle\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\" font-size=\"10\" font-weight=\"300\" fill=\"PLACEHOLDER_COLOR_GOLD\" fill-opacity=\"0.5\" letter-spacing=\"2\">PLACEHOLDER_DT3_LABEL</text>\n  <text x=\"761\" y=\"1076\"  text-anchor=\"middle\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\" font-size=\"10\" font-weight=\"300\" fill=\"PLACEHOLDER_COLOR_GOLD\" fill-opacity=\"0.5\" letter-spacing=\"2\">PLACEHOLDER_DT4_LABEL</text>\n  <text x=\"976\" y=\"1076\"  text-anchor=\"middle\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\" font-size=\"10\" font-weight=\"300\" fill=\"PLACEHOLDER_COLOR_GOLD\" fill-opacity=\"0.5\" letter-spacing=\"2\">PLACEHOLDER_DT5_LABEL</text>\n\n  <!-- LAYER 11: gold rule -->\n  <rect x=\"0\" y=\"1100\" width=\"1080\" height=\"1.5\" fill=\"url(#ds-gold)\" opacity=\"0.7\"/>\n\n  <!-- LAYER 12: bottom price + CTA -->\n  <rect x=\"0\" y=\"1101\" width=\"1080\" height=\"249\" fill=\"PLACEHOLDER_COLOR_BG_BOTTOM\"/>\n\n  <text x=\"56\"  y=\"1178\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\"    font-size=\"13\" font-weight=\"200\" fill=\"PLACEHOLDER_COLOR_GOLD\" fill-opacity=\"0.6\" letter-spacing=\"5\">PLACEHOLDER_PRICE_LABEL</text>\n  <text x=\"56\"  y=\"1278\" font-family=\"PLACEHOLDER_FONT_DISPLAY, serif\"      font-size=\"96\" font-weight=\"700\" fill=\"#FFFFFF\" letter-spacing=\"-2\">PLACEHOLDER_PRICE_VALUE</text>\n  <text x=\"56\"  y=\"1316\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\"    font-size=\"13\" font-weight=\"200\" fill=\"PLACEHOLDER_COLOR_GOLD\" fill-opacity=\"0.45\" letter-spacing=\"3\">PLACEHOLDER_PRICE_SUB</text>\n\n  <line x1=\"700\" y1=\"1118\" x2=\"700\" y2=\"1338\" stroke=\"PLACEHOLDER_COLOR_GOLD\" stroke-width=\"0.5\" opacity=\"0.15\"/>\n\n  <text x=\"868\" y=\"1166\" text-anchor=\"middle\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\"    font-size=\"11\" font-weight=\"200\" fill=\"PLACEHOLDER_COLOR_GOLD\" fill-opacity=\"0.5\" letter-spacing=\"5\">PLACEHOLDER_CTA_AVAILABLE</text>\n  <text x=\"868\" y=\"1206\" text-anchor=\"middle\" font-family=\"PLACEHOLDER_FONT_DISPLAY, serif\"      font-size=\"24\" font-weight=\"700\" fill=\"PLACEHOLDER_COLOR_GOLD\" letter-spacing=\"2\">PLACEHOLDER_STORE_NAME</text>\n  <text x=\"868\" y=\"1232\" text-anchor=\"middle\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\"    font-size=\"13\" font-weight=\"200\" fill=\"#FFFFFF\" fill-opacity=\"0.3\" letter-spacing=\"3\">PLACEHOLDER_STORE_URL</text>\n\n  <rect x=\"716\" y=\"1256\" width=\"304\" height=\"56\" rx=\"0\" fill=\"url(#ds-cta)\"/>\n  <text x=\"868\" y=\"1291\" text-anchor=\"middle\" font-family=\"PLACEHOLDER_FONT_DISPLAY, serif\"      font-size=\"22\" font-weight=\"700\" fill=\"#FFFFFF\" letter-spacing=\"3\">PLACEHOLDER_CTA_TEXT</text>\n\n  <text x=\"868\" y=\"1330\" text-anchor=\"middle\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\"    font-size=\"12\" font-weight=\"200\" fill=\"#FFFFFF\" fill-opacity=\"0.25\" letter-spacing=\"2\">PLACEHOLDER_FOOTER_TEXT</text>\n</svg>",
+  "tokens": {
+    "PLACEHOLDER_PRODUCT_IMAGE_1": {
+      "type": "image",
+      "label": "Tile 1 image (dinner plate)",
+      "default": ""
+    },
+    "PLACEHOLDER_PRODUCT_IMAGE_2": {
+      "type": "image",
+      "label": "Tile 2 image (bowl)",
+      "default": ""
+    },
+    "PLACEHOLDER_PRODUCT_IMAGE_3": {
+      "type": "image",
+      "label": "Tile 3 image (mug/cup)",
+      "default": ""
+    },
+    "PLACEHOLDER_TILE1_LABEL": {
+      "type": "text",
+      "label": "Tile 1 label",
+      "default": "DINNER PLATE"
+    },
+    "PLACEHOLDER_TILE2_LABEL": {
+      "type": "text",
+      "label": "Tile 2 label",
+      "default": "SOUP BOWL"
+    },
+    "PLACEHOLDER_TILE3_LABEL": {
+      "type": "text",
+      "label": "Tile 3 label",
+      "default": "MUG & SAUCER"
+    },
+    "PLACEHOLDER_STORE_NAME": {
+      "type": "text",
+      "label": "Store name",
+      "default": "MAISON DE TABLE"
+    },
+    "PLACEHOLDER_STORE_LOCATION": {
+      "type": "text",
+      "label": "Location",
+      "default": "KAMPALA  ·  UGANDA"
+    },
+    "PLACEHOLDER_STORE_URL": {
+      "type": "text",
+      "label": "Store URL",
+      "default": "maisondatable.ug"
+    },
+    "PLACEHOLDER_SET_INFO": {
+      "type": "text",
+      "label": "Set info top-right",
+      "default": "30-PIECE SET"
+    },
+    "PLACEHOLDER_SET_SUB": {
+      "type": "text",
+      "label": "Set sub-info",
+      "default": "SERVES 6 PEOPLE"
+    },
+    "PLACEHOLDER_COLLECTION_WORD": {
+      "type": "text",
+      "label": "Collection word (italic)",
+      "default": "Collection"
+    },
+    "PLACEHOLDER_TITLE_MAIN": {
+      "type": "text",
+      "label": "Title main word",
+      "default": "OPALE"
+    },
+    "PLACEHOLDER_TITLE_SUB": {
+      "type": "text",
+      "label": "Title subtitle (italic)",
+      "default": "Porcelain Dinner Set"
+    },
+    "PLACEHOLDER_DESC_LINE1": {
+      "type": "text",
+      "label": "Description line 1",
+      "default": "Fine bone porcelain  ·  Microwave & dishwasher safe"
+    },
+    "PLACEHOLDER_DESC_LINE2": {
+      "type": "text",
+      "label": "Description line 2",
+      "default": "Lead-free  ·  Chip resistant  ·  Gift box included"
+    },
+    "PLACEHOLDER_PC1_COUNT": {
+      "type": "text",
+      "label": "Piece count 1 number",
+      "default": "6"
+    },
+    "PLACEHOLDER_PC1_LABEL": {
+      "type": "text",
+      "label": "Piece count 1 label",
+      "default": "PLATES"
+    },
+    "PLACEHOLDER_PC2_COUNT": {
+      "type": "text",
+      "label": "Piece count 2 number",
+      "default": "6"
+    },
+    "PLACEHOLDER_PC2_LABEL": {
+      "type": "text",
+      "label": "Piece count 2 label",
+      "default": "BOWLS"
+    },
+    "PLACEHOLDER_PC3_COUNT": {
+      "type": "text",
+      "label": "Piece count 3 number",
+      "default": "6"
+    },
+    "PLACEHOLDER_PC3_LABEL": {
+      "type": "text",
+      "label": "Piece count 3 label",
+      "default": "MUGS"
+    },
+    "PLACEHOLDER_PC4_COUNT": {
+      "type": "text",
+      "label": "Piece count 4 number",
+      "default": "6"
+    },
+    "PLACEHOLDER_PC4_LABEL": {
+      "type": "text",
+      "label": "Piece count 4 label",
+      "default": "SAUCERS"
+    },
+    "PLACEHOLDER_PC5_COUNT": {
+      "type": "text",
+      "label": "Piece count 5 number",
+      "default": "6"
+    },
+    "PLACEHOLDER_PC5_LABEL": {
+      "type": "text",
+      "label": "Piece count 5 label",
+      "default": "SIDE PLATES"
+    },
+    "PLACEHOLDER_DT1_LABEL": {
+      "type": "text",
+      "label": "Detail tile 1 label",
+      "default": "SALAD PLATE"
+    },
+    "PLACEHOLDER_DT2_LABEL": {
+      "type": "text",
+      "label": "Detail tile 2 label",
+      "default": "SERVING DISH"
+    },
+    "PLACEHOLDER_DT3_LABEL": {
+      "type": "text",
+      "label": "Detail tile 3 label",
+      "default": "GRAVY BOAT"
+    },
+    "PLACEHOLDER_DT4_LABEL": {
+      "type": "text",
+      "label": "Detail tile 4 label",
+      "default": "SUGAR BOWL"
+    },
+    "PLACEHOLDER_DT5_LABEL": {
+      "type": "text",
+      "label": "Detail tile 5 label",
+      "default": "CREAMER"
+    },
+    "PLACEHOLDER_PRICE_LABEL": {
+      "type": "text",
+      "label": "Price label",
+      "default": "COMPLETE SET PRICE"
+    },
+    "PLACEHOLDER_PRICE_VALUE": {
+      "type": "text",
+      "label": "Price",
+      "default": "1.2M"
+    },
+    "PLACEHOLDER_PRICE_SUB": {
+      "type": "text",
+      "label": "Price sub-line",
+      "default": "UGX  ·  Gift-wrapped  ·  Free delivery"
+    },
+    "PLACEHOLDER_CTA_AVAILABLE": {
+      "type": "text",
+      "label": "CTA available label",
+      "default": "AVAILABLE AT"
+    },
+    "PLACEHOLDER_CTA_TEXT": {
+      "type": "text",
+      "label": "CTA button text",
+      "default": "Order Now"
+    },
+    "PLACEHOLDER_FOOTER_TEXT": {
+      "type": "text",
+      "label": "Footer",
+      "default": "+256 700 000 000  ·  1-year warranty"
+    },
+    "PLACEHOLDER_COLOR_BG_TOP": {
+      "type": "color",
+      "label": "Background top",
+      "default": "#0B1628"
+    },
+    "PLACEHOLDER_COLOR_BG_BOTTOM": {
+      "type": "color",
+      "label": "Background bottom",
+      "default": "#060D1A"
+    },
+    "PLACEHOLDER_COLOR_TILE_A": {
+      "type": "color",
+      "label": "Tile bg A",
+      "default": "#0F1E38"
+    },
+    "PLACEHOLDER_COLOR_TILE_B": {
+      "type": "color",
+      "label": "Tile bg B",
+      "default": "#0D1A32"
+    },
+    "PLACEHOLDER_COLOR_GOLD": {
+      "type": "color",
+      "label": "Gold accent",
+      "default": "#D4A843"
+    },
+    "PLACEHOLDER_COLOR_GOLD_LIGHT": {
+      "type": "color",
+      "label": "Gold light",
+      "default": "#F5CC6A"
+    },
+    "PLACEHOLDER_COLOR_GOLD_DARK": {
+      "type": "color",
+      "label": "Gold dark",
+      "default": "#8B6914"
+    },
+    "PLACEHOLDER_FONT_DISPLAY": {
+      "type": "font",
+      "label": "Display font (serif)",
+      "default": "Playfair Display"
+    },
+    "PLACEHOLDER_FONT_BODY": {
+      "type": "font",
+      "label": "Body font",
+      "default": "Lato"
+    }
+  }
+}

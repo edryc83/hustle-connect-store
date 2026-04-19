@@ -7,9 +7,23 @@ import desktopPcTerminalPromo from './desktop-pc-terminal-promo.json';
 import refrigeratorLifestylePromo from './refrigerator-lifestyle-promo.json';
 import washingMachineCircularPromo from './washing-machine-circular-promo.json';
 import blenderExplosionPromo from './blender-explosion-promo.json';
+import airFryerStackedPromo from './air-fryer-stacked-promo.json';
+import cameraDslrViewfinderPromo from './camera-dslr-viewfinder-promo.json';
+import coffeeMakerArtisanPromo from './coffee-maker-artisan-promo.json';
+import coffeeMakerMenuPromo from './coffee-maker-menu-promo.json';
+import dinnerSetLuxuryPromo from './dinner-set-luxury-promo.json';
+import pressureCookerGaugePromo from './pressure-cooker-gauge-promo.json';
+import riceCookerJapanesePromo from './rice-cooker-japanese-promo.json';
+import speakerSoundbarWavePromo from './speaker-soundbar-wave-promo.json';
+import womensDressBluePromo from './womens-dress-blue-promo.json';
+import womensDressEditorialPromo from './womens-dress-editorial-promo.json';
+import womensDressPinkPromo from './womens-dress-pink-promo.json';
+import womensDressPurplePromo from './womens-dress-purple-promo.json';
+import womensDressPurpleAltPromo from './womens-dress-purple-alt-promo.json';
 import type { TemplateEntry, TemplateJSON } from '@/screens/FlyerStudio/flyerTypes';
 
 export const TEMPLATES: TemplateEntry[] = [
+  // Electronics
   {
     id: 'laptop-electronics-promo',
     name: 'Laptop Pro',
@@ -47,6 +61,19 @@ export const TEMPLATES: TemplateEntry[] = [
     data: desktopPcTerminalPromo as unknown as TemplateJSON,
   },
   {
+    id: 'camera-dslr-viewfinder-promo',
+    name: 'Camera DSLR',
+    category: 'electronics',
+    data: cameraDslrViewfinderPromo as unknown as TemplateJSON,
+  },
+  {
+    id: 'speaker-soundbar-wave-promo',
+    name: 'Soundbar Wave',
+    category: 'electronics',
+    data: speakerSoundbarWavePromo as unknown as TemplateJSON,
+  },
+  // Home Appliances
+  {
     id: 'refrigerator-lifestyle-promo',
     name: 'Refrigerator Lifestyle',
     category: 'electronics',
@@ -54,7 +81,7 @@ export const TEMPLATES: TemplateEntry[] = [
   },
   {
     id: 'washing-machine-circular-promo',
-    name: 'Washing Machine Circular',
+    name: 'Washing Machine',
     category: 'electronics',
     data: washingMachineCircularPromo as unknown as TemplateJSON,
   },
@@ -63,6 +90,73 @@ export const TEMPLATES: TemplateEntry[] = [
     name: 'Blender Explosion',
     category: 'electronics',
     data: blenderExplosionPromo as unknown as TemplateJSON,
+  },
+  {
+    id: 'air-fryer-stacked-promo',
+    name: 'Air Fryer Stacked',
+    category: 'electronics',
+    data: airFryerStackedPromo as unknown as TemplateJSON,
+  },
+  {
+    id: 'coffee-maker-artisan-promo',
+    name: 'Coffee Maker Artisan',
+    category: 'electronics',
+    data: coffeeMakerArtisanPromo as unknown as TemplateJSON,
+  },
+  {
+    id: 'coffee-maker-menu-promo',
+    name: 'Coffee Maker Menu',
+    category: 'electronics',
+    data: coffeeMakerMenuPromo as unknown as TemplateJSON,
+  },
+  {
+    id: 'dinner-set-luxury-promo',
+    name: 'Dinner Set Luxury',
+    category: 'electronics',
+    data: dinnerSetLuxuryPromo as unknown as TemplateJSON,
+  },
+  {
+    id: 'pressure-cooker-gauge-promo',
+    name: 'Pressure Cooker',
+    category: 'electronics',
+    data: pressureCookerGaugePromo as unknown as TemplateJSON,
+  },
+  {
+    id: 'rice-cooker-japanese-promo',
+    name: 'Rice Cooker Japanese',
+    category: 'electronics',
+    data: riceCookerJapanesePromo as unknown as TemplateJSON,
+  },
+  // Fashion
+  {
+    id: 'womens-dress-blue-promo',
+    name: 'Dress Blue',
+    category: 'fashion',
+    data: womensDressBluePromo as unknown as TemplateJSON,
+  },
+  {
+    id: 'womens-dress-pink-promo',
+    name: 'Dress Pink',
+    category: 'fashion',
+    data: womensDressPinkPromo as unknown as TemplateJSON,
+  },
+  {
+    id: 'womens-dress-purple-promo',
+    name: 'Dress Purple',
+    category: 'fashion',
+    data: womensDressPurplePromo as unknown as TemplateJSON,
+  },
+  {
+    id: 'womens-dress-purple-alt-promo',
+    name: 'Dress Purple Alt',
+    category: 'fashion',
+    data: womensDressPurpleAltPromo as unknown as TemplateJSON,
+  },
+  {
+    id: 'womens-dress-editorial-promo',
+    name: 'Dress Editorial',
+    category: 'fashion',
+    data: womensDressEditorialPromo as unknown as TemplateJSON,
   },
 ];
 

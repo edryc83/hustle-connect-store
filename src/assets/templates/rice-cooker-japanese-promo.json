@@ -1,0 +1,171 @@
+{
+  "id": "rice-cooker-japanese-promo",
+  "name": "Rice Cooker – Japanese-Inspired Promo Flyer",
+  "category": "home-kitchen",
+  "thumbnail": "rice-cooker-japanese-promo.png",
+  "canvas": {
+    "width": 1080,
+    "height": 1350
+  },
+  "fonts": [
+    "https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;700;900&family=Poppins:wght@300;400;500;600&display=swap"
+  ],
+  "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" viewBox=\"0 0 1080 1350\" width=\"1080\" height=\"1350\">\n  <defs>\n    <linearGradient id=\"rc-bg\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1350\" gradientUnits=\"userSpaceOnUse\">\n      <stop offset=\"0%\"   stop-color=\"PLACEHOLDER_COLOR_BG_TOP\"/>\n      <stop offset=\"100%\" stop-color=\"PLACEHOLDER_COLOR_BG_BOTTOM\"/>\n    </linearGradient>\n    <linearGradient id=\"rc-sun\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1\" gradientUnits=\"objectBoundingBox\">\n      <stop offset=\"0%\"   stop-color=\"PLACEHOLDER_COLOR_GOLD_LIGHT\"/>\n      <stop offset=\"100%\" stop-color=\"PLACEHOLDER_COLOR_GOLD\"/>\n    </linearGradient>\n    <linearGradient id=\"rc-sash\" x1=\"0\" y1=\"0\" x2=\"1080\" y2=\"0\" gradientUnits=\"userSpaceOnUse\">\n      <stop offset=\"0%\"   stop-color=\"PLACEHOLDER_COLOR_RED\"/>\n      <stop offset=\"100%\" stop-color=\"PLACEHOLDER_COLOR_RED_DARK\"/>\n    </linearGradient>\n    <linearGradient id=\"rc-img-fade\" x1=\"0\" y1=\"700\" x2=\"0\" y2=\"920\" gradientUnits=\"userSpaceOnUse\">\n      <stop offset=\"0%\"   stop-color=\"PLACEHOLDER_COLOR_BG_TOP\" stop-opacity=\"0\"/>\n      <stop offset=\"100%\" stop-color=\"PLACEHOLDER_COLOR_BG_TOP\" stop-opacity=\"0.85\"/>\n    </linearGradient>\n    <clipPath id=\"rc-img-clip\">\n      <rect x=\"140\" y=\"180\" width=\"800\" height=\"740\"/>\n    </clipPath>\n    <clipPath id=\"rc-sun-clip\">\n      <rect x=\"0\" y=\"680\" width=\"1080\" height=\"300\"/>\n    </clipPath>\n  </defs>\n\n  <!-- LAYER 1: deep teal background -->\n  <rect width=\"1080\" height=\"1350\" fill=\"url(#rc-bg)\"/>\n\n  <!-- LAYER 2: top identity strip -->\n  <rect x=\"0\" y=\"0\" width=\"1080\" height=\"88\" fill=\"#FFFFFF\" fill-opacity=\"0.06\"/>\n  <line x1=\"0\" y1=\"88\" x2=\"1080\" y2=\"88\" stroke=\"PLACEHOLDER_COLOR_GOLD\" stroke-width=\"1\" opacity=\"0.3\"/>\n\n  <!-- LAYER 3: store name left -->\n  <text x=\"56\" y=\"54\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\" font-size=\"13\" font-weight=\"500\" fill=\"#FFFFFF\" fill-opacity=\"0.7\" letter-spacing=\"5\">PLACEHOLDER_STORE_NAME</text>\n  <text x=\"56\" y=\"76\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\" font-size=\"11\" font-weight=\"300\" fill=\"PLACEHOLDER_COLOR_GOLD\" fill-opacity=\"0.6\" letter-spacing=\"3\">PLACEHOLDER_STORE_URL</text>\n\n  <!-- LAYER 4: logotype box right -->\n  <rect x=\"840\" y=\"12\" width=\"196\" height=\"64\" rx=\"0\" fill=\"none\" stroke=\"PLACEHOLDER_COLOR_GOLD\" stroke-width=\"1\" stroke-opacity=\"0.35\"/>\n  <rect x=\"846\" y=\"18\" width=\"184\" height=\"52\" rx=\"0\" fill=\"none\" stroke=\"PLACEHOLDER_COLOR_GOLD\" stroke-width=\"0.4\" stroke-opacity=\"0.2\"/>\n  <text x=\"938\" y=\"52\" text-anchor=\"middle\" font-family=\"PLACEHOLDER_FONT_DISPLAY, serif\" font-size=\"22\" font-weight=\"700\" fill=\"PLACEHOLDER_COLOR_GOLD\" letter-spacing=\"6\">PLACEHOLDER_LOGOTYPE</text>\n\n  <!-- LAYER 5: product name centred -->\n  <text x=\"540\" y=\"164\" text-anchor=\"middle\" font-family=\"PLACEHOLDER_FONT_DISPLAY, serif\"  font-size=\"72\" font-weight=\"900\" fill=\"#FFFFFF\" letter-spacing=\"-1\">PLACEHOLDER_TITLE_LINE1</text>\n  <text x=\"540\" y=\"206\" text-anchor=\"middle\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\" font-size=\"18\" font-weight=\"300\" fill=\"PLACEHOLDER_COLOR_GOLD\" fill-opacity=\"0.7\" letter-spacing=\"8\">PLACEHOLDER_TITLE_LINE2</text>\n\n  <!-- LAYER 6: product image zone -->\n  <rect x=\"140\" y=\"220\" width=\"800\" height=\"700\" fill=\"PLACEHOLDER_COLOR_BG_BOTTOM\" fill-opacity=\"0.5\"/>\n  <g clip-path=\"url(#rc-img-clip)\">\n    <image href=\"PLACEHOLDER_PRODUCT_IMAGE\" x=\"140\" y=\"180\" width=\"800\" height=\"740\" preserveAspectRatio=\"xMidYMid meet\"/>\n  </g>\n  <rect x=\"140\" y=\"700\" width=\"800\" height=\"220\" fill=\"url(#rc-img-fade)\"/>\n\n  <!-- LAYER 7: rising sun rings clipped to lower half -->\n  <g clip-path=\"url(#rc-sun-clip)\">\n    <circle cx=\"540\" cy=\"680\" r=\"380\" fill=\"url(#rc-sun)\" fill-opacity=\"0.13\"/>\n    <circle cx=\"540\" cy=\"680\" r=\"340\" fill=\"none\" stroke=\"PLACEHOLDER_COLOR_GOLD\" stroke-width=\"0.8\" opacity=\"0.2\"/>\n    <circle cx=\"540\" cy=\"680\" r=\"300\" fill=\"none\" stroke=\"PLACEHOLDER_COLOR_GOLD\" stroke-width=\"0.5\" opacity=\"0.15\"/>\n    <circle cx=\"540\" cy=\"680\" r=\"260\" fill=\"none\" stroke=\"PLACEHOLDER_COLOR_GOLD\" stroke-width=\"0.4\" opacity=\"0.12\"/>\n  </g>\n\n  <!-- LAYER 8: wave pattern band -->\n  <rect x=\"0\" y=\"928\" width=\"1080\" height=\"48\" fill=\"PLACEHOLDER_COLOR_GOLD\" fill-opacity=\"0.1\"/>\n  <line x1=\"0\" y1=\"928\"  x2=\"1080\" y2=\"928\"  stroke=\"PLACEHOLDER_COLOR_GOLD\" stroke-width=\"0.8\" opacity=\"0.3\"/>\n  <line x1=\"0\" y1=\"976\"  x2=\"1080\" y2=\"976\"  stroke=\"PLACEHOLDER_COLOR_GOLD\" stroke-width=\"0.8\" opacity=\"0.3\"/>\n  <path d=\"M0 952 Q54 932 108 952 Q162 972 216 952 Q270 932 324 952 Q378 972 432 952 Q486 932 540 952 Q594 972 648 952 Q702 932 756 952 Q810 972 864 952 Q918 932 972 952 Q1026 972 1080 952\" fill=\"none\" stroke=\"PLACEHOLDER_COLOR_GOLD\" stroke-width=\"1.5\" opacity=\"0.35\"/>\n\n  <!-- LAYER 9: spec row -->\n  <rect x=\"0\" y=\"976\" width=\"1080\" height=\"138\" fill=\"PLACEHOLDER_COLOR_BG_BOTTOM\" fill-opacity=\"0.5\"/>\n\n  <text x=\"135\" y=\"1026\" text-anchor=\"middle\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\"    font-size=\"11\" font-weight=\"500\" fill=\"PLACEHOLDER_COLOR_GOLD\" fill-opacity=\"0.6\" letter-spacing=\"2\">PLACEHOLDER_SPEC1_LABEL</text>\n  <text x=\"135\" y=\"1064\" text-anchor=\"middle\" font-family=\"PLACEHOLDER_FONT_DISPLAY, serif\"       font-size=\"36\" font-weight=\"700\" fill=\"#FFFFFF\" letter-spacing=\"-1\">PLACEHOLDER_SPEC1_VALUE</text>\n  <circle cx=\"270\" cy=\"1044\" r=\"3\" fill=\"PLACEHOLDER_COLOR_GOLD\" fill-opacity=\"0.3\"/>\n\n  <text x=\"405\" y=\"1026\" text-anchor=\"middle\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\"    font-size=\"11\" font-weight=\"500\" fill=\"PLACEHOLDER_COLOR_GOLD\" fill-opacity=\"0.6\" letter-spacing=\"2\">PLACEHOLDER_SPEC2_LABEL</text>\n  <text x=\"405\" y=\"1064\" text-anchor=\"middle\" font-family=\"PLACEHOLDER_FONT_DISPLAY, serif\"       font-size=\"36\" font-weight=\"700\" fill=\"#FFFFFF\" letter-spacing=\"-1\">PLACEHOLDER_SPEC2_VALUE</text>\n  <circle cx=\"540\" cy=\"1044\" r=\"3\" fill=\"PLACEHOLDER_COLOR_GOLD\" fill-opacity=\"0.3\"/>\n\n  <text x=\"675\" y=\"1026\" text-anchor=\"middle\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\"    font-size=\"11\" font-weight=\"500\" fill=\"PLACEHOLDER_COLOR_GOLD\" fill-opacity=\"0.6\" letter-spacing=\"2\">PLACEHOLDER_SPEC3_LABEL</text>\n  <text x=\"675\" y=\"1064\" text-anchor=\"middle\" font-family=\"PLACEHOLDER_FONT_DISPLAY, serif\"       font-size=\"36\" font-weight=\"700\" fill=\"#FFFFFF\" letter-spacing=\"-1\">PLACEHOLDER_SPEC3_VALUE</text>\n  <circle cx=\"810\" cy=\"1044\" r=\"3\" fill=\"PLACEHOLDER_COLOR_GOLD\" fill-opacity=\"0.3\"/>\n\n  <text x=\"945\" y=\"1026\" text-anchor=\"middle\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\"    font-size=\"11\" font-weight=\"500\" fill=\"PLACEHOLDER_COLOR_GOLD\" fill-opacity=\"0.6\" letter-spacing=\"2\">PLACEHOLDER_SPEC4_LABEL</text>\n  <text x=\"945\" y=\"1064\" text-anchor=\"middle\" font-family=\"PLACEHOLDER_FONT_DISPLAY, serif\"       font-size=\"36\" font-weight=\"700\" fill=\"#FFFFFF\" letter-spacing=\"-1\">PLACEHOLDER_SPEC4_VALUE</text>\n\n  <line x1=\"0\" y1=\"1114\" x2=\"1080\" y2=\"1114\" stroke=\"PLACEHOLDER_COLOR_GOLD\" stroke-width=\"0.5\" opacity=\"0.2\"/>\n  <text x=\"540\" y=\"1100\" text-anchor=\"middle\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\" font-size=\"12\" font-weight=\"300\" fill=\"#FFFFFF\" fill-opacity=\"0.35\" letter-spacing=\"3\">PLACEHOLDER_FEATURES_LINE</text>\n\n  <!-- LAYER 10: red price sash -->\n  <rect x=\"0\" y=\"1130\" width=\"1080\" height=\"120\" fill=\"url(#rc-sash)\"/>\n  <line x1=\"0\" y1=\"1130\" x2=\"1080\" y2=\"1130\" stroke=\"PLACEHOLDER_COLOR_GOLD\" stroke-width=\"1.5\" opacity=\"0.5\"/>\n  <line x1=\"0\" y1=\"1250\" x2=\"1080\" y2=\"1250\" stroke=\"PLACEHOLDER_COLOR_GOLD\" stroke-width=\"0.5\" opacity=\"0.2\"/>\n\n  <text x=\"56\"  y=\"1186\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\"    font-size=\"13\" font-weight=\"300\" fill=\"#FFFFFF\" fill-opacity=\"0.6\" letter-spacing=\"4\">PLACEHOLDER_PRICE_LABEL</text>\n  <text x=\"56\"  y=\"1238\" font-family=\"PLACEHOLDER_FONT_DISPLAY, serif\"      font-size=\"72\" font-weight=\"900\" fill=\"#FFFFFF\" letter-spacing=\"-2\">PLACEHOLDER_PRICE_VALUE</text>\n\n  <line x1=\"680\" y1=\"1144\" x2=\"680\" y2=\"1240\" stroke=\"#FFFFFF\" stroke-width=\"0.5\" opacity=\"0.2\"/>\n\n  <text x=\"868\" y=\"1192\" text-anchor=\"middle\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\"    font-size=\"13\" font-weight=\"300\" fill=\"#FFFFFF\" fill-opacity=\"0.55\" letter-spacing=\"3\">PLACEHOLDER_CTA_LABEL</text>\n  <text x=\"868\" y=\"1232\" text-anchor=\"middle\" font-family=\"PLACEHOLDER_FONT_DISPLAY, serif\"      font-size=\"38\" font-weight=\"700\" fill=\"PLACEHOLDER_COLOR_GOLD\" letter-spacing=\"-1\">PLACEHOLDER_CTA_WORD</text>\n\n  <!-- LAYER 11: dark bottom strip -->\n  <rect x=\"0\" y=\"1250\" width=\"1080\" height=\"100\" fill=\"PLACEHOLDER_COLOR_BG_BOTTOM\"/>\n\n  <text x=\"56\"  y=\"1296\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\" font-size=\"14\" font-weight=\"500\" fill=\"PLACEHOLDER_COLOR_GOLD\" fill-opacity=\"0.8\">PLACEHOLDER_TRUST1</text>\n  <text x=\"310\" y=\"1296\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\" font-size=\"14\" font-weight=\"500\" fill=\"PLACEHOLDER_COLOR_GOLD\" fill-opacity=\"0.8\">PLACEHOLDER_TRUST2</text>\n  <text x=\"620\" y=\"1296\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\" font-size=\"14\" font-weight=\"500\" fill=\"PLACEHOLDER_COLOR_GOLD\" fill-opacity=\"0.8\">PLACEHOLDER_TRUST3</text>\n  <line x1=\"56\" y1=\"1312\" x2=\"1024\" y2=\"1312\" stroke=\"PLACEHOLDER_COLOR_GOLD\" stroke-width=\"0.4\" opacity=\"0.15\"/>\n  <text x=\"540\" y=\"1336\" text-anchor=\"middle\" font-family=\"PLACEHOLDER_FONT_BODY, sans-serif\" font-size=\"12\" font-weight=\"300\" fill=\"#FFFFFF\" fill-opacity=\"0.3\" letter-spacing=\"3\">PLACEHOLDER_FOOTER_TEXT</text>\n</svg>",
+  "tokens": {
+    "PLACEHOLDER_PRODUCT_IMAGE": {
+      "type": "image",
+      "label": "Product photo",
+      "default": ""
+    },
+    "PLACEHOLDER_STORE_NAME": {
+      "type": "text",
+      "label": "Store name",
+      "default": "KOME KITCHEN"
+    },
+    "PLACEHOLDER_STORE_URL": {
+      "type": "text",
+      "label": "Store URL + location",
+      "default": "komekitchen.ug  ·  KAMPALA"
+    },
+    "PLACEHOLDER_LOGOTYPE": {
+      "type": "text",
+      "label": "Logotype text (box top-right)",
+      "default": "KOME 米"
+    },
+    "PLACEHOLDER_TITLE_LINE1": {
+      "type": "text",
+      "label": "Product name line 1",
+      "default": "Rice Master"
+    },
+    "PLACEHOLDER_TITLE_LINE2": {
+      "type": "text",
+      "label": "Product subtitle",
+      "default": "PRO SERIES · 1.8L"
+    },
+    "PLACEHOLDER_SPEC1_LABEL": {
+      "type": "text",
+      "label": "Spec 1 label",
+      "default": "CAPACITY"
+    },
+    "PLACEHOLDER_SPEC1_VALUE": {
+      "type": "text",
+      "label": "Spec 1 value",
+      "default": "1.8L"
+    },
+    "PLACEHOLDER_SPEC2_LABEL": {
+      "type": "text",
+      "label": "Spec 2 label",
+      "default": "POWER"
+    },
+    "PLACEHOLDER_SPEC2_VALUE": {
+      "type": "text",
+      "label": "Spec 2 value",
+      "default": "700W"
+    },
+    "PLACEHOLDER_SPEC3_LABEL": {
+      "type": "text",
+      "label": "Spec 3 label",
+      "default": "MODES"
+    },
+    "PLACEHOLDER_SPEC3_VALUE": {
+      "type": "text",
+      "label": "Spec 3 value",
+      "default": "8"
+    },
+    "PLACEHOLDER_SPEC4_LABEL": {
+      "type": "text",
+      "label": "Spec 4 label",
+      "default": "KEEP WARM"
+    },
+    "PLACEHOLDER_SPEC4_VALUE": {
+      "type": "text",
+      "label": "Spec 4 value",
+      "default": "24H"
+    },
+    "PLACEHOLDER_FEATURES_LINE": {
+      "type": "text",
+      "label": "Features line",
+      "default": "Non-stick · Delay Timer · Auto Shut-Off · Dishwasher Safe"
+    },
+    "PLACEHOLDER_PRICE_LABEL": {
+      "type": "text",
+      "label": "Price label",
+      "default": "STARTING AT"
+    },
+    "PLACEHOLDER_PRICE_VALUE": {
+      "type": "text",
+      "label": "Price",
+      "default": "UGX 320,000"
+    },
+    "PLACEHOLDER_CTA_LABEL": {
+      "type": "text",
+      "label": "CTA label (top)",
+      "default": "ORDER TODAY"
+    },
+    "PLACEHOLDER_CTA_WORD": {
+      "type": "text",
+      "label": "CTA word (large, right sash)",
+      "default": "注文する"
+    },
+    "PLACEHOLDER_TRUST1": {
+      "type": "text",
+      "label": "Trust badge 1",
+      "default": "✓ Free Delivery"
+    },
+    "PLACEHOLDER_TRUST2": {
+      "type": "text",
+      "label": "Trust badge 2",
+      "default": "✓ 2-Year Warranty"
+    },
+    "PLACEHOLDER_TRUST3": {
+      "type": "text",
+      "label": "Trust badge 3",
+      "default": "✓ In Stock"
+    },
+    "PLACEHOLDER_FOOTER_TEXT": {
+      "type": "text",
+      "label": "Footer",
+      "default": "komekitchen.ug  ·  +256 700 000 000  ·  Kampala, Uganda"
+    },
+    "PLACEHOLDER_COLOR_BG_TOP": {
+      "type": "color",
+      "label": "Background top",
+      "default": "#006D6D"
+    },
+    "PLACEHOLDER_COLOR_BG_BOTTOM": {
+      "type": "color",
+      "label": "Background bottom / dark strip",
+      "default": "#004E4E"
+    },
+    "PLACEHOLDER_COLOR_GOLD": {
+      "type": "color",
+      "label": "Gold accent",
+      "default": "#FF9900"
+    },
+    "PLACEHOLDER_COLOR_GOLD_LIGHT": {
+      "type": "color",
+      "label": "Gold light",
+      "default": "#FFD166"
+    },
+    "PLACEHOLDER_COLOR_RED": {
+      "type": "color",
+      "label": "Sash / red",
+      "default": "#E63946"
+    },
+    "PLACEHOLDER_COLOR_RED_DARK": {
+      "type": "color",
+      "label": "Sash red dark",
+      "default": "#C1121F"
+    },
+    "PLACEHOLDER_FONT_DISPLAY": {
+      "type": "font",
+      "label": "Display font (serif)",
+      "default": "Noto Serif JP"
+    },
+    "PLACEHOLDER_FONT_BODY": {
+      "type": "font",
+      "label": "Body font",
+      "default": "Poppins"
+    }
+  }
+}

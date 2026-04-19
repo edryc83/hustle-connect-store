@@ -1,0 +1,156 @@
+{
+  "id": "camera-dslr-viewfinder-promo",
+  "name": "Camera / DSLR – Viewfinder HUD Promo Flyer",
+  "category": "electronics",
+  "thumbnail": "camera-dslr-viewfinder-promo.png",
+  "canvas": {
+    "width": 1080,
+    "height": 1350
+  },
+  "fonts": [
+    "https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@100;400;700;900&family=DM+Mono:wght@300;400&display=swap"
+  ],
+  "svg": "<svg xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\" viewBox=\"0 0 1080 1350\" width=\"1080\" height=\"1350\">\n  <defs>\n    <linearGradient id=\"cam-bg\" x1=\"0\" y1=\"0\" x2=\"0\" y2=\"1350\" gradientUnits=\"userSpaceOnUse\">\n      <stop offset=\"0%\"   stop-color=\"PLACEHOLDER_COLOR_BG_TOP\"/>\n      <stop offset=\"100%\" stop-color=\"PLACEHOLDER_COLOR_BG_BOTTOM\"/>\n    </linearGradient>\n    <linearGradient id=\"cam-cta\" x1=\"0\" y1=\"0\" x2=\"260\" y2=\"0\" gradientUnits=\"userSpaceOnUse\">\n      <stop offset=\"0%\"   stop-color=\"PLACEHOLDER_COLOR_ACCENT\"/>\n      <stop offset=\"100%\" stop-color=\"PLACEHOLDER_COLOR_ACCENT_ALT\"/>\n    </linearGradient>\n    <radialGradient id=\"cam-vignette\" cx=\"50%\" cy=\"50%\" r=\"55%\">\n      <stop offset=\"40%\"  stop-color=\"PLACEHOLDER_COLOR_BG_BOTTOM\" stop-opacity=\"0\"/>\n      <stop offset=\"100%\" stop-color=\"PLACEHOLDER_COLOR_BG_BOTTOM\" stop-opacity=\"0.7\"/>\n    </radialGradient>\n    <clipPath id=\"cam-img-clip\">\n      <rect x=\"80\" y=\"120\" width=\"920\" height=\"900\"/>\n    </clipPath>\n  </defs>\n\n  <!-- LAYER 1: near-black background -->\n  <rect width=\"1080\" height=\"1350\" fill=\"url(#cam-bg)\"/>\n\n  <!-- LAYER 2: outer viewfinder frame -->\n  <rect x=\"40\" y=\"60\" width=\"1000\" height=\"1000\" fill=\"none\" stroke=\"PLACEHOLDER_COLOR_ACCENT\" stroke-width=\"0.8\" opacity=\"0.35\"/>\n  <rect x=\"80\" y=\"100\" width=\"920\" height=\"940\" fill=\"none\" stroke=\"PLACEHOLDER_COLOR_ACCENT\" stroke-width=\"0.4\" opacity=\"0.2\"/>\n\n  <!-- LAYER 3: corner brackets -->\n  <path d=\"M40 130 L40 60 L110 60\"   fill=\"none\" stroke=\"PLACEHOLDER_COLOR_ACCENT\" stroke-width=\"2.5\"/>\n  <path d=\"M970 60 L1040 60 L1040 130\" fill=\"none\" stroke=\"PLACEHOLDER_COLOR_ACCENT\" stroke-width=\"2.5\"/>\n  <path d=\"M40 930 L40 1060 L110 1060\" fill=\"none\" stroke=\"PLACEHOLDER_COLOR_ACCENT\" stroke-width=\"2.5\"/>\n  <path d=\"M970 1060 L1040 1060 L1040 930\" fill=\"none\" stroke=\"PLACEHOLDER_COLOR_ACCENT\" stroke-width=\"2.5\"/>\n\n  <!-- LAYER 4: centre crosshair -->\n  <line x1=\"540\" y1=\"100\"  x2=\"540\" y2=\"180\"  stroke=\"PLACEHOLDER_COLOR_ACCENT\" stroke-width=\"0.8\" opacity=\"0.5\"/>\n  <line x1=\"540\" y1=\"940\"  x2=\"540\" y2=\"1020\" stroke=\"PLACEHOLDER_COLOR_ACCENT\" stroke-width=\"0.8\" opacity=\"0.5\"/>\n  <line x1=\"80\"  y1=\"560\"  x2=\"160\" y2=\"560\"  stroke=\"PLACEHOLDER_COLOR_ACCENT\" stroke-width=\"0.8\" opacity=\"0.5\"/>\n  <line x1=\"920\" y1=\"560\"  x2=\"1000\" y2=\"560\" stroke=\"PLACEHOLDER_COLOR_ACCENT\" stroke-width=\"0.8\" opacity=\"0.5\"/>\n  <circle cx=\"540\" cy=\"560\" r=\"3\"  fill=\"none\" stroke=\"PLACEHOLDER_COLOR_ACCENT\" stroke-width=\"1\"   opacity=\"0.6\"/>\n  <circle cx=\"540\" cy=\"560\" r=\"12\" fill=\"none\" stroke=\"PLACEHOLDER_COLOR_ACCENT\" stroke-width=\"0.4\" opacity=\"0.3\"/>\n\n  <!-- LAYER 5: rule of thirds grid -->\n  <line x1=\"386\" y1=\"100\"  x2=\"386\"  y2=\"1020\" stroke=\"PLACEHOLDER_COLOR_ACCENT\" stroke-width=\"0.3\" opacity=\"0.08\"/>\n  <line x1=\"694\" y1=\"100\"  x2=\"694\"  y2=\"1020\" stroke=\"PLACEHOLDER_COLOR_ACCENT\" stroke-width=\"0.3\" opacity=\"0.08\"/>\n  <line x1=\"80\"  y1=\"393\"  x2=\"1000\" y2=\"393\"  stroke=\"PLACEHOLDER_COLOR_ACCENT\" stroke-width=\"0.3\" opacity=\"0.08\"/>\n  <line x1=\"80\"  y1=\"727\"  x2=\"1000\" y2=\"727\"  stroke=\"PLACEHOLDER_COLOR_ACCENT\" stroke-width=\"0.3\" opacity=\"0.08\"/>\n\n  <!-- LAYER 6: HUD top edge -->\n  <text x=\"48\"   y=\"52\" font-family=\"PLACEHOLDER_FONT_MONO, monospace\" font-size=\"13\" fill=\"PLACEHOLDER_COLOR_ACCENT\" fill-opacity=\"0.7\" letter-spacing=\"2\">PLACEHOLDER_HUD_SHUTTER</text>\n  <text x=\"200\"  y=\"52\" font-family=\"PLACEHOLDER_FONT_MONO, monospace\" font-size=\"13\" fill=\"PLACEHOLDER_COLOR_ACCENT\" fill-opacity=\"0.5\" letter-spacing=\"2\">PLACEHOLDER_HUD_APERTURE</text>\n  <text x=\"310\"  y=\"52\" font-family=\"PLACEHOLDER_FONT_MONO, monospace\" font-size=\"13\" fill=\"PLACEHOLDER_COLOR_ACCENT\" fill-opacity=\"0.5\" letter-spacing=\"2\">PLACEHOLDER_HUD_ISO</text>\n  <text x=\"540\"  y=\"52\" text-anchor=\"middle\" font-family=\"PLACEHOLDER_FONT_MONO, monospace\" font-size=\"13\" fill=\"#FFFFFF\" fill-opacity=\"0.55\" letter-spacing=\"4\">PLACEHOLDER_STORE_NAME</text>\n  <text x=\"920\"  y=\"52\" text-anchor=\"end\" font-family=\"PLACEHOLDER_FONT_MONO, monospace\" font-size=\"13\" fill=\"PLACEHOLDER_COLOR_ACCENT\" fill-opacity=\"0.5\" letter-spacing=\"2\">PLACEHOLDER_HUD_FORMAT</text>\n  <text x=\"1032\" y=\"52\" text-anchor=\"end\" font-family=\"PLACEHOLDER_FONT_MONO, monospace\" font-size=\"13\" fill=\"PLACEHOLDER_COLOR_ACCENT\" fill-opacity=\"0.7\" letter-spacing=\"2\">PLACEHOLDER_HUD_REC</text>\n\n  <!-- LAYER 7: HUD side edges (rotated) -->\n  <text x=\"24\"    y=\"560\" font-family=\"PLACEHOLDER_FONT_MONO, monospace\" font-size=\"11\" fill=\"PLACEHOLDER_COLOR_ACCENT\" fill-opacity=\"0.4\" letter-spacing=\"3\" text-anchor=\"middle\" transform=\"rotate(-90 24 560)\">PLACEHOLDER_HUD_LEFT</text>\n  <text x=\"1056\"  y=\"560\" font-family=\"PLACEHOLDER_FONT_MONO, monospace\" font-size=\"11\" fill=\"PLACEHOLDER_COLOR_ACCENT\" fill-opacity=\"0.4\" letter-spacing=\"3\" text-anchor=\"middle\" transform=\"rotate(90 1056 560)\">PLACEHOLDER_HUD_RIGHT</text>\n\n  <!-- LAYER 8: HUD bottom edge -->\n  <text x=\"48\"   y=\"1080\" font-family=\"PLACEHOLDER_FONT_MONO, monospace\" font-size=\"13\" fill=\"PLACEHOLDER_COLOR_ACCENT\" fill-opacity=\"0.5\" letter-spacing=\"2\">PLACEHOLDER_HUD_BATTERY</text>\n  <text x=\"330\"  y=\"1080\" font-family=\"PLACEHOLDER_FONT_MONO, monospace\" font-size=\"13\" fill=\"#FFFFFF\" fill-opacity=\"0.3\"  letter-spacing=\"2\">PLACEHOLDER_HUD_AF</text>\n  <text x=\"540\"  y=\"1080\" text-anchor=\"middle\" font-family=\"PLACEHOLDER_FONT_MONO, monospace\" font-size=\"13\" fill=\"PLACEHOLDER_COLOR_ACCENT\" fill-opacity=\"0.5\" letter-spacing=\"2\">PLACEHOLDER_HUD_FOCUS</text>\n  <text x=\"840\"  y=\"1080\" font-family=\"PLACEHOLDER_FONT_MONO, monospace\" font-size=\"13\" fill=\"#FFFFFF\" fill-opacity=\"0.3\"  letter-spacing=\"2\">PLACEHOLDER_HUD_METER</text>\n  <text x=\"1032\" y=\"1080\" text-anchor=\"end\" font-family=\"PLACEHOLDER_FONT_MONO, monospace\" font-size=\"13\" fill=\"PLACEHOLDER_COLOR_ACCENT\" fill-opacity=\"0.5\" letter-spacing=\"2\">PLACEHOLDER_HUD_SHOTS</text>\n\n  <!-- LAYER 9: product image inside viewfinder -->\n  <rect x=\"80\" y=\"120\" width=\"920\" height=\"900\" fill=\"PLACEHOLDER_COLOR_IMG_BG\"/>\n  <g clip-path=\"url(#cam-img-clip)\">\n    <image href=\"PLACEHOLDER_PRODUCT_IMAGE\" x=\"80\" y=\"120\" width=\"920\" height=\"900\" preserveAspectRatio=\"xMidYMid meet\"/>\n  </g>\n  <rect x=\"80\" y=\"120\" width=\"920\" height=\"900\" fill=\"url(#cam-vignette)\"/>\n\n  <!-- LAYER 10: product name below viewfinder -->\n  <text x=\"48\" y=\"1168\" font-family=\"PLACEHOLDER_FONT_DISPLAY, sans-serif\" font-size=\"120\" font-weight=\"900\" fill=\"#FFFFFF\"                         letter-spacing=\"-3\">PLACEHOLDER_TITLE_LINE1</text>\n  <text x=\"48\" y=\"1274\" font-family=\"PLACEHOLDER_FONT_DISPLAY, sans-serif\" font-size=\"120\" font-weight=\"100\" fill=\"#FFFFFF\" fill-opacity=\"0.35\"       letter-spacing=\"-3\">PLACEHOLDER_TITLE_LINE2</text>\n\n  <!-- LAYER 11: price right side -->\n  <text x=\"1032\" y=\"1160\" text-anchor=\"end\" font-family=\"PLACEHOLDER_FONT_MONO, monospace\"    font-size=\"13\" fill=\"PLACEHOLDER_COLOR_ACCENT\" fill-opacity=\"0.6\" letter-spacing=\"2\">PLACEHOLDER_PRICE_COMMENT</text>\n  <text x=\"1032\" y=\"1232\" text-anchor=\"end\" font-family=\"PLACEHOLDER_FONT_DISPLAY, sans-serif\" font-size=\"88\" font-weight=\"900\" fill=\"PLACEHOLDER_COLOR_ACCENT\" letter-spacing=\"-2\">PLACEHOLDER_PRICE_VALUE</text>\n  <text x=\"1032\" y=\"1268\" text-anchor=\"end\" font-family=\"PLACEHOLDER_FONT_MONO, monospace\"    font-size=\"13\" fill=\"PLACEHOLDER_COLOR_ACCENT\" fill-opacity=\"0.45\" letter-spacing=\"2\">PLACEHOLDER_PRICE_SUB</text>\n\n  <!-- LAYER 12: rule + CTA + specs -->\n  <line x1=\"48\" y1=\"1292\" x2=\"1032\" y2=\"1292\" stroke=\"PLACEHOLDER_COLOR_ACCENT\" stroke-width=\"0.5\" opacity=\"0.2\"/>\n  <rect x=\"48\" y=\"1308\" width=\"260\" height=\"52\" rx=\"0\" fill=\"url(#cam-cta)\"/>\n  <text x=\"178\" y=\"1341\" text-anchor=\"middle\" font-family=\"PLACEHOLDER_FONT_DISPLAY, sans-serif\" font-size=\"24\" font-weight=\"700\" fill=\"PLACEHOLDER_COLOR_BG_TOP\" letter-spacing=\"3\">PLACEHOLDER_CTA_TEXT</text>\n  <text x=\"360\" y=\"1334\" font-family=\"PLACEHOLDER_FONT_MONO, monospace\" font-size=\"12\" fill=\"#FFFFFF\" fill-opacity=\"0.25\" letter-spacing=\"2\">PLACEHOLDER_SPEC_LINE</text>\n</svg>",
+  "tokens": {
+    "PLACEHOLDER_PRODUCT_IMAGE": {
+      "type": "image",
+      "label": "Product photo",
+      "default": ""
+    },
+    "PLACEHOLDER_STORE_NAME": {
+      "type": "text",
+      "label": "Store name (HUD top centre)",
+      "default": "LENS CRAFT STORE"
+    },
+    "PLACEHOLDER_HUD_SHUTTER": {
+      "type": "text",
+      "label": "HUD: shutter speed",
+      "default": "1/2000s"
+    },
+    "PLACEHOLDER_HUD_APERTURE": {
+      "type": "text",
+      "label": "HUD: aperture",
+      "default": "f/1.4"
+    },
+    "PLACEHOLDER_HUD_ISO": {
+      "type": "text",
+      "label": "HUD: ISO",
+      "default": "ISO 100"
+    },
+    "PLACEHOLDER_HUD_FORMAT": {
+      "type": "text",
+      "label": "HUD: file format",
+      "default": "RAW+JPG"
+    },
+    "PLACEHOLDER_HUD_REC": {
+      "type": "text",
+      "label": "HUD: record indicator",
+      "default": "●REC"
+    },
+    "PLACEHOLDER_HUD_LEFT": {
+      "type": "text",
+      "label": "HUD: left edge text",
+      "default": "EXPOSURE · AUTO · AWB"
+    },
+    "PLACEHOLDER_HUD_RIGHT": {
+      "type": "text",
+      "label": "HUD: right edge text",
+      "default": "LENSCRAFT.UG · KAMPALA"
+    },
+    "PLACEHOLDER_HUD_BATTERY": {
+      "type": "text",
+      "label": "HUD: battery",
+      "default": "▎▎▎▎ 96%"
+    },
+    "PLACEHOLDER_HUD_AF": {
+      "type": "text",
+      "label": "HUD: autofocus mode",
+      "default": "AF · SERVO"
+    },
+    "PLACEHOLDER_HUD_FOCUS": {
+      "type": "text",
+      "label": "HUD: focus status",
+      "default": "[ FOCUS LOCK ]"
+    },
+    "PLACEHOLDER_HUD_METER": {
+      "type": "text",
+      "label": "HUD: metering mode",
+      "default": "METERING · SPOT"
+    },
+    "PLACEHOLDER_HUD_SHOTS": {
+      "type": "text",
+      "label": "HUD: shot count",
+      "default": "36/36"
+    },
+    "PLACEHOLDER_TITLE_LINE1": {
+      "type": "text",
+      "label": "Title line 1 (bold)",
+      "default": "APEX"
+    },
+    "PLACEHOLDER_TITLE_LINE2": {
+      "type": "text",
+      "label": "Title line 2 (light)",
+      "default": "PRO 90D"
+    },
+    "PLACEHOLDER_PRICE_COMMENT": {
+      "type": "text",
+      "label": "Price comment tag",
+      "default": "// PRICE"
+    },
+    "PLACEHOLDER_PRICE_VALUE": {
+      "type": "text",
+      "label": "Price (large)",
+      "default": "1.6M"
+    },
+    "PLACEHOLDER_PRICE_SUB": {
+      "type": "text",
+      "label": "Price sub-line",
+      "default": "UGX STARTING AT"
+    },
+    "PLACEHOLDER_CTA_TEXT": {
+      "type": "text",
+      "label": "CTA button text",
+      "default": "ORDER NOW"
+    },
+    "PLACEHOLDER_SPEC_LINE": {
+      "type": "text",
+      "label": "Spec line (bottom right)",
+      "default": "45MP · 4K60 · Dual Pixel AF · lenscraft.ug"
+    },
+    "PLACEHOLDER_COLOR_BG_TOP": {
+      "type": "color",
+      "label": "Background top",
+      "default": "#0E0E0E"
+    },
+    "PLACEHOLDER_COLOR_BG_BOTTOM": {
+      "type": "color",
+      "label": "Background bottom",
+      "default": "#080808"
+    },
+    "PLACEHOLDER_COLOR_IMG_BG": {
+      "type": "color",
+      "label": "Image zone bg",
+      "default": "#111111"
+    },
+    "PLACEHOLDER_COLOR_ACCENT": {
+      "type": "color",
+      "label": "Accent / amber",
+      "default": "#D4A017"
+    },
+    "PLACEHOLDER_COLOR_ACCENT_ALT": {
+      "type": "color",
+      "label": "Accent highlight",
+      "default": "#F0C040"
+    },
+    "PLACEHOLDER_FONT_DISPLAY": {
+      "type": "font",
+      "label": "Display font",
+      "default": "Big Shoulders Display"
+    },
+    "PLACEHOLDER_FONT_MONO": {
+      "type": "font",
+      "label": "Mono font (HUD data)",
+      "default": "DM Mono"
+    }
+  }
+}
