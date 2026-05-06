@@ -724,7 +724,7 @@ function ShareToStatusButton({ product, imgs, currency, profile }: {
 
 /** List-style row for a single item */
 function ListingRow({
-  product, productImages, currency, formatDate, onEdit, onDelete, onToggleFeatured, profile, onDetail,
+  product, productImages, currency, formatDate, onEdit, onDelete, onToggleFeatured, profile, onDetail, onAutoDesign,
 }: {
   product: Product;
   productImages: Record<string, string[]>;
@@ -735,6 +735,7 @@ function ListingRow({
   onToggleFeatured: (p: Product) => void;
   profile: { store_name?: string; store_slug?: string } | null;
   onDetail: (p: Product) => void;
+  onAutoDesign: (p: Product) => void;
 }) {
   const imgs = productImages[product.id] ?? (product.image_url ? [product.image_url] : []);
   const { month, day } = formatDate(product.created_at);
@@ -750,7 +751,12 @@ function ListingRow({
       </div>
 
       {/* Thumbnail */}
-      <div className="h-12 w-12 shrink-0 rounded-lg overflow-hidden bg-muted">
+      <button
+        type="button"
+        onClick={(e) => { e.stopPropagation(); onAutoDesign(product); }}
+        className="relative h-12 w-12 shrink-0 rounded-lg overflow-hidden bg-muted group/thumb"
+        title="Auto Design with AI"
+      >
         {imgs[0] ? (
           <img src={imgs[0]} alt={product.name} className="h-full w-full object-cover" />
         ) : (
@@ -758,7 +764,12 @@ function ListingRow({
             {isService ? <Wrench className="h-5 w-5 text-muted-foreground/40" /> : <ImageIcon className="h-5 w-5 text-muted-foreground/40" />}
           </div>
         )}
-      </div>
+        {imgs[0] && (
+          <span className="absolute bottom-0.5 right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-md">
+            <Sparkles className="h-2.5 w-2.5" />
+          </span>
+        )}
+      </button>
 
       {/* Info */}
       <div className="flex-1 min-w-0">
