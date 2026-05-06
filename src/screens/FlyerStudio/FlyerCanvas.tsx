@@ -94,7 +94,7 @@ function applyTextOverrides(
 function resolveTemplate(svgString: string, userState: Record<string, string>): string {
   let svg = svgString;
   for (const [token, value] of Object.entries(userState)) {
-    svg = svg.replaceAll(token, value ?? '');
+    svg = svg.split(token).join(value ?? '');
   }
   return svg;
 }

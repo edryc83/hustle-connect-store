@@ -16,7 +16,7 @@ export default function WhatsAppTestCard({ whatsappNumber, storeName, storeSlug 
     ? `${window.location.origin}/${storeSlug}`
     : window.location.origin;
   const testMessage = encodeURIComponent(
-    `🛍️ Check out ${storeName || "my store"} on Afristall — order directly on WhatsApp!\n${storeUrl}`
+    `🛍️ Check out ${storeName || "my store"} — order directly on WhatsApp!\n${storeUrl}`
   );
   const whatsappUrl = `https://wa.me/${cleanNumber}?text=${testMessage}`;
 
