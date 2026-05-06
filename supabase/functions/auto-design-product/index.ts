@@ -57,9 +57,10 @@ Deno.serve(async (req) => {
 
     const { data: product, error: pErr } = await admin
       .from("products")
-      .select("id, name, price, discount_price, currency, image_url, description, user_id")
+      .select("id, name, price, discount_price, image_url, description, user_id")
       .eq("id", productId).maybeSingle();
     if (pErr || !product) {
+      console.error("Product fetch error", pErr, "productId:", productId);
       return new Response(JSON.stringify({ error: "Product not found" }), {
         status: 404, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -80,7 +81,7 @@ Deno.serve(async (req) => {
       .select("store_name, whatsapp_number, accent_color")
       .eq("id", userId).maybeSingle();
 
-    const currency = (product as any).currency || "UGX";
+    const currency = profile?.currency || "UGX";
     const priceNum = (product as any).discount_price ?? product.price;
     const priceStr = formatPrice(Number(priceNum), currency);
     const phone = profile?.whatsapp_number?.trim() || "";
