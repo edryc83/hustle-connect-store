@@ -24,9 +24,9 @@ Deno.serve(async (req) => {
       });
     }
 
-    const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-    if (!LOVABLE_API_KEY) {
-      return new Response(JSON.stringify({ error: "LOVABLE_API_KEY is not configured" }), {
+    const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY");
+    if (!OPENAI_API_KEY) {
+      return new Response(JSON.stringify({ error: "OPENAI_API_KEY is not configured" }), {
         status: 500, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
@@ -103,48 +103,52 @@ Deno.serve(async (req) => {
       "Final output must look like a high-end fashion / Apple-style product poster.",
     ].filter(Boolean).join("\n");
 
-    // Call Lovable AI Gateway (Nano Banana Pro) to edit the product image
-    const aiResp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    // Download product image
+    const imgResp = await fetch(product.image_url);
+    if (!imgResp.ok) {
+      return new Response(JSON.stringify({ error: "Could not load product image" }), {
+        status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    const imgBuf = await imgResp.arrayBuffer();
+    const imgType = imgResp.headers.get("content-type") || "image/png";
+    const imgFile = new File([imgBuf], "product.png", { type: imgType });
+
+    const form = new FormData();
+    form.append("model", "gpt-image-1");
+    form.append("prompt", prompt);
+    form.append("size", "1024x1024");
+    form.append("quality", "high");
+    form.append("n", "1");
+    form.append("image", imgFile);
+
+    const openaiResp = await fetch("https://api.openai.com/v1/images/edits", {
       method: "POST",
-      headers: {
-        Authorization: `Bearer ${LOVABLE_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        model: "google/gemini-3-pro-image-preview",
-        messages: [
-          {
-            role: "user",
-            content: [
-              { type: "text", text: prompt },
-              { type: "image_url", image_url: { url: product.image_url } },
-            ],
-          },
-        ],
-        modalities: ["image", "text"],
-      }),
+      headers: { Authorization: `Bearer ${OPENAI_API_KEY}` },
+      body: form,
     });
 
-    if (!aiResp.ok) {
-      const errText = await aiResp.text();
-      console.error("Lovable AI error:", aiResp.status, errText);
+    if (!openaiResp.ok) {
+      const errText = await openaiResp.text();
+      console.error("OpenAI error:", openaiResp.status, errText);
       let msg = "Image generation failed";
-      if (aiResp.status === 429) msg = "Rate limit reached. Please try again shortly.";
-      else if (aiResp.status === 402) msg = "AI credits exhausted. Top up your Lovable Cloud AI balance.";
+      if (openaiResp.status === 401) msg = "OpenAI API key is invalid";
+      else if (openaiResp.status === 429) msg = "OpenAI is rate-limiting requests. Try again in a moment.";
+      else if (errText.toLowerCase().includes("billing")) msg = "OpenAI billing limit reached. Check your OpenAI account.";
+      else if (errText.toLowerCase().includes("verified")) msg = "Your OpenAI organization needs verification for gpt-image-1.";
+      else if (errText.toLowerCase().includes("safety") || errText.toLowerCase().includes("policy")) msg = "OpenAI safety system blocked this image. Try a different photo.";
       return new Response(JSON.stringify({ error: msg, detail: errText }), {
         status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    const aiJson = await aiResp.json();
-    const dataUrl: string | undefined = aiJson?.choices?.[0]?.message?.images?.[0]?.image_url?.url;
-    if (!dataUrl || !dataUrl.startsWith("data:")) {
-      console.error("No image returned", JSON.stringify(aiJson).slice(0, 500));
+    const openaiJson = await openaiResp.json();
+    const b64: string | undefined = openaiJson?.data?.[0]?.b64_json;
+    if (!b64) {
       return new Response(JSON.stringify({ error: "No image returned" }), {
         status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
-    const b64 = dataUrl.split(",")[1];
     const bin = atob(b64);
     const bytes = new Uint8Array(bin.length);
     for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
