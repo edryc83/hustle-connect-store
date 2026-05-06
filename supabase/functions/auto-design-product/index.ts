@@ -115,7 +115,7 @@ Deno.serve(async (req) => {
     const imgFile = new File([imgBuf], "product.png", { type: imgType });
 
     const form = new FormData();
-    form.append("model", "gpt-image-1");
+    form.append("model", "gpt-image-2");
     form.append("prompt", prompt);
     form.append("size", "1024x1024");
     form.append("quality", "high");
@@ -135,7 +135,7 @@ Deno.serve(async (req) => {
       if (openaiResp.status === 401) msg = "OpenAI API key is invalid";
       else if (openaiResp.status === 429) msg = "OpenAI is rate-limiting requests. Try again in a moment.";
       else if (errText.toLowerCase().includes("billing")) msg = "OpenAI billing limit reached. Check your OpenAI account.";
-      else if (errText.toLowerCase().includes("verified")) msg = "Your OpenAI organization needs verification for gpt-image-1.";
+      else if (errText.toLowerCase().includes("verified")) msg = "Your OpenAI organization needs verification for gpt-image-2.";
       else if (errText.toLowerCase().includes("safety") || errText.toLowerCase().includes("policy")) msg = "OpenAI safety system blocked this image. Try a different photo.";
       return new Response(JSON.stringify({ error: msg, detail: errText }), {
         status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" },
