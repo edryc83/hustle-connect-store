@@ -69,7 +69,8 @@ Deno.serve(async (req) => {
 
     // Store-level OG (fallback)
     const storeUrl = `${APP_URL}/${slug}`;
-    const title = `${profile.store_name || slug} — Shop on Afristall`;
+    const storeName = profile.store_name || slug;
+    const title = storeName;
     // Parse category — could be a JSON string or plain text
     let categoryLabel = "";
     if (profile.category) {
@@ -84,11 +85,12 @@ Deno.serve(async (req) => {
         categoryLabel = profile.category;
       }
     }
+    const locationLabel = [profile.city, profile.country].filter(Boolean).join(", ");
     const description = profile.store_bio ||
-      `Check out ${profile.store_name || slug}${categoryLabel ? ` for ${categoryLabel}` : ""}${profile.city ? ` in ${profile.city}` : ""}. Order directly on WhatsApp! 🛒`;
+      `${categoryLabel ? `${categoryLabel}` : "Shop"}${locationLabel ? ` in ${locationLabel}` : ""}. Order directly on WhatsApp. 🛒`;
     const image = profile.profile_picture_url || FALLBACK_IMAGE;
 
-    return new Response(buildHtml({ title, description, image, pageUrl: storeUrl, storeName: profile.store_name || slug }), {
+    return new Response(buildHtml({ title, description, image, pageUrl: storeUrl, storeName }), {
       headers: { "Content-Type": "text/html; charset=utf-8", "Cache-Control": "public, max-age=300, s-maxage=300" },
     });
   } catch (error) {

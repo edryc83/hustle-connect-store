@@ -90,7 +90,7 @@ const DashboardOverview = () => {
   const shareStore = async () => {
     if (navigator.share) {
       try {
-        await navigator.share({ title: storeName, text: `🛍️ Check out ${storeName || "my store"} on Afristall — order directly on WhatsApp!`, url: storeUrl });
+        await navigator.share({ title: storeName, text: `🛍️ Check out ${storeName || "my store"} — order directly on WhatsApp!`, url: storeUrl });
       } catch { /* user cancelled */ }
     } else {
       await navigator.clipboard.writeText(storeUrl);

@@ -44,7 +44,7 @@ function ShareButton({ storeName, storeSlug, product, currency }: { storeName: s
     : `https://afristall.com/${storeSlug}`;
   const fallbackText = product
     ? `🔥 ${product.name} — ${formatPrice(product.discount_price ?? product.price, currency || "UGX")}\n\nShop here 👉 ${shareUrl}`
-    : `🛍️ Check out ${storeName} on Afristall — order directly on WhatsApp!`;
+    : `🛍️ Check out ${storeName} — order directly on WhatsApp!\n${shareUrl}`;
 
   const copyLink = async () => {
     await navigator.clipboard.writeText(shareUrl);
@@ -722,9 +722,10 @@ const StorefrontInner = () => {
   // Set dynamic OG meta tags for social sharing
   useEffect(() => {
     if (!profile) return;
-    const title = `${profile.store_name || storeSlug} — Shop on Afristall`;
+    const shopName = profile.store_name || storeSlug;
+    const title = shopName;
     const description = profile.store_bio ||
-      `Check out ${profile.store_name || storeSlug}${profile.category ? ` for ${profile.category}` : ""}${(profile.district || profile.city) ? ` in ${profile.district || profile.city}` : ""}. Order directly on WhatsApp! 🛒`;
+      `${profile.category ? `${profile.category}` : "Shop"}${(profile.district || profile.city) ? ` in ${profile.district || profile.city}` : ""}. Order directly on WhatsApp. 🛒`;
     const image = profile.profile_picture_url || "/logo-glow.png";
 
     document.title = title;
