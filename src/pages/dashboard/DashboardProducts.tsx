@@ -663,6 +663,7 @@ const DashboardProducts = () => {
         productName={autoDesignProduct?.name}
         open={!!autoDesignProduct}
         onClose={() => setAutoDesignProduct(null)}
+        onSaved={() => fetchProducts()}
       />
     </div>
   );
