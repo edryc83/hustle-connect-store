@@ -632,6 +632,13 @@ const DashboardProducts = () => {
                 >
                   <Sparkles className="h-4 w-4" /> Create Flyer
                 </Button>
+                <Button
+                  variant="outline"
+                  className="w-full rounded-xl gap-2 border-primary/30 text-primary hover:bg-primary/10"
+                  onClick={() => { setDetailProduct(null); setAutoDesignProduct(detailProduct); }}
+                >
+                  <Sparkles className="h-4 w-4" /> Design with AI
+                </Button>
                 <ShareToStatusButton product={detailProduct} imgs={imgs} currency={currency} profile={profile} />
               </div>
             );
