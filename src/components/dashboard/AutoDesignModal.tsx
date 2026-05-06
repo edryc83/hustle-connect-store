@@ -10,9 +10,10 @@ interface Props {
   productName?: string;
   open: boolean;
   onClose: () => void;
+  onSaved?: () => void;
 }
 
-export function AutoDesignModal({ productId, productName, open, onClose }: Props) {
+export function AutoDesignModal({ productId, productName, open, onClose, onSaved }: Props) {
   const [loading, setLoading] = useState(false);
   const [url, setUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -97,6 +98,7 @@ export function AutoDesignModal({ productId, productName, open, onClose }: Props
         .insert({ product_id: productId, image_url: url, position: nextPos });
       if (insErr) throw insErr;
       toast.success("Saved to product images");
+      onSaved?.();
       onClose();
     } catch (e: any) {
       toast.error(e?.message || "Could not save");
