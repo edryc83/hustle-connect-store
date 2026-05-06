@@ -78,7 +78,7 @@ Deno.serve(async (req) => {
 
     const { data: profile } = await admin
       .from("profiles")
-      .select("store_name, whatsapp_number, accent_color")
+      .select("store_name, whatsapp_number, accent_color, currency")
       .eq("id", userId).maybeSingle();
 
     const currency = profile?.currency || "UGX";
