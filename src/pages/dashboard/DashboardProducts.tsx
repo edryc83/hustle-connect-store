@@ -657,6 +657,13 @@ const DashboardProducts = () => {
           onClose={() => setFlyerProduct(null)}
         />
       )}
+
+      <AutoDesignModal
+        productId={autoDesignProduct?.id ?? null}
+        productName={autoDesignProduct?.name}
+        open={!!autoDesignProduct}
+        onClose={() => setAutoDesignProduct(null)}
+      />
     </div>
   );
 };
