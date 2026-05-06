@@ -768,9 +768,9 @@ function ListingRow({
       {/* Thumbnail */}
       <button
         type="button"
-        onClick={(e) => { e.stopPropagation(); onAutoDesign(product); }}
+        onClick={(e) => { e.stopPropagation(); onDetail(product); }}
         className="relative h-12 w-12 shrink-0 rounded-lg overflow-hidden bg-muted group/thumb"
-        title="Auto Design with AI"
+        title="View options"
       >
         {imgs[0] ? (
           <img src={imgs[0]} alt={product.name} className="h-full w-full object-cover" />
@@ -778,11 +778,6 @@ function ListingRow({
           <div className="flex h-full w-full items-center justify-center">
             {isService ? <Wrench className="h-5 w-5 text-muted-foreground/40" /> : <ImageIcon className="h-5 w-5 text-muted-foreground/40" />}
           </div>
-        )}
-        {imgs[0] && (
-          <span className="absolute bottom-0.5 right-0.5 flex h-4 w-4 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-md">
-            <Sparkles className="h-2.5 w-2.5" />
-          </span>
         )}
       </button>
 
