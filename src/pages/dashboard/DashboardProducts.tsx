@@ -26,6 +26,7 @@ import FlyerStudio from "@/screens/FlyerStudio";
 import { ProductAttributeForm } from "@/components/dashboard/ProductAttributeForm";
 import type { AiAttributeSuggestion } from "@/lib/attributeLibrary";
 import { aiSlugToCategory } from "@/lib/categoryMapping";
+import { AutoDesignModal } from "@/components/dashboard/AutoDesignModal";
 
 type Product = Tables<"products">;
 
