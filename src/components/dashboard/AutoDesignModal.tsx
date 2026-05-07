@@ -29,11 +29,28 @@ export function AutoDesignModal({ productId, productName, inspiration, inspirati
     setError(null);
     setUrl(null);
     try {
+      let inspirationDataUrl: string | null = null;
+      if (inspirationImage) {
+        try {
+          const r = await fetch(inspirationImage);
+          const blob = await r.blob();
+          if (blob.type.startsWith("image/")) {
+            inspirationDataUrl = await new Promise<string>((resolve, reject) => {
+              const fr = new FileReader();
+              fr.onloadend = () => resolve(fr.result as string);
+              fr.onerror = reject;
+              fr.readAsDataURL(blob);
+            });
+          }
+        } catch {
+          inspirationDataUrl = null;
+        }
+      }
       const { data, error: fnErr } = await supabase.functions.invoke("auto-design-product", {
         body: {
           productId,
           inspiration: inspiration || null,
-          inspirationImage: inspirationImage || null,
+          inspirationImage: inspirationDataUrl,
           themeColor: themeColor || null,
         },
       });
