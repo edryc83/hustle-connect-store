@@ -7,7 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import {
-  Loader2, Sparkles, Package, Wand2, ArrowLeft, Download, Share2, RefreshCw, Search, Shuffle, Check, Upload, Trash2, Link2,
+  Loader2, Sparkles, Package, Wand2, ArrowLeft, Download, Share2, RefreshCw, Search, Shuffle, Check, Upload, Trash2, Copy, ImagePlus,
 } from "lucide-react";
 import { AutoDesignModal } from "./AutoDesignModal";
 import { INSPIRATIONS, COLOR_THEMES, pickRandomInspiration } from "./designInspirations";
@@ -21,8 +21,9 @@ interface Props {
   initialProduct?: ProductRow | null;
 }
 
-type Track = "product" | "prompt" | "day";
-type Step = "menu" | "product" | "occasion" | "template" | "theme" | "final";
+type Track = "product" | "prompt" | "day" | "copy";
+type Step = "menu" | "product" | "occasion" | "template" | "theme" | "final" | "source" | "use";
+type CopyMode = "product" | "prompt";
 
 interface ProductRow {
   id: string;
@@ -52,7 +53,7 @@ export function DesignStudioModal({ open, onClose, initialProduct = null }: Prop
 
   const [userTemplates, setUserTemplates] = useState<Array<{ id: string; label: string; image: string; prompt: string | null; user: true }>>([]);
   const [uploadingTemplate, setUploadingTemplate] = useState(false);
-  const [importingUrl, setImportingUrl] = useState(false);
+  const [copyMode, setCopyMode] = useState<CopyMode | null>(null);
 
   useEffect(() => {
     if (!open) {
@@ -66,6 +67,7 @@ export function DesignStudioModal({ open, onClose, initialProduct = null }: Prop
       setThemeId(null);
       setOccasionId(null);
       setExtraCopy("");
+      setCopyMode(null);
     } else if (initialProduct) {
       // Pre-select product and jump straight into the template step
       setTrack("product");
@@ -75,7 +77,7 @@ export function DesignStudioModal({ open, onClose, initialProduct = null }: Prop
   }, [open, initialProduct]);
 
   useEffect(() => {
-    if (track === "product" && step === "product" && user && products.length === 0) {
+    if ((track === "product" || track === "copy") && step === "product" && user && products.length === 0) {
       setLoadingProducts(true);
       supabase
         .from("products")
@@ -145,42 +147,13 @@ export function DesignStudioModal({ open, onClose, initialProduct = null }: Prop
       setUserTemplates((prev) => [newItem, ...prev]);
       setInspirationId(newItem.id);
       toast.success("Template added");
+      if (track === "copy" && step === "source") {
+        setStep("use");
+      }
     } catch (e: any) {
       toast.error(e?.message || "Upload failed");
     } finally {
       setUploadingTemplate(false);
-    }
-  };
-
-  const handleImportFromUrl = async () => {
-    if (!user) return;
-    const url = window.prompt(
-      "Paste a Pinterest pin URL or any image link",
-      "",
-    );
-    if (!url) return;
-    setImportingUrl(true);
-    try {
-      const { data, error } = await supabase.functions.invoke("import-design-template", {
-        body: { url: url.trim() },
-      });
-      if (error) throw error;
-      if ((data as any)?.error) throw new Error((data as any).error);
-      const row = (data as any).template;
-      const newItem = {
-        id: `user-${row.id}`,
-        label: row.label,
-        image: row.image_url,
-        prompt: row.prompt,
-        user: true as const,
-      };
-      setUserTemplates((prev) => [newItem, ...prev]);
-      setInspirationId(newItem.id);
-      toast.success("Template imported");
-    } catch (e: any) {
-      toast.error(e?.message || "Import failed");
-    } finally {
-      setImportingUrl(false);
     }
   };
 
@@ -304,7 +277,10 @@ export function DesignStudioModal({ open, onClose, initialProduct = null }: Prop
   );
 
   // Hand off to AutoDesignModal once product + template + theme have been chosen
-  const handoffToAutoDesign = track === "product" && selectedProduct && step === "final";
+  const handoffToAutoDesign =
+    selectedProduct &&
+    step === "final" &&
+    (track === "product" || (track === "copy" && copyMode === "product"));
   if (handoffToAutoDesign) {
     return (
       <AutoDesignModal
@@ -324,25 +300,46 @@ export function DesignStudioModal({ open, onClose, initialProduct = null }: Prop
 
   const goBack = () => {
     if (step === "final") setStep("theme");
-    else if (step === "theme") setStep("template");
+    else if (step === "theme") setStep(track === "copy" ? "use" : "template");
     else if (step === "template") {
       if (track === "day") { setStep("occasion"); return; }
       if (track === "product") { setStep("product"); return; }
       setStep("menu");
       setTrack(null);
+    } else if (step === "use") {
+      setStep("source");
+      setCopyMode(null);
+    } else if (step === "source") {
+      setStep("menu");
+      setTrack(null);
     } else if (step === "occasion" || step === "product") {
+      if (track === "copy") { setStep("use"); return; }
       setStep("menu");
       setTrack(null);
     } else onClose();
   };
+  // Override theme back for copy track
+  // (handled above, but ensure copy+theme goes to use)
 
-  const stepIndex =
-    step === "menu" ? 0
-      : step === "product" || step === "occasion" ? 1
-      : step === "template" ? 2
-      : step === "theme" ? 3
-      : 4;
-  const totalSteps = track === "prompt" ? 3 : 4;
+  const stepIndex = (() => {
+    if (step === "menu") return 0;
+    if (track === "copy") {
+      if (step === "source") return 1;
+      if (step === "use") return 2;
+      if (step === "product") return 3;
+      if (step === "theme") return copyMode === "product" ? 4 : 3;
+      if (step === "final") return copyMode === "product" ? 5 : 4;
+      return 0;
+    }
+    if (step === "product" || step === "occasion") return 1;
+    if (step === "template") return 2;
+    if (step === "theme") return 3;
+    return 4;
+  })();
+  const totalSteps =
+    track === "copy"
+      ? copyMode === "product" ? 5 : 4
+      : track === "prompt" ? 3 : 4;
 
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
@@ -365,6 +362,8 @@ export function DesignStudioModal({ open, onClose, initialProduct = null }: Prop
             {step === "template" && "Pick a template"}
             {step === "theme" && "Pick a color"}
             {step === "final" && "Describe your poster"}
+            {step === "source" && "Upload your design"}
+            {step === "use" && "How to use it"}
           </DialogTitle>
         </DialogHeader>
 
@@ -409,6 +408,14 @@ export function DesignStudioModal({ open, onClose, initialProduct = null }: Prop
                 desc: "Jolly person + your daily vibe",
                 tint: "from-emerald-500/20 to-teal-500/10 text-emerald-300 border-emerald-500/30",
                 onClick: () => { setTrack("day"); setStep("occasion"); },
+              },
+              {
+                id: "copy",
+                icon: Copy,
+                title: "Copy this design",
+                desc: "Upload a design to recreate",
+                tint: "from-sky-500/20 to-blue-500/10 text-sky-300 border-sky-500/30",
+                onClick: () => { setTrack("copy"); setStep("source"); },
               },
             ].map((opt) => {
               const Icon = opt.icon;
@@ -479,21 +486,6 @@ export function DesignStudioModal({ open, onClose, initialProduct = null }: Prop
                 {insp ? `Selected: ${insp.label}` : "Tap a template"}
               </span>
               <div className="flex items-center gap-3">
-                {track !== "day" && (
-                  <button
-                    type="button"
-                    onClick={handleImportFromUrl}
-                    disabled={importingUrl}
-                    className="text-[11px] flex items-center gap-1 text-primary hover:underline disabled:opacity-50"
-                  >
-                    {importingUrl ? (
-                      <Loader2 className="h-3 w-3 animate-spin" />
-                    ) : (
-                      <Link2 className="h-3 w-3" />
-                    )}
-                    Copy from URL
-                  </button>
-                )}
                 {track !== "day" && (
                   <label className="text-[11px] flex items-center gap-1 text-primary hover:underline cursor-pointer">
                     {uploadingTemplate ? (
@@ -580,6 +572,106 @@ export function DesignStudioModal({ open, onClose, initialProduct = null }: Prop
           </div>
         )}
 
+        {/* STEP — SOURCE (copy track) */}
+        {step === "source" && track === "copy" && (
+          <div className="space-y-3">
+            <p className="text-[11px] text-muted-foreground">
+              Upload a poster or screenshot you love. AI will recreate it in your style.
+            </p>
+            {insp ? (
+              <div className="flex items-center gap-3 rounded-xl border border-primary/40 bg-primary/5 p-3">
+                <div className="h-20 w-20 rounded-lg overflow-hidden bg-muted shrink-0">
+                  <img src={insp.image} alt={insp.label} className="w-full h-full object-cover" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="text-sm font-semibold truncate">{insp.label}</div>
+                  <div className="text-[11px] text-muted-foreground">Ready to use</div>
+                </div>
+                <Check className="h-4 w-4 text-primary shrink-0" />
+              </div>
+            ) : (
+              <label className="flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-border/60 hover:border-primary/40 p-8 cursor-pointer transition">
+                {uploadingTemplate ? (
+                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                ) : (
+                  <ImagePlus className="h-8 w-8 text-muted-foreground" />
+                )}
+                <span className="text-sm font-semibold">
+                  {uploadingTemplate ? "Uploading…" : "Tap to upload"}
+                </span>
+                <span className="text-[11px] text-muted-foreground">
+                  PNG, JPG or WebP — up to 1MB
+                </span>
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  disabled={uploadingTemplate}
+                  onChange={(e) => {
+                    const f = e.target.files?.[0];
+                    if (f) handleUploadTemplate(f);
+                    e.target.value = "";
+                  }}
+                />
+              </label>
+            )}
+            {insp && (
+              <div className="grid grid-cols-2 gap-2">
+                <Button variant="outline" onClick={() => setInspirationId(null)}>
+                  Replace
+                </Button>
+                <Button onClick={() => setStep("use")}>Next</Button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* STEP — USE (copy track) */}
+        {step === "use" && track === "copy" && (
+          <div className="space-y-3">
+            <p className="text-[11px] text-muted-foreground">
+              How should we use your design?
+            </p>
+            {[
+              {
+                id: "product" as const,
+                icon: Package,
+                title: "Apply to a product",
+                desc: "Pick one of your products and recreate the design with it",
+                tint: "from-orange-500/20 to-amber-500/10 text-orange-400 border-orange-500/30",
+                onClick: () => { setCopyMode("product"); setStep("product"); },
+              },
+              {
+                id: "prompt" as const,
+                icon: Wand2,
+                title: "Use with a prompt",
+                desc: "Describe what to put in this design",
+                tint: "from-violet-500/20 to-fuchsia-500/10 text-violet-300 border-violet-500/30",
+                onClick: () => { setCopyMode("prompt"); setStep("theme"); },
+              },
+            ].map((opt) => {
+              const Icon = opt.icon;
+              return (
+                <button
+                  key={opt.id}
+                  onClick={opt.onClick}
+                  className={`group flex items-center gap-3 rounded-xl border bg-gradient-to-br ${opt.tint} px-3 py-2.5 text-left hover:brightness-110 transition w-full`}
+                >
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-background/40 backdrop-blur shrink-0">
+                    <Icon className="h-4 w-4" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm font-semibold text-foreground leading-tight">{opt.title}</div>
+                    <div className="text-[11px] text-muted-foreground leading-snug">
+                      {opt.desc}
+                    </div>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        )}
+
         {/* STEP 3 — COLOR THEME */}
         {step === "theme" && (
           <div className="space-y-3">
@@ -640,7 +732,7 @@ export function DesignStudioModal({ open, onClose, initialProduct = null }: Prop
         )}
 
         {/* STEP — PRODUCT (product track) */}
-        {step === "product" && track === "product" && (
+        {step === "product" && (track === "product" || track === "copy") && (
           <div className="space-y-3">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -665,7 +757,10 @@ export function DesignStudioModal({ open, onClose, initialProduct = null }: Prop
                   {filtered.map((p) => (
                     <button
                       key={p.id}
-                      onClick={() => { setSelectedProduct(p); setStep("template"); }}
+                      onClick={() => {
+                        setSelectedProduct(p);
+                        setStep(track === "copy" ? "theme" : "template");
+                      }}
                       className={`group rounded-xl overflow-hidden border bg-card/40 hover:border-primary/40 transition text-left ${
                         selectedProduct?.id === p.id ? "border-primary ring-2 ring-primary/40" : "border-border/60"
                       }`}
@@ -694,7 +789,7 @@ export function DesignStudioModal({ open, onClose, initialProduct = null }: Prop
           </div>
         )}
 
-        {step === "final" && (track === "prompt" || track === "day") && (
+        {step === "final" && (track === "prompt" || track === "day" || (track === "copy" && copyMode === "prompt")) && (
           <div className="space-y-3">
             <div className="aspect-square rounded-xl overflow-hidden bg-muted relative flex items-center justify-center">
               {generating && (
@@ -716,7 +811,7 @@ export function DesignStudioModal({ open, onClose, initialProduct = null }: Prop
                 </div>
               )}
             </div>
-            {track === "prompt" ? (
+            {track === "prompt" || (track === "copy" && copyMode === "prompt") ? (
               <Textarea
                 placeholder="e.g. Black Friday sale poster with bold red typography and a 50% off badge"
                 value={prompt}
