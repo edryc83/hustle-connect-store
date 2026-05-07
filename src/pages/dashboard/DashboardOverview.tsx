@@ -26,7 +26,6 @@ const DashboardOverview = () => {
   const terms = useBusinessTerms();
   const [productCount, setProductCount] = useState(0);
   const [viewCount, setViewCount] = useState(0);
-  const [orderCount, setOrderCount] = useState(0);
   const [firstName, setFirstName] = useState("");
   const [storeSlug, setStoreSlug] = useState("");
   const [storeName, setStoreName] = useState("");
@@ -42,13 +41,11 @@ const DashboardOverview = () => {
     if (!user) return;
 
     const fetchData = async () => {
-      const [{ count }, { data: profile }, { count: orders }] = await Promise.all([
+      const [{ count }, { data: profile }] = await Promise.all([
         supabase.from("products").select("*", { count: "exact", head: true }).eq("user_id", user.id),
         supabase.from("profiles").select("store_name, store_slug, first_name, profile_picture_url, category, view_count, welcome_message, city").eq("id", user.id).single(),
-        supabase.from("orders").select("*", { count: "exact", head: true }).eq("seller_id", user.id).eq("status", "confirmed"),
       ]);
       setProductCount(count ?? 0);
-      setOrderCount(orders ?? 0);
       const p = profile as any;
       const name = p?.first_name || p?.store_name || user.email?.split("@")[0]?.split(/[._]/)[0] || "";
       setFirstName(name.charAt(0).toUpperCase() + name.slice(1));
