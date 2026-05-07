@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { ReactNode, useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { useOnboardingCheck } from "@/hooks/useOnboardingCheck";
@@ -7,14 +7,16 @@ import { DashboardSidebar } from "./DashboardSidebar";
 import { MobileBottomNav } from "./MobileBottomNav";
 import AfristallLogo from "@/components/AfristallLogo";
 import { useTheme } from "@/hooks/useTheme";
-import { Moon, Sun, LogOut, Settings } from "lucide-react";
+import { Moon, Sun, LogOut, Settings, Sparkles } from "lucide-react";
 import { Link } from "react-router-dom";
+import { DesignStudioModal } from "./DesignStudioModal";
 
 export function DashboardLayout({ children }: { children: ReactNode }) {
   const { user, loading, signOut } = useAuth();
   const navigate = useNavigate();
   const { theme, toggleTheme } = useTheme();
   const { needsOnboarding, checking } = useOnboardingCheck(user?.id);
+  const [studioOpen, setStudioOpen] = useState(false);
 
   if (loading || checking) {
     return (
@@ -57,6 +59,14 @@ export function DashboardLayout({ children }: { children: ReactNode }) {
                 <Settings className="h-4 w-4" />
               </Link>
               <button
+                onClick={() => setStudioOpen(true)}
+                className="flex h-9 w-9 items-center justify-center rounded-full border bg-card/60 backdrop-blur-sm text-primary hover:bg-primary/10 transition-colors"
+                aria-label="Design Studio"
+                title="Design Studio"
+              >
+                <Sparkles className="h-4 w-4" />
+              </button>
+              <button
                 onClick={toggleTheme}
                 className="flex h-9 w-9 items-center justify-center rounded-full border bg-card/60 backdrop-blur-sm text-muted-foreground hover:text-foreground transition-colors"
                 aria-label="Toggle theme"
@@ -80,6 +90,7 @@ export function DashboardLayout({ children }: { children: ReactNode }) {
       </div>
 
       <MobileBottomNav />
+      <DesignStudioModal open={studioOpen} onClose={() => setStudioOpen(false)} />
     </SidebarProvider>
   );
 }
