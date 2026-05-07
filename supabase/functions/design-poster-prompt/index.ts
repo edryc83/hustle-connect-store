@@ -60,7 +60,7 @@ Deno.serve(async (req) => {
       "Design a PREMIUM EDITORIAL ADVERTISING POSTER, 1:1 square, gallery-grade — must clearly read as a real ad, not just an illustration.",
       `User brief: ${userPrompt.trim()}`,
       inspirationImage
-        ? "A reference image is attached purely as a STYLE & LAYOUT reference. Match its background treatment, color palette, typography hierarchy, headline placement, accent shapes, CTA style and overall composition energy. DO NOT copy any of its products, photos, logos, watermarks, brand names, phone numbers or text — invent fresh visuals that fit the user's brief."
+        ? "A reference image is attached as a STRICT STYLE & LAYOUT TEMPLATE. Treat it as a PERFECT REPLICA target: match its EXACT composition, proportions, background treatment, color palette, typography hierarchy, headline placement, accent shapes, CTA style and overall energy. CRITICALLY: match the SAME NUMBER OF TEXT BLOCKS and approximately the SAME WORD COUNT per block as the template (if the template headline is 3 words, yours must be ~3 words; same for subtitle, CTA, contact line). Match the SAME RELATIVE SIZE of every element. DO NOT copy any of the template's products, photos, logos, watermarks, brand names, phone numbers or text — invent fresh visuals that fit the user's brief while keeping the exact skeleton."
         : "",
       inspiration ? `Inspiration / style direction: ${inspiration}` : "",
       "Compose like a high-end magazine ad: strong grid, intentional negative space, premium background (soft gradient, paper grain, or subtle solid). Clean modern sans-serif typography with TIGHT hierarchy. NO MISSPELLINGS, NO GIBBERISH letters.",
@@ -69,9 +69,9 @@ Deno.serve(async (req) => {
       "1. TITLE (large, bold hero word/phrase that fits the brief).",
       "2. SUBTITLE / TAGLINE (one short punchy line, max 6 words, that you invent to fit the brief).",
       phone
-        ? `3. CTA BUTTON (pill-shaped, ${accent} background, white text): "Order on WhatsApp" with "${phone}" beside or below it, plus a tiny WhatsApp glyph.`
-        : `3. CTA BUTTON (pill-shaped, ${accent} background, white text): "Shop Now" or "Order Now".`,
-      `4. ALWAYS visible bottom-corner mark: "Designed by Afristall" — small, refined, low-contrast but clearly readable. NEVER omit this.`,
+        ? `3. CTA BUTTON — ONE single clean pill-shaped button, ${accent} background, crisp white text reading EXACTLY "Order on WhatsApp", with "${phone}" as a small clean line directly beneath the pill. Tiny WhatsApp glyph inside the pill, left of the text. Rounded-full corners, generous padding, no gradients, no duplicate buttons.`
+        : `3. CTA BUTTON — ONE single clean pill-shaped button, ${accent} background, crisp white text reading EXACTLY "Order Now". Rounded-full corners, generous padding, no gradients, no duplicate buttons.`,
+      `4. MANDATORY VISIBLE SIGNATURE: render the exact text "Designed by Afristall" in a bottom corner (bottom-right preferred). Small but CLEARLY LEGIBLE at thumbnail size — minimum ~2.2% of canvas height, high enough contrast to read easily. Never omit, never crop, never blur.`,
       storeName ? `5. Small store name "${storeName}" near a corner.` : "",
       "Layout rule: clear focal hero, title + subtitle balanced with negative space, CTA button visibly tappable. Everything aligned to a grid.",
       "Strictly avoid: paragraphs, watermarks across artwork, decorative emojis, hashtags, lorem ipsum, broken letters, multiple CTAs.",
