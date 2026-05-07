@@ -71,6 +71,59 @@ export const INSPIRATIONS: Inspiration[] = [
   },
 ];
 
+// Re-ordered & expanded to match real social-media flyer references.
+INSPIRATIONS.push(
+  {
+    id: "purple-motion",
+    label: "Purple Motion",
+    emoji: "🛹",
+    prompt:
+      "Vivid purple gradient background with horizontal motion-blur light streaks, hero subject in mid-action perfectly lit, large bold white headline with selected words highlighted in yellow, small logo top-center, contact bar pinned to bottom with thin gold rule.",
+  },
+  {
+    id: "navy-glow-product",
+    label: "Navy Product Glow",
+    emoji: "📱",
+    prompt:
+      "Deep navy/blue dotted background, hero product floating in mid-air encircled by a glowing neon ring of sparkles, headline split into yellow + white words, bold yellow pill CTA, white rounded contact bar at the bottom with WhatsApp + location lines.",
+  },
+  {
+    id: "mono-editorial",
+    label: "Mono Editorial",
+    emoji: "⚫",
+    prompt:
+      "Sleek dark almost-black background with subtle vignette, product hero on the right razor-sharp, huge condensed white headline on the left, accent-colored thin underline, pill price chip, pill WhatsApp CTA, tiny 'Designed by Afristall' bottom-right.",
+  },
+  {
+    id: "dark-lime-tech",
+    label: "Dark + Lime Tech",
+    emoji: "🟩",
+    prompt:
+      "Dark green-to-black gradient background, hero subject lit with lime green rim light, two-line headline where one half is lime and the other half is silver/white, small caps eyebrow line above, glassy rounded contact bar at the bottom.",
+  },
+  {
+    id: "month-hero",
+    label: "Big Month",
+    emoji: "📅",
+    prompt:
+      "Massive single word (e.g. month name) as the hero — outlined or filled — subject photo overlapping the word, small yellow rounded-pill labels floating around, soft dark background, glassy contact bar at the bottom.",
+  },
+  {
+    id: "teal-corporate",
+    label: "Teal Corporate",
+    emoji: "🟦",
+    prompt:
+      "Teal/cyan geometric chevron shapes overlaying a real lifestyle photo, bold white headline with one accent-colored highlighted word, small body paragraph, pill website CTA, small logo bottom-right.",
+  },
+  {
+    id: "campaign-bold",
+    label: "Campaign Bold",
+    emoji: "📣",
+    prompt:
+      "Dark dramatic background with green radial glow behind a hyper-real 3D hero, big bold white headline with one phrase highlighted in lime, supportive subline, white rounded panel at the bottom holding a green pill CTA + social handles.",
+  },
+);
+
 export const COLOR_THEMES = [
   { id: "brand", label: "Brand", color: "" }, // use user's accent_color
   { id: "lime", label: "Lime", color: "#C6F432" },
