@@ -77,7 +77,7 @@ export function DesignStudioModal({ open, onClose, initialProduct = null }: Prop
   }, [open, initialProduct]);
 
   useEffect(() => {
-    if (track === "product" && step === "product" && user && products.length === 0) {
+    if ((track === "product" || track === "copy") && step === "product" && user && products.length === 0) {
       setLoadingProducts(true);
       supabase
         .from("products")
