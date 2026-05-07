@@ -335,7 +335,6 @@ const DashboardProducts = () => {
   };
 
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
-  const [flyerProduct, setFlyerProduct] = useState<Product | null>(null);
   const [autoDesignProduct, setAutoDesignProduct] = useState<Product | null>(null);
 
   const handleDelete = async (id: string) => {
