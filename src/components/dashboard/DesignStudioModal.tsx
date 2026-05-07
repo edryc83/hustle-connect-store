@@ -7,12 +7,13 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import {
-  Loader2, Sparkles, Package, Wand2, ArrowLeft, Download, Share2, RefreshCw, Search, Shuffle, Check,
+  Loader2, Sparkles, Package, Wand2, ArrowLeft, Download, Share2, RefreshCw, Search, Shuffle, Check, Upload, Trash2,
 } from "lucide-react";
 import { AutoDesignModal } from "./AutoDesignModal";
 import { INSPIRATIONS, COLOR_THEMES, pickRandomInspiration } from "./designInspirations";
 import { POSTER_OCCASIONS, POSTER_OF_THE_DAY_TEMPLATES, getTodaysOccasions, type PosterOccasion } from "./posterOfTheDay";
 import { CalendarHeart } from "lucide-react";
+import { compressImage } from "@/lib/imageCompression";
 
 interface Props {
   open: boolean;
@@ -48,6 +49,9 @@ export function DesignStudioModal({ open, onClose, initialProduct = null }: Prop
   const [themeId, setThemeId] = useState<string | null>(null);
   const [occasionId, setOccasionId] = useState<string | null>(null);
   const [extraCopy, setExtraCopy] = useState("");
+
+  const [userTemplates, setUserTemplates] = useState<Array<{ id: string; label: string; image: string; prompt: string | null; user: true }>>([]);
+  const [uploadingTemplate, setUploadingTemplate] = useState(false);
 
   useEffect(() => {
     if (!open) {
@@ -85,7 +89,91 @@ export function DesignStudioModal({ open, onClose, initialProduct = null }: Prop
     }
   }, [track, step, user, products.length]);
 
-  const templatePool = track === "day" ? POSTER_OF_THE_DAY_TEMPLATES : INSPIRATIONS;
+  // Load user-uploaded templates
+  useEffect(() => {
+    if (!open || !user) return;
+    supabase
+      .from("user_design_templates")
+      .select("id, label, image_url, prompt")
+      .eq("user_id", user.id)
+      .order("created_at", { ascending: false })
+      .then(({ data, error }) => {
+        if (error) return;
+        setUserTemplates(
+          (data || []).map((d: any) => ({
+            id: `user-${d.id}`,
+            label: d.label,
+            image: d.image_url,
+            prompt: d.prompt,
+            user: true as const,
+          }))
+        );
+      });
+  }, [open, user]);
+
+  const handleUploadTemplate = async (file: File) => {
+    if (!user) return;
+    if (!file.type.startsWith("image/")) {
+      toast.error("Please upload an image file");
+      return;
+    }
+    setUploadingTemplate(true);
+    try {
+      const compressed = await compressImage(file);
+      const ext = (compressed.name.split(".").pop() || "webp").toLowerCase();
+      const path = `${user.id}/${Date.now()}.${ext}`;
+      const { error: upErr } = await supabase.storage
+        .from("design-templates")
+        .upload(path, compressed, { contentType: compressed.type, upsert: false });
+      if (upErr) throw upErr;
+      const { data: pub } = supabase.storage.from("design-templates").getPublicUrl(path);
+      const label = file.name.replace(/\.[^.]+$/, "").slice(0, 60) || "My template";
+      const { data: row, error: insErr } = await supabase
+        .from("user_design_templates")
+        .insert({ user_id: user.id, label, image_url: pub.publicUrl, prompt: null })
+        .select("id, label, image_url, prompt")
+        .single();
+      if (insErr) throw insErr;
+      const newItem = {
+        id: `user-${row.id}`,
+        label: row.label,
+        image: row.image_url,
+        prompt: row.prompt,
+        user: true as const,
+      };
+      setUserTemplates((prev) => [newItem, ...prev]);
+      setInspirationId(newItem.id);
+      toast.success("Template added");
+    } catch (e: any) {
+      toast.error(e?.message || "Upload failed");
+    } finally {
+      setUploadingTemplate(false);
+    }
+  };
+
+  const handleDeleteUserTemplate = async (templateId: string) => {
+    const realId = templateId.replace(/^user-/, "");
+    const item = userTemplates.find((t) => t.id === templateId);
+    if (!item) return;
+    setUserTemplates((prev) => prev.filter((t) => t.id !== templateId));
+    if (inspirationId === templateId) setInspirationId(null);
+    try {
+      // Best-effort: remove storage object
+      const url = item.image;
+      const marker = "/design-templates/";
+      const idx = url.indexOf(marker);
+      if (idx >= 0) {
+        const path = url.slice(idx + marker.length);
+        await supabase.storage.from("design-templates").remove([path]);
+      }
+      await supabase.from("user_design_templates").delete().eq("id", realId);
+    } catch {}
+  };
+
+  const templatePool: any[] =
+    track === "day"
+      ? POSTER_OF_THE_DAY_TEMPLATES
+      : [...userTemplates, ...INSPIRATIONS];
   const insp =
     (templatePool.find((i: any) => i.id === inspirationId) as any) || null;
   const theme = themeId ? COLOR_THEMES.find((t) => t.id === themeId) : null;
@@ -358,6 +446,27 @@ export function DesignStudioModal({ open, onClose, initialProduct = null }: Prop
                 {insp ? `Selected: ${insp.label}` : "Tap a template"}
               </span>
               <div className="flex items-center gap-3">
+                {track !== "day" && (
+                  <label className="text-[11px] flex items-center gap-1 text-primary hover:underline cursor-pointer">
+                    {uploadingTemplate ? (
+                      <Loader2 className="h-3 w-3 animate-spin" />
+                    ) : (
+                      <Upload className="h-3 w-3" />
+                    )}
+                    Upload
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      disabled={uploadingTemplate}
+                      onChange={(e) => {
+                        const f = e.target.files?.[0];
+                        if (f) handleUploadTemplate(f);
+                        e.target.value = "";
+                      }}
+                    />
+                  </label>
+                )}
                 <button
                   onClick={() => {
                     const pool = track === "day" ? POSTER_OF_THE_DAY_TEMPLATES : INSPIRATIONS;
@@ -396,6 +505,22 @@ export function DesignStudioModal({ open, onClose, initialProduct = null }: Prop
                       <div className="absolute top-1 right-1 h-5 w-5 rounded-full bg-primary text-primary-foreground flex items-center justify-center">
                         <Check className="h-3 w-3" />
                       </div>
+                    )}
+                    {i.user && (
+                      <span
+                        role="button"
+                        tabIndex={0}
+                        onClick={(e) => { e.stopPropagation(); handleDeleteUserTemplate(i.id); }}
+                        className="absolute top-1 left-1 h-5 w-5 rounded-full bg-black/60 text-white flex items-center justify-center hover:bg-destructive"
+                        aria-label="Delete template"
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </span>
+                    )}
+                    {i.user && (
+                      <span className="absolute top-1 right-1 text-[9px] px-1.5 py-0.5 rounded-full bg-primary/90 text-primary-foreground font-semibold">
+                        Mine
+                      </span>
                     )}
                     <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent px-1.5 py-1 text-[10px] text-white text-left line-clamp-1">
                       {i.label}
