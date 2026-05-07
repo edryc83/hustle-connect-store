@@ -1,0 +1,1 @@
+INSERT INTO public.app_config (key, value) VALUES ('force_update_at', NOW()::text) ON CONFLICT (key) DO UPDATE SET value = NOW()::text;
