@@ -89,6 +89,86 @@ export const INSPIRATIONS: Inspiration[] = [
     prompt:
       "Deep forest green background with a subtle dotted texture, oversized lime-green editorial headline at the top wrapping over multiple lines, hero product floating in a hand bottom-center, small wordmark bottom-right.",
   },
+  {
+    id: "green-key-ai",
+    label: "Green Key Spotlight",
+    emoji: "🗝️",
+    image: "/design-templates/green-key-ai.jpeg",
+    prompt:
+      "Black background with a vivid lime-green radial glow on the right, hero subject centered with diagonal lime brand-tape strips behind, small outlined eyebrow pill top-left, two pill chips top-center (logo + website), bold white headline with one word in huge lime caps, slim outlined arrow CTA pill, price block bottom-right with a small strikethrough old price next to a giant lime price number.",
+  },
+  {
+    id: "lime-portrait",
+    label: "Lime Portrait",
+    emoji: "🟢",
+    image: "/design-templates/lime-portrait.jpeg",
+    prompt:
+      "Full lime-green background, large black-and-white portrait bleeding off the left edge, bold black condensed headline on the right with one line in heavier weight, tiny social-icon eyebrow line, small body paragraph beneath, dark rounded card containing an arrow CTA row and a white WhatsApp pill with phone number, small wordmark with green dot at the bottom.",
+  },
+  {
+    id: "orange-credit",
+    label: "Orange Split Card",
+    emoji: "🟧",
+    image: "/design-templates/orange-credit.jpeg",
+    prompt:
+      "Solid orange background with a large white rounded panel on the left holding the headline (one accent word in orange) plus a short paragraph and a thin outlined CTA pill with chevron, hero subject bleeding in from the right, big outlined orange currency-style icon floating right, small white pill at the bottom with logo + social handles.",
+  },
+  {
+    id: "orange-relax",
+    label: "Orange Repeat Type",
+    emoji: "🛋️",
+    image: "/design-templates/orange-relax.jpeg",
+    prompt:
+      "Vivid orange background tiled with faint repeated wordmark watermark, tiny social icon row top-left, huge stacked white rounded headline with mixed weights, short two-line subline, slim outlined white pill CTA with arrow, hero subject lounging on the right side, small LOGO + handle row at the bottom.",
+  },
+  {
+    id: "iphone-orange-pop",
+    label: "Tech Orange Pop",
+    emoji: "📱",
+    image: "/design-templates/iphone-orange-pop.jpeg",
+    prompt:
+      "Light gray background with a giant orange rounded-square shape behind the hero subject, product/subject cut out and overlapping the shape, small @handle eyebrow top-left, vertical icon stack on the right, huge bold white centered headline at the bottom of the image, small caps subline, bottom row with a small badge chip on the left, glassy dark icon dock in the middle, and orange contact pill on the right.",
+  },
+  {
+    id: "landing-page-glow",
+    label: "Dark Orange Glow",
+    emoji: "🚀",
+    image: "/design-templates/landing-page-glow.jpeg",
+    prompt:
+      "Deep dark maroon background with subtle repeated wordmark texture, small white script eyebrow line, massive orange editorial headline with one word in white serif italic beneath, hero product centered with floating orange glowing 3D icon cubes around it, tiny wordmark at the bottom.",
+  },
+  {
+    id: "new-month-april",
+    label: "New Month Burst",
+    emoji: "📅",
+    image: "/design-templates/new-month-april.jpeg",
+    prompt:
+      "Top half vivid green with a torn white paint-stroke top-left holding a circular logo, small white caps eyebrow line, GIANT hand-painted brush-script white month/word as the centerpiece, hero subject arms-up below it, white circular brush-stroke on the right holding a small list of services, bottom half white with a green script 'happy new month' on the left, short thank-you paragraph, and a rounded outlined contact card on the right with phone icons.",
+  },
+  {
+    id: "smartport-tech",
+    label: "Neon Tech Green",
+    emoji: "🎮",
+    image: "/design-templates/smartport-tech.jpeg",
+    prompt:
+      "Black background with floating glassy green 3D crystal shards, small logo + wordmark top-left, two-line bold headline where line 1 is white and line 2 is lime green (same words/structure), hero subject centered, lime green pill CTA on the left mid, bottom strip with social icon row and @handle in lime.",
+  },
+  {
+    id: "trevix-vr",
+    label: "Purple Aurora",
+    emoji: "🟣",
+    image: "/design-templates/trevix-vr.jpeg",
+    prompt:
+      "Deep purple-to-magenta aurora gradient background with soft wispy light streaks, small logo + wordmark top-left, small dotted 'Media' eyebrow top-right, large soft serif headline on the left with one word as accent, two-line subline, small translucent purple chip pill, all-caps services line beneath, hero subject on the right with brand watermark overlaid, three small dark contact cards across the bottom (Follow / WhatsApp / Email) each with icon row.",
+  },
+  {
+    id: "gadgloft-purple",
+    label: "Premium Purple",
+    emoji: "💜",
+    image: "/design-templates/gadgloft-purple.jpeg",
+    prompt:
+      "Smooth deep purple gradient background, small logo + wordmark top-left, small caps tagline top-right, centered headline where line 1 is white and line 2 is light-purple italic serif, short two-line subline beneath a thin divider, hero subject centered-lower, three stacked small light-purple rounded chips on the right each with one bold word, large rounded purple contact bar at the bottom with a 'CONNECT WITH US' label and three icon+text columns (phone / handle / address).",
+  },
 ];
 
 export const COLOR_THEMES = [
