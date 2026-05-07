@@ -5,10 +5,7 @@ import { useBusinessTerms } from "@/hooks/useBusinessTerms";
 import { useAuth } from "@/hooks/useAuth";
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
-import { useFlyerStudio } from "@/contexts/FlyerStudioContext";
-
 export function MobileBottomNav() {
-  const { isOpen: flyerStudioOpen } = useFlyerStudio();
   const terms = useBusinessTerms();
   const { pathname } = useLocation();
   const isProfileActive = pathname === "/dashboard/profile";
@@ -28,9 +25,6 @@ export function MobileBottomNav() {
     enabled: !!user,
     staleTime: 5 * 60 * 1000,
   });
-
-  // Hide bottom nav when FlyerStudio is open - MUST be after all hooks
-  if (flyerStudioOpen) return null;
 
   const navItems = [
     { title: "Home", url: "/dashboard", icon: Home },

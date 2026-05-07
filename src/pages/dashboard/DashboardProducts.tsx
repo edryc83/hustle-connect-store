@@ -22,7 +22,6 @@ import { formatPrice } from "@/lib/currency";
 import whatsappIcon from "@/assets/whatsapp-icon.png";
 import { Badge } from "@/components/ui/badge";
 import type { Tables } from "@/integrations/supabase/types";
-import FlyerStudio from "@/screens/FlyerStudio";
 import { ProductAttributeForm } from "@/components/dashboard/ProductAttributeForm";
 import type { AiAttributeSuggestion } from "@/lib/attributeLibrary";
 import { aiSlugToCategory } from "@/lib/categoryMapping";
@@ -336,7 +335,6 @@ const DashboardProducts = () => {
   };
 
   const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
-  const [flyerProduct, setFlyerProduct] = useState<Product | null>(null);
   const [autoDesignProduct, setAutoDesignProduct] = useState<Product | null>(null);
 
   const handleDelete = async (id: string) => {
@@ -628,13 +626,6 @@ const DashboardProducts = () => {
                 <Button
                   variant="outline"
                   className="w-full rounded-xl gap-2 border-primary/30 text-primary hover:bg-primary/10"
-                  onClick={() => { setDetailProduct(null); setFlyerProduct(detailProduct); }}
-                >
-                  <Sparkles className="h-4 w-4" /> Create Flyer
-                </Button>
-                <Button
-                  variant="outline"
-                  className="w-full rounded-xl gap-2 border-primary/30 text-primary hover:bg-primary/10"
                   onClick={() => { setDetailProduct(null); setAutoDesignProduct(detailProduct); }}
                 >
                   <Sparkles className="h-4 w-4" /> Design with AI
@@ -645,25 +636,6 @@ const DashboardProducts = () => {
           })()}
         </DialogContent>
       </Dialog>
-
-      {/* Flyer Studio */}
-      {flyerProduct && profile && (
-        <FlyerStudio
-          product={{
-            id: flyerProduct.id,
-            name: flyerProduct.name,
-            price: String((flyerProduct as any).discount_price ?? flyerProduct.price),
-            description: flyerProduct.description ?? undefined,
-            category: (flyerProduct as any).category ?? undefined,
-            imageUrl: productImages[flyerProduct.id]?.[0] || flyerProduct.image_url,
-          }}
-          store={{
-            name: profile.store_name ?? "Store",
-            slug: profile.store_slug ?? "",
-          }}
-          onClose={() => setFlyerProduct(null)}
-        />
-      )}
 
       <AutoDesignModal
         productId={autoDesignProduct?.id ?? null}

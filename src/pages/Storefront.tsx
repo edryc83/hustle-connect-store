@@ -19,7 +19,6 @@ import { BuyerAttributePicker, ChatOnlyBanner } from "@/components/storefront/Bu
 import { getAttributeSummary, getSelectableKeys, buildAttributeLines } from "@/lib/attributeLibrary";
 import { StorefrontFilters, applyFilters, type FilterState } from "@/components/storefront/StorefrontFilters";
 import { StoreAssistantButton } from "@/components/storefront/StoreAssistant";
-import FlyerStudio from "@/screens/FlyerStudio";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -268,8 +267,6 @@ function ProductDetailView({
   const [qty, setQty] = useState(1);
   const [attrSelections, setAttrSelections] = useState<Record<string, string>>({});
   const [deliveryAddress, setDeliveryAddress] = useState("");
-  const [flyerModalOpen, setFlyerModalOpen] = useState(false);
-
   const attrs = (product as any).attributes as Record<string, any> | null;
   const isChatOnly = attrs?.chat_only === true;
   const selectableKeys = attrs ? getSelectableKeys(attrs) : [];
@@ -330,17 +327,6 @@ function ProductDetailView({
           </button>
           <h1 className="text-sm font-semibold truncate max-w-[200px]">{product.name}</h1>
           <div className="flex items-center gap-2">
-              {isOwner && (
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setFlyerModalOpen(true)}
-                  className="gap-1.5 h-9 rounded-full"
-                >
-                  <Sparkles className="h-4 w-4" />
-                  <span className="hidden sm:inline">Create Flyer</span>
-                </Button>
-              )}
               <button
                 onClick={() => toggle(product.id)}
                 className="h-9 w-9 rounded-full border border-border flex items-center justify-center hover:bg-muted transition-colors"
@@ -612,25 +598,6 @@ function ProductDetailView({
         visitorName={visitorName}
       />
 
-      {isOwner && flyerModalOpen && (
-        <FlyerStudio
-          product={{
-            id: product.id,
-            name: product.name,
-            price: String(product.discount_price ?? product.price),
-            description: product.description ?? undefined,
-            category: (product as any).category ?? undefined,
-            imageUrl: images[0] || product.image_url,
-          }}
-          store={{
-            name: profile.store_name ?? "Store",
-            slug: storeSlug,
-            phone: profile.whatsapp_number ?? undefined,
-            address: (profile as any).address ?? undefined,
-          }}
-          onClose={() => setFlyerModalOpen(false)}
-        />
-      )}
     </div>
   );
 }
