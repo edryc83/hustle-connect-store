@@ -92,7 +92,7 @@ Deno.serve(async (req) => {
       "Design a PREMIUM EDITORIAL PRODUCT AD POSTER, 1:1 square, gallery-grade — must clearly read as a real advertisement, not just a product photo.",
       "Use the supplied product image as the hero subject, clean and color-graded with a soft realistic shadow. Compose like a magazine ad: strong layout, intentional alignment, deliberate negative space, premium background (soft gradient, paper grain, or subtle solid).",
       inspirationImage
-        ? "A second reference image is attached purely as a STYLE & LAYOUT reference. Match its background treatment, color palette, typography hierarchy, headline placement, accent shapes, CTA style and overall composition energy. DO NOT copy any of its products, photos, logos, watermarks, brand names, phone numbers or text — replace ALL of them with this product's content."
+        ? "A second reference image is attached as a STRICT STYLE & LAYOUT TEMPLATE. Treat it as a PERFECT REPLICA target: match its EXACT composition, proportions, background treatment, color palette, typography hierarchy, headline placement, accent shapes, CTA style and overall energy. CRITICALLY: match the SAME NUMBER OF TEXT BLOCKS and approximately the SAME WORD COUNT per block as the template (e.g. if the template has a 3-word headline and a 4-word subtitle, yours must have ~3 words and ~4 words). Match the SAME RELATIVE SIZE of every element (headline scale, product scale, CTA scale, contact bar scale). DO NOT copy the template's products, photos, logos, watermarks, brand names, phone numbers or text — replace ALL of them with this product's content while keeping the same skeleton."
         : "",
       inspiration ? `Inspiration / style direction: ${inspiration}` : "",
       `Use ${accent} as a tasteful brand accent (thin line, dot, chip, or underline). Restrained, premium palette — no neon, no clutter, no stickers, no emojis, no fake badges or stars.`,
@@ -101,9 +101,9 @@ Deno.serve(async (req) => {
       `2. SUBTITLE / TAGLINE (medium, one short punchy line you invent that sells this product — max 6 words, e.g. "Built for everyday brilliance" or "Power, refined").`,
       `3. PRICE chip in ${accent}: "${priceStr}"`,
       phone
-        ? `4. CTA BUTTON (pill-shaped, ${accent} background, white text): "Order on WhatsApp" with the number "${phone}" directly below or beside it, plus a tiny WhatsApp glyph.`
-        : `4. CTA BUTTON (pill-shaped, ${accent} background, white text): "Order Now".`,
-      `5. ALWAYS visible bottom-corner mark: "Designed by Afristall" — small, refined, low-contrast but clearly readable. NEVER omit this.`,
+        ? `4. CTA BUTTON — ONE single clean pill-shaped button, ${accent} background, crisp white text reading EXACTLY "Order on WhatsApp", with the phone number "${phone}" rendered as a small clean line directly beneath the pill (not inside it). Include a tiny WhatsApp glyph inside the pill, left of the text. The pill must have generous padding, rounded-full corners, no gradients, no extra borders, no duplicate buttons.`
+        : `4. CTA BUTTON — ONE single clean pill-shaped button, ${accent} background, crisp white text reading EXACTLY "Order Now". Rounded-full corners, generous padding, no gradients, no duplicate buttons.`,
+      `5. MANDATORY VISIBLE SIGNATURE: render the exact text "Designed by Afristall" in a bottom corner (bottom-right preferred). It must be SMALL but CLEARLY LEGIBLE at thumbnail size — minimum ~2.2% of canvas height, high enough contrast against its background to be easily read. NEVER omit, never crop, never blur, never replace with a logo. This is non-negotiable.`,
       storeName ? `6. Small store name "${storeName}" near the top or opposite corner.` : "",
       "Layout rule: title + subtitle on one side, product hero on the other (or stacked top/bottom). CTA button must be visible and tappable-looking. Everything aligned to a clear grid.",
       "Strictly avoid: paragraphs, multiple prices, watermarks across the product, drop shadows on text, decorative emojis, flags, hashtags, lorem ipsum, broken letters.",
