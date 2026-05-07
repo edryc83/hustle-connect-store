@@ -38,8 +38,18 @@ Deno.serve(async (req) => {
     }
     const userId = userRes.user.id;
 
-    const { prompt: userPrompt, inspiration, inspirationImage, themeColor } = await req.json();
-    if (!userPrompt || typeof userPrompt !== "string" || userPrompt.trim().length < 3) {
+    const {
+      prompt: userPrompt,
+      inspiration,
+      inspirationImage,
+      themeColor,
+      occasion,
+      occasionVibe,
+      headlineHint,
+      extraCopy,
+    } = await req.json();
+    const isOccasion = !!occasion && typeof occasion === "string";
+    if (!isOccasion && (!userPrompt || typeof userPrompt !== "string" || userPrompt.trim().length < 3)) {
       return new Response(JSON.stringify({ error: "Describe what poster you want" }), {
         status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
@@ -56,7 +66,30 @@ Deno.serve(async (req) => {
     const storeName = profile?.store_name || "";
     const phone = profile?.whatsapp_number?.trim() || "";
 
-    const fullPrompt = [
+    const fullPrompt = isOccasion ? [
+      "Design a PREMIUM 'POSTER OF THE DAY' social media post, 1:1 square, gallery-grade.",
+      `Occasion: ${occasion}.`,
+      `Vibe: ${occasionVibe || "joyful, warm, premium"}.`,
+      extraCopy ? `Extra copy/context to weave in: ${extraCopy}` : "",
+      "MUST FEATURE a happy, jolly real-looking person (warm friendly smile, African / global-south appeal) clearly visible in the composition, holding or interacting with a product. The person should radiate genuine joy and energy that fits the occasion.",
+      inspirationImage
+        ? "A reference image is attached as a STRICT STYLE & LAYOUT TEMPLATE. Match its EXACT composition, proportions, background treatment, color palette, typography hierarchy, headline placement and energy. Match the SAME number of text blocks and approximately the SAME word count per block, and the SAME relative size of every element. DO NOT copy any of the template's products, photos, logos, watermarks, brand names, phone numbers or text — invent fresh visuals that fit the occasion."
+        : "",
+      inspiration ? `Inspiration / style direction: ${inspiration}` : "",
+      "Compose like a high-end magazine ad: strong grid, intentional negative space, premium background. Clean modern sans-serif typography with TIGHT hierarchy. NO MISSPELLINGS, NO GIBBERISH letters.",
+      `Use ${accent} as a tasteful brand accent. Restrained palette. No clutter, no emojis, no fake badges or stars, no neon.`,
+      "Render ALL of the following text elements crisply:",
+      `1. HEADLINE — large, bold hero text reading EXACTLY "${headlineHint || occasion}" (or a tasteful 2-4 word variation that keeps the same meaning). Must be the dominant text element.`,
+      "2. SHORT TAGLINE — one short punchy line (max 6 words) that vibes with the day and any extra copy provided.",
+      phone
+        ? `3. CTA BUTTON — ONE clean pill-shaped button, ${accent} background, crisp white text reading EXACTLY "Order on WhatsApp", with "${phone}" as a small clean line directly beneath the pill. Tiny WhatsApp glyph inside the pill. Rounded-full corners, generous padding, no gradients, no duplicate buttons.`
+        : `3. CTA BUTTON — ONE clean pill-shaped button, ${accent} background, crisp white text reading EXACTLY "Order Now". Rounded-full corners, generous padding, no gradients, no duplicate buttons.`,
+      `4. MANDATORY VISIBLE SIGNATURE: render the exact text "Powered by Afristall" in a bottom corner (bottom-right preferred). Small but CLEARLY LEGIBLE at thumbnail size — minimum ~2.2% of canvas height, high enough contrast to read easily. Never omit, never crop, never blur.`,
+      storeName ? `5. Small store name "${storeName}" near a corner (separate from the Powered by Afristall mark).` : "",
+      "Layout rule: clear focal hero (the joyful person + product), headline + tagline balanced with negative space, CTA button visibly tappable. Everything aligned to a grid.",
+      "Strictly avoid: paragraphs, watermarks across artwork, decorative emojis, hashtags, lorem ipsum, broken letters, multiple CTAs, multiple people unless the template clearly shows a group.",
+      "Final result must look like a high-end Apple / Nike / fashion-house 'day of the week' campaign post.",
+    ].filter(Boolean).join("\n") : [
       "Design a PREMIUM EDITORIAL ADVERTISING POSTER, 1:1 square, gallery-grade — must clearly read as a real ad, not just an illustration.",
       `User brief: ${userPrompt.trim()}`,
       inspirationImage
