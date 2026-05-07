@@ -8,6 +8,8 @@ import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import { Loader2, Sparkles, Package, Wand2, ArrowLeft, Download, Share2, RefreshCw, Search } from "lucide-react";
 import { AutoDesignModal } from "./AutoDesignModal";
+import { INSPIRATIONS, COLOR_THEMES, pickRandomInspiration, type Inspiration } from "./designInspirations";
+import { Shuffle } from "lucide-react";
 
 interface Props {
   open: boolean;
@@ -33,6 +35,8 @@ export function DesignStudioModal({ open, onClose }: Props) {
   const [prompt, setPrompt] = useState("");
   const [generating, setGenerating] = useState(false);
   const [resultUrl, setResultUrl] = useState<string | null>(null);
+  const [inspirationId, setInspirationId] = useState<string | null>(null);
+  const [themeId, setThemeId] = useState<string>("brand");
 
   useEffect(() => {
     if (!open) {
@@ -41,6 +45,8 @@ export function DesignStudioModal({ open, onClose }: Props) {
       setPrompt("");
       setResultUrl(null);
       setSearch("");
+      setInspirationId(null);
+      setThemeId("brand");
     }
   }, [open]);
 
@@ -68,8 +74,14 @@ export function DesignStudioModal({ open, onClose }: Props) {
     setGenerating(true);
     setResultUrl(null);
     try {
+      const insp = INSPIRATIONS.find((i) => i.id === inspirationId);
+      const theme = COLOR_THEMES.find((t) => t.id === themeId);
       const { data, error } = await supabase.functions.invoke("design-poster-prompt", {
-        body: { prompt: prompt.trim() },
+        body: {
+          prompt: prompt.trim(),
+          inspiration: insp?.prompt || null,
+          themeColor: theme?.color || null,
+        },
       });
       if (error) throw error;
       if ((data as any)?.error) throw new Error((data as any).error);
@@ -117,10 +129,14 @@ export function DesignStudioModal({ open, onClose }: Props) {
 
   // If a product is selected, hand off to AutoDesignModal
   if (selectedProduct) {
+    const insp = INSPIRATIONS.find((i) => i.id === inspirationId);
+    const theme = COLOR_THEMES.find((t) => t.id === themeId);
     return (
       <AutoDesignModal
         productId={selectedProduct.id}
         productName={selectedProduct.name}
+        inspiration={insp?.prompt || null}
+        themeColor={theme?.color || null}
         open={open}
         onClose={() => {
           setSelectedProduct(null);
@@ -129,6 +145,68 @@ export function DesignStudioModal({ open, onClose }: Props) {
       />
     );
   }
+
+  const ThemeStrip = (
+    <div className="flex items-center gap-2 overflow-x-auto pb-1 -mx-1 px-1">
+      <span className="text-[11px] text-muted-foreground shrink-0">Theme</span>
+      {COLOR_THEMES.map((t) => {
+        const active = themeId === t.id;
+        return (
+          <button
+            key={t.id}
+            onClick={() => setThemeId(t.id)}
+            className={`shrink-0 h-7 px-2 rounded-full border text-[11px] flex items-center gap-1.5 transition ${
+              active ? "border-primary bg-primary/10" : "border-border/60 hover:border-primary/40"
+            }`}
+          >
+            {t.color ? (
+              <span className="h-3 w-3 rounded-full border border-border/60" style={{ background: t.color }} />
+            ) : (
+              <Sparkles className="h-3 w-3 text-primary" />
+            )}
+            {t.label}
+          </button>
+        );
+      })}
+    </div>
+  );
+
+  const InspirationGrid = (
+    <div className="space-y-2">
+      <div className="flex items-center justify-between">
+        <span className="text-[11px] text-muted-foreground">Inspiration</span>
+        <button
+          onClick={() => {
+            const r = pickRandomInspiration();
+            setInspirationId(r.id);
+            if (mode === "prompt" && !prompt.trim()) {
+              setPrompt(`A poster in the style of ${r.label.toLowerCase()}`);
+            }
+          }}
+          className="text-[11px] flex items-center gap-1 text-primary hover:underline"
+        >
+          <Shuffle className="h-3 w-3" /> Random
+        </button>
+      </div>
+      <div className="grid grid-cols-3 gap-1.5">
+        {INSPIRATIONS.map((i) => {
+          const active = inspirationId === i.id;
+          return (
+            <button
+              key={i.id}
+              onClick={() => setInspirationId(active ? null : i.id)}
+              className={`rounded-lg border p-1.5 text-[10px] flex flex-col items-center gap-0.5 transition ${
+                active ? "border-primary bg-primary/10" : "border-border/60 hover:border-primary/40"
+              }`}
+            >
+              <span className="text-base leading-none">{i.emoji}</span>
+              <span className="line-clamp-1">{i.label}</span>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
 
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
@@ -189,6 +267,8 @@ export function DesignStudioModal({ open, onClose }: Props) {
 
         {mode === "products" && (
           <div className="space-y-3">
+            {ThemeStrip}
+            {InspirationGrid}
             <div className="relative">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
@@ -241,6 +321,8 @@ export function DesignStudioModal({ open, onClose }: Props) {
 
         {mode === "prompt" && (
           <div className="space-y-3">
+            {ThemeStrip}
+            {InspirationGrid}
             <div className="aspect-square rounded-xl overflow-hidden bg-muted relative flex items-center justify-center">
               {generating && (
                 <div className="flex flex-col items-center gap-2 text-muted-foreground">

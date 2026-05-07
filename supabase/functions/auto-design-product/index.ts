@@ -46,7 +46,7 @@ Deno.serve(async (req) => {
     }
     const userId = userRes.user.id;
 
-    const { productId } = await req.json();
+    const { productId, inspiration, themeColor } = await req.json();
     if (!productId || typeof productId !== "string") {
       return new Response(JSON.stringify({ error: "productId required" }), {
         status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -85,12 +85,13 @@ Deno.serve(async (req) => {
     const priceNum = (product as any).discount_price ?? product.price;
     const priceStr = formatPrice(Number(priceNum), currency);
     const phone = profile?.whatsapp_number?.trim() || "";
-    const accent = profile?.accent_color || "#F97316";
+    const accent = (typeof themeColor === "string" && themeColor) || profile?.accent_color || "#F97316";
     const storeName = profile?.store_name || "";
 
     const prompt = [
       "Design a PREMIUM EDITORIAL PRODUCT AD POSTER, 1:1 square, gallery-grade — must clearly read as a real advertisement, not just a product photo.",
       "Use the supplied product image as the hero subject, clean and color-graded with a soft realistic shadow. Compose like a magazine ad: strong layout, intentional alignment, deliberate negative space, premium background (soft gradient, paper grain, or subtle solid).",
+      inspiration ? `Inspiration / style direction: ${inspiration}` : "",
       `Use ${accent} as a tasteful brand accent (thin line, dot, chip, or underline). Restrained, premium palette — no neon, no clutter, no stickers, no emojis, no fake badges or stars.`,
       "Typography: clean modern sans-serif with TIGHT hierarchy. Render ALL of the following text elements crisply and legibly — NO MISSPELLINGS, NO GIBBERISH:",
       `1. TITLE (large, bold, hero): "${product.name}"`,

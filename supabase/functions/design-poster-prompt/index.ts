@@ -38,7 +38,7 @@ Deno.serve(async (req) => {
     }
     const userId = userRes.user.id;
 
-    const { prompt: userPrompt } = await req.json();
+    const { prompt: userPrompt, inspiration, themeColor } = await req.json();
     if (!userPrompt || typeof userPrompt !== "string" || userPrompt.trim().length < 3) {
       return new Response(JSON.stringify({ error: "Describe what poster you want" }), {
         status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -52,13 +52,14 @@ Deno.serve(async (req) => {
       .select("store_name, whatsapp_number, accent_color")
       .eq("id", userId).maybeSingle();
 
-    const accent = profile?.accent_color || "#F97316";
+    const accent = (typeof themeColor === "string" && themeColor) || profile?.accent_color || "#F97316";
     const storeName = profile?.store_name || "";
     const phone = profile?.whatsapp_number?.trim() || "";
 
     const fullPrompt = [
       "Design a PREMIUM EDITORIAL ADVERTISING POSTER, 1:1 square, gallery-grade — must clearly read as a real ad, not just an illustration.",
       `User brief: ${userPrompt.trim()}`,
+      inspiration ? `Inspiration / style direction: ${inspiration}` : "",
       "Compose like a high-end magazine ad: strong grid, intentional negative space, premium background (soft gradient, paper grain, or subtle solid). Clean modern sans-serif typography with TIGHT hierarchy. NO MISSPELLINGS, NO GIBBERISH letters.",
       `Use ${accent} as a tasteful brand accent (thin line, dot, chip, underline). Restrained palette. No clutter, no emojis, no fake badges or stars, no neon.`,
       "Render ALL of the following text elements crisply:",
