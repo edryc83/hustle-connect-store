@@ -118,7 +118,7 @@ Deno.serve(async (req) => {
     form.append("model", "gpt-image-2");
     form.append("prompt", prompt);
     form.append("size", "1024x1024");
-    form.append("quality", "high");
+    form.append("quality", "medium");
     form.append("n", "1");
     form.append("image", imgFile);
 
