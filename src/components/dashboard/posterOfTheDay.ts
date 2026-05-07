@@ -45,6 +45,118 @@ export const POSTER_OCCASIONS: PosterOccasion[] = [
   },
 ];
 
+/**
+ * Day-of-week tuned occasions. Each day has its own dedicated headline so the
+ * picker reflects TODAY rather than always showing Monday + Friday options.
+ */
+const DAY_OCCASIONS: Record<number, PosterOccasion> = {
+  0: {
+    id: "sunday-funday",
+    label: "Sunday Funday",
+    emoji: "☀️",
+    headlineHint: "Sunday Funday",
+    vibe: "warm, leisurely, family-and-friends mood, soft golden light, person relaxed and laughing, product shown casually",
+    accent: "#F59E0B",
+  },
+  1: {
+    id: "motivation-monday",
+    label: "Motivation Monday",
+    emoji: "💪",
+    headlineHint: "Motivation Monday",
+    vibe: "energetic, bold, sunrise tones, person looking confident and powerful, fist-pump or arms-crossed, product proudly in hand",
+    accent: "#EF4444",
+  },
+  2: {
+    id: "transformation-tuesday",
+    label: "Transformation Tuesday",
+    emoji: "✨",
+    headlineHint: "Transformation Tuesday",
+    vibe: "before/after glow-up energy, confident smile, polished premium look, person showcasing the product as a glow-up moment",
+    accent: "#8B5CF6",
+  },
+  3: {
+    id: "wins-wednesday",
+    label: "Wins Wednesday",
+    emoji: "🏆",
+    headlineHint: "Wins Wednesday",
+    vibe: "midweek victory energy, big genuine smile, celebratory but classy, person holding product like a trophy",
+    accent: "#10B981",
+  },
+  4: {
+    id: "throwback-thursday",
+    label: "Throwback Thursday",
+    emoji: "📸",
+    headlineHint: "Throwback Thursday",
+    vibe: "warm nostalgic film tones, slight retro grain, joyful person reminiscing while showing the product",
+    accent: "#D97706",
+  },
+  5: {
+    id: "friday-vibes",
+    label: "Friday Vibes",
+    emoji: "🌴",
+    headlineHint: "Friday Vibes",
+    vibe: "relaxed, warm golden-hour lighting, easy smile, weekend-ready mood, person chilling and showing the product casually",
+    accent: "#F59E0B",
+  },
+  6: {
+    id: "saturday-special",
+    label: "Saturday Special",
+    emoji: "🛍️",
+    headlineHint: "Saturday Special",
+    vibe: "promo energy, bold sale feel, person excited mid-laugh holding the product, big discount-style typography",
+    accent: "#10B981",
+  },
+};
+
+/** Build the list of occasions relevant to TODAY's date. */
+export function getTodaysOccasions(now: Date = new Date()): PosterOccasion[] {
+  const day = now.getDay();
+  const date = now.getDate();
+  const list: PosterOccasion[] = [];
+
+  // Always include today's day-of-week occasion first.
+  list.push(DAY_OCCASIONS[day]);
+
+  // Happy New Month within first 5 days of the month.
+  if (date <= 5) {
+    list.push({
+      id: "new-month",
+      label: "Happy New Month",
+      emoji: "🎉",
+      headlineHint: "Happy New Month",
+      vibe: "celebratory, fresh-start energy, confetti, bright optimistic palette, person beaming with joy holding the product up like a trophy",
+      accent: "#F97316",
+    });
+  }
+
+  // Weekend special on Sat/Sun (in addition to the day card).
+  if (day === 6 || day === 0) {
+    list.push({
+      id: "weekend-special",
+      label: "Weekend Special",
+      emoji: "🛍️",
+      headlineHint: "Weekend Special",
+      vibe: "promo energy, bold sale feel, person excited mid-laugh holding the product, big discount-style typography",
+      accent: "#10B981",
+    });
+  }
+
+  // Always offer a generic "Today's Special" fallback.
+  const dayName = now.toLocaleDateString("en-US", { weekday: "long" });
+  list.push({
+    id: "today-special",
+    label: `${dayName} Special`,
+    emoji: "⭐",
+    headlineHint: `${dayName} Special`,
+    vibe: "fresh promo energy for today, person beaming, premium and inviting",
+    accent: "#F97316",
+  });
+
+  // De-duplicate by id while preserving order.
+  const seen = new Set<string>();
+  return list.filter((o) => (seen.has(o.id) ? false : (seen.add(o.id), true)));
+}
+
 export interface PosterTemplate {
   id: string;
   label: string;
