@@ -9,13 +9,14 @@ interface Props {
   productId: string | null;
   productName?: string;
   inspiration?: string | null;
+  inspirationImage?: string | null;
   themeColor?: string | null;
   open: boolean;
   onClose: () => void;
   onSaved?: () => void;
 }
 
-export function AutoDesignModal({ productId, productName, inspiration, themeColor, open, onClose, onSaved }: Props) {
+export function AutoDesignModal({ productId, productName, inspiration, inspirationImage, themeColor, open, onClose, onSaved }: Props) {
   const [loading, setLoading] = useState(false);
   const [url, setUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -29,7 +30,12 @@ export function AutoDesignModal({ productId, productName, inspiration, themeColo
     setUrl(null);
     try {
       const { data, error: fnErr } = await supabase.functions.invoke("auto-design-product", {
-        body: { productId, inspiration: inspiration || null, themeColor: themeColor || null },
+        body: {
+          productId,
+          inspiration: inspiration || null,
+          inspirationImage: inspirationImage || null,
+          themeColor: themeColor || null,
+        },
       });
       if (fnErr) throw fnErr;
       if ((data as any)?.error) throw new Error((data as any).error);
@@ -42,7 +48,7 @@ export function AutoDesignModal({ productId, productName, inspiration, themeColo
     } finally {
       setLoading(false);
     }
-  }, [productId, inspiration, themeColor]);
+  }, [productId, inspiration, inspirationImage, themeColor]);
 
   useEffect(() => {
     if (open && productId) generate();
