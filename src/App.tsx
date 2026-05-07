@@ -5,7 +5,6 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "@/hooks/useAuth";
 import { ThemeProvider } from "@/hooks/useTheme";
-import { FlyerStudioProvider } from "@/contexts/FlyerStudioContext";
 import { DashboardLayout } from "@/components/dashboard/DashboardLayout";
 import { AdminLayout } from "@/components/admin/AdminLayout";
 import Index from "./pages/Index";
@@ -53,7 +52,6 @@ const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
       <ThemeProvider>
-        <FlyerStudioProvider>
           <TooltipProvider>
             <Toaster />
             <Sonner />
@@ -98,7 +96,6 @@ const App = () => (
             </Routes>
             </BrowserRouter>
           </TooltipProvider>
-        </FlyerStudioProvider>
       </ThemeProvider>
     </AuthProvider>
   </QueryClientProvider>
