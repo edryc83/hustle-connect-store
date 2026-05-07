@@ -352,23 +352,33 @@ export function DesignStudioModal({ open, onClose, initialProduct = null }: Prop
 
         {/* STEP 2 — TEMPLATE */}
         {step === "template" && (
-          <div className="space-y-3">
-            <div className="flex items-center justify-between">
+          <div className="space-y-3 pt-2">
+            <div className="flex items-center justify-between gap-2">
               <span className="text-[11px] text-muted-foreground">
                 {insp ? `Selected: ${insp.label}` : "Tap a template"}
               </span>
-              <button
-                onClick={() => {
-                  const pool = track === "day" ? POSTER_OF_THE_DAY_TEMPLATES : INSPIRATIONS;
-                  const pick = pool[Math.floor(Math.random() * pool.length)];
-                  setInspirationId(pick.id);
-                }}
-                className="text-[11px] flex items-center gap-1 text-primary hover:underline"
-              >
-                <Shuffle className="h-3 w-3" /> Random
-              </button>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => {
+                    const pool = track === "day" ? POSTER_OF_THE_DAY_TEMPLATES : INSPIRATIONS;
+                    const pick = pool[Math.floor(Math.random() * pool.length)];
+                    setInspirationId(pick.id);
+                  }}
+                  className="text-[11px] flex items-center gap-1 text-primary hover:underline"
+                >
+                  <Shuffle className="h-3 w-3" /> Random
+                </button>
+                <Button
+                  size="sm"
+                  disabled={!inspirationId}
+                  onClick={() => setStep("theme")}
+                  className="h-7 px-3 text-xs"
+                >
+                  Next
+                </Button>
+              </div>
             </div>
-            <div className="grid grid-cols-3 gap-1.5 max-h-[55vh] overflow-y-auto -mx-1 px-1">
+            <div className="grid grid-cols-3 gap-1.5 max-h-[72vh] overflow-y-auto -mx-1 px-1 pb-2">
               {templatePool.map((i: any) => {
                 const active = inspirationId === i.id;
                 return (
@@ -394,13 +404,6 @@ export function DesignStudioModal({ open, onClose, initialProduct = null }: Prop
                 );
               })}
             </div>
-            <Button
-              className="w-full"
-              disabled={!inspirationId}
-              onClick={() => setStep("theme")}
-            >
-              Next
-            </Button>
           </div>
         )}
 
