@@ -789,7 +789,7 @@ export function DesignStudioModal({ open, onClose, initialProduct = null }: Prop
           </div>
         )}
 
-        {step === "final" && (track === "prompt" || track === "day") && (
+        {step === "final" && (track === "prompt" || track === "day" || (track === "copy" && copyMode === "prompt")) && (
           <div className="space-y-3">
             <div className="aspect-square rounded-xl overflow-hidden bg-muted relative flex items-center justify-center">
               {generating && (
@@ -811,7 +811,7 @@ export function DesignStudioModal({ open, onClose, initialProduct = null }: Prop
                 </div>
               )}
             </div>
-            {track === "prompt" ? (
+            {track === "prompt" || (track === "copy" && copyMode === "prompt") ? (
               <Textarea
                 placeholder="e.g. Black Friday sale poster with bold red typography and a 50% off badge"
                 value={prompt}
