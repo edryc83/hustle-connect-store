@@ -173,12 +173,13 @@ export function DesignStudioModal({ open, onClose }: Props) {
     p.name.toLowerCase().includes(search.toLowerCase())
   );
 
-  // Hand off to AutoDesignModal once product is selected
-  if (selectedProduct) {
+  // Hand off to AutoDesignModal once product + template + theme have been chosen
+  const handoffToAutoDesign = track === "product" && selectedProduct && step === "final";
+  if (handoffToAutoDesign) {
     return (
       <AutoDesignModal
-        productId={selectedProduct.id}
-        productName={selectedProduct.name}
+        productId={selectedProduct!.id}
+        productName={selectedProduct!.name}
         inspiration={insp?.prompt || null}
         inspirationImage={insp?.image || null}
         themeColor={theme?.color || null}
