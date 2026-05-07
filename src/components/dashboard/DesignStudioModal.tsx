@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import { AutoDesignModal } from "./AutoDesignModal";
 import { INSPIRATIONS, COLOR_THEMES, pickRandomInspiration } from "./designInspirations";
-import { POSTER_OCCASIONS, POSTER_OF_THE_DAY_TEMPLATES, type PosterOccasion } from "./posterOfTheDay";
+import { POSTER_OCCASIONS, POSTER_OF_THE_DAY_TEMPLATES, getTodaysOccasions, type PosterOccasion } from "./posterOfTheDay";
 import { CalendarHeart } from "lucide-react";
 
 interface Props {
@@ -83,8 +83,11 @@ export function DesignStudioModal({ open, onClose }: Props) {
   const insp =
     (templatePool.find((i: any) => i.id === inspirationId) as any) || null;
   const theme = themeId ? COLOR_THEMES.find((t) => t.id === themeId) : null;
+  const todaysOccasions = getTodaysOccasions();
   const occasion: PosterOccasion | null =
-    POSTER_OCCASIONS.find((o) => o.id === occasionId) || null;
+    todaysOccasions.find((o) => o.id === occasionId) ||
+    POSTER_OCCASIONS.find((o) => o.id === occasionId) ||
+    null;
 
   const loadInspirationDataUrl = async (): Promise<string | null> => {
     if (!insp) return null;
@@ -310,7 +313,7 @@ export function DesignStudioModal({ open, onClose }: Props) {
               Pick the occasion. AI will design a poster with a happy person vibing your day.
             </p>
             <div className="grid grid-cols-2 gap-2">
-              {POSTER_OCCASIONS.map((o) => {
+              {todaysOccasions.map((o) => {
                 const active = occasionId === o.id;
                 return (
                   <button
