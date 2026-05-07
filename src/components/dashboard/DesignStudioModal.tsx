@@ -757,7 +757,10 @@ export function DesignStudioModal({ open, onClose, initialProduct = null }: Prop
                   {filtered.map((p) => (
                     <button
                       key={p.id}
-                      onClick={() => { setSelectedProduct(p); setStep("template"); }}
+                      onClick={() => {
+                        setSelectedProduct(p);
+                        setStep(track === "copy" ? "theme" : "template");
+                      }}
                       className={`group rounded-xl overflow-hidden border bg-card/40 hover:border-primary/40 transition text-left ${
                         selectedProduct?.id === p.id ? "border-primary ring-2 ring-primary/40" : "border-border/60"
                       }`}
