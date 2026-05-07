@@ -89,18 +89,21 @@ Deno.serve(async (req) => {
     const storeName = profile?.store_name || "";
 
     const prompt = [
-      "Design a PREMIUM, MINIMAL editorial product poster, 1:1 square, gallery-grade.",
-      "Use the supplied product image as the hero subject. Keep the real product photo clean, color-graded, with a soft realistic shadow.",
-      "Lots of negative space. Calm, sophisticated background — soft gradient, paper texture, or subtle solid color. No clutter, no stickers, no emojis, no fake badges, no stars, no busy patterns.",
-      `Use ${accent} as a tasteful brand accent color (small accents only — a thin line, dot, or small price chip). Keep the overall palette restrained and premium.`,
-      "Typography: clean modern sans-serif. Tight hierarchy. AT MOST these text elements, nothing else:",
-      `1. Product title: "${product.name}" (large, bold)`,
-      `2. Price: "${priceStr}" (medium, accent color)`,
-      phone ? `3. WhatsApp number: "${phone}" (small, with a tiny WhatsApp glyph)` : "3. (no phone number)",
-      `4. Tiny mark in a bottom corner: "Designed by Afristall" (very small, low-contrast).`,
-      storeName ? `Optional: small store name "${storeName}" near the corner if it fits gracefully.` : "",
-      "Strictly avoid: long descriptions, paragraphs, multiple price tags, watermarks across the product, neon, drop shadows on text, decorative emojis, flags, hashtags.",
-      "Final output must look like a high-end fashion / Apple-style product poster.",
+      "Design a PREMIUM EDITORIAL PRODUCT AD POSTER, 1:1 square, gallery-grade — must clearly read as a real advertisement, not just a product photo.",
+      "Use the supplied product image as the hero subject, clean and color-graded with a soft realistic shadow. Compose like a magazine ad: strong layout, intentional alignment, deliberate negative space, premium background (soft gradient, paper grain, or subtle solid).",
+      `Use ${accent} as a tasteful brand accent (thin line, dot, chip, or underline). Restrained, premium palette — no neon, no clutter, no stickers, no emojis, no fake badges or stars.`,
+      "Typography: clean modern sans-serif with TIGHT hierarchy. Render ALL of the following text elements crisply and legibly — NO MISSPELLINGS, NO GIBBERISH:",
+      `1. TITLE (large, bold, hero): "${product.name}"`,
+      `2. SUBTITLE / TAGLINE (medium, one short punchy line you invent that sells this product — max 6 words, e.g. "Built for everyday brilliance" or "Power, refined").`,
+      `3. PRICE chip in ${accent}: "${priceStr}"`,
+      phone
+        ? `4. CTA BUTTON (pill-shaped, ${accent} background, white text): "Order on WhatsApp" with the number "${phone}" directly below or beside it, plus a tiny WhatsApp glyph.`
+        : `4. CTA BUTTON (pill-shaped, ${accent} background, white text): "Order Now".`,
+      `5. ALWAYS visible bottom-corner mark: "Designed by Afristall" — small, refined, low-contrast but clearly readable. NEVER omit this.`,
+      storeName ? `6. Small store name "${storeName}" near the top or opposite corner.` : "",
+      "Layout rule: title + subtitle on one side, product hero on the other (or stacked top/bottom). CTA button must be visible and tappable-looking. Everything aligned to a clear grid.",
+      "Strictly avoid: paragraphs, multiple prices, watermarks across the product, drop shadows on text, decorative emojis, flags, hashtags, lorem ipsum, broken letters.",
+      "Final result must look like a high-end Apple / Nike / fashion-house product advertisement.",
     ].filter(Boolean).join("\n");
 
     // Download product image
