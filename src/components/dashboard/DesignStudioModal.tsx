@@ -75,7 +75,23 @@ export function DesignStudioModal({ open, onClose }: Props) {
 
   const insp = INSPIRATIONS.find((i) => i.id === inspirationId) || null;
   const theme = themeId ? COLOR_THEMES.find((t) => t.id === themeId) : null;
-  const inspirationImage = insp ? new URL(insp.image, window.location.origin).toString() : null;
+
+  const loadInspirationDataUrl = async (): Promise<string | null> => {
+    if (!insp) return null;
+    try {
+      const r = await fetch(insp.image);
+      const blob = await r.blob();
+      if (!blob.type.startsWith("image/")) return null;
+      return await new Promise<string>((resolve, reject) => {
+        const fr = new FileReader();
+        fr.onloadend = () => resolve(fr.result as string);
+        fr.onerror = reject;
+        fr.readAsDataURL(blob);
+      });
+    } catch {
+      return null;
+    }
+  };
 
   const generateFromPrompt = async () => {
     if (prompt.trim().length < 3) {
@@ -85,6 +101,7 @@ export function DesignStudioModal({ open, onClose }: Props) {
     setGenerating(true);
     setResultUrl(null);
     try {
+      const inspirationImage = await loadInspirationDataUrl();
       const { data, error } = await supabase.functions.invoke("design-poster-prompt", {
         body: {
           prompt: prompt.trim(),
