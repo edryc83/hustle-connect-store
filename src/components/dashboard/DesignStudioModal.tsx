@@ -161,7 +161,7 @@ export function DesignStudioModal({ open, onClose }: Props) {
         productId={selectedProduct.id}
         productName={selectedProduct.name}
         inspiration={insp?.prompt || null}
-        inspirationImage={inspirationImage}
+        inspirationImage={insp?.image || null}
         themeColor={theme?.color || null}
         open={open}
         onClose={() => {
