@@ -487,21 +487,6 @@ export function DesignStudioModal({ open, onClose, initialProduct = null }: Prop
               </span>
               <div className="flex items-center gap-3">
                 {track !== "day" && (
-                  <button
-                    type="button"
-                    onClick={handleImportFromUrl}
-                    disabled={importingUrl}
-                    className="text-[11px] flex items-center gap-1 text-primary hover:underline disabled:opacity-50"
-                  >
-                    {importingUrl ? (
-                      <Loader2 className="h-3 w-3 animate-spin" />
-                    ) : (
-                      <Link2 className="h-3 w-3" />
-                    )}
-                    Copy from URL
-                  </button>
-                )}
-                {track !== "day" && (
                   <label className="text-[11px] flex items-center gap-1 text-primary hover:underline cursor-pointer">
                     {uploadingTemplate ? (
                       <Loader2 className="h-3 w-3 animate-spin" />
