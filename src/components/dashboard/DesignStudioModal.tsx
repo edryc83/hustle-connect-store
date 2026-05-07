@@ -76,10 +76,12 @@ export function DesignStudioModal({ open, onClose }: Props) {
     try {
       const insp = INSPIRATIONS.find((i) => i.id === inspirationId);
       const theme = COLOR_THEMES.find((t) => t.id === themeId);
+      const inspirationImage = insp ? new URL(insp.image, window.location.origin).toString() : null;
       const { data, error } = await supabase.functions.invoke("design-poster-prompt", {
         body: {
           prompt: prompt.trim(),
           inspiration: insp?.prompt || null,
+          inspirationImage,
           themeColor: theme?.color || null,
         },
       });
@@ -131,11 +133,13 @@ export function DesignStudioModal({ open, onClose }: Props) {
   if (selectedProduct) {
     const insp = INSPIRATIONS.find((i) => i.id === inspirationId);
     const theme = COLOR_THEMES.find((t) => t.id === themeId);
+    const inspirationImage = insp ? new URL(insp.image, window.location.origin).toString() : null;
     return (
       <AutoDesignModal
         productId={selectedProduct.id}
         productName={selectedProduct.name}
         inspiration={insp?.prompt || null}
+        inspirationImage={inspirationImage}
         themeColor={theme?.color || null}
         open={open}
         onClose={() => {
@@ -195,12 +199,16 @@ export function DesignStudioModal({ open, onClose }: Props) {
             <button
               key={i.id}
               onClick={() => setInspirationId(active ? null : i.id)}
-              className={`rounded-lg border p-1.5 text-[10px] flex flex-col items-center gap-0.5 transition ${
-                active ? "border-primary bg-primary/10" : "border-border/60 hover:border-primary/40"
+              className={`relative rounded-lg overflow-hidden border text-[10px] transition ${
+                active ? "border-primary ring-2 ring-primary/40" : "border-border/60 hover:border-primary/40"
               }`}
             >
-              <span className="text-base leading-none">{i.emoji}</span>
-              <span className="line-clamp-1">{i.label}</span>
+              <div className="aspect-square bg-muted">
+                <img src={i.image} alt={i.label} className="w-full h-full object-cover" loading="lazy" />
+              </div>
+              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent px-1.5 py-1 text-[10px] text-white text-left line-clamp-1">
+                {i.label}
+              </div>
             </button>
           );
         })}
