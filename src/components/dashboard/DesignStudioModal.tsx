@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import { AutoDesignModal } from "./AutoDesignModal";
 import { INSPIRATIONS, COLOR_THEMES, pickRandomInspiration } from "./designInspirations";
-import { POSTER_OCCASIONS, type PosterOccasion } from "./posterOfTheDay";
+import { POSTER_OCCASIONS, POSTER_OF_THE_DAY_TEMPLATES, type PosterOccasion } from "./posterOfTheDay";
 import { CalendarHeart } from "lucide-react";
 
 interface Props {
@@ -79,7 +79,9 @@ export function DesignStudioModal({ open, onClose }: Props) {
     }
   }, [track, step, user, products.length]);
 
-  const insp = INSPIRATIONS.find((i) => i.id === inspirationId) || null;
+  const templatePool = track === "day" ? POSTER_OF_THE_DAY_TEMPLATES : INSPIRATIONS;
+  const insp =
+    (templatePool.find((i: any) => i.id === inspirationId) as any) || null;
   const theme = themeId ? COLOR_THEMES.find((t) => t.id === themeId) : null;
   const occasion: PosterOccasion | null =
     POSTER_OCCASIONS.find((o) => o.id === occasionId) || null;
@@ -344,14 +346,18 @@ export function DesignStudioModal({ open, onClose }: Props) {
                 {insp ? `Selected: ${insp.label}` : "Tap a template"}
               </span>
               <button
-                onClick={() => setInspirationId(pickRandomInspiration().id)}
+                onClick={() => {
+                  const pool = track === "day" ? POSTER_OF_THE_DAY_TEMPLATES : INSPIRATIONS;
+                  const pick = pool[Math.floor(Math.random() * pool.length)];
+                  setInspirationId(pick.id);
+                }}
                 className="text-[11px] flex items-center gap-1 text-primary hover:underline"
               >
                 <Shuffle className="h-3 w-3" /> Random
               </button>
             </div>
             <div className="grid grid-cols-3 gap-1.5 max-h-[55vh] overflow-y-auto -mx-1 px-1">
-              {INSPIRATIONS.map((i) => {
+              {templatePool.map((i: any) => {
                 const active = inspirationId === i.id;
                 return (
                   <button
