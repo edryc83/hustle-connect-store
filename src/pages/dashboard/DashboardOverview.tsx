@@ -6,11 +6,12 @@ import whatsappIcon from "@/assets/whatsapp-icon.png";
 import { useBusinessTerms } from "@/hooks/useBusinessTerms";
 import { Button } from "@/components/ui/button";
 import {
-  Package, Copy, Share2, X, Plus, Eye, ShoppingCart, TrendingUp,
+  Package, Copy, Share2, X, Plus, Eye, ShoppingCart, TrendingUp, Sparkles,
 } from "lucide-react";
 import AfristallLogo from "@/components/AfristallLogo";
 import { toast } from "sonner";
 import CaptionGenerator from "@/components/dashboard/CaptionGenerator";
+import DesignStudioModal from "@/components/dashboard/DesignStudioModal";
 
 function getGreeting(): { text: string; emoji: string } {
   const hour = new Date().getHours();
@@ -35,6 +36,7 @@ const DashboardOverview = () => {
     () => localStorage.getItem("afristall_banner_dismissed") === "true"
   );
   const [copied, setCopied] = useState(false);
+  const [studioOpen, setStudioOpen] = useState(false);
 
   useEffect(() => {
     if (!user) return;
@@ -153,22 +155,23 @@ const DashboardOverview = () => {
           <p className="text-xs text-muted-foreground mt-0.5">Store Views</p>
         </Link>
 
-        {/* Confirmed Sales */}
-        <Link
-          to="/dashboard/orders"
-          className="col-span-2 rounded-2xl border border-border/40 bg-card/40 backdrop-blur-xl p-4 shadow-sm hover:bg-card/60 transition-all group"
+        {/* Creative Studio */}
+        <button
+          type="button"
+          onClick={() => setStudioOpen(true)}
+          className="col-span-2 text-left rounded-2xl border border-primary/40 bg-gradient-to-br from-primary/15 via-card/40 to-fuchsia-500/10 backdrop-blur-xl p-4 shadow-sm hover:from-primary/25 transition-all group"
         >
           <div className="flex items-center gap-4">
-            <div className="h-12 w-12 rounded-xl bg-green-500/10 flex items-center justify-center">
-              <ShoppingCart className="h-6 w-6 text-green-500" />
+            <div className="h-12 w-12 rounded-xl bg-primary/20 flex items-center justify-center">
+              <Sparkles className="h-6 w-6 text-primary" />
             </div>
             <div className="flex-1 min-w-0">
-              <p className="text-2xl font-bold">{orderCount}</p>
-              <p className="text-xs text-muted-foreground">Confirmed Sales</p>
+              <p className="text-base font-bold">Creative Studio</p>
+              <p className="text-xs text-muted-foreground">Design posters & ads with AI</p>
             </div>
-            <TrendingUp className="h-4 w-4 text-muted-foreground/50 group-hover:text-green-500 transition-colors" />
+            <TrendingUp className="h-4 w-4 text-muted-foreground/50 group-hover:text-primary transition-colors" />
           </div>
-        </Link>
+        </button>
       </div>
 
       {/* Share bar — glowing */}
@@ -227,6 +230,8 @@ const DashboardOverview = () => {
         category={category}
         productCount={productCount}
       />
+
+      <DesignStudioModal open={studioOpen} onClose={() => setStudioOpen(false)} />
     </div>
   );
 };
