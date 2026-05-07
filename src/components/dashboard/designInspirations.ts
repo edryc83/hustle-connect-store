@@ -377,6 +377,54 @@ export const INSPIRATIONS: Inspiration[] = [
     prompt:
       "Tall 4:5 pure black background. Tiny tracked caps category label centered at the top. Hero: a real hand holding a single product bottle dead-center, lit softly. Three short annotation labels float around the hero (top-right, mid-left, bottom-left), each with a small bold title and 2-3 line description in white sans, connected to the product by thin hand-drawn curved arrows. Centered at the very bottom: a small social handle in light grey. Editorial, minimal, magazine-grade.",
   },
+  {
+    id: "celestial-musk-notes",
+    label: "Bold Question + Notes",
+    emoji: "🌿",
+    image: "/design-templates/celestial-musk-notes.png",
+    prompt:
+      "Tall 4:5 warm light-grey background with a faint olive palm-leaf shadow on the right. Massive bold black sans question headline upper-left in 2-3 stacked lines. Hero product centered-lower, tilted slightly. Three short annotation labels float around the hero, each with a small bold title and a 2-line description in dark grey, connected to the product by thin hand-drawn brown curved arrows. Editorial, magazine-grade, lots of negative space.",
+  },
+  {
+    id: "lomas-not-for-everyone",
+    label: "Echo Headline",
+    emoji: "🔁",
+    image: "/design-templates/lomas-not-for-everyone.png",
+    prompt:
+      "1:1 soft white-to-light-grey vignette background. Centered massive bold sans headline in 2 lines, mixing a heavy uppercase word with a flowing italic script accent word. Behind/below the headline, the second word repeats 4-5 times stacked vertically as faint ghost echoes fading into the background. Hero product centered, slightly tilted, casting a soft shadow over the echo type. Minimal, editorial, premium.",
+  },
+  {
+    id: "scent-dynasty-romance",
+    label: "Word Behind Bottle",
+    emoji: "💎",
+    image: "/design-templates/scent-dynasty-romance.png",
+    prompt:
+      "1:1 soft cream-grey background. Centered top: small icon + wordmark logo. Mid-canvas: a single huge bold uppercase word stretched edge-to-edge sitting BEHIND the hero product (product overlaps the middle letters). Hero product centered, tilted slightly, casting a soft shadow. Lower-center: small caps eyebrow line followed by a 2-line bold dark title. Tiny centered URL pinned at the very bottom inside a thin rule. Minimal, editorial, premium.",
+  },
+  {
+    id: "mb-parfums-luxe",
+    label: "Teal Card Layout",
+    emoji: "🟢",
+    image: "/design-templates/mb-parfums-luxe.jpeg",
+    prompt:
+      "Tall 4:5 deep teal background. Top-right: small rounded teal card with a logo icon and brand name. Centered upper-mid: a large rounded translucent panel containing a 2-line bold white serif headline, a 3-line short paragraph beneath, and a small cream rounded pill 'availability' chip with a tiny gold seal icon. Hero: two product bottles overlapping diagonally on the right, one with a soft pink ribbon bow. Bottom: two long pill chips side by side, one with a phone icon + number, one with a location icon + address. Premium, brand-flyer style.",
+  },
+  {
+    id: "royal-luxury-spray",
+    label: "Service List Hero",
+    emoji: "💧",
+    image: "/design-templates/royal-luxury-spray.jpeg",
+    prompt:
+      "Tall 4:5 deep blue background with subtle prism light leaks. Top-left: logo + wordmark. Top-right: small white outlined 'SHOP NOW' pill. Left column: bold 2-line outlined-display headline with a thin yellow underline swoosh, then a 2-line supporting paragraph in white sans. Below: a translucent dark rounded panel with a blue 'We Sell:' tab header and a 7-9 item bulleted list with small blue check-circle bullets. Right side: a tightly-grouped lineup of multiple product bottles with dynamic blue fabric flowing around them. Bottom: a white curved bottom bar with 'Reach Us Via:' label and a stacked contact list (phone, whatsapp, tiktok, email) with small icons.",
+  },
+  {
+    id: "dalpha-perfume-house",
+    label: "Model + Lineup Hero",
+    emoji: "💚",
+    image: "/design-templates/dalpha-perfume-house.jpeg",
+    prompt:
+      "Tall 4:5 deep green background with subtle smoky textures. Top-left: logo + wordmark. Top-right: small dashed-outlined caps tagline pill. Left column: huge bold 3-line stacked white display headline with a subtle outline glow and a thin green underline swoosh, then a 2-line supporting paragraph. Below: a translucent dark rounded glass panel with a green 'OUR SERVICES' tab header and a 6-item bulleted list with small green check-badge bullets. Right side: a smiling person photo holding a product near their face, a small 'Tested And Trusted!' green badge floating top-right, plus a tightly-grouped lineup of multiple product bottles arranged at the lower-right. Bottom: white curved bottom bar with a green 'Home Delivery' circular badge on the left and a 3-column contact row (whatsapp, instagram, tiktok) each with small icons.",
+  },
 ];
 
 export const COLOR_THEMES = [
