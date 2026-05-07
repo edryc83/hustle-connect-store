@@ -20,7 +20,7 @@ interface Props {
 }
 
 type Track = "product" | "prompt" | "day";
-type Step = "menu" | "occasion" | "template" | "theme" | "final";
+type Step = "menu" | "product" | "occasion" | "template" | "theme" | "final";
 
 interface ProductRow {
   id: string;
@@ -64,7 +64,7 @@ export function DesignStudioModal({ open, onClose }: Props) {
   }, [open]);
 
   useEffect(() => {
-    if (track === "product" && step === "final" && user && products.length === 0) {
+    if (track === "product" && step === "product" && user && products.length === 0) {
       setLoadingProducts(true);
       supabase
         .from("products")
@@ -195,13 +195,11 @@ export function DesignStudioModal({ open, onClose }: Props) {
     if (step === "final") setStep("theme");
     else if (step === "theme") setStep("template");
     else if (step === "template") {
-      if (track === "day") {
-        setStep("occasion");
-        return;
-      }
+      if (track === "day") { setStep("occasion"); return; }
+      if (track === "product") { setStep("product"); return; }
       setStep("menu");
       setTrack(null);
-    } else if (step === "occasion") {
+    } else if (step === "occasion" || step === "product") {
       setStep("menu");
       setTrack(null);
     } else onClose();
@@ -209,11 +207,11 @@ export function DesignStudioModal({ open, onClose }: Props) {
 
   const stepIndex =
     step === "menu" ? 0
-      : step === "occasion" ? 1
-      : step === "template" ? (track === "day" ? 2 : 1)
-      : step === "theme" ? (track === "day" ? 3 : 2)
-      : (track === "day" ? 4 : 3);
-  const totalSteps = track === "day" ? 4 : 3;
+      : step === "product" || step === "occasion" ? 1
+      : step === "template" ? 2
+      : step === "theme" ? 3
+      : 4;
+  const totalSteps = track === "prompt" ? 3 : 4;
 
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
@@ -231,10 +229,11 @@ export function DesignStudioModal({ open, onClose }: Props) {
             )}
             <Sparkles className="h-4 w-4 text-primary" />
             {step === "menu" && "Design Studio"}
+            {step === "product" && "Choose a product"}
             {step === "occasion" && "Poster of the Day"}
             {step === "template" && "Pick a template"}
             {step === "theme" && "Pick a color"}
-            {step === "final" && (track === "product" ? "Choose a product" : "Describe your poster")}
+            {step === "final" && "Describe your poster"}
           </DialogTitle>
         </DialogHeader>
 
@@ -262,7 +261,7 @@ export function DesignStudioModal({ open, onClose }: Props) {
                 title: "Choose product",
                 desc: "Auto-generate from a product",
                 tint: "from-orange-500/20 to-amber-500/10 text-orange-400 border-orange-500/30",
-                onClick: () => { setTrack("product"); setStep("template"); },
+                onClick: () => { setTrack("product"); setStep("product"); },
               },
               {
                 id: "prompt",
@@ -448,14 +447,23 @@ export function DesignStudioModal({ open, onClose }: Props) {
               })}
             </div>
 
-            <Button className="w-full" onClick={() => setStep("final")}>
-              {track === "product" ? "Choose product" : "Continue"}
+            <Button
+              className="w-full"
+              onClick={() => {
+                if (track === "product" && selectedProduct) {
+                  // selectedProduct truthy will mount AutoDesignModal on next render
+                  return;
+                }
+                setStep("final");
+              }}
+            >
+              {track === "product" ? "Generate poster" : "Continue"}
             </Button>
           </div>
         )}
 
-        {/* STEP 4 — FINAL: pick product OR describe + generate */}
-        {step === "final" && track === "product" && (
+        {/* STEP — PRODUCT (product track) */}
+        {step === "product" && track === "product" && (
           <div className="space-y-3">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
@@ -480,8 +488,10 @@ export function DesignStudioModal({ open, onClose }: Props) {
                   {filtered.map((p) => (
                     <button
                       key={p.id}
-                      onClick={() => setSelectedProduct(p)}
-                      className="group rounded-xl overflow-hidden border border-border/60 bg-card/40 hover:border-primary/40 transition text-left"
+                      onClick={() => { setSelectedProduct(p); setStep("template"); }}
+                      className={`group rounded-xl overflow-hidden border bg-card/40 hover:border-primary/40 transition text-left ${
+                        selectedProduct?.id === p.id ? "border-primary ring-2 ring-primary/40" : "border-border/60"
+                      }`}
                     >
                       <div className="aspect-square bg-muted overflow-hidden">
                         {p.image_url ? (
