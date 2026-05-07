@@ -254,49 +254,52 @@ export function DesignStudioModal({ open, onClose }: Props) {
 
         {/* STEP 1 — MENU */}
         {step === "menu" && (
-          <div className="grid grid-cols-1 gap-3">
-            <button
-              onClick={() => { setTrack("product"); setStep("template"); }}
-              className="group flex items-center gap-3 rounded-2xl border border-border/60 bg-card/40 p-4 text-left hover:border-primary/40 hover:bg-card/80 transition"
-            >
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/15 text-primary">
-                <Package className="h-5 w-5" />
-              </div>
-              <div className="flex-1">
-                <div className="font-semibold">Choose product</div>
-                <div className="text-xs text-muted-foreground">
-                  Pick a product and auto-generate a premium poster
-                </div>
-              </div>
-            </button>
-            <button
-              onClick={() => { setTrack("prompt"); setStep("template"); }}
-              className="group flex items-center gap-3 rounded-2xl border border-border/60 bg-card/40 p-4 text-left hover:border-primary/40 hover:bg-card/80 transition"
-            >
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/15 text-primary">
-                <Wand2 className="h-5 w-5" />
-              </div>
-              <div className="flex-1">
-                <div className="font-semibold">Make poster</div>
-                <div className="text-xs text-muted-foreground">
-                  Describe any poster — AI designs it for you
-                </div>
-              </div>
-            </button>
-            <button
-              onClick={() => { setTrack("day"); setStep("occasion"); }}
-              className="group flex items-center gap-3 rounded-2xl border border-border/60 bg-card/40 p-4 text-left hover:border-primary/40 hover:bg-card/80 transition"
-            >
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/15 text-primary">
-                <CalendarHeart className="h-5 w-5" />
-              </div>
-              <div className="flex-1">
-                <div className="font-semibold">Poster of the Day</div>
-                <div className="text-xs text-muted-foreground">
-                  Happy New Month, Motivation Monday & more — a jolly person + your vibe
-                </div>
-              </div>
-            </button>
+          <div className="grid grid-cols-1 gap-2.5">
+            {[
+              {
+                id: "product",
+                icon: Package,
+                title: "Choose product",
+                desc: "Auto-generate from a product",
+                tint: "from-orange-500/20 to-amber-500/10 text-orange-400 border-orange-500/30",
+                onClick: () => { setTrack("product"); setStep("template"); },
+              },
+              {
+                id: "prompt",
+                icon: Wand2,
+                title: "Make poster",
+                desc: "Describe any poster — AI designs it",
+                tint: "from-violet-500/20 to-fuchsia-500/10 text-violet-300 border-violet-500/30",
+                onClick: () => { setTrack("prompt"); setStep("template"); },
+              },
+              {
+                id: "day",
+                icon: CalendarHeart,
+                title: "Poster of the Day",
+                desc: "Jolly person + your daily vibe",
+                tint: "from-emerald-500/20 to-teal-500/10 text-emerald-300 border-emerald-500/30",
+                onClick: () => { setTrack("day"); setStep("occasion"); },
+              },
+            ].map((opt) => {
+              const Icon = opt.icon;
+              return (
+                <button
+                  key={opt.id}
+                  onClick={opt.onClick}
+                  className={`group flex items-center gap-3 rounded-xl border bg-gradient-to-br ${opt.tint} px-3 py-2.5 text-left hover:brightness-110 transition`}
+                >
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-background/40 backdrop-blur shrink-0">
+                    <Icon className="h-4 w-4" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm font-semibold text-foreground leading-tight">{opt.title}</div>
+                    <div className="text-[11px] text-muted-foreground leading-snug truncate">
+                      {opt.desc}
+                    </div>
+                  </div>
+                </button>
+              );
+            })}
           </div>
         )}
 
