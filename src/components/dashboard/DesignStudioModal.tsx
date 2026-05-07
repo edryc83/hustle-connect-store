@@ -6,17 +6,19 @@ import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
-import { Loader2, Sparkles, Package, Wand2, ArrowLeft, Download, Share2, RefreshCw, Search } from "lucide-react";
+import {
+  Loader2, Sparkles, Package, Wand2, ArrowLeft, Download, Share2, RefreshCw, Search, Shuffle, Check,
+} from "lucide-react";
 import { AutoDesignModal } from "./AutoDesignModal";
-import { INSPIRATIONS, COLOR_THEMES, pickRandomInspiration, type Inspiration } from "./designInspirations";
-import { Shuffle } from "lucide-react";
+import { INSPIRATIONS, COLOR_THEMES, pickRandomInspiration } from "./designInspirations";
 
 interface Props {
   open: boolean;
   onClose: () => void;
 }
 
-type Mode = "menu" | "products" | "prompt";
+type Track = "product" | "prompt";
+type Step = "menu" | "template" | "theme" | "final";
 
 interface ProductRow {
   id: string;
@@ -26,7 +28,9 @@ interface ProductRow {
 
 export function DesignStudioModal({ open, onClose }: Props) {
   const { user } = useAuth();
-  const [mode, setMode] = useState<Mode>("menu");
+  const [track, setTrack] = useState<Track | null>(null);
+  const [step, setStep] = useState<Step>("menu");
+
   const [products, setProducts] = useState<ProductRow[]>([]);
   const [loadingProducts, setLoadingProducts] = useState(false);
   const [search, setSearch] = useState("");
@@ -35,23 +39,26 @@ export function DesignStudioModal({ open, onClose }: Props) {
   const [prompt, setPrompt] = useState("");
   const [generating, setGenerating] = useState(false);
   const [resultUrl, setResultUrl] = useState<string | null>(null);
+
   const [inspirationId, setInspirationId] = useState<string | null>(null);
-  const [themeId, setThemeId] = useState<string>("brand");
+  // null themeId == "use template default"
+  const [themeId, setThemeId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!open) {
-      setMode("menu");
+      setTrack(null);
+      setStep("menu");
       setSelectedProduct(null);
       setPrompt("");
       setResultUrl(null);
       setSearch("");
       setInspirationId(null);
-      setThemeId("brand");
+      setThemeId(null);
     }
   }, [open]);
 
   useEffect(() => {
-    if (mode === "products" && user && products.length === 0) {
+    if (track === "product" && step === "final" && user && products.length === 0) {
       setLoadingProducts(true);
       supabase
         .from("products")
@@ -64,7 +71,11 @@ export function DesignStudioModal({ open, onClose }: Props) {
           setLoadingProducts(false);
         });
     }
-  }, [mode, user, products.length]);
+  }, [track, step, user, products.length]);
+
+  const insp = INSPIRATIONS.find((i) => i.id === inspirationId) || null;
+  const theme = themeId ? COLOR_THEMES.find((t) => t.id === themeId) : null;
+  const inspirationImage = insp ? new URL(insp.image, window.location.origin).toString() : null;
 
   const generateFromPrompt = async () => {
     if (prompt.trim().length < 3) {
@@ -74,9 +85,6 @@ export function DesignStudioModal({ open, onClose }: Props) {
     setGenerating(true);
     setResultUrl(null);
     try {
-      const insp = INSPIRATIONS.find((i) => i.id === inspirationId);
-      const theme = COLOR_THEMES.find((t) => t.id === themeId);
-      const inspirationImage = insp ? new URL(insp.image, window.location.origin).toString() : null;
       const { data, error } = await supabase.functions.invoke("design-poster-prompt", {
         body: {
           prompt: prompt.trim(),
@@ -129,11 +137,8 @@ export function DesignStudioModal({ open, onClose }: Props) {
     p.name.toLowerCase().includes(search.toLowerCase())
   );
 
-  // If a product is selected, hand off to AutoDesignModal
+  // Hand off to AutoDesignModal once product is selected
   if (selectedProduct) {
-    const insp = INSPIRATIONS.find((i) => i.id === inspirationId);
-    const theme = COLOR_THEMES.find((t) => t.id === themeId);
-    const inspirationImage = insp ? new URL(insp.image, window.location.origin).toString() : null;
     return (
       <AutoDesignModal
         productId={selectedProduct.id}
@@ -150,83 +155,26 @@ export function DesignStudioModal({ open, onClose }: Props) {
     );
   }
 
-  const ThemeStrip = (
-    <div className="flex items-center gap-2 overflow-x-auto pb-1 -mx-1 px-1">
-      <span className="text-[11px] text-muted-foreground shrink-0">Theme</span>
-      {COLOR_THEMES.map((t) => {
-        const active = themeId === t.id;
-        return (
-          <button
-            key={t.id}
-            onClick={() => setThemeId(t.id)}
-            className={`shrink-0 h-7 px-2 rounded-full border text-[11px] flex items-center gap-1.5 transition ${
-              active ? "border-primary bg-primary/10" : "border-border/60 hover:border-primary/40"
-            }`}
-          >
-            {t.color ? (
-              <span className="h-3 w-3 rounded-full border border-border/60" style={{ background: t.color }} />
-            ) : (
-              <Sparkles className="h-3 w-3 text-primary" />
-            )}
-            {t.label}
-          </button>
-        );
-      })}
-    </div>
-  );
+  const goBack = () => {
+    if (step === "final") setStep("theme");
+    else if (step === "theme") setStep("template");
+    else if (step === "template") {
+      setStep("menu");
+      setTrack(null);
+    } else onClose();
+  };
 
-  const InspirationGrid = (
-    <div className="space-y-2">
-      <div className="flex items-center justify-between">
-        <span className="text-[11px] text-muted-foreground">Inspiration</span>
-        <button
-          onClick={() => {
-            const r = pickRandomInspiration();
-            setInspirationId(r.id);
-            if (mode === "prompt" && !prompt.trim()) {
-              setPrompt(`A poster in the style of ${r.label.toLowerCase()}`);
-            }
-          }}
-          className="text-[11px] flex items-center gap-1 text-primary hover:underline"
-        >
-          <Shuffle className="h-3 w-3" /> Random
-        </button>
-      </div>
-      <div className="grid grid-cols-3 gap-1.5">
-        {INSPIRATIONS.map((i) => {
-          const active = inspirationId === i.id;
-          return (
-            <button
-              key={i.id}
-              onClick={() => setInspirationId(active ? null : i.id)}
-              className={`relative rounded-lg overflow-hidden border text-[10px] transition ${
-                active ? "border-primary ring-2 ring-primary/40" : "border-border/60 hover:border-primary/40"
-              }`}
-            >
-              <div className="aspect-square bg-muted">
-                <img src={i.image} alt={i.label} className="w-full h-full object-cover" loading="lazy" />
-              </div>
-              <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent px-1.5 py-1 text-[10px] text-white text-left line-clamp-1">
-                {i.label}
-              </div>
-            </button>
-          );
-        })}
-      </div>
-    </div>
-  );
+  const stepIndex =
+    step === "menu" ? 0 : step === "template" ? 1 : step === "theme" ? 2 : 3;
 
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="max-w-md">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
-            {mode !== "menu" && (
+            {step !== "menu" && (
               <button
-                onClick={() => {
-                  setMode("menu");
-                  setResultUrl(null);
-                }}
+                onClick={goBack}
                 className="text-muted-foreground hover:text-foreground"
                 aria-label="Back"
               >
@@ -234,30 +182,32 @@ export function DesignStudioModal({ open, onClose }: Props) {
               </button>
             )}
             <Sparkles className="h-4 w-4 text-primary" />
-            {mode === "menu" && "Design Studio"}
-            {mode === "products" && "Choose a product"}
-            {mode === "prompt" && "Describe your poster"}
+            {step === "menu" && "Design Studio"}
+            {step === "template" && "Pick a template"}
+            {step === "theme" && "Pick a color"}
+            {step === "final" && (track === "product" ? "Choose a product" : "Describe your poster")}
           </DialogTitle>
         </DialogHeader>
 
-        {mode === "menu" && (
+        {/* Step indicator */}
+        {step !== "menu" && (
+          <div className="flex items-center gap-1.5 -mt-1">
+            {[1, 2, 3].map((n) => (
+              <div
+                key={n}
+                className={`h-1 flex-1 rounded-full transition ${
+                  n <= stepIndex ? "bg-primary" : "bg-border/60"
+                }`}
+              />
+            ))}
+          </div>
+        )}
+
+        {/* STEP 1 — MENU */}
+        {step === "menu" && (
           <div className="grid grid-cols-1 gap-3">
             <button
-              onClick={() => setMode("prompt")}
-              className="group flex items-center gap-3 rounded-2xl border border-border/60 bg-card/40 p-4 text-left hover:border-primary/40 hover:bg-card/80 transition"
-            >
-              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/15 text-primary">
-                <Wand2 className="h-5 w-5" />
-              </div>
-              <div className="flex-1">
-                <div className="font-semibold">Make poster</div>
-                <div className="text-xs text-muted-foreground">
-                  Describe any poster — AI designs it for you
-                </div>
-              </div>
-            </button>
-            <button
-              onClick={() => setMode("products")}
+              onClick={() => { setTrack("product"); setStep("template"); }}
               className="group flex items-center gap-3 rounded-2xl border border-border/60 bg-card/40 p-4 text-left hover:border-primary/40 hover:bg-card/80 transition"
             >
               <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/15 text-primary">
@@ -270,13 +220,135 @@ export function DesignStudioModal({ open, onClose }: Props) {
                 </div>
               </div>
             </button>
+            <button
+              onClick={() => { setTrack("prompt"); setStep("template"); }}
+              className="group flex items-center gap-3 rounded-2xl border border-border/60 bg-card/40 p-4 text-left hover:border-primary/40 hover:bg-card/80 transition"
+            >
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/15 text-primary">
+                <Wand2 className="h-5 w-5" />
+              </div>
+              <div className="flex-1">
+                <div className="font-semibold">Make poster</div>
+                <div className="text-xs text-muted-foreground">
+                  Describe any poster — AI designs it for you
+                </div>
+              </div>
+            </button>
           </div>
         )}
 
-        {mode === "products" && (
+        {/* STEP 2 — TEMPLATE */}
+        {step === "template" && (
           <div className="space-y-3">
-            {ThemeStrip}
-            {InspirationGrid}
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] text-muted-foreground">
+                {insp ? `Selected: ${insp.label}` : "Tap a template"}
+              </span>
+              <button
+                onClick={() => setInspirationId(pickRandomInspiration().id)}
+                className="text-[11px] flex items-center gap-1 text-primary hover:underline"
+              >
+                <Shuffle className="h-3 w-3" /> Random
+              </button>
+            </div>
+            <div className="grid grid-cols-3 gap-1.5 max-h-[55vh] overflow-y-auto -mx-1 px-1">
+              {INSPIRATIONS.map((i) => {
+                const active = inspirationId === i.id;
+                return (
+                  <button
+                    key={i.id}
+                    onClick={() => setInspirationId(i.id)}
+                    className={`relative rounded-lg overflow-hidden border transition ${
+                      active ? "border-primary ring-2 ring-primary/40" : "border-border/60 hover:border-primary/40"
+                    }`}
+                  >
+                    <div className="aspect-square bg-muted">
+                      <img src={i.image} alt={i.label} className="w-full h-full object-cover" loading="lazy" />
+                    </div>
+                    {active && (
+                      <div className="absolute top-1 right-1 h-5 w-5 rounded-full bg-primary text-primary-foreground flex items-center justify-center">
+                        <Check className="h-3 w-3" />
+                      </div>
+                    )}
+                    <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent px-1.5 py-1 text-[10px] text-white text-left line-clamp-1">
+                      {i.label}
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+            <Button
+              className="w-full"
+              disabled={!inspirationId}
+              onClick={() => setStep("theme")}
+            >
+              Next
+            </Button>
+          </div>
+        )}
+
+        {/* STEP 3 — COLOR THEME */}
+        {step === "theme" && (
+          <div className="space-y-3">
+            <p className="text-[11px] text-muted-foreground">
+              Override the template's colors, or keep them as-is.
+            </p>
+            <button
+              onClick={() => setThemeId(null)}
+              className={`w-full flex items-center gap-3 rounded-xl border p-3 text-left transition ${
+                themeId === null ? "border-primary bg-primary/10" : "border-border/60 hover:border-primary/40"
+              }`}
+            >
+              {insp && (
+                <div className="h-12 w-12 rounded-lg overflow-hidden bg-muted shrink-0">
+                  <img src={insp.image} alt={insp.label} className="w-full h-full object-cover" />
+                </div>
+              )}
+              <div className="flex-1">
+                <div className="text-sm font-semibold">Use template colors</div>
+                <div className="text-[11px] text-muted-foreground">
+                  Keep the original palette of {insp?.label || "this template"}
+                </div>
+              </div>
+              {themeId === null && <Check className="h-4 w-4 text-primary" />}
+            </button>
+
+            <div className="grid grid-cols-4 gap-2">
+              {COLOR_THEMES.map((t) => {
+                const active = themeId === t.id;
+                return (
+                  <button
+                    key={t.id}
+                    onClick={() => setThemeId(t.id)}
+                    className={`flex flex-col items-center gap-1 rounded-xl border p-2 transition ${
+                      active ? "border-primary bg-primary/10" : "border-border/60 hover:border-primary/40"
+                    }`}
+                  >
+                    {t.color ? (
+                      <span
+                        className="h-8 w-8 rounded-full border border-border/60"
+                        style={{ background: t.color }}
+                      />
+                    ) : (
+                      <span className="h-8 w-8 rounded-full border border-border/60 flex items-center justify-center bg-primary/10">
+                        <Sparkles className="h-4 w-4 text-primary" />
+                      </span>
+                    )}
+                    <span className="text-[10px]">{t.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+
+            <Button className="w-full" onClick={() => setStep("final")}>
+              {track === "product" ? "Choose product" : "Continue"}
+            </Button>
+          </div>
+        )}
+
+        {/* STEP 4 — FINAL: pick product OR describe + generate */}
+        {step === "final" && track === "product" && (
+          <div className="space-y-3">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
@@ -327,10 +399,8 @@ export function DesignStudioModal({ open, onClose }: Props) {
           </div>
         )}
 
-        {mode === "prompt" && (
+        {step === "final" && track === "prompt" && (
           <div className="space-y-3">
-            {ThemeStrip}
-            {InspirationGrid}
             <div className="aspect-square rounded-xl overflow-hidden bg-muted relative flex items-center justify-center">
               {generating && (
                 <div className="flex flex-col items-center gap-2 text-muted-foreground">
@@ -341,7 +411,10 @@ export function DesignStudioModal({ open, onClose }: Props) {
               {!generating && resultUrl && (
                 <img src={resultUrl} alt="Generated poster" className="w-full h-full object-cover" />
               )}
-              {!generating && !resultUrl && (
+              {!generating && !resultUrl && insp && (
+                <img src={insp.image} alt="Template preview" className="w-full h-full object-cover opacity-40" />
+              )}
+              {!generating && !resultUrl && !insp && (
                 <div className="text-center text-muted-foreground p-6">
                   <Wand2 className="h-8 w-8 mx-auto mb-2 opacity-40" />
                   <p className="text-xs">Your poster will appear here</p>
