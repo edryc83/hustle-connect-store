@@ -572,6 +572,106 @@ export function DesignStudioModal({ open, onClose, initialProduct = null }: Prop
           </div>
         )}
 
+        {/* STEP — SOURCE (copy track) */}
+        {step === "source" && track === "copy" && (
+          <div className="space-y-3">
+            <p className="text-[11px] text-muted-foreground">
+              Upload a poster or screenshot you love. AI will recreate it in your style.
+            </p>
+            {insp ? (
+              <div className="flex items-center gap-3 rounded-xl border border-primary/40 bg-primary/5 p-3">
+                <div className="h-20 w-20 rounded-lg overflow-hidden bg-muted shrink-0">
+                  <img src={insp.image} alt={insp.label} className="w-full h-full object-cover" />
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="text-sm font-semibold truncate">{insp.label}</div>
+                  <div className="text-[11px] text-muted-foreground">Ready to use</div>
+                </div>
+                <Check className="h-4 w-4 text-primary shrink-0" />
+              </div>
+            ) : (
+              <label className="flex flex-col items-center justify-center gap-2 rounded-xl border-2 border-dashed border-border/60 hover:border-primary/40 p-8 cursor-pointer transition">
+                {uploadingTemplate ? (
+                  <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                ) : (
+                  <ImagePlus className="h-8 w-8 text-muted-foreground" />
+                )}
+                <span className="text-sm font-semibold">
+                  {uploadingTemplate ? "Uploading…" : "Tap to upload"}
+                </span>
+                <span className="text-[11px] text-muted-foreground">
+                  PNG, JPG or WebP — up to 1MB
+                </span>
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  disabled={uploadingTemplate}
+                  onChange={(e) => {
+                    const f = e.target.files?.[0];
+                    if (f) handleUploadTemplate(f);
+                    e.target.value = "";
+                  }}
+                />
+              </label>
+            )}
+            {insp && (
+              <div className="grid grid-cols-2 gap-2">
+                <Button variant="outline" onClick={() => setInspirationId(null)}>
+                  Replace
+                </Button>
+                <Button onClick={() => setStep("use")}>Next</Button>
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* STEP — USE (copy track) */}
+        {step === "use" && track === "copy" && (
+          <div className="space-y-3">
+            <p className="text-[11px] text-muted-foreground">
+              How should we use your design?
+            </p>
+            {[
+              {
+                id: "product" as const,
+                icon: Package,
+                title: "Apply to a product",
+                desc: "Pick one of your products and recreate the design with it",
+                tint: "from-orange-500/20 to-amber-500/10 text-orange-400 border-orange-500/30",
+                onClick: () => { setCopyMode("product"); setStep("product"); },
+              },
+              {
+                id: "prompt" as const,
+                icon: Wand2,
+                title: "Use with a prompt",
+                desc: "Describe what to put in this design",
+                tint: "from-violet-500/20 to-fuchsia-500/10 text-violet-300 border-violet-500/30",
+                onClick: () => { setCopyMode("prompt"); setStep("theme"); },
+              },
+            ].map((opt) => {
+              const Icon = opt.icon;
+              return (
+                <button
+                  key={opt.id}
+                  onClick={opt.onClick}
+                  className={`group flex items-center gap-3 rounded-xl border bg-gradient-to-br ${opt.tint} px-3 py-2.5 text-left hover:brightness-110 transition w-full`}
+                >
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-background/40 backdrop-blur shrink-0">
+                    <Icon className="h-4 w-4" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <div className="text-sm font-semibold text-foreground leading-tight">{opt.title}</div>
+                    <div className="text-[11px] text-muted-foreground leading-snug">
+                      {opt.desc}
+                    </div>
+                  </div>
+                </button>
+              );
+            })}
+          </div>
+        )}
+
         {/* STEP 3 — COLOR THEME */}
         {step === "theme" && (
           <div className="space-y-3">
