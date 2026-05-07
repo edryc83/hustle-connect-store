@@ -81,7 +81,7 @@ Deno.serve(async (req) => {
         model: "gpt-image-2",
         prompt: fullPrompt,
         size: "1024x1024",
-        quality: "high",
+        quality: "medium",
         n: 1,
       }),
     });
