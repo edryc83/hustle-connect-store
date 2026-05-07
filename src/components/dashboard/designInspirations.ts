@@ -585,6 +585,86 @@ export const INSPIRATIONS: Inspiration[] = [
     prompt:
       "Tall 4:5 cinematic dessert poster with warm chocolate-brown background and tabletop lighting. Top-right: round bakery seal logo. Upper-left: clean mixed-weight headline where key words are highlighted in warm peach/orange. Center: elegant plated cake slice hero with strawberry, mint, and glossy chocolate drip. Left-middle overlapping the hero: translucent frosted-glass UI panel with faint menu items inside, used purely as a design element. Bottom-left: bold phone-order line with WhatsApp icon. Bottom-right: location pin and address block. Refined, premium dessert advertising.",
   },
+  {
+    id: "potd-afeko-delivery",
+    label: "Doorstep Delivery",
+    emoji: "📦",
+    image: "/design-templates/potd-afeko-delivery.jpeg",
+    prompt:
+      "Tall 4:5 lifestyle poster. Right two-thirds is a vivid royal-purple flat panel with subtle vertical stripe texture; left third is a real interior doorway photograph showing a smiling delivery courier in a purple polo and helmet handing a purple cardboard box to a customer in a cream shirt. Top-right: tiny white reg-no eyebrow line. Mid-right: bold white sans headline stacked over four lines with one accent word highlighted in a yellow rounded box. Below the headline: short 5-line white body paragraph. Bottom strip: full-width white bar with a small circular logo, social handle row with bird/camera icons, WhatsApp icon + phone number on the right, then a thin yellow accent rule at the very bottom edge. Clean, premium, doorstep-delivery energy.",
+  },
+  {
+    id: "potd-binna-research",
+    label: "Cinematic Window Light",
+    emoji: "💡",
+    image: "/design-templates/potd-binna-research.jpeg",
+    prompt:
+      "Tall 4:5 cinematic poster on a deep teal-navy background with soft window-blind light streaks raking across the right side. Top-left: small white wordmark logo. Top-right: tiny '-YourCreator' caps eyebrow. Upper-left: huge bold white sans headline stacked over three lines where the final word is filled in light cyan and underlined with a thin cyan curve. Lower-center: hero subject seated at a wooden desk under a vintage desk lamp, writing in a notebook, wearing a printed bandana and a white tee with the brand logo. Bottom-left: short 4-line white body paragraph in small caps-y sans. Bottom-right: rounded translucent cyan-outlined pill button with 'See Caption' label and a small down-arrow icon. Premium editorial advertising mood.",
+  },
+  {
+    id: "potd-creating-significance",
+    label: "Teal Workspace",
+    emoji: "🪑",
+    image: "/design-templates/potd-creating-significance.jpeg",
+    prompt:
+      "Tall 4:5 corporate event poster on a saturated teal-green flat background with a soft radial highlight upper-right. Top-left: stacked logo lockup with mark + multi-line caps wordmark. Top-right: small white caps eyebrow stacked over two lines. Upper-left: huge bold white serif headline split over two lines, with a thin one-line subtitle directly beneath. Mid-left: small bold name + 4-5 line tiny credentials block in light cream type. Center-right: small calendar icon next to a 3-line cream/orange date block, beside a small hourglass icon next to a 3-line time-zones block (each timezone abbreviation in a different accent color). Lower half: real photograph of a modern workspace — black executive chair at a wooden desk with an open laptop and a yellow vase, flanked by two yellow planters with green palms — bleeding edge-to-edge across the bottom. Refined, corporate, premium.",
+  },
+  {
+    id: "potd-earn-school",
+    label: "Neon Student Glow",
+    emoji: "💸",
+    image: "/design-templates/potd-earn-school.jpeg",
+    prompt:
+      "Tall 4:5 dark glossy poster on a black-to-deep-navy background with a vivid lime-green radial glow on the right side and faint floating dollar bills around the subject. Top-left: small stacked sponsor logo + caps wordmark. Top-right: small partner logo with green leaf mark. Upper-left: massive bold sans headline stacked over three lines in a soft chrome/silver gradient with subtle inner shadow. Mid-left: short 5-line white body paragraph with two key words highlighted in lime green. Right two-thirds: hero subject — a smiling young man in a sharp navy suit and tie with backpack — half-turned toward camera, lit with a cool blue rim glow, dollar bills tucked in his suit. Bottom-left: lime-green rounded pill CTA button with dark text. Bottom-right: lime-green rounded pill with WhatsApp icon and phone number. Premium youth-finance advertising.",
+  },
+  {
+    id: "potd-hitchpay-purple",
+    label: "Purple Living Room",
+    emoji: "💳",
+    image: "/design-templates/potd-hitchpay-purple.jpeg",
+    prompt:
+      "Tall 4:5 lifestyle poster. Top two-thirds: real photograph of a smiling subject in a dark sweater seated on a grey sofa in a warm wood-toned living room with a tall bookshelf behind, holding a phone in one hand and a purple bank card in the other, soft window light. Top-left: small white stacked wordmark logo. Bottom third: vivid royal-purple flat panel that bleeds upward into the photo with a soft gradient transition. On the purple panel, mid-left: bold sans headline stacked over three lines where roughly half the words are filled in lighter lavender and half in white, plus a thin one-line subtitle beneath with two key words bolded. Bottom strip: full-width dark rounded bar containing a small white @handle on the left, a centered light-grey 'Coming Soon' label, and two app-store badges on the right (Google Play + App Store). Premium fintech lifestyle.",
+  },
+  {
+    id: "potd-mahir-express",
+    label: "Motion Purple",
+    emoji: "🚴",
+    image: "/design-templates/potd-mahir-express.jpeg",
+    prompt:
+      "Tall 4:5 dynamic delivery poster on a vivid royal-purple flat background with subtle radiating sunburst lines and a giant white arrow chevron sweeping in from the lower-left edge. Top-left: bold white logo lockup with italic mark + caps wordmark beneath. Top-right: small white social-icon row + @handle. Mid-upper-left: huge bold white sans headline split over two lines with a horizontal motion-blur ghosting trail behind the words to imply speed. Mid-right: short 3-line white body paragraph with key words bolded. Center: hero subject — courier in a brown jacket and helmet, yellow delivery backpack, mid-ride on a black-and-green electric bicycle — angled diagonally into the frame. Bottom-center: white rounded pill bar with the WhatsApp/Call label and phone number. Premium dispatch advertising.",
+  },
+  {
+    id: "potd-mahir-yellow",
+    label: "Sunshine Smile",
+    emoji: "🛵",
+    image: "/design-templates/potd-mahir-yellow.jpeg",
+    prompt:
+      "Tall 4:5 joyful courier poster on a vivid royal-purple flat background with subtle radiating sunburst lines and a giant white arrow chevron sweeping in from the lower-left edge. Top-left: bold white logo lockup with italic mark + caps wordmark beneath. Top-right: small white social-icon row + @handle. Upper-left: huge bold white sans headline stacked over three lines. Mid-left: short 4-line white body paragraph. Lower-right: hero subject — laughing courier in a yellow tee, yellow cap and round glasses, riding a yellow scooter with side mirrors — bleeding off the right edge. Bottom-center: white rounded pill bar with WhatsApp/Call label and phone number. Bright, happy, premium dispatch advertising.",
+  },
+  {
+    id: "potd-pandar-rewards",
+    label: "Sunny Yellow Cards",
+    emoji: "🪙",
+    image: "/design-templates/potd-pandar-rewards.jpeg",
+    prompt:
+      "Tall 4:5 cheerful product poster on a soft pastel-yellow flat background with faint floating cash-bill graphics in the corners. Top-center: small dark logo with two-people mark + caps wordmark. Upper-center: huge bold black sans headline stacked over two lines where one accent word is filled in a green gradient with subtle inner shadow. Beneath headline: tight 2-line dark subline with a key phrase bolded. Center-left: stack of three glassy translucent rounded pill cards each containing a small colorful icon on the left (drop, chart, money-bag) and a short bold dark label on the right. Right two-thirds: hero subject — smiling young man in a bright green tee, fist raised in celebration, holding a white smartphone — bleeding off the right edge. Bottom-left: small black vertical rule with a 2-line dark caption beside it, plus Google Play + App Store badges directly beneath. Premium rewards-app advertising.",
+  },
+  {
+    id: "potd-shosial-yellow",
+    label: "Schedule Yellow",
+    emoji: "⏰",
+    image: "/design-templates/potd-shosial-yellow.jpeg",
+    prompt:
+      "Tall 4:5 bold lifestyle poster split into a soft cream upper half (with faint repeating outline-pattern texture) and a saturated yellow lower third. Top-left: small round yellow logo badge. Top-right: small dark social-icon row + two @handles. Upper-center: massive bold black sans headline stacked over two lines where smaller words sit on the left and the larger emphasis word dominates the right, slightly script-mixed. Center: hero subject — smiling man in a bright yellow sweater and jeans — looking down at a smartphone in his hands, flanked by two floating 3D alarm-clock illustrations and small bright-yellow lightning-bolt accents. Bottom strip on the yellow panel: two dark rounded pill buttons — left pill with a small globe icon and a website URL, right pill with a short 'swipe' label. Premium scheduler-app advertising.",
+  },
+  {
+    id: "potd-swiftcoins-dark",
+    label: "Deep Purple Hero",
+    emoji: "🪙",
+    image: "/design-templates/potd-swiftcoins-dark.jpeg",
+    prompt:
+      "Tall 4:5 premium fintech poster on a deep eggplant-purple flat background with subtle gradient shading. Top-left: small white stacked logo lockup with circular mark + caps wordmark. Top-right: tiny white caps eyebrow tagline of three short words separated by dots. Mid-left: huge bold white sans headline stacked over four lines with a long em-dash break, sharp and editorial. Below headline: short 5-line white body paragraph in small grey-tinted sans with two key words highlighted in a soft pink-lavender gradient. Right two-thirds: hero subject — a surprised young man in a striped shirt holding a smartphone with both hands — half-turned toward the screen, lit dramatically against the dark background, with a small floating gold Bitcoin icon and a translucent dark rounded notification card overlaid near the phone showing a fake transaction confirmation. Bottom-left: outlined white rounded pill CTA button, then beneath it a small Instagram icon + handle row and a Telegram icon + phone number row. Premium crypto-app advertising.",
+  },
 ];
 
 export const COLOR_THEMES = [
