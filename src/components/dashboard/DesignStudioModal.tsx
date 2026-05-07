@@ -17,6 +17,7 @@ import { CalendarHeart } from "lucide-react";
 interface Props {
   open: boolean;
   onClose: () => void;
+  initialProduct?: ProductRow | null;
 }
 
 type Track = "product" | "prompt" | "day";
@@ -28,7 +29,7 @@ interface ProductRow {
   image_url: string | null;
 }
 
-export function DesignStudioModal({ open, onClose }: Props) {
+export function DesignStudioModal({ open, onClose, initialProduct = null }: Props) {
   const { user } = useAuth();
   const [track, setTrack] = useState<Track | null>(null);
   const [step, setStep] = useState<Step>("menu");
@@ -60,8 +61,13 @@ export function DesignStudioModal({ open, onClose }: Props) {
       setThemeId(null);
       setOccasionId(null);
       setExtraCopy("");
+    } else if (initialProduct) {
+      // Pre-select product and jump straight into the template step
+      setTrack("product");
+      setSelectedProduct(initialProduct);
+      setStep("template");
     }
-  }, [open]);
+  }, [open, initialProduct]);
 
   useEffect(() => {
     if (track === "product" && step === "product" && user && products.length === 0) {
