@@ -7,7 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import {
-  Loader2, Sparkles, Package, Wand2, ArrowLeft, Download, Share2, RefreshCw, Search, Shuffle, Check, Upload, Trash2, Link2,
+  Loader2, Sparkles, Package, Wand2, ArrowLeft, Download, Share2, RefreshCw, Search, Shuffle, Check, Upload, Trash2, Copy, ImagePlus,
 } from "lucide-react";
 import { AutoDesignModal } from "./AutoDesignModal";
 import { INSPIRATIONS, COLOR_THEMES, pickRandomInspiration } from "./designInspirations";
@@ -21,8 +21,9 @@ interface Props {
   initialProduct?: ProductRow | null;
 }
 
-type Track = "product" | "prompt" | "day";
-type Step = "menu" | "product" | "occasion" | "template" | "theme" | "final";
+type Track = "product" | "prompt" | "day" | "copy";
+type Step = "menu" | "product" | "occasion" | "template" | "theme" | "final" | "source" | "use";
+type CopyMode = "product" | "prompt";
 
 interface ProductRow {
   id: string;
@@ -52,7 +53,7 @@ export function DesignStudioModal({ open, onClose, initialProduct = null }: Prop
 
   const [userTemplates, setUserTemplates] = useState<Array<{ id: string; label: string; image: string; prompt: string | null; user: true }>>([]);
   const [uploadingTemplate, setUploadingTemplate] = useState(false);
-  const [importingUrl, setImportingUrl] = useState(false);
+  const [copyMode, setCopyMode] = useState<CopyMode | null>(null);
 
   useEffect(() => {
     if (!open) {
@@ -66,6 +67,7 @@ export function DesignStudioModal({ open, onClose, initialProduct = null }: Prop
       setThemeId(null);
       setOccasionId(null);
       setExtraCopy("");
+      setCopyMode(null);
     } else if (initialProduct) {
       // Pre-select product and jump straight into the template step
       setTrack("product");
@@ -145,42 +147,13 @@ export function DesignStudioModal({ open, onClose, initialProduct = null }: Prop
       setUserTemplates((prev) => [newItem, ...prev]);
       setInspirationId(newItem.id);
       toast.success("Template added");
+      if (track === "copy" && step === "source") {
+        setStep("use");
+      }
     } catch (e: any) {
       toast.error(e?.message || "Upload failed");
     } finally {
       setUploadingTemplate(false);
-    }
-  };
-
-  const handleImportFromUrl = async () => {
-    if (!user) return;
-    const url = window.prompt(
-      "Paste a Pinterest pin URL or any image link",
-      "",
-    );
-    if (!url) return;
-    setImportingUrl(true);
-    try {
-      const { data, error } = await supabase.functions.invoke("import-design-template", {
-        body: { url: url.trim() },
-      });
-      if (error) throw error;
-      if ((data as any)?.error) throw new Error((data as any).error);
-      const row = (data as any).template;
-      const newItem = {
-        id: `user-${row.id}`,
-        label: row.label,
-        image: row.image_url,
-        prompt: row.prompt,
-        user: true as const,
-      };
-      setUserTemplates((prev) => [newItem, ...prev]);
-      setInspirationId(newItem.id);
-      toast.success("Template imported");
-    } catch (e: any) {
-      toast.error(e?.message || "Import failed");
-    } finally {
-      setImportingUrl(false);
     }
   };
 
@@ -304,7 +277,10 @@ export function DesignStudioModal({ open, onClose, initialProduct = null }: Prop
   );
 
   // Hand off to AutoDesignModal once product + template + theme have been chosen
-  const handoffToAutoDesign = track === "product" && selectedProduct && step === "final";
+  const handoffToAutoDesign =
+    selectedProduct &&
+    step === "final" &&
+    (track === "product" || (track === "copy" && copyMode === "product"));
   if (handoffToAutoDesign) {
     return (
       <AutoDesignModal
@@ -325,24 +301,46 @@ export function DesignStudioModal({ open, onClose, initialProduct = null }: Prop
   const goBack = () => {
     if (step === "final") setStep("theme");
     else if (step === "theme") setStep("template");
+    else if (step === "theme" && track === "copy") setStep("use");
     else if (step === "template") {
       if (track === "day") { setStep("occasion"); return; }
       if (track === "product") { setStep("product"); return; }
       setStep("menu");
       setTrack(null);
+    } else if (step === "use") {
+      setStep("source");
+      setCopyMode(null);
+    } else if (step === "source") {
+      setStep("menu");
+      setTrack(null);
     } else if (step === "occasion" || step === "product") {
+      if (track === "copy") { setStep("use"); return; }
       setStep("menu");
       setTrack(null);
     } else onClose();
   };
+  // Override theme back for copy track
+  // (handled above, but ensure copy+theme goes to use)
 
-  const stepIndex =
-    step === "menu" ? 0
-      : step === "product" || step === "occasion" ? 1
-      : step === "template" ? 2
-      : step === "theme" ? 3
-      : 4;
-  const totalSteps = track === "prompt" ? 3 : 4;
+  const stepIndex = (() => {
+    if (step === "menu") return 0;
+    if (track === "copy") {
+      if (step === "source") return 1;
+      if (step === "use") return 2;
+      if (step === "product") return 3;
+      if (step === "theme") return copyMode === "product" ? 4 : 3;
+      if (step === "final") return copyMode === "product" ? 5 : 4;
+      return 0;
+    }
+    if (step === "product" || step === "occasion") return 1;
+    if (step === "template") return 2;
+    if (step === "theme") return 3;
+    return 4;
+  })();
+  const totalSteps =
+    track === "copy"
+      ? copyMode === "product" ? 5 : 4
+      : track === "prompt" ? 3 : 4;
 
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
@@ -365,6 +363,8 @@ export function DesignStudioModal({ open, onClose, initialProduct = null }: Prop
             {step === "template" && "Pick a template"}
             {step === "theme" && "Pick a color"}
             {step === "final" && "Describe your poster"}
+            {step === "source" && "Upload your design"}
+            {step === "use" && "How to use it"}
           </DialogTitle>
         </DialogHeader>
 
@@ -409,6 +409,14 @@ export function DesignStudioModal({ open, onClose, initialProduct = null }: Prop
                 desc: "Jolly person + your daily vibe",
                 tint: "from-emerald-500/20 to-teal-500/10 text-emerald-300 border-emerald-500/30",
                 onClick: () => { setTrack("day"); setStep("occasion"); },
+              },
+              {
+                id: "copy",
+                icon: Copy,
+                title: "Copy this design",
+                desc: "Upload a design to recreate",
+                tint: "from-sky-500/20 to-blue-500/10 text-sky-300 border-sky-500/30",
+                onClick: () => { setTrack("copy"); setStep("source"); },
               },
             ].map((opt) => {
               const Icon = opt.icon;
