@@ -249,6 +249,62 @@ export const INSPIRATIONS: Inspiration[] = [
     prompt:
       "Vivid yellow background with faint repeated outline wordmark watermark, small dark logo + wordmark centered at the top, ENORMOUS hand-drawn rounded white display word as the centerpiece dominating the canvas, small white tagline stacked over three lines on the lower-left with a thin underline rule, hero subject on the right with hand-to-mouth gesture.",
   },
+  {
+    id: "myth-vs-fact-teal",
+    label: "Myth vs Fact Teal",
+    emoji: "🟢",
+    image: "/design-templates/myth-vs-fact-teal.jpeg",
+    prompt:
+      "Dark teal-to-black room background with soft circular green glow center, small logo top-left, huge two-word headline split into teal + white words at top center, two stacked glassy translucent dark pill cards centered with rounded corners, each card tagged with a small bright label chip (red on the first, green on the second) sitting on its top edge — first card label reads MYTH, second reads FACT, each card holds a two-line short statement in white. Bottom-left WhatsApp label with phone number and tiny social icons row. Clean, premium, minimal.",
+  },
+  {
+    id: "lime-chat-cards",
+    label: "Lime Chat Cards",
+    emoji: "💬",
+    image: "/design-templates/lime-chat-cards.jpeg",
+    prompt:
+      "Vivid lime-yellow flat background, small dark logo centered top, two short white headline lines under it, two stacked dark glassy rounded pill cards angled like chat bubbles — each card has a small white rounded square icon on the left and a bold white label + 2-line message on the right, tiny black sparkle accents around the cards, small dark mail icon centered below cards, white pill contact bar at the bottom with email/phone. Clean, modern, premium.",
+  },
+  {
+    id: "myth-fact-green-glow",
+    label: "Myth Fact Green Glow",
+    emoji: "⚡",
+    image: "/design-templates/myth-fact-green-glow.jpeg",
+    prompt:
+      "Pitch black background with subtle hex-grid texture and a vivid radial green glow on the right edge, small logo + wordmark top-left, small Follow-us bookmark tag top-right, two stacked glassy translucent dark pill cards centered — each tagged with a small bright label chip on its top edge (red MYTH on the first, lime FACT on the second), each card holds a two-line short statement in white with key words bolded. Bottom bar with tiny social icons row left and a small white rounded CTA pill on the right. Premium, techy, minimal.",
+  },
+  {
+    id: "lime-single-card",
+    label: "Lime Single Card",
+    emoji: "🟡",
+    image: "/design-templates/lime-single-card.jpeg",
+    prompt:
+      "Pure black background, small dark logo centered top, single white headline line under it, ONE large lime-yellow rounded pill card centered with a small dark rounded square icon on the left and a 3-line short message in dark text on the right, soft drop shadow under the card, tiny black sparkle accents around it, small dark mail icon centered below, white pill contact bar at the bottom with email. Clean, bold, premium.",
+  },
+  {
+    id: "identity-why-us",
+    label: "Identity Why Us",
+    emoji: "✅",
+    image: "/design-templates/identity-why-us.jpeg",
+    prompt:
+      "Dark almost-black background with subtle wavy line texture and a faint giant rotated wordmark watermark on the right edge, small logo + wordmark centered top, large white display headline lower-left with a single accent-color word + accent question mark, one large rounded dark glassy card centered holding 4 stacked rows — each row is a thin dark rounded pill with a small accent-color rounded square icon (arrow-up-right) on the left and a short white label on the right. Small email line centered at the bottom. Clean, premium, branded.",
+  },
+  {
+    id: "identity-welcome",
+    label: "Identity Welcome",
+    emoji: "👋",
+    image: "/design-templates/identity-welcome.jpeg",
+    prompt:
+      "Dark almost-black background with subtle wavy line texture and a faint giant rotated wordmark watermark on the right edge, small logo + wordmark centered top, ENORMOUS 4-line display headline left-aligned filling most of the canvas with one accent-color word in the middle, small dashed rounded outline pill under the headline holding a short 2-word CTA with one accent-color word, small email line centered at the bottom. Editorial, premium, minimal.",
+  },
+  {
+    id: "raffin-penguin",
+    label: "Editorial Hero Quote",
+    emoji: "🐧",
+    image: "/design-templates/raffin-penguin.jpeg",
+    prompt:
+      "Deep navy-to-purple radial gradient background, small logo top-right, large multi-line display headline upper-left in quotes with a soft purple-to-white gradient on the words, short 3-line italic-feeling subtitle underneath in white, hero subject photo on the right occupying half the canvas, two small rounded pill chips at the bottom corners (one mint-green left, one mint-outlined right) each with a tiny label. Cinematic, editorial, premium.",
+  },
 ];
 
 export const COLOR_THEMES = [
