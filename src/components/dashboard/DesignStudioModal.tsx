@@ -448,16 +448,7 @@ export function DesignStudioModal({ open, onClose }: Props) {
               })}
             </div>
 
-            <Button
-              className="w-full"
-              onClick={() => {
-                if (track === "product" && selectedProduct) {
-                  // selectedProduct truthy will mount AutoDesignModal on next render
-                  return;
-                }
-                setStep("final");
-              }}
-            >
+            <Button className="w-full" onClick={() => setStep("final")}>
               {track === "product" ? "Generate poster" : "Continue"}
             </Button>
           </div>
