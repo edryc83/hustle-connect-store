@@ -2,130 +2,97 @@ export interface Inspiration {
   id: string;
   label: string;
   emoji: string;
+  /** Public path to a template image used as visual reference for gpt-image-2 */
+  image: string;
+  /** Short style brief sent to the model */
   prompt: string;
 }
 
 export const INSPIRATIONS: Inspiration[] = [
   {
-    id: "bold-neon",
-    label: "Bold Neon",
-    emoji: "⚡",
-    prompt:
-      "Bold neon editorial: oversized sans-serif headline, single neon accent color glow, dark cinematic background, hero subject sharply lit, asymmetric grid, magazine-grade negative space.",
-  },
-  {
-    id: "lime-pop",
-    label: "Lime Pop",
-    emoji: "🟢",
-    prompt:
-      "Vibrant lime/green flat background, monochrome black-and-white hero subject, massive condensed black headline, small dark CTA pill, social-media editorial style.",
-  },
-  {
-    id: "apple-premium",
-    label: "Apple Premium",
-    emoji: "🍎",
-    prompt:
-      "Apple-style premium minimal: clean light or soft gradient background, perfectly centered hero, refined thin-to-bold typography hierarchy, generous negative space, subtle shadows.",
-  },
-  {
-    id: "orange-wellness",
-    label: "Orange Lifestyle",
-    emoji: "🧡",
-    prompt:
-      "Warm orange flat background with giant faded repeating word texture, lifestyle photo of a relaxed person, friendly rounded white sans-serif headline, pill CTA outline.",
-  },
-  {
-    id: "dark-cinematic",
-    label: "Dark Cinematic",
-    emoji: "🌑",
-    prompt:
-      "Moody cinematic dark scene, single warm accent glow (orange or amber), dramatic product spotlight, elegant serif/sans mix, premium typographic hierarchy, tasteful film grain.",
-  },
-  {
-    id: "tech-glow",
-    label: "Tech Glow",
-    emoji: "💚",
-    prompt:
-      "Futuristic tech aesthetic: deep black background, glowing neon green/cyan rim light on subject, two-tone headline (white + neon), pill CTA, floating 3D tech elements.",
-  },
-  {
-    id: "new-month",
-    label: "Big Word Hero",
-    emoji: "🅰️",
-    prompt:
-      "Massive single hero WORD as the centerpiece (the title) with the subject overlapping it, floating chat-bubble micro-labels, soft modern background, contact bar at the bottom.",
-  },
-  {
-    id: "credit-card",
-    label: "Split Color Block",
-    emoji: "🟧",
-    prompt:
-      "Bold split composition: solid accent-color block on one side with headline + CTA, photo of subject on the other side, floating circular icon badge, clean sans-serif.",
-  },
-  {
-    id: "futuristic-purple",
-    label: "Cosmic Purple",
-    emoji: "🟣",
-    prompt:
-      "Cosmic purple-to-magenta gradient background with smoke/mist textures, soft glowing logo mark, elegant light typography, premium tech-fashion advertising vibe.",
-  },
-];
-
-// Re-ordered & expanded to match real social-media flyer references.
-INSPIRATIONS.push(
-  {
     id: "purple-motion",
     label: "Purple Motion",
     emoji: "🛹",
+    image: "/design-templates/purple-motion.jpeg",
     prompt:
-      "Vivid purple gradient background with horizontal motion-blur light streaks, hero subject in mid-action perfectly lit, large bold white headline with selected words highlighted in yellow, small logo top-center, contact bar pinned to bottom with thin gold rule.",
+      "Vivid purple gradient with horizontal motion-blur light streaks, hero subject mid-action, bold white headline with selected words highlighted in yellow, small logo top-center, contact bar pinned to bottom with thin gold rule.",
   },
   {
-    id: "navy-glow-product",
+    id: "navy-glow",
     label: "Navy Product Glow",
     emoji: "📱",
+    image: "/design-templates/navy-glow.jpeg",
     prompt:
-      "Deep navy/blue dotted background, hero product floating in mid-air encircled by a glowing neon ring of sparkles, headline split into yellow + white words, bold yellow pill CTA, white rounded contact bar at the bottom with WhatsApp + location lines.",
+      "Deep navy dotted background, hero product floating encircled by a glowing neon ring of sparkles, headline split into yellow + white words, bold yellow pill CTA, white rounded contact bar at the bottom.",
   },
   {
     id: "mono-editorial",
     label: "Mono Editorial",
     emoji: "⚫",
+    image: "/design-templates/mono-editorial.png",
     prompt:
-      "Sleek dark almost-black background with subtle vignette, product hero on the right razor-sharp, huge condensed white headline on the left, accent-colored thin underline, pill price chip, pill WhatsApp CTA, tiny 'Designed by Afristall' bottom-right.",
+      "Sleek dark almost-black background with subtle vignette, product hero on the right razor-sharp, huge condensed white headline on the left, accent thin underline, pill price chip, pill WhatsApp CTA.",
   },
   {
-    id: "dark-lime-tech",
-    label: "Dark + Lime Tech",
-    emoji: "🟩",
+    id: "navy-curve",
+    label: "Navy Curve",
+    emoji: "🌊",
+    image: "/design-templates/navy-curve.jpeg",
     prompt:
-      "Dark green-to-black gradient background, hero subject lit with lime green rim light, two-line headline where one half is lime and the other half is silver/white, small caps eyebrow line above, glassy rounded contact bar at the bottom.",
-  },
-  {
-    id: "month-hero",
-    label: "Big Month",
-    emoji: "📅",
-    prompt:
-      "Massive single word (e.g. month name) as the hero — outlined or filled — subject photo overlapping the word, small yellow rounded-pill labels floating around, soft dark background, glassy contact bar at the bottom.",
-  },
-  {
-    id: "teal-corporate",
-    label: "Teal Corporate",
-    emoji: "🟦",
-    prompt:
-      "Teal/cyan geometric chevron shapes overlaying a real lifestyle photo, bold white headline with one accent-colored highlighted word, small body paragraph, pill website CTA, small logo bottom-right.",
+      "Deep navy background with a soft cyan curved swoosh, hero product on the right, bold split yellow/white headline on the left, yellow pill CTA, white rounded contact bar at the bottom.",
   },
   {
     id: "campaign-bold",
     label: "Campaign Bold",
     emoji: "📣",
+    image: "/design-templates/campaign-bold.jpeg",
     prompt:
-      "Dark dramatic background with green radial glow behind a hyper-real 3D hero, big bold white headline with one phrase highlighted in lime, supportive subline, white rounded panel at the bottom holding a green pill CTA + social handles.",
+      "Dark dramatic background with green radial glow behind a hyper-real 3D hero, big bold white headline with one phrase highlighted in lime, white rounded panel at the bottom holding a green pill CTA + social handles.",
   },
-);
+  {
+    id: "dark-lime-tech",
+    label: "Dark + Lime Tech",
+    emoji: "🟩",
+    image: "/design-templates/dark-lime-tech.jpeg",
+    prompt:
+      "Dark green-to-black gradient, hero subject lit with lime green rim light, two-line headline where one half is lime and the other half is silver, small caps eyebrow line above, glassy rounded contact bar at the bottom.",
+  },
+  {
+    id: "big-month",
+    label: "Big Month",
+    emoji: "📅",
+    image: "/design-templates/big-month.jpeg",
+    prompt:
+      "Massive single hero word as the centerpiece, subject photo overlapping the word, small yellow rounded-pill labels floating around, soft dark background, glassy contact bar at the bottom.",
+  },
+  {
+    id: "exclusive-class",
+    label: "Exclusive Class",
+    emoji: "🎓",
+    image: "/design-templates/exclusive-class.jpeg",
+    prompt:
+      "Dark background, small outlined 'EXCLUSIVE' eyebrow pill, gigantic stacked white headline with one word in lime green, soft body text, hero subject bottom-right with floating chat-bubble CTA card.",
+  },
+  {
+    id: "teal-corporate",
+    label: "Teal Corporate",
+    emoji: "🟦",
+    image: "/design-templates/teal-corporate.jpeg",
+    prompt:
+      "Teal/cyan geometric chevron shapes overlaying a real lifestyle photo, bold white headline with one accent-colored highlighted word, small body paragraph, pill website CTA, small logo bottom-right.",
+  },
+  {
+    id: "green-editorial",
+    label: "Green Editorial",
+    emoji: "🟢",
+    image: "/design-templates/green-editorial.jpeg",
+    prompt:
+      "Deep forest green background with a subtle dotted texture, oversized lime-green editorial headline at the top wrapping over multiple lines, hero product floating in a hand bottom-center, small wordmark bottom-right.",
+  },
+];
 
 export const COLOR_THEMES = [
-  { id: "brand", label: "Brand", color: "" }, // use user's accent_color
+  { id: "brand", label: "Brand", color: "" }, // user's accent_color
   { id: "lime", label: "Lime", color: "#C6F432" },
   { id: "orange", label: "Orange", color: "#F97316" },
   { id: "purple", label: "Purple", color: "#A855F7" },

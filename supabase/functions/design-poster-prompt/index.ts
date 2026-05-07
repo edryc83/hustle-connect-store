@@ -38,7 +38,7 @@ Deno.serve(async (req) => {
     }
     const userId = userRes.user.id;
 
-    const { prompt: userPrompt, inspiration, themeColor } = await req.json();
+    const { prompt: userPrompt, inspiration, inspirationImage, themeColor } = await req.json();
     if (!userPrompt || typeof userPrompt !== "string" || userPrompt.trim().length < 3) {
       return new Response(JSON.stringify({ error: "Describe what poster you want" }), {
         status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -59,6 +59,9 @@ Deno.serve(async (req) => {
     const fullPrompt = [
       "Design a PREMIUM EDITORIAL ADVERTISING POSTER, 1:1 square, gallery-grade — must clearly read as a real ad, not just an illustration.",
       `User brief: ${userPrompt.trim()}`,
+      inspirationImage
+        ? "A reference image is attached purely as a STYLE & LAYOUT reference. Match its background treatment, color palette, typography hierarchy, headline placement, accent shapes, CTA style and overall composition energy. DO NOT copy any of its products, photos, logos, watermarks, brand names, phone numbers or text — invent fresh visuals that fit the user's brief."
+        : "",
       inspiration ? `Inspiration / style direction: ${inspiration}` : "",
       "Compose like a high-end magazine ad: strong grid, intentional negative space, premium background (soft gradient, paper grain, or subtle solid). Clean modern sans-serif typography with TIGHT hierarchy. NO MISSPELLINGS, NO GIBBERISH letters.",
       `Use ${accent} as a tasteful brand accent (thin line, dot, chip, underline). Restrained palette. No clutter, no emojis, no fake badges or stars, no neon.`,
@@ -75,17 +78,42 @@ Deno.serve(async (req) => {
       "Final result must look like a high-end Apple / Nike / fashion-house advertisement.",
     ].filter(Boolean).join("\n");
 
-    const openaiResp = await fetch("https://api.openai.com/v1/images/generations", {
-      method: "POST",
-      headers: { Authorization: `Bearer ${OPENAI_API_KEY}`, "Content-Type": "application/json" },
-      body: JSON.stringify({
-        model: "gpt-image-2",
-        prompt: fullPrompt,
-        size: "1024x1024",
-        quality: "medium",
-        n: 1,
-      }),
-    });
+    let openaiResp: Response;
+    if (inspirationImage && typeof inspirationImage === "string") {
+      // Use the edits endpoint with the inspiration image as a visual reference.
+      try {
+        const inspResp = await fetch(inspirationImage);
+        if (!inspResp.ok) throw new Error(`inspiration fetch ${inspResp.status}`);
+        const inspBuf = await inspResp.arrayBuffer();
+        const inspType = inspResp.headers.get("content-type") || "image/jpeg";
+        const inspFile = new File([inspBuf], "inspiration.jpg", { type: inspType });
+        const form = new FormData();
+        form.append("model", "gpt-image-2");
+        form.append("prompt", fullPrompt);
+        form.append("size", "1024x1024");
+        form.append("quality", "medium");
+        form.append("n", "1");
+        form.append("image[]", inspFile);
+        openaiResp = await fetch("https://api.openai.com/v1/images/edits", {
+          method: "POST",
+          headers: { Authorization: `Bearer ${OPENAI_API_KEY}` },
+          body: form,
+        });
+      } catch (e) {
+        console.warn("inspiration image unavailable, falling back to text-only:", e);
+        openaiResp = await fetch("https://api.openai.com/v1/images/generations", {
+          method: "POST",
+          headers: { Authorization: `Bearer ${OPENAI_API_KEY}`, "Content-Type": "application/json" },
+          body: JSON.stringify({ model: "gpt-image-2", prompt: fullPrompt, size: "1024x1024", quality: "medium", n: 1 }),
+        });
+      }
+    } else {
+      openaiResp = await fetch("https://api.openai.com/v1/images/generations", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${OPENAI_API_KEY}`, "Content-Type": "application/json" },
+        body: JSON.stringify({ model: "gpt-image-2", prompt: fullPrompt, size: "1024x1024", quality: "medium", n: 1 }),
+      });
+    }
 
     if (!openaiResp.ok) {
       const errText = await openaiResp.text();

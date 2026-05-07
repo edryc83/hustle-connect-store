@@ -46,7 +46,7 @@ Deno.serve(async (req) => {
     }
     const userId = userRes.user.id;
 
-    const { productId, inspiration, themeColor } = await req.json();
+    const { productId, inspiration, inspirationImage, themeColor } = await req.json();
     if (!productId || typeof productId !== "string") {
       return new Response(JSON.stringify({ error: "productId required" }), {
         status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" },
@@ -91,6 +91,9 @@ Deno.serve(async (req) => {
     const prompt = [
       "Design a PREMIUM EDITORIAL PRODUCT AD POSTER, 1:1 square, gallery-grade — must clearly read as a real advertisement, not just a product photo.",
       "Use the supplied product image as the hero subject, clean and color-graded with a soft realistic shadow. Compose like a magazine ad: strong layout, intentional alignment, deliberate negative space, premium background (soft gradient, paper grain, or subtle solid).",
+      inspirationImage
+        ? "A second reference image is attached purely as a STYLE & LAYOUT reference. Match its background treatment, color palette, typography hierarchy, headline placement, accent shapes, CTA style and overall composition energy. DO NOT copy any of its products, photos, logos, watermarks, brand names, phone numbers or text — replace ALL of them with this product's content."
+        : "",
       inspiration ? `Inspiration / style direction: ${inspiration}` : "",
       `Use ${accent} as a tasteful brand accent (thin line, dot, chip, or underline). Restrained, premium palette — no neon, no clutter, no stickers, no emojis, no fake badges or stars.`,
       "Typography: clean modern sans-serif with TIGHT hierarchy. Render ALL of the following text elements crisply and legibly — NO MISSPELLINGS, NO GIBBERISH:",
@@ -124,7 +127,23 @@ Deno.serve(async (req) => {
     form.append("size", "1024x1024");
     form.append("quality", "medium");
     form.append("n", "1");
-    form.append("image", imgFile);
+    form.append("image[]", imgFile);
+
+    if (inspirationImage && typeof inspirationImage === "string") {
+      try {
+        const inspResp = await fetch(inspirationImage);
+        if (inspResp.ok) {
+          const inspBuf = await inspResp.arrayBuffer();
+          const inspType = inspResp.headers.get("content-type") || "image/jpeg";
+          const inspFile = new File([inspBuf], "inspiration.jpg", { type: inspType });
+          form.append("image[]", inspFile);
+        } else {
+          console.warn("inspiration image fetch failed", inspResp.status);
+        }
+      } catch (e) {
+        console.warn("inspiration image fetch error", e);
+      }
+    }
 
     const openaiResp = await fetch("https://api.openai.com/v1/images/edits", {
       method: "POST",
