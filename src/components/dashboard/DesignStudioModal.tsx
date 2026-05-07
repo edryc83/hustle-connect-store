@@ -732,7 +732,7 @@ export function DesignStudioModal({ open, onClose, initialProduct = null }: Prop
         )}
 
         {/* STEP — PRODUCT (product track) */}
-        {step === "product" && track === "product" && (
+        {step === "product" && (track === "product" || track === "copy") && (
           <div className="space-y-3">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
