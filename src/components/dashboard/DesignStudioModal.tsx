@@ -498,7 +498,7 @@ export function DesignStudioModal({ open, onClose }: Props) {
           </div>
         )}
 
-        {step === "final" && track === "prompt" && (
+        {step === "final" && (track === "prompt" || track === "day") && (
           <div className="space-y-3">
             <div className="aspect-square rounded-xl overflow-hidden bg-muted relative flex items-center justify-center">
               {generating && (
@@ -520,17 +520,24 @@ export function DesignStudioModal({ open, onClose }: Props) {
                 </div>
               )}
             </div>
-            <Textarea
-              placeholder="e.g. Black Friday sale poster with bold red typography and a 50% off badge"
-              value={prompt}
-              onChange={(e) => setPrompt(e.target.value)}
-              className="min-h-[80px]"
-              disabled={generating}
-            />
+            {track === "prompt" ? (
+              <Textarea
+                placeholder="e.g. Black Friday sale poster with bold red typography and a 50% off badge"
+                value={prompt}
+                onChange={(e) => setPrompt(e.target.value)}
+                className="min-h-[80px]"
+                disabled={generating}
+              />
+            ) : (
+              <div className="rounded-xl border border-border/60 bg-card/40 p-3 text-xs text-muted-foreground">
+                <div className="font-semibold text-foreground mb-0.5">{occasion?.emoji} {occasion?.label}</div>
+                {extraCopy ? <div className="line-clamp-2">{extraCopy}</div> : <div>AI will design a jolly poster vibing this day.</div>}
+              </div>
+            )}
             {!resultUrl ? (
               <Button
                 onClick={generateFromPrompt}
-                disabled={generating || prompt.trim().length < 3}
+                disabled={generating || (track === "prompt" && prompt.trim().length < 3)}
                 className="w-full gap-1.5"
               >
                 {generating ? <Loader2 className="h-4 w-4 animate-spin" /> : <Sparkles className="h-4 w-4" />}
