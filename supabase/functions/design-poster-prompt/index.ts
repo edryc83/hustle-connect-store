@@ -57,14 +57,21 @@ Deno.serve(async (req) => {
     const phone = profile?.whatsapp_number?.trim() || "";
 
     const fullPrompt = [
-      "Design a PREMIUM, MINIMAL editorial poster, 1:1 square, gallery-grade.",
+      "Design a PREMIUM EDITORIAL ADVERTISING POSTER, 1:1 square, gallery-grade — must clearly read as a real ad, not just an illustration.",
       `User brief: ${userPrompt.trim()}`,
-      "Lots of negative space. Typography clean modern sans-serif. Tight hierarchy. No clutter, no emojis, no fake badges.",
-      `Use ${accent} as a tasteful brand accent color (small accents only).`,
-      storeName ? `Optionally include store name "${storeName}" subtly.` : "",
-      phone ? `Optionally include WhatsApp "${phone}" small at the bottom.` : "",
-      `Tiny mark in a bottom corner: "Designed by Afristall".`,
-      "Final must look like a high-end Apple-style poster.",
+      "Compose like a high-end magazine ad: strong grid, intentional negative space, premium background (soft gradient, paper grain, or subtle solid). Clean modern sans-serif typography with TIGHT hierarchy. NO MISSPELLINGS, NO GIBBERISH letters.",
+      `Use ${accent} as a tasteful brand accent (thin line, dot, chip, underline). Restrained palette. No clutter, no emojis, no fake badges or stars, no neon.`,
+      "Render ALL of the following text elements crisply:",
+      "1. TITLE (large, bold hero word/phrase that fits the brief).",
+      "2. SUBTITLE / TAGLINE (one short punchy line, max 6 words, that you invent to fit the brief).",
+      phone
+        ? `3. CTA BUTTON (pill-shaped, ${accent} background, white text): "Order on WhatsApp" with "${phone}" beside or below it, plus a tiny WhatsApp glyph.`
+        : `3. CTA BUTTON (pill-shaped, ${accent} background, white text): "Shop Now" or "Order Now".`,
+      `4. ALWAYS visible bottom-corner mark: "Designed by Afristall" — small, refined, low-contrast but clearly readable. NEVER omit this.`,
+      storeName ? `5. Small store name "${storeName}" near a corner.` : "",
+      "Layout rule: clear focal hero, title + subtitle balanced with negative space, CTA button visibly tappable. Everything aligned to a grid.",
+      "Strictly avoid: paragraphs, watermarks across artwork, decorative emojis, hashtags, lorem ipsum, broken letters, multiple CTAs.",
+      "Final result must look like a high-end Apple / Nike / fashion-house advertisement.",
     ].filter(Boolean).join("\n");
 
     const openaiResp = await fetch("https://api.openai.com/v1/images/generations", {
