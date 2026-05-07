@@ -11,7 +11,7 @@ import {
 import AfristallLogo from "@/components/AfristallLogo";
 import { toast } from "sonner";
 import CaptionGenerator from "@/components/dashboard/CaptionGenerator";
-import DesignStudioModal from "@/components/dashboard/DesignStudioModal";
+import { DesignStudioModal } from "@/components/dashboard/DesignStudioModal";
 
 function getGreeting(): { text: string; emoji: string } {
   const hour = new Date().getHours();
