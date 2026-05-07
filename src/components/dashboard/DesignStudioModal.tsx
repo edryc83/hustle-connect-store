@@ -216,7 +216,7 @@ export function DesignStudioModal({ open, onClose }: Props) {
 
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="max-w-full w-screen h-[100dvh] sm:max-w-lg sm:h-auto sm:max-h-[90vh] p-4 overflow-y-auto rounded-none sm:rounded-lg">
+      <DialogContent className="max-w-full w-screen h-[100dvh] sm:max-w-lg sm:h-auto sm:max-h-[90vh] p-4 overflow-y-auto rounded-none sm:rounded-lg flex flex-col gap-3">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             {step !== "menu" && (
@@ -254,7 +254,7 @@ export function DesignStudioModal({ open, onClose }: Props) {
 
         {/* STEP 1 — MENU */}
         {step === "menu" && (
-          <div className="grid grid-cols-1 gap-2.5">
+          <div className="grid grid-cols-1 gap-3 flex-1 content-center sm:flex-none sm:content-start">
             {[
               {
                 id: "product",
