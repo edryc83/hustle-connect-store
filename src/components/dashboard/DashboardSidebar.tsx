@@ -45,6 +45,7 @@ export function DashboardSidebar() {
   };
 
   return (
+    <>
     <Sidebar collapsible="icon">
       <SidebarContent>
         <SidebarGroup>
