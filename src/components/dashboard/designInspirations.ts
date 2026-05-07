@@ -425,6 +425,86 @@ export const INSPIRATIONS: Inspiration[] = [
     prompt:
       "Tall 4:5 deep green background with subtle smoky textures. Top-left: logo + wordmark. Top-right: small dashed-outlined caps tagline pill. Left column: huge bold 3-line stacked white display headline with a subtle outline glow and a thin green underline swoosh, then a 2-line supporting paragraph. Below: a translucent dark rounded glass panel with a green 'OUR SERVICES' tab header and a 6-item bulleted list with small green check-badge bullets. Right side: a smiling person photo holding a product near their face, a small 'Tested And Trusted!' green badge floating top-right, plus a tightly-grouped lineup of multiple product bottles arranged at the lower-right. Bottom: white curved bottom bar with a green 'Home Delivery' circular badge on the left and a 3-column contact row (whatsapp, instagram, tiktok) each with small icons.",
   },
+  {
+    id: "data-reloaded-cream",
+    label: "Cream Hashtag Hero",
+    emoji: "📱",
+    image: "/design-templates/data-reloaded-cream.png",
+    prompt:
+      "Tall 4:5 soft cream-to-blush gradient background with vibrant red ribbon-like swooshes flowing across the lower half. Top-left: small circular logo + 2-line wordmark. Top-right: tiny 'Please Visit:' URL line. Centered upper area: huge bold black hashtag headline word stacked on top of a giant bold red second word, then a 2-line dark serif/sans subline beneath. Centerpiece: a large hero phone/product mockup centered-bottom with a smiling person on each side (left + right) reacting to it, both holding their own phones. Bottom-left: small Google Play + App Store badge row with a tiny 'Download to get started' caption.",
+  },
+  {
+    id: "aladun-fitfam-yellow",
+    label: "Pidgin Yellow Duo",
+    emoji: "🍲",
+    image: "/design-templates/aladun-fitfam-yellow.png",
+    prompt:
+      "Tall 4:5 soft pale-yellow background with faint repeated food-icon watermark and a green leaf accent. Top-left: small square logo card. Top-right: tiny '#tagline' caps line. Upper area: bold 2-line dark headline with the final 2 words in a vivid orange-to-red gradient and a question mark, then a short 3-line subline beneath in dark text. Centerpiece: two smiling people (one in a branded cap, one beside them) bleeding off the bottom edge. Mid-overlay: one orange-to-red gradient rounded pill button on the left and one white rounded pill button on the right (CTA + secondary). Bottom: dark rounded glass contact bar with an Instagram icon + handle, a thin divider, and a phone icon + number.",
+  },
+  {
+    id: "bites-shano-crush",
+    label: "Crunch Snack Cream",
+    emoji: "🍔",
+    image: "/design-templates/bites-shano-crush.png",
+    prompt:
+      "Tall 4:5 warm cream paper-textured background with floating chili peppers and snack pieces around the edges. Top-left: small playful brand logo badge. Centered upper: 2-line headline where line 1 is a vivid orange-to-yellow gradient bold word and line 2 is a huge bold dark display word, then a centered 2-line short subline beneath. Mid-left: tiny 2-row checkbox-style value list (one short label per row). Centerpiece: a wide-eyed person holding a hero food item (burger/snack) up to their face, bleeding off the bottom. Sides: small platters of food peeking from bottom-left and bottom-right corners. Bottom: dark rounded contact bar with thin orange accent line, holding 3 icon+text columns (phone, instagram, email).",
+  },
+  {
+    id: "lacremeux-taste-grabs",
+    label: "Red Pattern Wrap",
+    emoji: "🌯",
+    image: "/design-templates/lacremeux-taste-grabs.png",
+    prompt:
+      "Tall 4:5 vivid red background with a faint repeating geometric tribal pattern watermark. Top-right: small circular dark logo badge. Upper-center: huge bold white display headline word with a thin italic 3-word subline beneath, plus a small yellow lightning-bolt accent stroke. Centerpiece: a person taking a bite of a hero food item on the left while a giant second hero item rises diagonally on the right with fresh garnish flying around it. Lower: a short italic 2-line white subline centered, with a small red lightning underline accent. Bottom: thin pale-cream contact strip with 3 small icon+text items (email, whatsapp+phone, instagram handle).",
+  },
+  {
+    id: "quickie-bites-wrap",
+    label: "Split Cream Orange",
+    emoji: "🥙",
+    image: "/design-templates/quickie-bites-wrap.png",
+    prompt:
+      "Tall 4:5 canvas split diagonally — left two-thirds soft cream, right third vivid orange with a faint repeated wordmark watermark. Top-left: small rounded yellow brand logo card. Top-right: tiny dark '#hashtag' caps line. Left column: huge bold 3-line dark display headline with small sparkle accents, a short 2-line dark subline beneath, then a small 'Download app on' caption with stacked Google Play + App Store badges. Centerpiece: a giant hero food item (wrap/sandwich) bleeding diagonally from the right side with sauce drips and floating ingredients. Bottom: a long pill divided into a yellow left half with a globe icon + website URL and a dark right half with social icons + handle.",
+  },
+  {
+    id: "peps-bite-happiness",
+    label: "Pink Swirl Portrait",
+    emoji: "💕",
+    image: "/design-templates/peps-bite-happiness.png",
+    prompt:
+      "Tall 4:5 soft cream background with a large flowing pink ribbon swirl looping across the canvas. Top-center: small brand logo card. Upper area: 2-line headline where line 1 is bold dark display text and line 2 is a bold pink/red display word, then a short italic single-line subline beneath. Centerpiece: a smiling person taking a bite of a hero food item, framed inside the pink swirl loop, with two extra hero food items floating bottom-left and bottom-right against a soft sky/grass scene. Bottom: dark rounded contact bar with melting drip edges, holding a left column of social icons + handle + phone and a right column with a location pin + 2-line address.",
+  },
+  {
+    id: "peps-every-wrap-masterpiece",
+    label: "Spotlight Masterpiece",
+    emoji: "🔦",
+    image: "/design-templates/peps-every-wrap-masterpiece.png",
+    prompt:
+      "Tall 4:5 dark moody background with a single bright spotlight beam from the top center casting smoke and glowing dust around a hero food item. Top-left: brand logo card. Top-right: tiny italic tagline line. Centerpiece: a giant hero food item floating centered-upper with fresh garnish, sauce drops and ingredients orbiting it in a swirling motion-blur ring. Lower-center: a large orange-to-red gradient rounded card holding a 2-line bold white headline and a 2-line shorter subline, with a small 3D bell icon poking out the top-left corner. Bottom: dual contact bars side-by-side — left dark with melting drip edge holding social icons + handle + phone, right yellow with melting drip edge holding location pin + 2-line address.",
+  },
+  {
+    id: "peps-hunger-wrap-it",
+    label: "Menu Cards Dark",
+    emoji: "📋",
+    image: "/design-templates/peps-hunger-wrap-it.png",
+    prompt:
+      "Tall 4:5 dark interior scene background with warm red ambient lighting on the left. Top-left: brand logo card. Top-right: tiny italic tagline line. Left side: a smiling person holding a hero food item up to their face, lit by warm light. Upper-right: bold 2-line orange-to-yellow gradient display headline with a question mark and exclamation mark, then a 2-line dark-text subline beneath. Mid-right: 3 stacked rounded menu cards (alternating dark / orange / orange) each holding a small thumbnail photo on the left and a bold caps title + 2-line description on the right. Bottom: dual contact bars side-by-side with melting drip edges — left dark with social icons + handle + phone, right yellow with location pin + 2-line address.",
+  },
+  {
+    id: "jollof-republic-iykyk",
+    label: "Orange Wave Plate",
+    emoji: "🍛",
+    image: "/design-templates/jollof-republic-iykyk.png",
+    prompt:
+      "Tall 4:5 vivid orange background with faint repeating wave-line watermark texture. Top-left: small brand logo + wordmark. Top-right: tiny outlined-pill caps tagline. Upper area: huge bold 2-line cream display headline with ellipsis, then a thin outlined rounded pill beneath holding a single short white sentence. Centerpiece: a hand reaching up from the bottom holding a hero plated dish with steam rising, plus small floating chili pepper accents on the sides. Bottom: dark rounded contact bar with a small wordmark on the left, an App Store + Google Play badge row in the middle, and small social icons + handle on the right.",
+  },
+  {
+    id: "aladun-bold-spicy-grilled",
+    label: "Bold Spicy Plate",
+    emoji: "🍗",
+    image: "/design-templates/aladun-bold-spicy-grilled.png",
+    prompt:
+      "Tall 4:5 vivid orange background with faint repeated food-icon watermark and small floating chili pepper accents. Top-left: small square logo card. Top-right: tiny '#tagline' caps line. Upper area: bold 2-line headline where line 1 mixes white + dark words and line 2 ends with a dark accent word, then a centered 3-line short paragraph subline beneath in white. Centerpiece: a hero plated dish (grilled meat with veggies) tilted slightly, with a small floating white 'Order Now' rounded label pill on the left edge and a small floating dark-green 'Hot N Spicy' rounded label pill on the right edge. Lower-right: tiny 2-line value list with small check-badge icons. Bottom: dark rounded contact bar with thin yellow accent line, holding 3 icon+text columns (instagram, phone, location).",
+  },
 ];
 
 export const COLOR_THEMES = [
