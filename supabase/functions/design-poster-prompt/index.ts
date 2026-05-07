@@ -78,13 +78,13 @@ Deno.serve(async (req) => {
       inspiration ? `Inspiration / style direction: ${inspiration}` : "",
       "Compose like a high-end magazine ad: strong grid, intentional negative space, premium background. Clean modern sans-serif typography with TIGHT hierarchy. NO MISSPELLINGS, NO GIBBERISH letters.",
       `Use ${accent} as a tasteful brand accent. Restrained palette. No clutter, no emojis, no fake badges or stars, no neon.`,
-      "Render ALL of the following text elements crisply:",
-      `1. HEADLINE — large, bold hero text reading EXACTLY "${headlineHint || occasion}" (or a tasteful 2-4 word variation that keeps the same meaning). Must be the dominant text element.`,
-      "2. SHORT TAGLINE — one short punchy line (max 6 words) that vibes with the day and any extra copy provided.",
+      "Render ALL of the following text elements crisply, spelled PERFECTLY, no broken letters, no extra words, no swapped wording:",
+      `1. HEADLINE — large, bold hero text reading the EXACT words "${headlineHint || occasion}" character-for-character. Do NOT paraphrase, do NOT translate, do NOT add or remove words. Must be the dominant text element on the canvas.`,
+      "2. SHORT TAGLINE — one short punchy line (max 6 words) that vibes with the day and any extra copy provided. Spell every word correctly.",
       phone
         ? `3. CTA BUTTON — ONE clean pill-shaped button, ${accent} background, crisp white text reading EXACTLY "Order on WhatsApp", with "${phone}" as a small clean line directly beneath the pill. Tiny WhatsApp glyph inside the pill. Rounded-full corners, generous padding, no gradients, no duplicate buttons.`
         : `3. CTA BUTTON — ONE clean pill-shaped button, ${accent} background, crisp white text reading EXACTLY "Order Now". Rounded-full corners, generous padding, no gradients, no duplicate buttons.`,
-      `4. MANDATORY VISIBLE SIGNATURE: render the exact text "Powered by Afristall" in a bottom corner (bottom-right preferred). Small but CLEARLY LEGIBLE at thumbnail size — minimum ~2.2% of canvas height, high enough contrast to read easily. Never omit, never crop, never blur.`,
+      `4. MANDATORY HIGHLY-LEGIBLE SIGNATURE: render the EXACT text "Powered by Afristall" (correct capitalization, correct spelling, no other words near it) along the bottom of the canvas. It MUST be unmistakably readable: minimum ~3.5% of canvas height, bold or semi-bold sans-serif, high-contrast color (pure white on dark backgrounds, near-black on light backgrounds), placed inside its own clear safe-zone with no graphics or product overlapping it. Never omit, never crop, never blur, never stylize into illegible script. This text is non-negotiable.`,
       storeName ? `5. Small store name "${storeName}" near a corner (separate from the Powered by Afristall mark).` : "",
       "Layout rule: clear focal hero (the joyful person + product), headline + tagline balanced with negative space, CTA button visibly tappable. Everything aligned to a grid.",
       "Strictly avoid: paragraphs, watermarks across artwork, decorative emojis, hashtags, lorem ipsum, broken letters, multiple CTAs, multiple people unless the template clearly shows a group.",
@@ -104,7 +104,7 @@ Deno.serve(async (req) => {
       phone
         ? `3. CTA BUTTON — ONE single clean pill-shaped button, ${accent} background, crisp white text reading EXACTLY "Order on WhatsApp", with "${phone}" as a small clean line directly beneath the pill. Tiny WhatsApp glyph inside the pill, left of the text. Rounded-full corners, generous padding, no gradients, no duplicate buttons.`
         : `3. CTA BUTTON — ONE single clean pill-shaped button, ${accent} background, crisp white text reading EXACTLY "Order Now". Rounded-full corners, generous padding, no gradients, no duplicate buttons.`,
-      `4. MANDATORY VISIBLE SIGNATURE: render the exact text "Designed by Afristall" in a bottom corner (bottom-right preferred). Small but CLEARLY LEGIBLE at thumbnail size — minimum ~2.2% of canvas height, high enough contrast to read easily. Never omit, never crop, never blur.`,
+      `4. MANDATORY HIGHLY-LEGIBLE SIGNATURE: render the EXACT text "Designed by Afristall" (correct capitalization, correct spelling) along the bottom of the canvas. It MUST be unmistakably readable: minimum ~3.5% of canvas height, bold or semi-bold sans-serif, high-contrast color (pure white on dark backgrounds, near-black on light backgrounds), placed inside its own clear safe-zone with no graphics or product overlapping it. Never omit, never crop, never blur, never stylize into illegible script. This text is non-negotiable.`,
       storeName ? `5. Small store name "${storeName}" near a corner.` : "",
       "Layout rule: clear focal hero, title + subtitle balanced with negative space, CTA button visibly tappable. Everything aligned to a grid.",
       "Strictly avoid: paragraphs, watermarks across artwork, decorative emojis, hashtags, lorem ipsum, broken letters, multiple CTAs.",
