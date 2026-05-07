@@ -300,8 +300,7 @@ export function DesignStudioModal({ open, onClose, initialProduct = null }: Prop
 
   const goBack = () => {
     if (step === "final") setStep("theme");
-    else if (step === "theme") setStep("template");
-    else if (step === "theme" && track === "copy") setStep("use");
+    else if (step === "theme") setStep(track === "copy" ? "use" : "template");
     else if (step === "template") {
       if (track === "day") { setStep("occasion"); return; }
       if (track === "product") { setStep("product"); return; }
