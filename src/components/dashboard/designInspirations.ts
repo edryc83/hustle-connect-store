@@ -169,6 +169,86 @@ export const INSPIRATIONS: Inspiration[] = [
     prompt:
       "Smooth deep purple gradient background, small logo + wordmark top-left, small caps tagline top-right, centered headline where line 1 is white and line 2 is light-purple italic serif, short two-line subline beneath a thin divider, hero subject centered-lower, three stacked small light-purple rounded chips on the right each with one bold word, large rounded purple contact bar at the bottom with a 'CONNECT WITH US' label and three icon+text columns (phone / handle / address).",
   },
+  {
+    id: "college-sensei",
+    label: "Soft Service List",
+    emoji: "📚",
+    image: "/design-templates/college-sensei.jpeg",
+    prompt:
+      "Soft warm beige/cream background with a centered logo card at the very top, large dark serif headline with one accent-color word, hero subject centered-left with hand-drawn lightning-bolt sketch accents, small two-line subline pinned mid-right, glassy translucent rounded card on the right listing 5-7 short bullet items, dark rounded contact bar at the bottom with social icons + handle.",
+  },
+  {
+    id: "collaborate-create",
+    label: "Editorial Dark",
+    emoji: "🤝",
+    image: "/design-templates/collaborate-create.jpeg",
+    prompt:
+      "Dark almost-black background with a soft glowing orb behind the subjects, small orange caps eyebrow top-left, huge bold white serif/sans headline stacked over two lines, short two-line subline beneath, hero subject(s) bleeding off the right edge, rounded orange logo card bottom-left, small translucent 'Follow us' chip with social icons + handle bottom-right.",
+  },
+  {
+    id: "opportunities-scholarship",
+    label: "Bold Lifestyle",
+    emoji: "🎯",
+    image: "/design-templates/opportunities-scholarship.jpeg",
+    prompt:
+      "Real lifestyle photograph as the full background, bold white sans headline stacked over four lines on the lower-left with the final line highlighted in yellow, small outlined-pill secondary line beneath, vivid red rounded logo card pinned bottom-left, white pill at the bottom-right with social icons + handles.",
+  },
+  {
+    id: "red-creative",
+    label: "Red Spotlight",
+    emoji: "🔴",
+    image: "/design-templates/red-creative.jpeg",
+    prompt:
+      "Deep red radial spotlight background fading to black with subtle light streaks at the edges, small avatar + wordmark + handle row top-left with a thin horizontal rule, large bold serif headline centered where the last word sits inside an orange rounded highlight box, hero subject centered-bottom, small circular icon button bottom-right.",
+  },
+  {
+    id: "trusted-traders",
+    label: "Warm Glow",
+    emoji: "💱",
+    image: "/design-templates/trusted-traders.jpeg",
+    prompt:
+      "Dark background with a warm amber radial glow behind the subjects and softly bokeh'd floating coins/orbs on the sides, small wordmark top-right, big bold white headline stacked over two lines, short single-line subline beneath, hero subject(s) centered-lower, dark contact strip at the bottom with social icons + handles on the left and a small QR code on the right.",
+  },
+  {
+    id: "stay-connected-data",
+    label: "Cinematic Bokeh",
+    emoji: "📶",
+    image: "/design-templates/stay-connected-data.jpeg",
+    prompt:
+      "Cinematic dark background with a soft warm bokeh blur, thin horizontal rule with a small logo + wordmark on the left and a small URL on the right, big bold white headline stacked over three lines with the final word highlighted in orange, hero subject(s) centered-lower, glassy rounded chip on the lower-left with a short 2-line sentence, small app-store + play-store badge row pinned at the very bottom-left with a one-line caption beneath.",
+  },
+  {
+    id: "happy-new-week",
+    label: "Warm Overlay",
+    emoji: "☀️",
+    image: "/design-templates/happy-new-week.jpeg",
+    prompt:
+      "Real lifestyle photograph with a warm orange gradient overlay on the lower half, small logo card top-left, small hashtag eyebrow top-right, huge bold white sans headline stacked over three lines with a tiny yellow sparkle accent, short two-line subline beneath, thin yellow underline rule, glassy translucent contact pill pinned at the very bottom with phone number + social icon + handle.",
+  },
+  {
+    id: "its-a-new-week",
+    label: "Script + Block",
+    emoji: "📅",
+    image: "/design-templates/its-a-new-week.jpeg",
+    prompt:
+      "Real lifestyle photograph as the full background, small handwritten yellow script eyebrow line, huge bold white sans headline stacked over three lines, short single-line subline beneath, small chevron arrow accent on the right, small white rounded sticky-note card on the right listing 4-5 short value words with a tiny eyebrow label, big white rounded contact bar at the bottom with three icon+text columns (web / handle / email) and a thin separator with address.",
+  },
+  {
+    id: "dia-juventude",
+    label: "Stacked Block Type",
+    emoji: "🟧",
+    image: "/design-templates/dia-juventude.jpeg",
+    prompt:
+      "Real lifestyle photograph as the full background, small orange-bordered date pill eyebrow, huge bold white headline broken into stacked syllable blocks on the left (each syllable on its own line, dark navy background card behind), small heart accent, dark rounded translucent card on the right with a short 3-line sentence, bottom strip with WhatsApp icon + phone, social icon row + handle, and a short paragraph on the right.",
+  },
+  {
+    id: "june-yellow",
+    label: "Mega Display Type",
+    emoji: "🟡",
+    image: "/design-templates/june-yellow.jpeg",
+    prompt:
+      "Vivid yellow background with faint repeated outline wordmark watermark, small dark logo + wordmark centered at the top, ENORMOUS hand-drawn rounded white display word as the centerpiece dominating the canvas, small white tagline stacked over three lines on the lower-left with a thin underline rule, hero subject on the right with hand-to-mouth gesture.",
+  },
 ];
 
 export const COLOR_THEMES = [
