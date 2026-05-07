@@ -505,6 +505,86 @@ export const INSPIRATIONS: Inspiration[] = [
     prompt:
       "Tall 4:5 vivid orange background with faint repeated food-icon watermark and small floating chili pepper accents. Top-left: small square logo card. Top-right: tiny '#tagline' caps line. Upper area: bold 2-line headline where line 1 mixes white + dark words and line 2 ends with a dark accent word, then a centered 3-line short paragraph subline beneath in white. Centerpiece: a hero plated dish (grilled meat with veggies) tilted slightly, with a small floating white 'Order Now' rounded label pill on the left edge and a small floating dark-green 'Hot N Spicy' rounded label pill on the right edge. Lower-right: tiny 2-line value list with small check-badge icons. Bottom: dark rounded contact bar with thin yellow accent line, holding 3 icon+text columns (instagram, phone, location).",
   },
+  {
+    id: "asabell-online-baking-class",
+    label: "Baking Class Poster",
+    emoji: "🎂",
+    image: "/design-templates/asabell-online-baking-class.png",
+    prompt:
+      "Tall 4:5 soft peach paper-textured background with faint botanical line art doodles at the edges. Top-left: elegant bakery logo + tiny 'presents' label. Center-left: ENORMOUS stacked condensed baking-course headline filling most of the height in deep burnt-orange with soft inner glow and shadow. Top-right: hand-drawn black marker circle around a bold registration-fee price callout with a smaller crossed old price. Right upper-mid: a torn-paper bank/payment note card. Lower-left: an off-white ripped-paper note listing 5-7 class items in short bullet lines with a tiny bonus section. Bottom-right: a huge glossy chocolate cake hero with berries, cropped dramatically off the edge.",
+  },
+  {
+    id: "nikkys-bake-house",
+    label: "Warm Bakehouse Glow",
+    emoji: "🧁",
+    image: "/design-templates/nikkys-bake-house.png",
+    prompt:
+      "Tall 4:5 cozy golden-brown bakery interior with heavy warm bokeh lights and shallow depth of field. Top-left: layered bakery logo lockup with a red ribbon tab. Center-left: distressed bold white headline stacked over 3-4 lines with a smaller accent line beneath. Upper-mid: torn-paper badge with a short freshness phrase and one floating pastry image above. Centerpiece: smiling baker/person holding a tray of pastries with one large blurred pastry in the foreground for depth. Lower-left: short white paragraph copy. Bottom-center: outlined rounded CTA pill with arrow icon and exact button feel. Bottom-right: two compact phone-number rows with small icons.",
+  },
+  {
+    id: "uje-cakes-more",
+    label: "Bakery Services Grid",
+    emoji: "🍩",
+    image: "/design-templates/uje-cakes-more.png",
+    prompt:
+      "Tall 4:5 rich dark brown-to-orange glowing background with soft circular light streaks. Top-left: round bakery logo. Left upper area: elegant serif bakery headline split across 2 lines in cream and warm orange. Left middle: translucent rounded services card with a bright orange section tab and a 5-7 item bullet list using tiny rosette/star bullets. Right: smiling baker/person holding a large decorated cake, cropped from waist-up. Lower middle: a row of 4 rounded-square product thumbnails with orange borders. Bottom: wide cream rounded contact bar with big phone number on the left, a tiny vertical rolling-pin divider, and instagram handle/contact line on the right. Top-right: slim vertical tag card for home delivery.",
+  },
+  {
+    id: "jennys-cake-more",
+    label: "Minimal Cake Listing",
+    emoji: "🍰",
+    image: "/design-templates/jennys-cake-more.png",
+    prompt:
+      "Tall 4:5 clean cream background with soft warm vignettes in the corners. Top-center: simple cupcake logo with bakery wordmark. Middle: huge geometric display headline across 2 lines using brown and black for contrast. Lower-left: brown product list card with a bright orange header tab and 6-8 short bullet items. Lower-right: neat hero cluster of a frosted cake with cupcake and cookies on a soft floor shadow. Bottom: thick horizontal brown-to-orange footer band containing a centered outlined contact pill with a phone icon and bold number.",
+  },
+  {
+    id: "delicious-cupcake-dark",
+    label: "Dark Cupcake Hero",
+    emoji: "🧁",
+    image: "/design-templates/delicious-cupcake-dark.png",
+    prompt:
+      "Tall 4:5 deep chocolate-black background with a subtle red glow center and giant low-opacity repeated word watermark on the right. Top-left: tiny bold eyebrow phrase. Upper-left: small outlined glass label above an oversized 2-line condensed white headline. Between text and hero: a dotted path doodle leading toward the product. Right: giant hyper-real chocolate cupcake with glossy frosting and sliced strawberry on top. Lower-left: short white paragraph copy and a bold cream rounded CTA pill. Bottom-left: simple social icon row plus handle.",
+  },
+  {
+    id: "baked-fresh-cupcakes",
+    label: "Bakery Discount Splash",
+    emoji: "🍫",
+    image: "/design-templates/baked-fresh-cupcakes.png",
+    prompt:
+      "Tall 4:5 glossy brown radial background with faceted rays and dramatic food-ad lighting. Top-left: red ribbon brand badge. Top-right: tiny website row with globe icon. Upper-left: large yellow-and-white condensed headline stacked over 3 lines with a short white description beneath. Center-right: giant flying muffin/cupcake hero angled diagonally with chocolate chips scattering. Bottom: glossy liquid-chocolate wave crossing the canvas. Lower-left on top of the wave: bright red starburst discount badge.",
+  },
+  {
+    id: "dia-do-panificador-bread",
+    label: "Bread Day Homage",
+    emoji: "🥖",
+    image: "/design-templates/dia-do-panificador-bread.jpeg",
+    prompt:
+      "Tall 4:5 warm orange bakery scene with atmospheric smoke and soft vignette edges. Top-center: elegant script headline celebrating a bread day/event with a tiny date arc above. Center: woven basket overflowing with artisan bread rolls, lit dramatically, with a few floating blurred bread pieces around the scene. Left-middle: stacked short copy blocks in dark translucent rectangles with selected words bolded. Lower-middle: handwritten script accent stroke. Bottom: slim social row, tiny website text, and a minimal logo tag. Rich, nostalgic, premium bakery mood.",
+  },
+  {
+    id: "padaria-history-bread",
+    label: "Soft Bread Story",
+    emoji: "🥐",
+    image: "/design-templates/padaria-history-bread.jpeg",
+    prompt:
+      "Square or tall-leaning soft beige bakery poster with a calm monochrome palette. Left: clean sans headline in white and brown over 3-4 lines, followed by a short paragraph and a small rounded CTA. Right: large wicker basket full of bread rolls and artisan loaves viewed from above, cropped generously. Around the bread: small circular social/heart badges. Bottom-left: oversized abstract script stroke partially bleeding off the canvas. Minimal, warm, editorial bakery feel.",
+  },
+  {
+    id: "baking-days-cafe",
+    label: "Search Bar Cake",
+    emoji: "🔎",
+    image: "/design-templates/baking-days-cafe.jpeg",
+    prompt:
+      "Tall 4:5 moody café interior with shallow blur and warm wooden tones. Top-left: playful bakery logo. Top-right: tiny social icon row. Upper-middle: oversized floating search-bar UI card with typed query suggestions underneath, styled like a modern search popup. Bottom-center: hero slice of chocolate cake on a plate with strawberries and sauce in sharp focus. Bottom strip: two location/address blocks with phone numbers separated by a slim divider. Premium café ad meets digital discovery theme.",
+  },
+  {
+    id: "bakery-hub-desserts",
+    label: "Dessert Glass Panel",
+    emoji: "🍓",
+    image: "/design-templates/bakery-hub-desserts.jpeg",
+    prompt:
+      "Tall 4:5 cinematic dessert poster with warm chocolate-brown background and tabletop lighting. Top-right: round bakery seal logo. Upper-left: clean mixed-weight headline where key words are highlighted in warm peach/orange. Center: elegant plated cake slice hero with strawberry, mint, and glossy chocolate drip. Left-middle overlapping the hero: translucent frosted-glass UI panel with faint menu items inside, used purely as a design element. Bottom-left: bold phone-order line with WhatsApp icon. Bottom-right: location pin and address block. Refined, premium dessert advertising.",
+  },
 ];
 
 export const COLOR_THEMES = [
