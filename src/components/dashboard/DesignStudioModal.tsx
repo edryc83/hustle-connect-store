@@ -217,7 +217,7 @@ export function DesignStudioModal({ open, onClose }: Props) {
 
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className={track === "day" ? "max-w-md sm:max-w-lg h-[100dvh] sm:h-auto sm:max-h-[90vh] p-4 overflow-y-auto" : "max-w-md"}>
+      <DialogContent className="max-w-full w-screen h-[100dvh] sm:max-w-lg sm:h-auto sm:max-h-[90vh] p-4 overflow-y-auto rounded-none sm:rounded-lg">
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             {step !== "menu" && (
