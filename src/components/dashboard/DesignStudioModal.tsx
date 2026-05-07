@@ -446,6 +446,27 @@ export function DesignStudioModal({ open, onClose, initialProduct = null }: Prop
                 {insp ? `Selected: ${insp.label}` : "Tap a template"}
               </span>
               <div className="flex items-center gap-3">
+                {track !== "day" && (
+                  <label className="text-[11px] flex items-center gap-1 text-primary hover:underline cursor-pointer">
+                    {uploadingTemplate ? (
+                      <Loader2 className="h-3 w-3 animate-spin" />
+                    ) : (
+                      <Upload className="h-3 w-3" />
+                    )}
+                    Upload
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="hidden"
+                      disabled={uploadingTemplate}
+                      onChange={(e) => {
+                        const f = e.target.files?.[0];
+                        if (f) handleUploadTemplate(f);
+                        e.target.value = "";
+                      }}
+                    />
+                  </label>
+                )}
                 <button
                   onClick={() => {
                     const pool = track === "day" ? POSTER_OF_THE_DAY_TEMPLATES : INSPIRATIONS;
@@ -484,6 +505,22 @@ export function DesignStudioModal({ open, onClose, initialProduct = null }: Prop
                       <div className="absolute top-1 right-1 h-5 w-5 rounded-full bg-primary text-primary-foreground flex items-center justify-center">
                         <Check className="h-3 w-3" />
                       </div>
+                    )}
+                    {i.user && (
+                      <span
+                        role="button"
+                        tabIndex={0}
+                        onClick={(e) => { e.stopPropagation(); handleDeleteUserTemplate(i.id); }}
+                        className="absolute top-1 left-1 h-5 w-5 rounded-full bg-black/60 text-white flex items-center justify-center hover:bg-destructive"
+                        aria-label="Delete template"
+                      >
+                        <Trash2 className="h-3 w-3" />
+                      </span>
+                    )}
+                    {i.user && (
+                      <span className="absolute top-1 right-1 text-[9px] px-1.5 py-0.5 rounded-full bg-primary/90 text-primary-foreground font-semibold">
+                        Mine
+                      </span>
                     )}
                     <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent px-1.5 py-1 text-[10px] text-white text-left line-clamp-1">
                       {i.label}
