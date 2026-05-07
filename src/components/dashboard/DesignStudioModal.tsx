@@ -7,7 +7,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
 import {
-  Loader2, Sparkles, Package, Wand2, ArrowLeft, Download, Share2, RefreshCw, Search, Shuffle, Check, Upload, Trash2,
+  Loader2, Sparkles, Package, Wand2, ArrowLeft, Download, Share2, RefreshCw, Search, Shuffle, Check, Upload, Trash2, Link2,
 } from "lucide-react";
 import { AutoDesignModal } from "./AutoDesignModal";
 import { INSPIRATIONS, COLOR_THEMES, pickRandomInspiration } from "./designInspirations";
@@ -52,6 +52,7 @@ export function DesignStudioModal({ open, onClose, initialProduct = null }: Prop
 
   const [userTemplates, setUserTemplates] = useState<Array<{ id: string; label: string; image: string; prompt: string | null; user: true }>>([]);
   const [uploadingTemplate, setUploadingTemplate] = useState(false);
+  const [importingUrl, setImportingUrl] = useState(false);
 
   useEffect(() => {
     if (!open) {
@@ -148,6 +149,38 @@ export function DesignStudioModal({ open, onClose, initialProduct = null }: Prop
       toast.error(e?.message || "Upload failed");
     } finally {
       setUploadingTemplate(false);
+    }
+  };
+
+  const handleImportFromUrl = async () => {
+    if (!user) return;
+    const url = window.prompt(
+      "Paste a Pinterest pin URL or any image link",
+      "",
+    );
+    if (!url) return;
+    setImportingUrl(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("import-design-template", {
+        body: { url: url.trim() },
+      });
+      if (error) throw error;
+      if ((data as any)?.error) throw new Error((data as any).error);
+      const row = (data as any).template;
+      const newItem = {
+        id: `user-${row.id}`,
+        label: row.label,
+        image: row.image_url,
+        prompt: row.prompt,
+        user: true as const,
+      };
+      setUserTemplates((prev) => [newItem, ...prev]);
+      setInspirationId(newItem.id);
+      toast.success("Template imported");
+    } catch (e: any) {
+      toast.error(e?.message || "Import failed");
+    } finally {
+      setImportingUrl(false);
     }
   };
 
@@ -446,6 +479,21 @@ export function DesignStudioModal({ open, onClose, initialProduct = null }: Prop
                 {insp ? `Selected: ${insp.label}` : "Tap a template"}
               </span>
               <div className="flex items-center gap-3">
+                {track !== "day" && (
+                  <button
+                    type="button"
+                    onClick={handleImportFromUrl}
+                    disabled={importingUrl}
+                    className="text-[11px] flex items-center gap-1 text-primary hover:underline disabled:opacity-50"
+                  >
+                    {importingUrl ? (
+                      <Loader2 className="h-3 w-3 animate-spin" />
+                    ) : (
+                      <Link2 className="h-3 w-3" />
+                    )}
+                    Copy from URL
+                  </button>
+                )}
                 {track !== "day" && (
                   <label className="text-[11px] flex items-center gap-1 text-primary hover:underline cursor-pointer">
                     {uploadingTemplate ? (
