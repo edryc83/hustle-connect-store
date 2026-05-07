@@ -19,7 +19,6 @@ import { BuyerAttributePicker, ChatOnlyBanner } from "@/components/storefront/Bu
 import { getAttributeSummary, getSelectableKeys, buildAttributeLines } from "@/lib/attributeLibrary";
 import { StorefrontFilters, applyFilters, type FilterState } from "@/components/storefront/StorefrontFilters";
 import { StoreAssistantButton } from "@/components/storefront/StoreAssistant";
-import FlyerStudio from "@/screens/FlyerStudio";
 import {
   DropdownMenu,
   DropdownMenuContent,
