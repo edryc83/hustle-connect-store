@@ -1,6 +1,7 @@
-import { Package, LayoutDashboard, User, Settings, LogOut, ClipboardList, BarChart3, Moon, Sun, Sparkles, Lock } from "lucide-react";
-import { Badge } from "@/components/ui/badge";
+import { useState } from "react";
+import { Package, LayoutDashboard, User, Settings, LogOut, ClipboardList, BarChart3, Moon, Sun, Sparkles } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
+import { DesignStudioModal } from "./DesignStudioModal";
 import { useAuth } from "@/hooks/useAuth";
 import { useTheme } from "@/hooks/useTheme";
 import { useBusinessTerms } from "@/hooks/useBusinessTerms";
@@ -27,6 +28,7 @@ export function DashboardSidebar() {
   const { theme, toggleTheme } = useTheme();
   const terms = useBusinessTerms();
   const navigate = useNavigate();
+  const [studioOpen, setStudioOpen] = useState(false);
 
   const navItems = [
     { title: "Home", url: "/dashboard", icon: LayoutDashboard },
@@ -35,7 +37,6 @@ export function DashboardSidebar() {
     { title: "Analytics", url: "/dashboard/analytics", icon: BarChart3 },
     { title: "Profile", url: "/dashboard/profile", icon: User },
     { title: "Settings", url: "/dashboard/settings", icon: Settings },
-    { title: "AI Design", url: "#", icon: Sparkles, comingSoon: true },
   ];
 
   const handleSignOut = async () => {
@@ -44,6 +45,7 @@ export function DashboardSidebar() {
   };
 
   return (
+    <>
     <Sidebar collapsible="icon">
       <SidebarContent>
         <SidebarGroup>
@@ -57,21 +59,8 @@ export function DashboardSidebar() {
             <SidebarMenu>
               {navItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton asChild={!item.comingSoon}>
-                    {item.comingSoon ? (
-                      <div className="flex items-center gap-2 rounded-md px-3 py-2 text-sm text-muted-foreground/50 cursor-not-allowed">
-                        <item.icon className="h-4 w-4 shrink-0" />
-                        {!collapsed && (
-                          <>
-                            <span>{item.title}</span>
-                            <Badge variant="outline" className="ml-auto text-[9px] px-1.5 py-0 border-muted-foreground/30 text-muted-foreground/50">
-                              Soon
-                            </Badge>
-                          </>
-                        )}
-                      </div>
-                    ) : (
-                      <NavLink
+                  <SidebarMenuButton asChild>
+                    <NavLink
                         to={item.url}
                         end
                         className="flex items-center gap-2 rounded-md px-3 py-2 text-sm transition-colors hover:bg-accent/10"
@@ -80,10 +69,20 @@ export function DashboardSidebar() {
                         <item.icon className="h-4 w-4 shrink-0" />
                         {!collapsed && <span>{item.title}</span>}
                       </NavLink>
-                    )}
                   </SidebarMenuButton>
                 </SidebarMenuItem>
               ))}
+              <SidebarMenuItem>
+                <SidebarMenuButton asChild>
+                  <button
+                    onClick={() => setStudioOpen(true)}
+                    className="flex items-center gap-2 rounded-md px-3 py-2 text-sm transition-colors hover:bg-accent/10 text-primary w-full"
+                  >
+                    <Sparkles className="h-4 w-4 shrink-0" />
+                    {!collapsed && <span>Creative Studio</span>}
+                  </button>
+                </SidebarMenuButton>
+              </SidebarMenuItem>
             </SidebarMenu>
           </SidebarGroupContent>
         </SidebarGroup>
@@ -109,5 +108,7 @@ export function DashboardSidebar() {
         </Button>
       </SidebarFooter>
     </Sidebar>
+    <DesignStudioModal open={studioOpen} onClose={() => setStudioOpen(false)} />
+    </>
   );
 }
