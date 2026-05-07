@@ -25,7 +25,7 @@ import type { Tables } from "@/integrations/supabase/types";
 import { ProductAttributeForm } from "@/components/dashboard/ProductAttributeForm";
 import type { AiAttributeSuggestion } from "@/lib/attributeLibrary";
 import { aiSlugToCategory } from "@/lib/categoryMapping";
-import { AutoDesignModal } from "@/components/dashboard/AutoDesignModal";
+import { DesignStudioModal } from "@/components/dashboard/DesignStudioModal";
 
 type Product = Tables<"products">;
 
@@ -637,12 +637,14 @@ const DashboardProducts = () => {
         </DialogContent>
       </Dialog>
 
-      <AutoDesignModal
-        productId={autoDesignProduct?.id ?? null}
-        productName={autoDesignProduct?.name}
+      <DesignStudioModal
         open={!!autoDesignProduct}
         onClose={() => setAutoDesignProduct(null)}
-        onSaved={() => fetchProducts()}
+        initialProduct={
+          autoDesignProduct
+            ? { id: autoDesignProduct.id, name: autoDesignProduct.name, image_url: autoDesignProduct.image_url ?? null }
+            : null
+        }
       />
     </div>
   );
