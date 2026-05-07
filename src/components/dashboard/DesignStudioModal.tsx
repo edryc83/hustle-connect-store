@@ -11,14 +11,16 @@ import {
 } from "lucide-react";
 import { AutoDesignModal } from "./AutoDesignModal";
 import { INSPIRATIONS, COLOR_THEMES, pickRandomInspiration } from "./designInspirations";
+import { POSTER_OCCASIONS, type PosterOccasion } from "./posterOfTheDay";
+import { CalendarHeart } from "lucide-react";
 
 interface Props {
   open: boolean;
   onClose: () => void;
 }
 
-type Track = "product" | "prompt";
-type Step = "menu" | "template" | "theme" | "final";
+type Track = "product" | "prompt" | "day";
+type Step = "menu" | "occasion" | "template" | "theme" | "final";
 
 interface ProductRow {
   id: string;
@@ -43,6 +45,8 @@ export function DesignStudioModal({ open, onClose }: Props) {
   const [inspirationId, setInspirationId] = useState<string | null>(null);
   // null themeId == "use template default"
   const [themeId, setThemeId] = useState<string | null>(null);
+  const [occasionId, setOccasionId] = useState<string | null>(null);
+  const [extraCopy, setExtraCopy] = useState("");
 
   useEffect(() => {
     if (!open) {
@@ -54,6 +58,8 @@ export function DesignStudioModal({ open, onClose }: Props) {
       setSearch("");
       setInspirationId(null);
       setThemeId(null);
+      setOccasionId(null);
+      setExtraCopy("");
     }
   }, [open]);
 
@@ -75,6 +81,8 @@ export function DesignStudioModal({ open, onClose }: Props) {
 
   const insp = INSPIRATIONS.find((i) => i.id === inspirationId) || null;
   const theme = themeId ? COLOR_THEMES.find((t) => t.id === themeId) : null;
+  const occasion: PosterOccasion | null =
+    POSTER_OCCASIONS.find((o) => o.id === occasionId) || null;
 
   const loadInspirationDataUrl = async (): Promise<string | null> => {
     if (!insp) return null;
@@ -94,8 +102,13 @@ export function DesignStudioModal({ open, onClose }: Props) {
   };
 
   const generateFromPrompt = async () => {
-    if (prompt.trim().length < 3) {
+    const isDay = track === "day";
+    if (!isDay && prompt.trim().length < 3) {
       toast.error("Describe what poster you want");
+      return;
+    }
+    if (isDay && !occasion) {
+      toast.error("Pick an occasion first");
       return;
     }
     setGenerating(true);
@@ -104,10 +117,14 @@ export function DesignStudioModal({ open, onClose }: Props) {
       const inspirationImage = await loadInspirationDataUrl();
       const { data, error } = await supabase.functions.invoke("design-poster-prompt", {
         body: {
-          prompt: prompt.trim(),
+          prompt: isDay ? `Poster of the day: ${occasion!.label}` : prompt.trim(),
           inspiration: insp?.prompt || null,
           inspirationImage,
-          themeColor: theme?.color || null,
+          themeColor: theme?.color || (isDay ? occasion!.accent : null),
+          occasion: isDay ? occasion!.label : null,
+          occasionVibe: isDay ? occasion!.vibe : null,
+          headlineHint: isDay ? occasion!.headlineHint : null,
+          extraCopy: isDay ? extraCopy.trim() || null : null,
         },
       });
       if (error) throw error;
@@ -176,17 +193,29 @@ export function DesignStudioModal({ open, onClose }: Props) {
     if (step === "final") setStep("theme");
     else if (step === "theme") setStep("template");
     else if (step === "template") {
+      if (track === "day") {
+        setStep("occasion");
+        return;
+      }
+      setStep("menu");
+      setTrack(null);
+    } else if (step === "occasion") {
       setStep("menu");
       setTrack(null);
     } else onClose();
   };
 
   const stepIndex =
-    step === "menu" ? 0 : step === "template" ? 1 : step === "theme" ? 2 : 3;
+    step === "menu" ? 0
+      : step === "occasion" ? 1
+      : step === "template" ? (track === "day" ? 2 : 1)
+      : step === "theme" ? (track === "day" ? 3 : 2)
+      : (track === "day" ? 4 : 3);
+  const totalSteps = track === "day" ? 4 : 3;
 
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="max-w-md">
+      <DialogContent className={track === "day" ? "max-w-md sm:max-w-lg h-[100dvh] sm:h-auto sm:max-h-[90vh] p-4 overflow-y-auto" : "max-w-md"}>
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             {step !== "menu" && (
@@ -200,6 +229,7 @@ export function DesignStudioModal({ open, onClose }: Props) {
             )}
             <Sparkles className="h-4 w-4 text-primary" />
             {step === "menu" && "Design Studio"}
+            {step === "occasion" && "Poster of the Day"}
             {step === "template" && "Pick a template"}
             {step === "theme" && "Pick a color"}
             {step === "final" && (track === "product" ? "Choose a product" : "Describe your poster")}
@@ -209,7 +239,7 @@ export function DesignStudioModal({ open, onClose }: Props) {
         {/* Step indicator */}
         {step !== "menu" && (
           <div className="flex items-center gap-1.5 -mt-1">
-            {[1, 2, 3].map((n) => (
+            {Array.from({ length: totalSteps }, (_, i) => i + 1).map((n) => (
               <div
                 key={n}
                 className={`h-1 flex-1 rounded-full transition ${
@@ -251,6 +281,58 @@ export function DesignStudioModal({ open, onClose }: Props) {
                 </div>
               </div>
             </button>
+            <button
+              onClick={() => { setTrack("day"); setStep("occasion"); }}
+              className="group flex items-center gap-3 rounded-2xl border border-border/60 bg-card/40 p-4 text-left hover:border-primary/40 hover:bg-card/80 transition"
+            >
+              <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-primary/15 text-primary">
+                <CalendarHeart className="h-5 w-5" />
+              </div>
+              <div className="flex-1">
+                <div className="font-semibold">Poster of the Day</div>
+                <div className="text-xs text-muted-foreground">
+                  Happy New Month, Motivation Monday & more — a jolly person + your vibe
+                </div>
+              </div>
+            </button>
+          </div>
+        )}
+
+        {/* STEP — OCCASION (day only) */}
+        {step === "occasion" && (
+          <div className="space-y-3">
+            <p className="text-[11px] text-muted-foreground">
+              Pick the occasion. AI will design a poster with a happy person vibing your day.
+            </p>
+            <div className="grid grid-cols-2 gap-2">
+              {POSTER_OCCASIONS.map((o) => {
+                const active = occasionId === o.id;
+                return (
+                  <button
+                    key={o.id}
+                    onClick={() => setOccasionId(o.id)}
+                    className={`flex flex-col items-start gap-1 rounded-xl border p-3 text-left transition ${
+                      active ? "border-primary bg-primary/10" : "border-border/60 hover:border-primary/40"
+                    }`}
+                  >
+                    <span className="text-2xl">{o.emoji}</span>
+                    <span className="text-sm font-semibold">{o.label}</span>
+                  </button>
+                );
+              })}
+            </div>
+            <div>
+              <label className="text-[11px] text-muted-foreground">Any extra vibe to add? (optional)</label>
+              <Textarea
+                placeholder="e.g. We just restocked perfumes — start your month smelling great"
+                value={extraCopy}
+                onChange={(e) => setExtraCopy(e.target.value)}
+                className="min-h-[60px] mt-1"
+              />
+            </div>
+            <Button className="w-full" disabled={!occasionId} onClick={() => setStep("template")}>
+              Next
+            </Button>
           </div>
         )}
 
