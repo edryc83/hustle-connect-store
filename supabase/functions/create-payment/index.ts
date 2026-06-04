@@ -47,7 +47,7 @@ Deno.serve(async (req) => {
     const YO_USERNAME = Deno.env.get("YO_USERNAME")!;
     const YO_PASSWORD = Deno.env.get("YO_PASSWORD")!;
     const YO_API_URL = "https://paymentsapi1.yo.co.ug/ybs/task.php";
-    const IPN_URL = `${SUPABASE_URL.replace(".supabase.co", "")}.supabase.co/functions/v1/yo-ipn`;
+    const IPN_URL = `${SUPABASE_URL.replace(".supabase.co", "")}.supabase.co/functions/v1/yo-ipn?apikey=${ANON}`;
 
     const userClient = createClient(SUPABASE_URL, ANON, {
       global: { headers: { Authorization: authHeader } },
