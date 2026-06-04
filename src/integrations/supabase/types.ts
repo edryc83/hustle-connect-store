@@ -358,6 +358,7 @@ export type Database = {
           store_slug: string | null
           street: string | null
           tiktok_url: string | null
+          token_balance: number
           view_count: number
           welcome_message: string | null
           whatsapp_number: string | null
@@ -393,6 +394,7 @@ export type Database = {
           store_slug?: string | null
           street?: string | null
           tiktok_url?: string | null
+          token_balance?: number
           view_count?: number
           welcome_message?: string | null
           whatsapp_number?: string | null
@@ -428,6 +430,7 @@ export type Database = {
           store_slug?: string | null
           street?: string | null
           tiktok_url?: string | null
+          token_balance?: number
           view_count?: number
           welcome_message?: string | null
           whatsapp_number?: string | null
@@ -485,6 +488,94 @@ export type Database = {
         }
         Relationships: []
       }
+      token_payments: {
+        Row: {
+          amount_local: number | null
+          amount_ugx: number
+          completed_at: string | null
+          created_at: string
+          currency: string
+          eversend_payment_id: string | null
+          id: string
+          package_id: string
+          status: string
+          tokens: number
+          user_id: string
+        }
+        Insert: {
+          amount_local?: number | null
+          amount_ugx: number
+          completed_at?: string | null
+          created_at?: string
+          currency?: string
+          eversend_payment_id?: string | null
+          id?: string
+          package_id: string
+          status?: string
+          tokens: number
+          user_id: string
+        }
+        Update: {
+          amount_local?: number | null
+          amount_ugx?: number
+          completed_at?: string | null
+          created_at?: string
+          currency?: string
+          eversend_payment_id?: string | null
+          id?: string
+          package_id?: string
+          status?: string
+          tokens?: number
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "token_payments_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      token_transactions: {
+        Row: {
+          amount: number
+          created_at: string
+          description: string | null
+          id: string
+          reference_id: string | null
+          type: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          description?: string | null
+          id?: string
+          reference_id?: string | null
+          type: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          description?: string | null
+          id?: string
+          reference_id?: string | null
+          type?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "token_transactions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       user_design_templates: {
         Row: {
           created_at: string
@@ -541,6 +632,14 @@ export type Database = {
       admin_delete_seller: {
         Args: { _admin_id: string; _seller_id: string }
         Returns: undefined
+      }
+      credit_tokens: {
+        Args: { p_amount: number; p_user_id: string }
+        Returns: number
+      }
+      deduct_tokens: {
+        Args: { p_amount: number; p_user_id: string }
+        Returns: number
       }
       delete_email: {
         Args: { message_id: number; queue_name: string }
