@@ -14,21 +14,28 @@ serve(async (req) => {
     const BANNERBEAR_API_KEY = Deno.env.get("BANNERBEAR_API_KEY");
     if (!BANNERBEAR_API_KEY) throw new Error("BANNERBEAR_API_KEY not configured");
 
-    // Fetch all templates from Bannerbear
-    const res = await fetch(`${BB_BASE}/templates`, {
-      headers: { "Authorization": `Bearer ${BANNERBEAR_API_KEY}` },
-    });
-
-    if (!res.ok) {
-      const text = await res.text();
-      console.error("Bannerbear templates error:", res.status, text);
-      return new Response(JSON.stringify({ error: `Bannerbear error: ${res.status}` }), {
-        status: res.status,
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
+    // Fetch ALL templates from Bannerbear (paginated, 25 per page)
+    const bbTemplates: any[] = [];
+    let page = 1;
+    while (true) {
+      const res = await fetch(`${BB_BASE}/templates?page=${page}&limit=100`, {
+        headers: { "Authorization": `Bearer ${BANNERBEAR_API_KEY}` },
       });
+      if (!res.ok) {
+        const text = await res.text();
+        console.error("Bannerbear templates error:", res.status, text);
+        return new Response(JSON.stringify({ error: `Bannerbear error: ${res.status}` }), {
+          status: res.status,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      const batch = await res.json();
+      if (!Array.isArray(batch) || batch.length === 0) break;
+      bbTemplates.push(...batch);
+      if (batch.length < 25) break; // last page
+      page++;
+      if (page > 20) break; // safety cap
     }
-
-    const bbTemplates = await res.json();
 
     // Map Bannerbear templates to our format
     const templates = (Array.isArray(bbTemplates) ? bbTemplates : []).map((t: any) => {
