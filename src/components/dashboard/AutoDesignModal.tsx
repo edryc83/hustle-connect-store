@@ -3,7 +3,13 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Loader2, RefreshCw, Download, Share2, Save, Sparkles, AlertCircle } from "lucide-react";
+import { Loader2, RefreshCw, Download, Share2, Save, Sparkles, AlertCircle, Coins } from "lucide-react";
+import { Capacitor } from "@capacitor/core";
+import { Filesystem, Directory } from "@capacitor/filesystem";
+import { Share } from "@capacitor/share";
+import { useTokens } from "@/hooks/useTokens";
+import { InsufficientTokensModal } from "@/components/tokens/InsufficientTokensModal";
+import { TOKENS_PER_DESIGN } from "@/lib/tokenPackages";
 
 interface Props {
   productId: string | null;
@@ -22,9 +28,15 @@ export function AutoDesignModal({ productId, productName, inspiration, inspirati
   const [error, setError] = useState<string | null>(null);
   const [hasPhone, setHasPhone] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [showInsufficientTokens, setShowInsufficientTokens] = useState(false);
+  const { balance, enabled: tokensEnabled, refetch: refetchTokens } = useTokens();
 
   const generate = useCallback(async () => {
     if (!productId) return;
+    if (tokensEnabled && balance < TOKENS_PER_DESIGN) {
+      setShowInsufficientTokens(true);
+      return;
+    }
     setLoading(true);
     setError(null);
     setUrl(null);
@@ -65,10 +77,15 @@ export function AutoDesignModal({ productId, productName, inspiration, inspirati
         }
       );
       const data = await resp.json();
+      if (resp.status === 402 || data?.error === "insufficient_tokens") {
+        setShowInsufficientTokens(true);
+        return;
+      }
       if (!resp.ok) throw new Error(data?.error || `Error ${resp.status}`);
       if (data?.error) throw new Error(data.error);
       setUrl(data.url);
       setHasPhone(!!data.hasPhone);
+      refetchTokens();
     } catch (e: any) {
       const msg = e?.message || "Failed to generate design";
       setError(msg);
@@ -76,7 +93,7 @@ export function AutoDesignModal({ productId, productName, inspiration, inspirati
     } finally {
       setLoading(false);
     }
-  }, [productId, inspiration, inspirationImage, themeColor]);
+  }, [productId, inspiration, inspirationImage, themeColor, tokensEnabled, balance, refetchTokens]);
 
   useEffect(() => {
     if (open && productId) generate();
@@ -98,21 +115,30 @@ export function AutoDesignModal({ productId, productName, inspiration, inspirati
     try {
       const r = await fetch(url);
       const blob = await r.blob();
-      const blobUrl = URL.createObjectURL(blob);
-      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-      if (isIOS) {
-        // iOS ignores <a download> for cross-origin blobs; open in new tab so user can long-press to save
-        window.open(blobUrl, "_blank");
+
+      if (Capacitor.isNativePlatform()) {
+        const base64 = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve((reader.result as string).split(",")[1]);
+          reader.onerror = reject;
+          reader.readAsDataURL(blob);
+        });
+        const fileName = `${productName || "design"}-${Date.now()}.png`;
+        await Filesystem.writeFile({ path: fileName, data: base64, directory: Directory.Cache });
+        const { uri } = await Filesystem.getUri({ path: fileName, directory: Directory.Cache });
+        await Share.share({ title: productName || "Design", url: uri, dialogTitle: "Save or share your design" });
       } else {
+        const blobUrl = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = blobUrl;
         a.download = `${productName || "design"}.png`;
         document.body.appendChild(a);
         a.click();
         a.remove();
+        setTimeout(() => URL.revokeObjectURL(blobUrl), 30_000);
       }
-      setTimeout(() => URL.revokeObjectURL(blobUrl), 30_000);
-    } catch {
+    } catch (e: any) {
+      if (e?.message?.toLowerCase().includes("cancel")) return;
       toast.error("Could not download image");
     }
   };
@@ -159,11 +185,25 @@ export function AutoDesignModal({ productId, productName, inspiration, inspirati
   };
 
   return (
+    <>
+    <InsufficientTokensModal
+      open={showInsufficientTokens}
+      onClose={() => setShowInsufficientTokens(false)}
+      balance={balance}
+    />
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="max-w-md">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Sparkles className="h-4 w-4 text-primary" /> Auto Design
+          <DialogTitle className="flex items-center justify-between">
+            <span className="flex items-center gap-2">
+              <Sparkles className="h-4 w-4 text-primary" /> Auto Design
+            </span>
+            {tokensEnabled && (
+              <span className="flex items-center gap-1 text-xs font-normal text-muted-foreground">
+                <Coins className="h-3.5 w-3.5 text-amber-400" />
+                {balance} tokens
+              </span>
+            )}
           </DialogTitle>
         </DialogHeader>
 
@@ -212,5 +252,6 @@ export function AutoDesignModal({ productId, productName, inspiration, inspirati
         </div>
       </DialogContent>
     </Dialog>
+    </>
   );
 }

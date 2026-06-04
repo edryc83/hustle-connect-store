@@ -6,6 +6,13 @@ import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
+import { Capacitor } from "@capacitor/core";
+import { Filesystem, Directory } from "@capacitor/filesystem";
+import { Share } from "@capacitor/share";
+import { useTokens } from "@/hooks/useTokens";
+import { InsufficientTokensModal } from "@/components/tokens/InsufficientTokensModal";
+import { TOKENS_PER_DESIGN } from "@/lib/tokenPackages";
+import { Coins } from "lucide-react";
 import {
   Loader2, Sparkles, Package, Wand2, ArrowLeft, Download, Share2, RefreshCw, Search, Shuffle, Check, Upload, Trash2, Copy, ImagePlus,
 } from "lucide-react";
@@ -54,6 +61,8 @@ export function DesignStudioModal({ open, onClose, initialProduct = null }: Prop
   const [userTemplates, setUserTemplates] = useState<Array<{ id: string; label: string; image: string; prompt: string | null; user: true }>>([]);
   const [uploadingTemplate, setUploadingTemplate] = useState(false);
   const [copyMode, setCopyMode] = useState<CopyMode | null>(null);
+  const [showInsufficientTokens, setShowInsufficientTokens] = useState(false);
+  const { balance, enabled: tokensEnabled, refetch: refetchTokens } = useTokens();
 
   useEffect(() => {
     if (!open) {
@@ -223,6 +232,10 @@ export function DesignStudioModal({ open, onClose, initialProduct = null }: Prop
       toast.error("Pick an occasion first");
       return;
     }
+    if (tokensEnabled && balance < TOKENS_PER_DESIGN) {
+      setShowInsufficientTokens(true);
+      return;
+    }
     setGenerating(true);
     setResultUrl(null);
     try {
@@ -250,9 +263,14 @@ export function DesignStudioModal({ open, onClose, initialProduct = null }: Prop
         }
       );
       const data = await resp.json();
+      if (resp.status === 402 || data?.error === "insufficient_tokens") {
+        setShowInsufficientTokens(true);
+        return;
+      }
       if (!resp.ok) throw new Error(data?.error || `Error ${resp.status}`);
       if (data?.error) throw new Error(data.error);
       setResultUrl(data.url);
+      refetchTokens();
     } catch (e: any) {
       toast.error(e?.message || "Failed to generate");
     } finally {
@@ -265,20 +283,30 @@ export function DesignStudioModal({ open, onClose, initialProduct = null }: Prop
     try {
       const r = await fetch(resultUrl);
       const blob = await r.blob();
-      const blobUrl = URL.createObjectURL(blob);
-      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
-      if (isIOS) {
-        window.open(blobUrl, "_blank");
+
+      if (Capacitor.isNativePlatform()) {
+        const base64 = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve((reader.result as string).split(",")[1]);
+          reader.onerror = reject;
+          reader.readAsDataURL(blob);
+        });
+        const fileName = `poster-${Date.now()}.png`;
+        await Filesystem.writeFile({ path: fileName, data: base64, directory: Directory.Cache });
+        const { uri } = await Filesystem.getUri({ path: fileName, directory: Directory.Cache });
+        await Share.share({ title: "Poster", url: uri, dialogTitle: "Save or share your poster" });
       } else {
+        const blobUrl = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = blobUrl;
         a.download = `poster-${Date.now()}.png`;
         document.body.appendChild(a);
         a.click();
         a.remove();
+        setTimeout(() => URL.revokeObjectURL(blobUrl), 30_000);
       }
-      setTimeout(() => URL.revokeObjectURL(blobUrl), 30_000);
-    } catch {
+    } catch (e: any) {
+      if (e?.message?.toLowerCase().includes("cancel")) return;
       toast.error("Download failed");
     }
   };
@@ -369,10 +397,17 @@ export function DesignStudioModal({ open, onClose, initialProduct = null }: Prop
       : track === "prompt" ? 3 : 4;
 
   return (
+    <>
+    <InsufficientTokensModal
+      open={showInsufficientTokens}
+      onClose={() => setShowInsufficientTokens(false)}
+      balance={balance}
+    />
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="max-w-full w-screen h-[100dvh] sm:max-w-lg sm:h-auto sm:max-h-[90vh] p-4 overflow-y-auto rounded-none sm:rounded-lg flex flex-col gap-3">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
+          <DialogTitle className="flex items-center gap-2 justify-between">
+            <span className="flex items-center gap-2">
             {step !== "menu" && (
               <button
                 onClick={goBack}
@@ -391,6 +426,12 @@ export function DesignStudioModal({ open, onClose, initialProduct = null }: Prop
             {step === "final" && "Describe your poster"}
             {step === "source" && "Upload your design"}
             {step === "use" && "How to use it"}
+            </span>
+            {tokensEnabled && (
+              <span className="flex items-center gap-1 text-xs font-normal text-muted-foreground">
+                <Coins className="h-3.5 w-3.5 text-amber-400" /> {balance}
+              </span>
+            )}
           </DialogTitle>
         </DialogHeader>
 
@@ -878,5 +919,6 @@ export function DesignStudioModal({ open, onClose, initialProduct = null }: Prop
         )}
       </DialogContent>
     </Dialog>
+    </>
   );
 }

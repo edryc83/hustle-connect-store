@@ -10,6 +10,7 @@ import { useTheme } from "@/hooks/useTheme";
 import { Moon, Sun, LogOut, Settings, Sparkles } from "lucide-react";
 import { Link } from "react-router-dom";
 import { DesignStudioModal } from "./DesignStudioModal";
+import { TokenBadge } from "@/components/tokens/TokenBadge";
 
 export function DashboardLayout({ children }: { children: ReactNode }) {
   const { user, loading, signOut } = useAuth();
@@ -51,6 +52,7 @@ export function DashboardLayout({ children }: { children: ReactNode }) {
               </div>
             </div>
             <div className="flex items-center gap-2">
+              <TokenBadge />
               <Link
                 to="/dashboard/settings"
                 className="flex h-9 w-9 items-center justify-center rounded-full border bg-card/60 backdrop-blur-sm text-muted-foreground hover:text-foreground transition-colors md:hidden"

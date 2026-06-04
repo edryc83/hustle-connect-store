@@ -57,6 +57,26 @@ Deno.serve(async (req) => {
 
     const admin = createClient(SUPABASE_URL, SERVICE_ROLE);
 
+    // Token gate
+    const TOKENS_PER_DESIGN = 10;
+    const { data: configRow } = await admin
+      .from("app_config").select("value").eq("key", "tokens_enabled").maybeSingle();
+    const tokensEnabled = configRow?.value === "true";
+    let tokenDeducted = false;
+
+    if (tokensEnabled) {
+      const { error: deductErr } = await admin.rpc("deduct_tokens", {
+        p_user_id: userId,
+        p_amount: TOKENS_PER_DESIGN,
+      });
+      if (deductErr) {
+        return new Response(JSON.stringify({ error: "insufficient_tokens" }), {
+          status: 402, headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      tokenDeducted = true;
+    }
+
     const { data: profile } = await admin
       .from("profiles")
       .select("store_name, whatsapp_number, accent_color")
@@ -302,6 +322,7 @@ Deno.serve(async (req) => {
       if (!openaiResp.ok) {
         const errText = await openaiResp.text();
         console.error("OpenAI error:", openaiResp.status, errText);
+        if (tokenDeducted) await admin.rpc("credit_tokens", { p_user_id: userId, p_amount: TOKENS_PER_DESIGN });
         let msg = "Image generation failed";
         if (openaiResp.status === 401) msg = "OpenAI API key is invalid";
         else if (openaiResp.status === 429) msg = "OpenAI is rate-limiting requests. Try again in a moment.";
@@ -315,6 +336,7 @@ Deno.serve(async (req) => {
       const openaiJson = await openaiResp.json();
       const candidate: string | undefined = openaiJson?.data?.[0]?.b64_json;
       if (!candidate) {
+        if (tokenDeducted) await admin.rpc("credit_tokens", { p_user_id: userId, p_amount: TOKENS_PER_DESIGN });
         return new Response(JSON.stringify({ error: "No image returned" }), {
           status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" },
         });
@@ -325,6 +347,7 @@ Deno.serve(async (req) => {
       if (validation.ok) break;
     }
     if (!b64) {
+      if (tokenDeducted) await admin.rpc("credit_tokens", { p_user_id: userId, p_amount: TOKENS_PER_DESIGN });
       return new Response(JSON.stringify({ error: "No image returned" }), {
         status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
