@@ -68,6 +68,13 @@ export function DesignStudioModal({ open, onClose, initialProduct = null }: Prop
       setOccasionId(null);
       setExtraCopy("");
       setCopyMode(null);
+      // Release any scroll lock Radix leaves behind on iOS
+      const t = setTimeout(() => {
+        document.body.removeAttribute("data-scroll-locked");
+        document.body.style.overflow = "";
+        document.body.style.paddingRight = "";
+      }, 250);
+      return () => clearTimeout(t);
     } else if (initialProduct) {
       // Pre-select product and jump straight into the template step
       setTrack("product");
@@ -220,21 +227,32 @@ export function DesignStudioModal({ open, onClose, initialProduct = null }: Prop
     setResultUrl(null);
     try {
       const inspirationImage = await loadInspirationDataUrl();
-      const { data, error } = await supabase.functions.invoke("design-poster-prompt", {
-        body: {
-          prompt: isDay ? `Poster of the day: ${occasion!.label}` : prompt.trim(),
-          inspiration: insp?.prompt || null,
-          inspirationImage,
-          themeColor: theme?.color || (isDay ? occasion!.accent : null),
-          occasion: isDay ? occasion!.label : null,
-          occasionVibe: isDay ? occasion!.vibe : null,
-          headlineHint: isDay ? occasion!.headlineHint : null,
-          extraCopy: isDay ? extraCopy.trim() || null : null,
-        },
-      });
-      if (error) throw error;
-      if ((data as any)?.error) throw new Error((data as any).error);
-      setResultUrl((data as any).url);
+      const { data: { session } } = await supabase.auth.getSession();
+      const resp = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/design-poster-prompt`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${session?.access_token}`,
+            "apikey": import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+          },
+          body: JSON.stringify({
+            prompt: isDay ? `Poster of the day: ${occasion!.label}` : prompt.trim(),
+            inspiration: insp?.prompt || null,
+            inspirationImage,
+            themeColor: theme?.color || (isDay ? occasion!.accent : null),
+            occasion: isDay ? occasion!.label : null,
+            occasionVibe: isDay ? occasion!.vibe : null,
+            headlineHint: isDay ? occasion!.headlineHint : null,
+            extraCopy: isDay ? extraCopy.trim() || null : null,
+          }),
+        }
+      );
+      const data = await resp.json();
+      if (!resp.ok) throw new Error(data?.error || `Error ${resp.status}`);
+      if (data?.error) throw new Error(data.error);
+      setResultUrl(data.url);
     } catch (e: any) {
       toast.error(e?.message || "Failed to generate");
     } finally {
@@ -247,12 +265,19 @@ export function DesignStudioModal({ open, onClose, initialProduct = null }: Prop
     try {
       const r = await fetch(resultUrl);
       const blob = await r.blob();
-      const a = document.createElement("a");
-      a.href = URL.createObjectURL(blob);
-      a.download = `poster-${Date.now()}.png`;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
+      const blobUrl = URL.createObjectURL(blob);
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+      if (isIOS) {
+        window.open(blobUrl, "_blank");
+      } else {
+        const a = document.createElement("a");
+        a.href = blobUrl;
+        a.download = `poster-${Date.now()}.png`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+      }
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 30_000);
     } catch {
       toast.error("Download failed");
     }
@@ -292,6 +317,8 @@ export function DesignStudioModal({ open, onClose, initialProduct = null }: Prop
         open={open}
         onClose={() => {
           setSelectedProduct(null);
+          setStep("menu");
+          setTrack(null);
           onClose();
         }}
       />

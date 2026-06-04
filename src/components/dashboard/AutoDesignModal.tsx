@@ -46,18 +46,29 @@ export function AutoDesignModal({ productId, productName, inspiration, inspirati
           inspirationDataUrl = null;
         }
       }
-      const { data, error: fnErr } = await supabase.functions.invoke("auto-design-product", {
-        body: {
-          productId,
-          inspiration: inspiration || null,
-          inspirationImage: inspirationDataUrl,
-          themeColor: themeColor || null,
-        },
-      });
-      if (fnErr) throw fnErr;
-      if ((data as any)?.error) throw new Error((data as any).error);
-      setUrl((data as any).url);
-      setHasPhone(!!(data as any).hasPhone);
+      const { data: { session } } = await supabase.auth.getSession();
+      const resp = await fetch(
+        `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/auto-design-product`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${session?.access_token}`,
+            "apikey": import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY,
+          },
+          body: JSON.stringify({
+            productId,
+            inspiration: inspiration || null,
+            inspirationImage: inspirationDataUrl,
+            themeColor: themeColor || null,
+          }),
+        }
+      );
+      const data = await resp.json();
+      if (!resp.ok) throw new Error(data?.error || `Error ${resp.status}`);
+      if (data?.error) throw new Error(data.error);
+      setUrl(data.url);
+      setHasPhone(!!data.hasPhone);
     } catch (e: any) {
       const msg = e?.message || "Failed to generate design";
       setError(msg);
@@ -72,6 +83,13 @@ export function AutoDesignModal({ productId, productName, inspiration, inspirati
     if (!open) {
       setUrl(null);
       setError(null);
+      // Release any scroll lock Radix leaves behind on iOS
+      const t = setTimeout(() => {
+        document.body.removeAttribute("data-scroll-locked");
+        document.body.style.overflow = "";
+        document.body.style.paddingRight = "";
+      }, 250);
+      return () => clearTimeout(t);
     }
   }, [open, productId, generate]);
 
@@ -80,12 +98,20 @@ export function AutoDesignModal({ productId, productName, inspiration, inspirati
     try {
       const r = await fetch(url);
       const blob = await r.blob();
-      const a = document.createElement("a");
-      a.href = URL.createObjectURL(blob);
-      a.download = `${productName || "design"}.png`;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
+      const blobUrl = URL.createObjectURL(blob);
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+      if (isIOS) {
+        // iOS ignores <a download> for cross-origin blobs; open in new tab so user can long-press to save
+        window.open(blobUrl, "_blank");
+      } else {
+        const a = document.createElement("a");
+        a.href = blobUrl;
+        a.download = `${productName || "design"}.png`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+      }
+      setTimeout(() => URL.revokeObjectURL(blobUrl), 30_000);
     } catch {
       toast.error("Could not download image");
     }
