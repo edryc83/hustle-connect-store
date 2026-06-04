@@ -3,13 +3,15 @@ import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useBusinessTerms } from "@/hooks/useBusinessTerms";
+import { useTokens } from "@/hooks/useTokens";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import { formatPrice } from "@/lib/currency";
 import {
-  Camera, Loader2, Sparkles, Eye, ShoppingCart, Settings, Pencil, Check, X, Share2, Trash2, AlertTriangle,
+  Camera, Loader2, Sparkles, Eye, ShoppingCart, Settings, Pencil, Check, X, Share2, Trash2, AlertTriangle, Coins,
 } from "lucide-react";
+import { TokenPackagesModal } from "@/components/tokens/TokenPackagesModal";
 
 import whatsappIcon from "@/assets/whatsapp-icon.png";
 import AfristallLogo from "@/components/AfristallLogo";
@@ -27,6 +29,8 @@ type Product = Tables<"products">;
 const DashboardProfile = () => {
   const { user } = useAuth();
   const terms = useBusinessTerms();
+  const { balance: tokenBalance, refetch: refetchTokens } = useTokens();
+  const [showTokenModal, setShowTokenModal] = useState(false);
 
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState<any>(null);
@@ -305,6 +309,27 @@ const DashboardProfile = () => {
           </Link>
         </div>
 
+        {/* Token balance card */}
+        <div className="mt-3 rounded-xl border border-amber-400/30 bg-gradient-to-br from-amber-500/5 to-yellow-400/5 p-3 flex items-center gap-3">
+          <div className="h-10 w-10 rounded-full bg-amber-400/15 flex items-center justify-center shrink-0">
+            <Coins className="h-5 w-5 text-amber-400" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-xs text-muted-foreground">Design tokens</p>
+            <p className="font-bold text-lg leading-tight">
+              {tokenBalance} <span className="text-sm font-normal text-muted-foreground">tokens</span>
+            </p>
+            <p className="text-[10px] text-muted-foreground">10 tokens = 1 design</p>
+          </div>
+          <Button
+            size="sm"
+            className="shrink-0 h-8 px-3 text-xs gap-1 bg-amber-500 hover:bg-amber-600 text-white"
+            onClick={() => setShowTokenModal(true)}
+          >
+            <Coins className="h-3.5 w-3.5" /> Buy
+          </Button>
+        </div>
+
         {/* View as buyer button */}
         {profile.store_slug && (
           <div className="mt-3">
@@ -427,6 +452,8 @@ const DashboardProfile = () => {
           </>
         )}
       </div>
+
+      <TokenPackagesModal open={showTokenModal} onClose={() => { setShowTokenModal(false); refetchTokens(); }} />
 
       {/* Product detail / edit modal */}
       <Dialog open={!!selectedProduct} onOpenChange={(open) => !open && setSelectedProduct(null)}>

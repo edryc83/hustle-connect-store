@@ -113,11 +113,27 @@ Deno.serve(async (req) => {
   </Request>
 </AutoCreate>`;
 
-    const yoResp = await fetch(YO_API_URL, {
-      method: "POST",
-      headers: { "Content-Type": "text/xml; charset=UTF-8" },
-      body: xml,
-    });
+    const abortCtrl = new AbortController();
+    const timeoutId = setTimeout(() => abortCtrl.abort(), 25_000);
+    let yoResp: Response;
+    try {
+      yoResp = await fetch(YO_API_URL, {
+        method: "POST",
+        headers: { "Content-Type": "text/xml; charset=UTF-8" },
+        body: xml,
+        signal: abortCtrl.signal,
+      });
+    } catch (fetchErr: any) {
+      clearTimeout(timeoutId);
+      await admin.from("token_payments").update({ status: "failed" }).eq("id", paymentId);
+      const msg = fetchErr?.name === "AbortError"
+        ? "Payment gateway timed out. Please try again."
+        : `Could not reach payment gateway: ${fetchErr?.message}`;
+      return new Response(JSON.stringify({ error: msg }), {
+        status: 502, headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+    clearTimeout(timeoutId);
 
     const yoText = await yoResp.text();
     console.log("Yo Uganda response:", yoText);
