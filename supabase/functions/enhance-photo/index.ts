@@ -75,17 +75,18 @@ Deno.serve(async (req) => {
 
     // Build the cleaning / enhancement prompt
     const enhancePrompt = [
-      "TASK: High-end professional photo retouching. This is NOT image generation. Treat the input as a RAW phone photo being finished by a top commercial retoucher in Capture One + Photoshop. The goal is MAGAZINE / FLAGSHIP E-COMMERCE QUALITY output of the EXACT SAME scene — never a different photo.",
+      "TASK: WORLD-CLASS commercial photo finishing. This is NOT image generation. Treat the input as a RAW phone capture being finished by the best retoucher in the world inside Capture One + Photoshop, shot on the best medium-format camera (Phase One / Hasselblad) with prime lenses in a top-tier studio. The output must look like a flagship campaign / Apple-keynote / Vogue-cover quality photograph of the EXACT SAME scene — never a different photo.",
       mode === "product"
-        ? "Goal: deliver a tack-sharp, studio-grade product photograph of the EXACT SAME physical object — full of fine detail, clean micro-contrast, balanced studio-style lighting, and a refined background — while keeping the subject 100% faithful to the input."
-        : "Goal: deliver a tack-sharp, studio-grade photograph of the EXACT SAME scene — rich detail, clean lighting, refined background — while keeping every subject 100% faithful to the input.",
+        ? "Goal: deliver a razor-sharp, studio-grade product photograph of the EXACT SAME physical object — every feature crystal clear, every texture readable, perfectly lit, perfectly finished — while keeping the subject 100% faithful to the input."
+        : "Goal: deliver a razor-sharp, studio-grade photograph of the EXACT SAME scene — every detail crystal clear, perfectly lit, perfectly finished — while keeping every subject 100% faithful to the input.",
       "",
-      "QUALITY BAR (push these to the maximum):",
-      "- Resolution feel: ultra sharp, high micro-contrast, crisp edges, fine texture preserved (fabric weave, brushed metal, skin pores, leather grain, screen pixels).",
-      "- Lighting: clean studio-style key + soft fill that REPLACES harsh phone-flash hot spots and muddy ambient light, but keeps the SAME overall light direction so the subject still looks like itself. Gentle, believable highlights and shadow roll-off. No flat, washed-out look.",
-      "- Color: accurate white balance, natural skin tones, true brand colors, deep but not crushed blacks, clean whites. Wide tonal range. No oversaturation, no Instagram filter look, no color shifts.",
-      "- Background: keep the SAME background, but make it look intentional — denoise it, smooth distracting texture, gently blur clutter, deepen/clean the tone. Only when the original background is truly unusable, replace it with a simple seamless studio backdrop that matches the existing tone; never invent a new environment.",
-      "- Output should be indistinguishable from a high-end commercial product shoot in sharpness, lighting, and finish.",
+      "QUALITY BAR — push every dimension to world-class maximum:",
+      "- Sharpness: tack-sharp on the subject, edge-to-edge clarity, deep depth of focus on the product. Every feature (buttons, ports, lens rings, stitching, labels, fabric weave, brushed metal, leather grain, screen pixels, text, logos) must be crisp and fully legible. No softness, no motion blur, no smear, no AI mushiness.",
+      "- Detail & micro-contrast: maximum fine detail and micro-contrast. Real texture preserved and enhanced — not smoothed, not plasticky, not over-denoised.",
+      "- Lighting: world-class studio lighting — clean key + soft fill + subtle rim, replacing harsh phone-flash hot spots, muddy shadows, mixed color temperatures, and ambient ugliness. Keep the SAME overall light direction so the subject still looks like itself. Beautiful highlight roll-off, clean specular highlights, controlled shadows. No flat, washed-out, or HDR look.",
+      "- Color: perfect white balance, natural skin tones, true brand colors, deep clean blacks (not crushed), pure clean whites (not blown). Wide, rich tonal range. No oversaturation, no Instagram filter, no color cast.",
+      "- Background & framing: keep the SAME background and SAME framing, but make them intentional — denoise, smooth distracting texture, gently blur clutter, deepen/clean the tone. You MAY tighten the crop slightly or trim unnecessary empty/cluttered edges if and only if it improves composition WITHOUT cutting any part of the subject, hands, or held items. Only when the original background is truly unusable, replace it with a simple seamless studio backdrop matching the existing tone — never invent a new environment, never add props.",
+      "- Finish: indistinguishable from a high-end commercial shoot — Apple product page, Vogue editorial, Leica gallery print level.",
       "",
       "ABSOLUTE RULES — DO NOT BREAK:",
       "1. DO NOT change, replace, redraw, restyle, or 'idealize' the subject. The product/object/person in the output MUST be pixel-faithful to the input: same exact model, same exact color shade, same exact shape, same exact size, same exact angle, same exact position, same exact reflections, same exact imperfections in shape.",
