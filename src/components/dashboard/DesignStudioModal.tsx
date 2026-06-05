@@ -17,6 +17,7 @@ import {
   Loader2, Sparkles, Package, Wand2, ArrowLeft, Download, Share2, RefreshCw, Search, Shuffle, Check, Upload, Trash2, Copy, ImagePlus,
 } from "lucide-react";
 import { AutoDesignModal } from "./AutoDesignModal";
+import { StudioShotModal } from "./StudioShotModal";
 import { INSPIRATIONS, COLOR_THEMES, pickRandomInspiration } from "./designInspirations";
 import { POSTER_OCCASIONS, POSTER_OF_THE_DAY_TEMPLATES, getTodaysOccasions, type PosterOccasion } from "./posterOfTheDay";
 import { CalendarHeart } from "lucide-react";
@@ -62,6 +63,7 @@ export function DesignStudioModal({ open, onClose, initialProduct = null }: Prop
   const [uploadingTemplate, setUploadingTemplate] = useState(false);
   const [copyMode, setCopyMode] = useState<CopyMode | null>(null);
   const [showInsufficientTokens, setShowInsufficientTokens] = useState(false);
+  const [studioShotOpen, setStudioShotOpen] = useState(false);
   const { balance, enabled: tokensEnabled, refetch: refetchTokens } = useTokens();
 
   useEffect(() => {
