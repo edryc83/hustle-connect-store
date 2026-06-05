@@ -413,8 +413,10 @@ export function DesignStudioModal({ open, onClose, initialProduct = null }: Prop
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
       <DialogContent
         hideCloseButton
-        className="max-w-full w-screen h-[100dvh] sm:max-w-lg sm:h-auto sm:max-h-[90vh] p-4 rounded-none sm:rounded-lg flex flex-col gap-3"
+        className="max-w-full w-screen h-[100dvh] sm:max-w-lg sm:h-auto sm:max-h-[90vh] p-4 rounded-none sm:rounded-lg gap-3"
         style={{
+          display: 'flex',
+          flexDirection: 'column',
           top: 0, left: 0, right: 0, transform: 'none',
           paddingTop: 'max(1rem, env(safe-area-inset-top))',
           paddingBottom: 'max(1rem, env(safe-area-inset-bottom))',
@@ -621,7 +623,7 @@ export function DesignStudioModal({ open, onClose, initialProduct = null }: Prop
                 </Button>
               </div>
             </div>
-            <div className="grid grid-cols-3 gap-1.5 flex-1 min-h-0 overflow-y-auto -mx-1 px-1 pb-2">
+            <div className="grid grid-cols-3 gap-1.5 flex-1 min-h-0 overflow-y-auto -mx-1 px-1 pb-2" style={{ minHeight: 200 }}>
               {templatePool.map((i: any) => {
                 const active = inspirationId === i.id;
                 return (
