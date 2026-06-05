@@ -74,30 +74,9 @@ Deno.serve(async (req) => {
     }
 
     // Build the cleaning / enhancement prompt
-    const enhancePrompt = [
-      "TASK: WORLD-CLASS commercial photo finishing. This is NOT image generation. Treat the input as a RAW phone capture being finished by the best retoucher in the world inside Capture One + Photoshop, shot on the best medium-format camera (Phase One / Hasselblad) with prime lenses in a top-tier studio. The output must look like a flagship campaign / Apple-keynote / Vogue-cover quality photograph of the EXACT SAME scene — never a different photo.",
-      mode === "product"
-        ? "Goal: deliver a razor-sharp, studio-grade product photograph of the EXACT SAME physical object — every feature crystal clear, every texture readable, perfectly lit, perfectly finished — while keeping the subject 100% faithful to the input."
-        : "Goal: deliver a razor-sharp, studio-grade photograph of the EXACT SAME scene — every detail crystal clear, perfectly lit, perfectly finished — while keeping every subject 100% faithful to the input.",
-      "",
-      "QUALITY BAR — push every dimension to world-class maximum:",
-      "- Sharpness: tack-sharp on the subject, edge-to-edge clarity, deep depth of focus on the product. Every feature (buttons, ports, lens rings, stitching, labels, fabric weave, brushed metal, leather grain, screen pixels, text, logos) must be crisp and fully legible. No softness, no motion blur, no smear, no AI mushiness.",
-      "- Detail & micro-contrast: maximum fine detail and micro-contrast. Real texture preserved and enhanced — not smoothed, not plasticky, not over-denoised.",
-      "- Lighting: world-class studio lighting — clean key + soft fill + subtle rim, replacing harsh phone-flash hot spots, muddy shadows, mixed color temperatures, and ambient ugliness. Keep the SAME overall light direction so the subject still looks like itself. Beautiful highlight roll-off, clean specular highlights, controlled shadows. No flat, washed-out, or HDR look.",
-      "- Color: perfect white balance, natural skin tones, true brand colors, deep clean blacks (not crushed), pure clean whites (not blown). Wide, rich tonal range. No oversaturation, no Instagram filter, no color cast.",
-      "- Background & framing: keep the SAME background and SAME framing, but make them intentional — denoise, smooth distracting texture, gently blur clutter, deepen/clean the tone. You MAY tighten the crop slightly or trim unnecessary empty/cluttered edges if and only if it improves composition WITHOUT cutting any part of the subject, hands, or held items. Only when the original background is truly unusable, replace it with a simple seamless studio backdrop matching the existing tone — never invent a new environment, never add props.",
-      "- Finish: indistinguishable from a high-end commercial shoot — Apple product page, Vogue editorial, Leica gallery print level.",
-      "",
-      "ABSOLUTE RULES — DO NOT BREAK:",
-      "1. DO NOT change, replace, redraw, restyle, or 'idealize' the subject. The product/object/person in the output MUST be pixel-faithful to the input: same exact model, same exact color shade, same exact shape, same exact size, same exact angle, same exact position, same exact reflections, same exact imperfections in shape.",
-      "2. DO NOT swap the product for a stock / marketing / render / press version of itself. If the input is a real used iPhone held in a hand, the output must still be THAT real used iPhone in THAT hand — not a clean press-render of an iPhone on a grey backdrop.",
-      "3. DO NOT remove, add, move, or re-pose objects, hands, fingers, supporting surfaces, or held items. Keep composition, framing, crop, camera angle, perspective, and zoom IDENTICAL.",
-      "4. DO NOT change brand colors, logos, text, labels, packaging, buttons, ports, camera lens layout, screen content, or any physical detail of the product.",
-      "5. DO NOT smooth away real product features, real wear, real scratches, real wrinkles, or real skin/material texture. Only remove dust, lint, sensor spots, and noise.",
-      "6. If you cannot raise quality without changing the subject, prefer faithfulness. Faithfulness beats prettiness.",
-      "",
-      "OUTPUT: a single, maximum-quality retouched photograph of the exact same scene. No added text, logos, badges, borders, frames, watermarks, or signatures. It must look like the user's own photo, shot in a professional studio with pro lighting and a pro camera — not a different photo.",
-    ].join("\n");
+    const enhancePrompt = mode === "product"
+      ? "Transform this phone photo of a product into a stunning, professional studio product shot. Place the product on a clean, seamless light studio backdrop with beautiful soft studio lighting, gentle shadows, and a polished commercial look — like a high-end e-commerce or magazine product photo. Make it sharp, crisp, vibrant, and beautifully lit. Keep the product itself EXACTLY the same — same shape, same label, same colors, same text, same packaging, same proportions. Do not redesign the product, do not change the label, do not alter the logo or text. Only improve the lighting, background, sharpness, and overall photo quality. No added text, watermarks, badges, or borders."
+      : "Transform this phone photo into a stunning, professional studio-quality photograph. Improve lighting, sharpness, clarity, and color so it looks like it was shot with a high-end camera in a beautiful studio. Clean up the background and remove distractions while keeping the subject and scene exactly as they are. Keep every person and object faithful to the original — same faces, same clothes, same poses, same items. No added text, watermarks, badges, or borders.";
 
     // Call Lovable AI Gateway with Gemini image-edit model
     const aiResp = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
