@@ -75,19 +75,28 @@ Deno.serve(async (req) => {
 
     // Build the cleaning / enhancement prompt
     const enhancePrompt = [
+      "TASK: Photo retouching only. This is NOT image generation. Treat the input as a RAW photo to be cleaned up in Lightroom/Photoshop — not as a reference to recreate.",
       mode === "product"
-        ? "Transform this phone-quality product photo into a clean, premium e-commerce studio shot."
-        : "Transform this phone-quality photo into a crisp, sharp, premium-looking photo.",
-      "PRESERVE the exact subject, shape, colors, labels, text, packaging and proportions — do NOT redesign, recolor, or replace the product. This is enhancement, not generation.",
-      "Improvements to apply:",
-      "- Remove noise, grain and motion blur. Sharpen edges and fine details.",
-      "- Correct white balance and exposure. Lift shadows gently, recover highlights.",
-      "- Apply soft, even studio-style lighting that flatters the subject. Remove harsh phone-flash hot spots.",
-      "- Boost clarity and natural color saturation tastefully — do not oversaturate or change brand colors.",
-      "- Clean up the background: smooth out clutter, distracting objects, dirty surfaces, fingers, watermarks. Keep the existing background style if it works, otherwise replace with a clean soft neutral seamless studio backdrop (light grey, off-white, or a subtle gradient) that complements the subject.",
-      "- Straighten and recenter the subject if it is slightly tilted. Crop tightly enough to feel intentional but never crop the subject.",
-      "- Remove visible dust, scratches, lint, and small skin blemishes naturally.",
-      "Result must look like it was shot with a professional DSLR in a small studio — not like an AI render. No added text, no logos, no badges, no borders, no frames. Output a single high-quality photo.",
+        ? "Goal: make this phone-quality product photo look like a clean, premium e-commerce studio shot of the EXACT SAME physical object."
+        : "Goal: make this phone-quality photo look crisp, sharp, and premium — of the EXACT SAME scene.",
+      "",
+      "ABSOLUTE RULES — DO NOT BREAK:",
+      "1. DO NOT change, replace, redraw, restyle, or 'idealize' the subject. The product/object in the output MUST be pixel-faithful to the input: same exact model, same exact color shade, same exact shape, same exact size, same exact angle, same exact position, same exact reflections, same exact imperfections in shape.",
+      "2. DO NOT swap the product for a stock/marketing/render version of itself. If the input is a real used iPhone held in a hand, the output must still be THAT real used iPhone in THAT hand — not a clean press-render of an iPhone on a grey backdrop.",
+      "3. DO NOT remove, add, or move objects in the scene. Hands, fingers, surfaces the product is resting on, and held items MUST stay exactly where they are. Do not 'float' the product or place it on a new backdrop.",
+      "4. DO NOT change camera angle, perspective, framing, crop, or zoom. Same composition in, same composition out.",
+      "5. DO NOT change brand colors, logos, text, labels, packaging, buttons, ports, camera lens layout, or any physical detail of the product.",
+      "6. If you cannot improve the photo without changing the subject, return it almost unchanged. Faithfulness beats prettiness.",
+      "",
+      "ALLOWED IMPROVEMENTS (retouching only, applied to the existing pixels):",
+      "- Reduce noise, grain, and motion blur. Sharpen existing edges and fine details.",
+      "- Correct white balance and exposure. Lift shadows gently, recover blown highlights.",
+      "- Even out harsh phone-flash hot spots and uneven lighting — but keep the same light direction.",
+      "- Tasteful clarity and natural saturation. Never oversaturate. Never shift hues.",
+      "- Clean the background ONLY by reducing noise, smoothing texture, and softly de-emphasizing clutter that is already there. Do NOT replace the background with a studio backdrop unless the original background is unusable; if you must, keep the subject, hand, and any supporting surface untouched.",
+      "- Remove dust specks, lint, sensor spots — not product features.",
+      "",
+      "OUTPUT: a single retouched photograph of the exact same scene. No added text, logos, badges, borders, frames, watermarks, or signatures. It must look like a better-lit version of the user's own photo, not a different photo.",
     ].join("\n");
 
     // Call Lovable AI Gateway with Gemini image-edit model
