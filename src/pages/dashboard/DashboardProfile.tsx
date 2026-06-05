@@ -29,7 +29,7 @@ type Product = Tables<"products">;
 const DashboardProfile = () => {
   const { user } = useAuth();
   const terms = useBusinessTerms();
-  const { balance: tokenBalance, refetch: refetchTokens } = useTokens();
+  const { balance: tokenBalance, enabled: tokensEnabled, refetch: refetchTokens } = useTokens();
   const [showTokenModal, setShowTokenModal] = useState(false);
 
   const [loading, setLoading] = useState(true);
