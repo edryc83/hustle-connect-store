@@ -455,7 +455,7 @@ const DashboardProfile = () => {
         )}
       </div>
 
-      <TokenPackagesModal open={showTokenModal} onClose={() => { setShowTokenModal(false); refetchTokens(); }} />
+      {tokensEnabled && <TokenPackagesModal open={showTokenModal} onClose={() => { setShowTokenModal(false); refetchTokens(); }} />}
 
       {/* Product detail / edit modal */}
       <Dialog open={!!selectedProduct} onOpenChange={(open) => !open && setSelectedProduct(null)}>
