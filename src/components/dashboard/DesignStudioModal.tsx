@@ -623,7 +623,7 @@ export function DesignStudioModal({ open, onClose, initialProduct = null }: Prop
                 </Button>
               </div>
             </div>
-            <div className="grid grid-cols-3 gap-1.5 flex-1 min-h-0 overflow-y-auto -mx-1 px-1 pb-2" style={{ minHeight: 200 }}>
+            <div className="grid grid-cols-3 gap-1.5 overflow-y-auto -mx-1 px-1 pb-2" style={{ maxHeight: '72vh' }}>
               {templatePool.map((i: any) => {
                 const active = inspirationId === i.id;
                 return (
@@ -634,12 +634,16 @@ export function DesignStudioModal({ open, onClose, initialProduct = null }: Prop
                       active ? "border-primary ring-2 ring-primary/40" : "border-border/60 hover:border-primary/40"
                     }`}
                   >
-                    <div className="relative w-full" style={{ paddingBottom: "100%" }}>
-                      <div
-                        className="absolute inset-0 bg-cover bg-center bg-muted"
-                        style={{ backgroundImage: `url(${JSON.stringify(i.image)})` }}
-                      />
-                    </div>
+                    <img
+                      src={i.image}
+                      alt={i.label}
+                      style={{
+                        display: 'block',
+                        width: '100%',
+                        height: 'calc((100vw - 56px) / 3)',
+                        objectFit: 'cover',
+                      }}
+                    />
                     {active && (
                       <div className="absolute top-1 right-1 h-5 w-5 rounded-full bg-primary text-primary-foreground flex items-center justify-center">
                         <Check className="h-3 w-3" />
