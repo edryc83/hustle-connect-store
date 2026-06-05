@@ -488,6 +488,14 @@ export function DesignStudioModal({ open, onClose, initialProduct = null }: Prop
                 tint: "from-sky-500/20 to-blue-500/10 text-sky-300 border-sky-500/30",
                 onClick: () => { setTrack("copy"); setStep("source"); },
               },
+              {
+                id: "studioshot",
+                icon: Camera,
+                title: "Studio Shot",
+                desc: "Turn a phone pic into a clean studio photo",
+                tint: "from-pink-500/20 to-rose-500/10 text-pink-300 border-pink-500/30",
+                onClick: () => { setStudioShotOpen(true); },
+              },
             ].map((opt) => {
               const Icon = opt.icon;
               return (
