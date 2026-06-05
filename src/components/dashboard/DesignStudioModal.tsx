@@ -14,7 +14,7 @@ import { InsufficientTokensModal } from "@/components/tokens/InsufficientTokensM
 import { TOKENS_PER_DESIGN } from "@/lib/tokenPackages";
 import { Coins } from "lucide-react";
 import {
-  Loader2, Sparkles, Package, Wand2, ArrowLeft, Download, Share2, RefreshCw, Search, Shuffle, Check, Upload, Trash2, Copy, ImagePlus,
+  Loader2, Sparkles, Package, Wand2, ArrowLeft, Download, Share2, RefreshCw, Search, Shuffle, Check, Upload, Trash2, Copy, ImagePlus, X,
 } from "lucide-react";
 import { Camera } from "lucide-react";
 import { AutoDesignModal } from "./AutoDesignModal";
@@ -411,34 +411,45 @@ export function DesignStudioModal({ open, onClose, initialProduct = null }: Prop
       onClose={() => setStudioShotOpen(false)}
     />
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
-      <DialogContent className="max-w-full w-screen h-[100dvh] sm:max-w-lg sm:h-auto sm:max-h-[90vh] p-4 overflow-y-auto rounded-none sm:rounded-lg flex flex-col gap-3">
+      <DialogContent
+        hideCloseButton
+        className="max-w-full w-screen h-[100dvh] sm:max-w-lg sm:h-auto sm:max-h-[90vh] p-4 rounded-none sm:rounded-lg flex flex-col gap-3"
+        style={{
+          top: 0, left: 0, right: 0, transform: 'none',
+          paddingTop: 'max(1rem, env(safe-area-inset-top))',
+          paddingBottom: 'max(1rem, env(safe-area-inset-bottom))',
+        }}
+      >
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 justify-between">
-            <span className="flex items-center gap-2">
-            {step !== "menu" && (
-              <button
-                onClick={goBack}
-                className="text-muted-foreground hover:text-foreground"
-                aria-label="Back"
-              >
-                <ArrowLeft className="h-4 w-4" />
-              </button>
-            )}
-            <Sparkles className="h-4 w-4 text-primary" />
-            {step === "menu" && "Design Studio"}
-            {step === "product" && "Choose a product"}
-            {step === "occasion" && "Poster of the Day"}
-            {step === "template" && "Pick a template"}
-            {step === "theme" && "Pick a color"}
-            {step === "final" && "Describe your poster"}
-            {step === "source" && "Upload your design"}
-            {step === "use" && "How to use it"}
-            </span>
-            {tokensEnabled && (
-              <span className="flex items-center gap-1 text-xs font-normal text-muted-foreground">
-                <Coins className="h-3.5 w-3.5 text-amber-400" /> {balance}
+          <DialogTitle className="flex items-center justify-between gap-2">
+            <span className="flex items-center gap-2 min-w-0">
+              {step !== "menu" && (
+                <button onClick={goBack} className="shrink-0 text-muted-foreground hover:text-foreground" aria-label="Back">
+                  <ArrowLeft className="h-4 w-4" />
+                </button>
+              )}
+              <Sparkles className="h-4 w-4 shrink-0 text-primary" />
+              <span className="truncate text-base">
+                {step === "menu"     && "Design Studio"}
+                {step === "product"  && "Choose a product"}
+                {step === "occasion" && "Poster of the Day"}
+                {step === "template" && "Pick a template"}
+                {step === "theme"    && "Pick a color"}
+                {step === "final"    && "Describe your poster"}
+                {step === "source"   && "Upload your design"}
+                {step === "use"      && "How to use it"}
               </span>
-            )}
+            </span>
+            <span className="flex items-center gap-2 shrink-0">
+              {tokensEnabled && (
+                <span className="flex items-center gap-1 text-xs font-normal text-muted-foreground">
+                  <Coins className="h-3.5 w-3.5 text-amber-400" /> {balance}
+                </span>
+              )}
+              <button onClick={onClose} className="text-muted-foreground hover:text-foreground" aria-label="Close">
+                <X className="h-4 w-4" />
+              </button>
+            </span>
           </DialogTitle>
         </DialogHeader>
 
@@ -563,7 +574,7 @@ export function DesignStudioModal({ open, onClose, initialProduct = null }: Prop
 
         {/* STEP 2 — TEMPLATE */}
         {step === "template" && (
-          <div className="space-y-3 pt-2">
+          <div className="flex flex-col flex-1 min-h-0 gap-3 pt-2">
             <div className="flex items-center justify-between gap-2">
               <span className="text-[11px] text-muted-foreground">
                 {insp ? `Selected: ${insp.label}` : "Tap a template"}
@@ -610,7 +621,7 @@ export function DesignStudioModal({ open, onClose, initialProduct = null }: Prop
                 </Button>
               </div>
             </div>
-            <div className="grid grid-cols-3 gap-1.5 max-h-[72vh] overflow-y-auto -mx-1 px-1 pb-2">
+            <div className="grid grid-cols-3 gap-1.5 flex-1 min-h-0 overflow-y-auto -mx-1 px-1 pb-2">
               {templatePool.map((i: any) => {
                 const active = inspirationId === i.id;
                 return (
@@ -621,8 +632,8 @@ export function DesignStudioModal({ open, onClose, initialProduct = null }: Prop
                       active ? "border-primary ring-2 ring-primary/40" : "border-border/60 hover:border-primary/40"
                     }`}
                   >
-                    <div className="aspect-square bg-muted">
-                      <img src={i.image} alt={i.label} className="w-full h-full object-cover" loading="lazy" />
+                    <div className="relative w-full bg-muted" style={{ paddingBottom: "100%" }}>
+                      <img src={i.image} alt={i.label} className="absolute inset-0 w-full h-full object-cover" />
                     </div>
                     {active && (
                       <div className="absolute top-1 right-1 h-5 w-5 rounded-full bg-primary text-primary-foreground flex items-center justify-center">
@@ -816,7 +827,7 @@ export function DesignStudioModal({ open, onClose, initialProduct = null }: Prop
 
         {/* STEP — PRODUCT (product track) */}
         {step === "product" && (track === "product" || track === "copy") && (
-          <div className="space-y-3">
+          <div className="flex flex-col flex-1 min-h-0 gap-3">
             <div className="relative">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
@@ -826,7 +837,7 @@ export function DesignStudioModal({ open, onClose, initialProduct = null }: Prop
                 onChange={(e) => setSearch(e.target.value)}
               />
             </div>
-            <div className="max-h-[60vh] overflow-y-auto -mx-1 px-1">
+            <div className="flex-1 min-h-0 overflow-y-auto -mx-1 px-1">
               {loadingProducts ? (
                 <div className="flex justify-center p-8">
                   <Loader2 className="h-5 w-5 animate-spin text-primary" />
