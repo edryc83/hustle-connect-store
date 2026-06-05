@@ -16,7 +16,9 @@ import { Coins } from "lucide-react";
 import {
   Loader2, Sparkles, Package, Wand2, ArrowLeft, Download, Share2, RefreshCw, Search, Shuffle, Check, Upload, Trash2, Copy, ImagePlus,
 } from "lucide-react";
+import { Camera } from "lucide-react";
 import { AutoDesignModal } from "./AutoDesignModal";
+import { StudioShotModal } from "./StudioShotModal";
 import { INSPIRATIONS, COLOR_THEMES, pickRandomInspiration } from "./designInspirations";
 import { POSTER_OCCASIONS, POSTER_OF_THE_DAY_TEMPLATES, getTodaysOccasions, type PosterOccasion } from "./posterOfTheDay";
 import { CalendarHeart } from "lucide-react";
@@ -62,6 +64,7 @@ export function DesignStudioModal({ open, onClose, initialProduct = null }: Prop
   const [uploadingTemplate, setUploadingTemplate] = useState(false);
   const [copyMode, setCopyMode] = useState<CopyMode | null>(null);
   const [showInsufficientTokens, setShowInsufficientTokens] = useState(false);
+  const [studioShotOpen, setStudioShotOpen] = useState(false);
   const { balance, enabled: tokensEnabled, refetch: refetchTokens } = useTokens();
 
   useEffect(() => {
@@ -403,6 +406,10 @@ export function DesignStudioModal({ open, onClose, initialProduct = null }: Prop
       onClose={() => setShowInsufficientTokens(false)}
       balance={balance}
     />
+    <StudioShotModal
+      open={studioShotOpen}
+      onClose={() => setStudioShotOpen(false)}
+    />
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="max-w-full w-screen h-[100dvh] sm:max-w-lg sm:h-auto sm:max-h-[90vh] p-4 overflow-y-auto rounded-none sm:rounded-lg flex flex-col gap-3">
         <DialogHeader>
@@ -484,6 +491,14 @@ export function DesignStudioModal({ open, onClose, initialProduct = null }: Prop
                 desc: "Upload a design to recreate",
                 tint: "from-sky-500/20 to-blue-500/10 text-sky-300 border-sky-500/30",
                 onClick: () => { setTrack("copy"); setStep("source"); },
+              },
+              {
+                id: "studioshot",
+                icon: Camera,
+                title: "Studio Shot",
+                desc: "Turn a phone pic into a clean studio photo",
+                tint: "from-pink-500/20 to-rose-500/10 text-pink-300 border-pink-500/30",
+                onClick: () => { setStudioShotOpen(true); },
               },
             ].map((opt) => {
               const Icon = opt.icon;
