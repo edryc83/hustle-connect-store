@@ -632,8 +632,11 @@ export function DesignStudioModal({ open, onClose, initialProduct = null }: Prop
                       active ? "border-primary ring-2 ring-primary/40" : "border-border/60 hover:border-primary/40"
                     }`}
                   >
-                    <div className="relative w-full bg-muted" style={{ paddingBottom: "100%" }}>
-                      <img src={i.image} alt={i.label} className="absolute inset-0 w-full h-full object-cover" />
+                    <div className="relative w-full" style={{ paddingBottom: "100%" }}>
+                      <div
+                        className="absolute inset-0 bg-cover bg-center bg-muted"
+                        style={{ backgroundImage: `url(${JSON.stringify(i.image)})` }}
+                      />
                     </div>
                     {active && (
                       <div className="absolute top-1 right-1 h-5 w-5 rounded-full bg-primary text-primary-foreground flex items-center justify-center">
