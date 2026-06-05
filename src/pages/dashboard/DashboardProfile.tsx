@@ -310,25 +310,27 @@ const DashboardProfile = () => {
         </div>
 
         {/* Token balance card */}
-        <div className="mt-3 rounded-xl border border-amber-400/30 bg-gradient-to-br from-amber-500/5 to-yellow-400/5 p-3 flex items-center gap-3">
-          <div className="h-10 w-10 rounded-full bg-amber-400/15 flex items-center justify-center shrink-0">
-            <Coins className="h-5 w-5 text-amber-400" />
+        {tokensEnabled && (
+          <div className="mt-3 rounded-xl border border-amber-400/30 bg-gradient-to-br from-amber-500/5 to-yellow-400/5 p-3 flex items-center gap-3">
+            <div className="h-10 w-10 rounded-full bg-amber-400/15 flex items-center justify-center shrink-0">
+              <Coins className="h-5 w-5 text-amber-400" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-xs text-muted-foreground">Design tokens</p>
+              <p className="font-bold text-lg leading-tight">
+                {tokenBalance} <span className="text-sm font-normal text-muted-foreground">tokens</span>
+              </p>
+              <p className="text-[10px] text-muted-foreground">10 tokens = 1 design</p>
+            </div>
+            <Button
+              size="sm"
+              className="shrink-0 h-8 px-3 text-xs gap-1 bg-amber-500 hover:bg-amber-600 text-white"
+              onClick={() => setShowTokenModal(true)}
+            >
+              <Coins className="h-3.5 w-3.5" /> Buy
+            </Button>
           </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-xs text-muted-foreground">Design tokens</p>
-            <p className="font-bold text-lg leading-tight">
-              {tokenBalance} <span className="text-sm font-normal text-muted-foreground">tokens</span>
-            </p>
-            <p className="text-[10px] text-muted-foreground">10 tokens = 1 design</p>
-          </div>
-          <Button
-            size="sm"
-            className="shrink-0 h-8 px-3 text-xs gap-1 bg-amber-500 hover:bg-amber-600 text-white"
-            onClick={() => setShowTokenModal(true)}
-          >
-            <Coins className="h-3.5 w-3.5" /> Buy
-          </Button>
-        </div>
+        )}
 
         {/* View as buyer button */}
         {profile.store_slug && (
