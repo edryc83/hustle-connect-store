@@ -274,24 +274,29 @@ export function StudioShotModal({ open, onClose }: Props) {
           {/* STAGE 3 — RESULT */}
           {stage === "result" && resultUrl && originalUrl && (
             <div className="space-y-3">
-              <div className="aspect-square rounded-xl overflow-hidden bg-muted relative">
+              <div
+                className="aspect-square rounded-xl overflow-hidden bg-muted relative select-none touch-none cursor-pointer"
+                onPointerDown={(e) => { (e.target as Element).setPointerCapture?.(e.pointerId); setCompare(true); }}
+                onPointerUp={() => setCompare(false)}
+                onPointerCancel={() => setCompare(false)}
+                onPointerLeave={() => setCompare(false)}
+              >
+                {/* After (base) */}
+                <img src={resultUrl} alt="Enhanced" className="absolute inset-0 w-full h-full object-cover" draggable={false} />
+                {/* Before (overlay while pressed) */}
                 <img
-                  src={compare ? originalUrl : resultUrl}
-                  alt={compare ? "Original" : "Enhanced"}
-                  className="w-full h-full object-cover"
+                  src={originalUrl}
+                  alt="Original"
+                  draggable={false}
+                  className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-150 ${compare ? "opacity-100" : "opacity-0"}`}
                 />
-                <button
-                  onMouseDown={() => setCompare(true)}
-                  onMouseUp={() => setCompare(false)}
-                  onMouseLeave={() => setCompare(false)}
-                  onTouchStart={() => setCompare(true)}
-                  onTouchEnd={() => setCompare(false)}
-                  className="absolute top-2 right-2 px-2.5 py-1 rounded-full bg-background/80 backdrop-blur text-[10px] font-semibold border border-border/60"
-                >
-                  Hold to compare
-                </button>
-                <span className="absolute top-2 left-2 px-2 py-0.5 rounded-full bg-primary text-primary-foreground text-[10px] font-semibold">
+                <span className="absolute top-2 left-2 px-2 py-0.5 rounded-full bg-primary text-primary-foreground text-[10px] font-semibold pointer-events-none">
                   {compare ? "Before" : "After"}
+                </span>
+                <span
+                  className={`absolute bottom-2 left-1/2 -translate-x-1/2 px-3 py-1 rounded-full bg-background/85 backdrop-blur text-[10px] font-semibold border border-border/60 pointer-events-none transition-opacity ${compare ? "opacity-0" : "opacity-100"}`}
+                >
+                  Press &amp; hold to see original
                 </span>
               </div>
               <div className="grid grid-cols-3 gap-2">
