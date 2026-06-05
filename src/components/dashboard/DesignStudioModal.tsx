@@ -406,6 +406,10 @@ export function DesignStudioModal({ open, onClose, initialProduct = null }: Prop
       onClose={() => setShowInsufficientTokens(false)}
       balance={balance}
     />
+    <StudioShotModal
+      open={studioShotOpen}
+      onClose={() => setStudioShotOpen(false)}
+    />
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
       <DialogContent className="max-w-full w-screen h-[100dvh] sm:max-w-lg sm:h-auto sm:max-h-[90vh] p-4 overflow-y-auto rounded-none sm:rounded-lg flex flex-col gap-3">
         <DialogHeader>
