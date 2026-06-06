@@ -2,6 +2,14 @@ import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./useAuth";
 
+function parseTokensEnabled(value: string | null | undefined) {
+  return value?.trim().toLowerCase() === "true";
+}
+
+type TokenBalancePayload = {
+  token_balance?: number | null;
+};
+
 export function useTokens() {
   const { user } = useAuth();
   const [balance, setBalance] = useState<number>(0);
@@ -19,9 +27,15 @@ export function useTokens() {
   }, [user]);
 
   useEffect(() => {
-    if (!user) { setLoading(false); return; }
+    if (!user) {
+      setBalance(0);
+      setEnabled(false);
+      setLoading(false);
+      return;
+    }
 
     let cancelled = false;
+    setLoading(true);
     (async () => {
       const [profileRes, configRes] = await Promise.all([
         supabase.from("profiles").select("token_balance").eq("id", user.id).single(),
@@ -29,7 +43,7 @@ export function useTokens() {
       ]);
       if (cancelled) return;
       setBalance(profileRes.data?.token_balance ?? 0);
-      setEnabled(false); // tokens feature disabled until launch
+      setEnabled(parseTokensEnabled(configRes.data?.value));
       setLoading(false);
     })();
 
@@ -40,8 +54,9 @@ export function useTokens() {
         "postgres_changes",
         { event: "UPDATE", schema: "public", table: "profiles", filter: `id=eq.${user.id}` },
         (payload) => {
-          if ((payload.new as any)?.token_balance !== undefined) {
-            setBalance((payload.new as any).token_balance);
+          const profile = payload.new as TokenBalancePayload;
+          if (profile.token_balance !== undefined) {
+            setBalance(profile.token_balance ?? 0);
           }
         }
       )

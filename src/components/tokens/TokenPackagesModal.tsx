@@ -16,7 +16,7 @@ interface Props {
 type Stage = "packages" | "phone" | "waiting" | "confirmed";
 
 export function TokenPackagesModal({ open, onClose }: Props) {
-  const { balance, refetch } = useTokens();
+  const { balance, enabled, loading, refetch } = useTokens();
   const [stage, setStage] = useState<Stage>("packages");
   const [selectedPkg, setSelectedPkg] = useState<TokenPackage | null>(null);
   const [phone, setPhone] = useState("");
@@ -27,7 +27,7 @@ export function TokenPackagesModal({ open, onClose }: Props) {
 
   // Pre-fill phone from profile
   useEffect(() => {
-    if (!open) return;
+    if (!open || !enabled) return;
     supabase.auth.getUser().then(({ data }) => {
       if (!data.user) return;
       supabase.from("profiles").select("phone, whatsapp_number").eq("id", data.user.id).single()
@@ -36,7 +36,7 @@ export function TokenPackagesModal({ open, onClose }: Props) {
           if (num) setPhone(num.replace(/^\+/, ""));
         });
     });
-  }, [open]);
+  }, [open, enabled]);
 
   // Reset state on close
   useEffect(() => {
@@ -53,7 +53,7 @@ export function TokenPackagesModal({ open, onClose }: Props) {
 
   // Realtime: listen for payment confirmation
   useEffect(() => {
-    if (!pendingPaymentId || stage !== "waiting") return;
+    if (!enabled || !pendingPaymentId || stage !== "waiting") return;
 
     const channel = supabase
       .channel(`payment-${pendingPaymentId}`)
@@ -63,9 +63,9 @@ export function TokenPackagesModal({ open, onClose }: Props) {
         table: "token_payments",
         filter: `id=eq.${pendingPaymentId}`,
       }, (payload) => {
-        const row = payload.new as any;
+        const row = payload.new as { status?: string; tokens?: number | null };
         if (row.status === "completed") {
-          setConfirmedTokens(row.tokens);
+          setConfirmedTokens(row.tokens ?? 0);
           setStage("confirmed");
           refetch();
         } else if (row.status === "failed") {
@@ -78,7 +78,11 @@ export function TokenPackagesModal({ open, onClose }: Props) {
 
     channelRef.current = channel;
     return () => { supabase.removeChannel(channel); };
-  }, [pendingPaymentId, stage, refetch]);
+  }, [enabled, pendingPaymentId, stage, refetch]);
+
+  useEffect(() => {
+    if (open && !loading && !enabled) onClose();
+  }, [enabled, loading, onClose, open]);
 
   const handleSelectPackage = (pkg: TokenPackage) => {
     setSelectedPkg(pkg);
@@ -106,8 +110,8 @@ export function TokenPackagesModal({ open, onClose }: Props) {
       if (!resp.ok) throw new Error(data?.error || "Payment request failed");
       setPendingPaymentId(data.paymentId);
       setStage("waiting");
-    } catch (e: any) {
-      toast.error(e?.message || "Could not start payment");
+    } catch (e) {
+      toast.error(e instanceof Error ? e.message : "Could not start payment");
     } finally {
       setPaying(false);
     }
@@ -128,6 +132,8 @@ export function TokenPackagesModal({ open, onClose }: Props) {
       toast.info("Not confirmed yet — please check your phone and enter your PIN.");
     }
   };
+
+  if (!enabled || loading) return null;
 
   return (
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>

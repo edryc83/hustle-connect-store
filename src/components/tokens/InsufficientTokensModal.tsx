@@ -4,6 +4,7 @@ import { Coins, Sparkles } from "lucide-react";
 import { useState } from "react";
 import { TokenPackagesModal } from "./TokenPackagesModal";
 import { TOKENS_PER_DESIGN } from "@/lib/tokenPackages";
+import { useTokens } from "@/hooks/useTokens";
 
 interface Props {
   open: boolean;
@@ -12,8 +13,11 @@ interface Props {
 }
 
 export function InsufficientTokensModal({ open, onClose, balance }: Props) {
+  const { enabled, loading } = useTokens();
   const [buyOpen, setBuyOpen] = useState(false);
   const needed = TOKENS_PER_DESIGN - balance;
+
+  if (!enabled || loading) return null;
 
   return (
     <>
