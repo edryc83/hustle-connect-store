@@ -229,10 +229,12 @@ export function StudioShotModal({ open, onClose }: Props) {
                 }}
               />
 
-              <p className="text-center text-[11px] text-muted-foreground flex items-center justify-center gap-1">
-                <Coins className="h-3 w-3 text-amber-400" />
-                {TOKENS_PER_ENHANCE} tokens per photo
-              </p>
+              {tokensEnabled && (
+                <p className="text-center text-[11px] text-muted-foreground flex items-center justify-center gap-1">
+                  <Coins className="h-3 w-3 text-amber-400" />
+                  {TOKENS_PER_ENHANCE} tokens per photo
+                </p>
+              )}
             </div>
           )}
 
@@ -259,7 +261,7 @@ export function StudioShotModal({ open, onClose }: Props) {
                 ) : (
                   <>
                     <Sparkles className="h-4 w-4" />
-                    Enhance ({TOKENS_PER_ENHANCE} tokens)
+                    Enhance{tokensEnabled ? ` (${TOKENS_PER_ENHANCE} tokens)` : ""}
                   </>
                 )}
               </Button>
