@@ -29,7 +29,7 @@ export function useTokens() {
       ]);
       if (cancelled) return;
       setBalance(profileRes.data?.token_balance ?? 0);
-      setEnabled(configRes.data?.value === "true");
+      setEnabled(false); // tokens feature disabled until launch
       setLoading(false);
     })();
 
