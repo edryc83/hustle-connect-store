@@ -21,3 +21,5 @@ project_id = "rmhpdalhkcbsbrphhjre"
     verify_jwt = false
   [functions.store-assistant]
     verify_jwt = false
+  [functions.supplier-pay-ipn]
+    verify_jwt = false
