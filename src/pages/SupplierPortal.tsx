@@ -14,7 +14,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { LogOut, Loader2, Plus, Package, Wallet, KeyRound, Trash2 } from "lucide-react";
 import { toast } from "sonner";
-import { compressImageToWebp } from "@/lib/imageCompression";
+import { compressImage } from "@/lib/imageCompression";
 
 type Supplier = { id: string; supplier_code: string; business_name: string; country: string; currency: string; whatsapp: string | null; bio: string | null; lead_time_days: number | null; must_change_password: boolean };
 type Product = { id: string; name: string; description: string | null; images: string[]; category: string | null; moq: number; unit_price: number; currency: string; lead_time_days: number | null; active: boolean };
@@ -164,7 +164,7 @@ function AddProductDialog({ open, onClose, supplier, onSaved }: { open: boolean;
   const [form, setForm] = useState({ name: "", description: "", category: "", moq: "1", unit_price: "", lead_time_days: String(supplier.lead_time_days || 14) });
 
   const onFile = async (f: File) => {
-    const compressed = await compressImageToWebp(f, 1024 * 1024);
+    const compressed = await compressImage(f);
     setImageFile(compressed);
     setImagePreview(URL.createObjectURL(compressed));
   };
