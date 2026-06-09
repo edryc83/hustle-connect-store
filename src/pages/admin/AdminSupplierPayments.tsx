@@ -14,8 +14,8 @@ export default function AdminSupplierPayments() {
   const load = async () => {
     setLoading(true);
     const { data: pays } = await supabase.from("supplier_payments" as any).select("*").order("created_at", { ascending: false }) as any;
-    const supIds = Array.from(new Set((pays || []).map((p: any) => p.supplier_id)));
-    const buyerIds = Array.from(new Set((pays || []).map((p: any) => p.buyer_id)));
+    const supIds = Array.from(new Set((pays || []).map((p: any) => p.supplier_id))) as string[];
+    const buyerIds = Array.from(new Set((pays || []).map((p: any) => p.buyer_id))) as string[];
     const [{ data: sups }, { data: buyers }] = await Promise.all([
       supIds.length ? (supabase.from("suppliers" as any).select("id, business_name, supplier_code").in("id", supIds) as any) : { data: [] },
       buyerIds.length ? (supabase.from("profiles").select("id, first_name, email, store_name").in("id", buyerIds) as any) : { data: [] },

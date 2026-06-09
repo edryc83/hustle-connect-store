@@ -33,7 +33,7 @@ export default function Import() {
         .select("id, name, description, images, category, moq, unit_price, currency, lead_time_days, supplier_id")
         .eq("active", true)
         .order("created_at", { ascending: false }) as any);
-      const supIds = Array.from(new Set((prods || []).map((p: any) => p.supplier_id)));
+      const supIds = Array.from(new Set((prods || []).map((p: any) => p.supplier_id))) as string[];
       const { data: sups } = supIds.length
         ? await (supabase.from("suppliers_public" as any).select("id, business_name, country, supplier_code").in("id", supIds) as any)
         : { data: [] };
