@@ -21,6 +21,14 @@ import AdminSellers from "./pages/admin/AdminSellers";
 import AdminOrders from "./pages/admin/AdminOrders";
 import AdminAnalyticsPage from "./pages/admin/AdminAnalytics";
 import AdminAgents from "./pages/admin/AdminAgents";
+import AdminSuppliers from "./pages/admin/AdminSuppliers";
+import AdminShippingAgents from "./pages/admin/AdminShippingAgents";
+import AdminSupplierPayments from "./pages/admin/AdminSupplierPayments";
+import SupplierPortal from "./pages/SupplierPortal";
+import Import from "./pages/Import";
+import ImportProduct from "./pages/ImportProduct";
+import ImportPay from "./pages/ImportPay";
+import ImportShipping from "./pages/ImportShipping";
 import Storefront from "./pages/Storefront";
 import Explore from "./pages/Explore";
 import ResetPassword from "./pages/ResetPassword";
@@ -73,7 +81,16 @@ const App = () => (
               <Route path="/admin/sellers" element={<AdminLayout><AdminSellers /></AdminLayout>} />
               <Route path="/admin/orders" element={<AdminLayout><AdminOrders /></AdminLayout>} />
               <Route path="/admin/agents" element={<AdminLayout><AdminAgents /></AdminLayout>} />
+              <Route path="/admin/suppliers" element={<AdminLayout><AdminSuppliers /></AdminLayout>} />
+              <Route path="/admin/shipping-agents" element={<AdminLayout><AdminShippingAgents /></AdminLayout>} />
+              <Route path="/admin/supplier-payments" element={<AdminLayout><AdminSupplierPayments /></AdminLayout>} />
               <Route path="/admin/analytics" element={<AdminLayout><AdminAnalyticsPage /></AdminLayout>} />
+
+              <Route path="/supplier" element={<SupplierPortal />} />
+              <Route path="/import" element={<Import />} />
+              <Route path="/import/product/:id" element={<ImportProduct />} />
+              <Route path="/import/pay" element={<ImportPay />} />
+              <Route path="/import/shipping" element={<ImportShipping />} />
 
               <Route path="/superadmin" element={<SuperAdminLogin />} />
               <Route path="/explore" element={<Explore />} />

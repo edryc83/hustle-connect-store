@@ -464,6 +464,289 @@ export type Database = {
         }
         Relationships: []
       }
+      shipping_agents: {
+        Row: {
+          active: boolean
+          created_at: string
+          created_by_agent: string | null
+          duration_days: number | null
+          id: string
+          lane_from: string
+          lane_to: string
+          logo_url: string | null
+          mode: string
+          name: string
+          notes: string | null
+          rate_amount: number
+          rate_currency: string
+          rate_unit: string
+          updated_at: string
+          whatsapp: string
+        }
+        Insert: {
+          active?: boolean
+          created_at?: string
+          created_by_agent?: string | null
+          duration_days?: number | null
+          id?: string
+          lane_from: string
+          lane_to?: string
+          logo_url?: string | null
+          mode: string
+          name: string
+          notes?: string | null
+          rate_amount: number
+          rate_currency?: string
+          rate_unit: string
+          updated_at?: string
+          whatsapp: string
+        }
+        Update: {
+          active?: boolean
+          created_at?: string
+          created_by_agent?: string | null
+          duration_days?: number | null
+          id?: string
+          lane_from?: string
+          lane_to?: string
+          logo_url?: string | null
+          mode?: string
+          name?: string
+          notes?: string | null
+          rate_amount?: number
+          rate_currency?: string
+          rate_unit?: string
+          updated_at?: string
+          whatsapp?: string
+        }
+        Relationships: []
+      }
+      supplier_payments: {
+        Row: {
+          admin_note: string | null
+          amount_foreign: number
+          amount_foreign_total: number
+          amount_ugx: number
+          bank_proof_url: string | null
+          buyer_id: string
+          created_at: string
+          currency: string
+          fee_pct: number
+          fx_locked_at: string
+          fx_rate: number
+          id: string
+          method: string
+          momo_phone: string | null
+          note: string | null
+          settled_at: string | null
+          status: string
+          supplier_id: string
+          supplier_product_id: string | null
+          updated_at: string
+          yo_ref: string | null
+        }
+        Insert: {
+          admin_note?: string | null
+          amount_foreign: number
+          amount_foreign_total: number
+          amount_ugx: number
+          bank_proof_url?: string | null
+          buyer_id: string
+          created_at?: string
+          currency: string
+          fee_pct?: number
+          fx_locked_at: string
+          fx_rate: number
+          id?: string
+          method: string
+          momo_phone?: string | null
+          note?: string | null
+          settled_at?: string | null
+          status?: string
+          supplier_id: string
+          supplier_product_id?: string | null
+          updated_at?: string
+          yo_ref?: string | null
+        }
+        Update: {
+          admin_note?: string | null
+          amount_foreign?: number
+          amount_foreign_total?: number
+          amount_ugx?: number
+          bank_proof_url?: string | null
+          buyer_id?: string
+          created_at?: string
+          currency?: string
+          fee_pct?: number
+          fx_locked_at?: string
+          fx_rate?: number
+          id?: string
+          method?: string
+          momo_phone?: string | null
+          note?: string | null
+          settled_at?: string | null
+          status?: string
+          supplier_id?: string
+          supplier_product_id?: string | null
+          updated_at?: string
+          yo_ref?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "supplier_payments_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "suppliers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "supplier_payments_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "suppliers_public"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "supplier_payments_supplier_product_id_fkey"
+            columns: ["supplier_product_id"]
+            isOneToOne: false
+            referencedRelation: "supplier_products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      supplier_products: {
+        Row: {
+          active: boolean
+          attributes: Json | null
+          category: string | null
+          created_at: string
+          currency: string
+          description: string | null
+          id: string
+          images: string[]
+          lead_time_days: number | null
+          moq: number
+          name: string
+          subcategory: string | null
+          supplier_id: string
+          unit_price: number
+          updated_at: string
+        }
+        Insert: {
+          active?: boolean
+          attributes?: Json | null
+          category?: string | null
+          created_at?: string
+          currency?: string
+          description?: string | null
+          id?: string
+          images?: string[]
+          lead_time_days?: number | null
+          moq?: number
+          name: string
+          subcategory?: string | null
+          supplier_id: string
+          unit_price: number
+          updated_at?: string
+        }
+        Update: {
+          active?: boolean
+          attributes?: Json | null
+          category?: string | null
+          created_at?: string
+          currency?: string
+          description?: string | null
+          id?: string
+          images?: string[]
+          lead_time_days?: number | null
+          moq?: number
+          name?: string
+          subcategory?: string | null
+          supplier_id?: string
+          unit_price?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "supplier_products_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "suppliers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "supplier_products_supplier_id_fkey"
+            columns: ["supplier_id"]
+            isOneToOne: false
+            referencedRelation: "suppliers_public"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      suppliers: {
+        Row: {
+          bank_details: Json | null
+          bio: string | null
+          business_name: string
+          contact_name: string | null
+          country: string
+          created_at: string
+          created_by_agent: string | null
+          currency: string
+          email: string | null
+          id: string
+          lead_time_days: number | null
+          logo_url: string | null
+          must_change_password: boolean
+          status: string
+          supplier_code: string
+          updated_at: string
+          user_id: string
+          whatsapp: string | null
+        }
+        Insert: {
+          bank_details?: Json | null
+          bio?: string | null
+          business_name: string
+          contact_name?: string | null
+          country: string
+          created_at?: string
+          created_by_agent?: string | null
+          currency?: string
+          email?: string | null
+          id?: string
+          lead_time_days?: number | null
+          logo_url?: string | null
+          must_change_password?: boolean
+          status?: string
+          supplier_code: string
+          updated_at?: string
+          user_id: string
+          whatsapp?: string | null
+        }
+        Update: {
+          bank_details?: Json | null
+          bio?: string | null
+          business_name?: string
+          contact_name?: string | null
+          country?: string
+          created_at?: string
+          created_by_agent?: string | null
+          currency?: string
+          email?: string | null
+          id?: string
+          lead_time_days?: number | null
+          logo_url?: string | null
+          must_change_password?: boolean
+          status?: string
+          supplier_code?: string
+          updated_at?: string
+          user_id?: string
+          whatsapp?: string | null
+        }
+        Relationships: []
+      }
       suppressed_emails: {
         Row: {
           created_at: string
@@ -626,7 +909,48 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      suppliers_public: {
+        Row: {
+          bio: string | null
+          business_name: string | null
+          country: string | null
+          created_at: string | null
+          currency: string | null
+          id: string | null
+          lead_time_days: number | null
+          logo_url: string | null
+          status: string | null
+          supplier_code: string | null
+          whatsapp: string | null
+        }
+        Insert: {
+          bio?: string | null
+          business_name?: string | null
+          country?: string | null
+          created_at?: string | null
+          currency?: string | null
+          id?: string | null
+          lead_time_days?: number | null
+          logo_url?: string | null
+          status?: string | null
+          supplier_code?: string | null
+          whatsapp?: string | null
+        }
+        Update: {
+          bio?: string | null
+          business_name?: string | null
+          country?: string | null
+          created_at?: string | null
+          currency?: string | null
+          id?: string | null
+          lead_time_days?: number | null
+          logo_url?: string | null
+          status?: string | null
+          supplier_code?: string | null
+          whatsapp?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       admin_delete_seller: {
@@ -653,6 +977,7 @@ export type Database = {
       increment_whatsapp_taps: { Args: { p_id: string }; Returns: undefined }
       is_admin: { Args: { _user_id: string }; Returns: boolean }
       is_agent: { Args: { _user_id: string }; Returns: boolean }
+      is_supplier: { Args: { _user_id: string }; Returns: boolean }
       move_to_dlq: {
         Args: {
           dlq_name: string

@@ -3,6 +3,7 @@ import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { useOnboardingCheck } from "@/hooks/useOnboardingCheck";
+import { useUserRole } from "@/hooks/useUserRole";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -17,6 +18,7 @@ const Login = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
   const { needsOnboarding, checking } = useOnboardingCheck(user?.id);
+  const { role, loading: roleLoading } = useUserRole();
   const { canInstall, isInstalled, promptInstall } = useInstallPrompt();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -24,14 +26,22 @@ const Login = () => {
 
   // Redirect if already authenticated
   useEffect(() => {
-    if (!user || checking) return;
+    if (!user || checking || roleLoading) return;
+    if (role === "supplier") {
+      navigate("/supplier", { replace: true });
+      return;
+    }
+    if (role === "agent") {
+      navigate("/agent", { replace: true });
+      return;
+    }
     if (needsOnboarding) {
       sessionStorage.setItem("onboarding_redirect", "true");
       navigate("/signup?step=2", { replace: true });
     } else {
       navigate("/dashboard", { replace: true });
     }
-  }, [user, checking, needsOnboarding, navigate]);
+  }, [user, checking, needsOnboarding, navigate, role, roleLoading]);
   const [loading, setLoading] = useState(false);
   const [forgotMode, setForgotMode] = useState(false);
   const [forgotLoading, setForgotLoading] = useState(false);
