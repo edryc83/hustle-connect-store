@@ -35,6 +35,8 @@ export default function ImportPay() {
   const [amount, setAmount] = useState("");
   const [note, setNote] = useState("");
   const [method, setMethod] = useState<"momo" | "bank_transfer">("momo");
+  // Bank transfer is intentionally hidden from buyers for now. Mobile Money only.
+  const SHOW_BANK_TRANSFER = false;
   const [phone, setPhone] = useState("");
   const [fx, setFx] = useState<FxResp | null>(null);
   const [fxLoading, setFxLoading] = useState(false);
@@ -219,17 +221,19 @@ export default function ImportPay() {
         {step === 3 && supplier && fx && (
           <Card><CardContent className="p-4 space-y-4">
             <p className="text-sm font-semibold">Payment method</p>
-            <div className="grid grid-cols-2 gap-2">
+            <div className={`grid ${SHOW_BANK_TRANSFER ? "grid-cols-2" : "grid-cols-1"} gap-2`}>
               <button onClick={() => setMethod("momo")} className={`rounded-lg border p-3 text-left ${method === "momo" ? "border-primary bg-primary/5" : "border-border"}`}>
                 <Smartphone className="h-4 w-4 text-primary mb-1" />
                 <p className="text-sm font-semibold">Mobile Money</p>
                 <p className="text-[10px] text-muted-foreground">Instant via Yo Uganda</p>
               </button>
-              <button onClick={() => setMethod("bank_transfer")} className={`rounded-lg border p-3 text-left ${method === "bank_transfer" ? "border-primary bg-primary/5" : "border-border"}`}>
-                <Building2 className="h-4 w-4 text-primary mb-1" />
-                <p className="text-sm font-semibold">Bank Transfer</p>
-                <p className="text-[10px] text-muted-foreground">Upload payment slip</p>
-              </button>
+              {SHOW_BANK_TRANSFER && (
+                <button onClick={() => setMethod("bank_transfer")} className={`rounded-lg border p-3 text-left ${method === "bank_transfer" ? "border-primary bg-primary/5" : "border-border"}`}>
+                  <Building2 className="h-4 w-4 text-primary mb-1" />
+                  <p className="text-sm font-semibold">Bank Transfer</p>
+                  <p className="text-[10px] text-muted-foreground">Upload payment slip</p>
+                </button>
+              )}
             </div>
 
             {method === "momo" ? (
