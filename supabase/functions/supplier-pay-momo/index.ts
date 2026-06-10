@@ -87,7 +87,9 @@ Deno.serve(async (req) => {
     if (payErr || !pay) throw new Error(payErr?.message || "Could not create payment");
 
     const paymentId = pay.id;
-    const IPN_URL = `${SUPABASE_URL}/functions/v1/supplier-pay-ipn?apikey=${ANON}`;
+    // Reuse the existing token-payments callback. yo-ipn handles supplier payments
+    // as a fallback when the ExternalReference does not match a token_payments row.
+    const IPN_URL = `${SUPABASE_URL}/functions/v1/yo-ipn`;
 
     const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <AutoCreate>
