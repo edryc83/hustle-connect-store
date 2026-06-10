@@ -87,6 +87,9 @@ const App = () => (
               <Route path="/admin/analytics" element={<AdminLayout><AdminAnalyticsPage /></AdminLayout>} />
 
               <Route path="/supplier" element={<SupplierPortal />} />
+              <Route path="/supplier/payments" element={<SupplierPortal />} />
+              <Route path="/supplier/profile" element={<SupplierPortal />} />
+              <Route path="/agent/suppliers" element={<AdminSuppliers />} />
               <Route path="/import" element={<Import />} />
               <Route path="/import/product/:id" element={<ImportProduct />} />
               <Route path="/import/pay" element={<ImportPay />} />

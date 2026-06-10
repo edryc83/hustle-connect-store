@@ -87,7 +87,7 @@ function OnboardDialog({ open, onClose, onCreated }: { open: boolean; onClose: (
     setSaving(true);
     try {
       const bank = f.bank_details_text.trim() ? { raw: f.bank_details_text.trim() } : null;
-      const { data, error } = await supabase.functions.invoke("create-supplier-account", {
+      const { data, error } = await supabase.functions.invoke("admin-create-supplier", {
         body: { ...f, lead_time_days: parseInt(f.lead_time_days) || 14, bank_details: bank },
       });
       if (error) throw new Error(error.message);

@@ -71,7 +71,25 @@ Deno.serve(async (req) => {
       .single();
 
     if (fetchErr || !payment) {
-      console.warn("Payment record not found:", paymentId);
+      // Fallback: maybe this reference is a supplier_payment
+      const { data: sp } = await admin
+        .from("supplier_payments")
+        .select("id, buyer_id, supplier_id, status, amount_foreign_total, currency")
+        .eq("id", paymentId)
+        .maybeSingle();
+      if (!sp) {
+        console.warn("Payment record not found in token_payments or supplier_payments:", paymentId);
+        return new Response("ok", { status: 200 });
+      }
+      if (sp.status === "funds_received" || sp.status === "settled") {
+        return new Response("ok", { status: 200 });
+      }
+      if (isFailed) {
+        await admin.from("supplier_payments").update({ status: "failed" }).eq("id", paymentId);
+        return new Response("ok", { status: 200 });
+      }
+      await admin.from("supplier_payments").update({ status: "funds_received" }).eq("id", paymentId);
+      console.log(`Marked supplier_payment ${paymentId} as funds_received`);
       return new Response("ok", { status: 200 });
     }
 
