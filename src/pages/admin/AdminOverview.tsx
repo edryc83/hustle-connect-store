@@ -2,21 +2,23 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Users, ShoppingBag, Package, Eye, RefreshCw } from "lucide-react";
+import { Users, ShoppingBag, Package, Eye, RefreshCw, ShieldCheck, Store } from "lucide-react";
 import { toast } from "sonner";
 
 export default function AdminOverview() {
-  const [stats, setStats] = useState({ sellers: 0, products: 0, orders: 0, totalViews: 0 });
+  const [stats, setStats] = useState({ sellers: 0, products: 0, orders: 0, totalViews: 0, pendingAgents: 0, pendingSuppliers: 0 });
   const [recentSellers, setRecentSellers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const load = async () => {
-      const [profilesRes, productsRes, ordersRes, recentRes] = await Promise.all([
+      const [profilesRes, productsRes, ordersRes, recentRes, pendingAgentsRes, pendingSuppliersRes] = await Promise.all([
         supabase.from("profiles").select("id, view_count", { count: "exact" }),
         supabase.from("products").select("id", { count: "exact" }),
         supabase.from("orders").select("id", { count: "exact" }),
         supabase.from("profiles").select("*").order("created_at", { ascending: false }).limit(5),
+        supabase.from("user_roles" as any).select("id", { count: "exact", head: true }).eq("role", "agent").eq("status", "pending"),
+        supabase.from("suppliers" as any).select("id", { count: "exact", head: true }).eq("status", "pending"),
       ]);
 
       const totalViews = (profilesRes.data || []).reduce((s, p) => s + (p.view_count || 0), 0);
@@ -26,6 +28,8 @@ export default function AdminOverview() {
         products: productsRes.count || 0,
         orders: ordersRes.count || 0,
         totalViews,
+        pendingAgents: pendingAgentsRes.count || 0,
+        pendingSuppliers: pendingSuppliersRes.count || 0,
       });
       setRecentSellers(recentRes.data || []);
       setLoading(false);
@@ -36,6 +40,8 @@ export default function AdminOverview() {
   if (loading) return <div className="animate-pulse text-muted-foreground p-8">Loading…</div>;
 
   const cards = [
+    { label: "Pending Agents", value: stats.pendingAgents, icon: ShieldCheck, color: "text-amber-500" },
+    { label: "Pending Suppliers", value: stats.pendingSuppliers, icon: Store, color: "text-amber-500" },
     { label: "Total Sellers", value: stats.sellers, icon: Users, color: "text-blue-500" },
     { label: "Total Products", value: stats.products, icon: Package, color: "text-green-500" },
     { label: "Total Orders", value: stats.orders, icon: ShoppingBag, color: "text-orange-500" },
@@ -67,7 +73,7 @@ export default function AdminOverview() {
         </Button>
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
         {cards.map((c) => (
           <Card key={c.label}>
             <CardContent className="pt-6">

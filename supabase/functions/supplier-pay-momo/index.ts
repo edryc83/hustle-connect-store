@@ -54,7 +54,7 @@ Deno.serve(async (req) => {
 
     // Fetch supplier
     const { data: supplier } = await admin.from("suppliers").select("id, business_name, status").eq("id", supplier_id).single();
-    if (!supplier || supplier.status !== "active") {
+    if (!supplier || supplier.status !== "approved") {
       return new Response(JSON.stringify({ error: "Supplier unavailable" }), { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } });
     }
 

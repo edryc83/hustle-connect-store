@@ -642,9 +642,10 @@ const StorefrontInner = () => {
       // Check if this profile belongs to an agent — redirect to signup with referral
       const { data: agentRole } = await supabase
         .from("user_roles")
-        .select("role")
+        .select("role, status")
         .eq("user_id", prof.id)
         .eq("role", "agent")
+        .eq("status", "approved")
         .maybeSingle();
 
       if (agentRole) {
@@ -764,6 +765,14 @@ const StorefrontInner = () => {
       window.scrollTo({ top: 0, behavior: "instant" });
     }
   }, [productId]);
+
+  useEffect(() => {
+    if (!productId || !products.some((product) => product.id === productId)) return;
+    const storageKey = `product_viewed_${productId}`;
+    if (sessionStorage.getItem(storageKey)) return;
+    sessionStorage.setItem(storageKey, "true");
+    supabase.rpc("increment_product_views", { p_id: productId }).then(() => {});
+  }, [productId, products]);
 
 
   if (loading) {

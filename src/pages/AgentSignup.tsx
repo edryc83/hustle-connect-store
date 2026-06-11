@@ -74,10 +74,12 @@ export default function AgentSignup() {
       await (supabase.from("user_roles" as any) as any).insert({
         user_id: userId,
         role: "agent",
+        status: "pending",
       });
 
-      toast.success("Welcome to the Agent Programme! 🎉");
-      navigate("/agent");
+      await supabase.auth.signOut();
+      toast.success("Application submitted. An admin must approve your agent account before you can sign in.");
+      navigate("/agent-login");
     } catch (error: any) {
       toast.error(error.message || "Something went wrong");
     } finally {

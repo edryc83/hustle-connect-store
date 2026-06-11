@@ -17,9 +17,10 @@ export default function AgentLogin() {
     if (user) {
       supabase
         .from("user_roles" as any)
-        .select("role")
+        .select("role, status")
         .eq("user_id", user.id)
         .eq("role", "agent")
+        .eq("status", "approved")
         .maybeSingle()
         .then(({ data }: any) => {
           if (data) navigate("/agent", { replace: true });
@@ -65,7 +66,7 @@ export default function AgentLogin() {
       // Verify agent role
       const { data: roleData } = await (supabase
         .from("user_roles" as any)
-        .select("role")
+        .select("role, status")
         .eq("user_id", data.user.id)
         .eq("role", "agent")
         .maybeSingle() as any);
@@ -73,6 +74,11 @@ export default function AgentLogin() {
       if (!roleData) {
         await supabase.auth.signOut();
         toast.error("This account does not have agent access.");
+        return;
+      }
+      if (roleData.status !== "approved") {
+        await supabase.auth.signOut();
+        toast.error(roleData.status === "pending" ? "Your agent account is pending admin approval." : "Your agent account is not approved for access.");
         return;
       }
 

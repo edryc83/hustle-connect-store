@@ -82,6 +82,7 @@ Deno.serve(async (req) => {
       bio,
       lead_time_days: lead_time_days || 14,
       bank_details: bank_details || null,
+      status: "pending",
       created_by_agent: caller.id,
     }).select().single();
 

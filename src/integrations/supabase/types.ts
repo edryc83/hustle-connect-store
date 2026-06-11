@@ -276,6 +276,7 @@ export type Database = {
           updated_at: string
           user_id: string
           variants_text: string | null
+          view_count: number
           whatsapp_taps: number
         }
         Insert: {
@@ -295,6 +296,7 @@ export type Database = {
           updated_at?: string
           user_id: string
           variants_text?: string | null
+          view_count?: number
           whatsapp_taps?: number
         }
         Update: {
@@ -314,12 +316,49 @@ export type Database = {
           updated_at?: string
           user_id?: string
           variants_text?: string | null
+          view_count?: number
           whatsapp_taps?: number
         }
         Relationships: [
           {
             foreignKeyName: "products_user_id_fkey"
             columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      product_views: {
+        Row: {
+          created_at: string
+          id: string
+          product_id: string
+          seller_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          product_id: string
+          seller_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          product_id?: string
+          seller_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_views_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "product_views_seller_id_fkey"
+            columns: ["seller_id"]
             isOneToOne: false
             referencedRelation: "profiles"
             referencedColumns: ["id"]
@@ -891,18 +930,21 @@ export type Database = {
           created_at: string
           id: string
           role: string
+          status: string
           user_id: string
         }
         Insert: {
           created_at?: string
           id?: string
           role?: string
+          status?: string
           user_id: string
         }
         Update: {
           created_at?: string
           id?: string
           role?: string
+          status?: string
           user_id?: string
         }
         Relationships: []
@@ -973,6 +1015,7 @@ export type Database = {
         Args: { payload: Json; queue_name: string }
         Returns: number
       }
+      increment_product_views: { Args: { p_id: string }; Returns: undefined }
       increment_store_views: { Args: { slug: string }; Returns: undefined }
       increment_whatsapp_taps: { Args: { p_id: string }; Returns: undefined }
       is_admin: { Args: { _user_id: string }; Returns: boolean }

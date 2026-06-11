@@ -6,10 +6,12 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { toast } from "@/components/ui/sonner";
-import { Users, Wallet, CheckCircle2, Clock, Loader2 } from "lucide-react";
+import { Users, Wallet, CheckCircle2, Clock, Loader2, ShieldCheck, XCircle } from "lucide-react";
 
 type AgentRow = {
   id: string;
+  roleId: string;
+  status: string;
   first_name: string | null;
   email: string | null;
   store_slug: string | null;
@@ -35,12 +37,15 @@ export default function AdminAgents() {
     // Get all agent user IDs
     const { data: roles } = await supabase
       .from("user_roles" as any)
-      .select("user_id")
+      .select("id, user_id, status")
       .eq("role", "agent") as any;
 
     if (!roles || roles.length === 0) { setAgents([]); setLoading(false); return; }
 
     const agentIds = roles.map((r: any) => r.user_id) as string[];
+    const roleMap = new Map<string, { id: string; status: string }>(
+      roles.map((r: any) => [r.user_id, { id: r.id, status: r.status || "approved" }])
+    );
 
     // Get agent profiles
     const { data: profiles } = await supabase
@@ -91,11 +96,14 @@ export default function AdminAgents() {
     }
 
     const mapped: AgentRow[] = (profiles || []).map((p: any) => {
+      const roleInfo = roleMap.get(p.id);
       const shops = agentShops[p.id] || { total: 0, complete: 0 };
       const wdata = withdrawalMap[p.id] || { withdrawn: 0, pending: null };
       const earned = shops.complete * 2000;
       return {
         id: p.id,
+        roleId: roleInfo?.id || p.id,
+        status: roleInfo?.status || "approved",
         first_name: p.first_name,
         email: p.email,
         store_slug: p.store_slug,
@@ -117,6 +125,19 @@ export default function AdminAgents() {
 
   useEffect(() => { fetchAgents(); }, []);
 
+  const updateAgentStatus = async (agent: AgentRow, status: "approved" | "suspended" | "rejected") => {
+    const { error } = await supabase
+      .from("user_roles" as any)
+      .update({ status })
+      .eq("id", agent.roleId)
+      .eq("role", "agent");
+    if (error) toast.error(error.message);
+    else {
+      toast.success(`Agent ${status}`);
+      fetchAgents();
+    }
+  };
+
   const handleApprove = async () => {
     if (!approveTarget) return;
     setApproving(true);
@@ -137,8 +158,9 @@ export default function AdminAgents() {
     }
   };
 
-  const totalShops = agents.reduce((s, a) => s + a.shopCount, 0);
   const totalEarned = agents.reduce((s, a) => s + a.earned, 0);
+  const pendingAgents = agents.filter((a) => a.status === "pending").length;
+  const approvedAgents = agents.filter((a) => a.status === "approved").length;
 
   return (
     <div className="space-y-6">
@@ -148,12 +170,19 @@ export default function AdminAgents() {
       </div>
 
       {/* Summary cards */}
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <Card>
+          <CardContent className="flex flex-col items-center p-4">
+            <ShieldCheck className="h-5 w-5 text-primary mb-1" />
+            <span className="text-2xl font-bold">{approvedAgents}</span>
+            <span className="text-xs text-muted-foreground">Approved Agents</span>
+          </CardContent>
+        </Card>
         <Card>
           <CardContent className="flex flex-col items-center p-4">
             <Users className="h-5 w-5 text-primary mb-1" />
-            <span className="text-2xl font-bold">{totalShops}</span>
-            <span className="text-xs text-muted-foreground">Total Shops</span>
+            <span className="text-2xl font-bold">{pendingAgents}</span>
+            <span className="text-xs text-muted-foreground">Pending Approval</span>
           </CardContent>
         </Card>
         <Card>
@@ -182,11 +211,13 @@ export default function AdminAgents() {
             <TableHeader>
               <TableRow>
                 <TableHead>Agent</TableHead>
+                <TableHead>Status</TableHead>
                 <TableHead className="text-center">Shops</TableHead>
                 <TableHead className="text-center">Complete</TableHead>
                 <TableHead className="text-right">Earned</TableHead>
                 <TableHead className="text-right">Balance</TableHead>
                 <TableHead className="text-center">Payout</TableHead>
+                <TableHead className="text-right">Approval</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -200,6 +231,11 @@ export default function AdminAgents() {
                         <p className="text-xs text-muted-foreground">MoMo: {agent.momo_number} ({agent.momo_name})</p>
                       )}
                     </div>
+                  </TableCell>
+                  <TableCell>
+                    <Badge variant={agent.status === "approved" ? "default" : agent.status === "pending" ? "secondary" : "destructive"}>
+                      {agent.status}
+                    </Badge>
                   </TableCell>
                   <TableCell className="text-center text-sm">{agent.shopCount}</TableCell>
                   <TableCell className="text-center text-sm">{agent.completeShopCount}</TableCell>
@@ -219,11 +255,29 @@ export default function AdminAgents() {
                       <span className="text-xs text-muted-foreground">—</span>
                     )}
                   </TableCell>
+                  <TableCell className="text-right">
+                    <div className="flex justify-end gap-2">
+                      {agent.status !== "approved" && (
+                        <Button size="sm" className="h-8 gap-1" onClick={() => updateAgentStatus(agent, "approved")}>
+                          <CheckCircle2 className="h-3.5 w-3.5" /> Approve
+                        </Button>
+                      )}
+                      {agent.status === "approved" ? (
+                        <Button size="sm" variant="outline" className="h-8 gap-1" onClick={() => updateAgentStatus(agent, "suspended")}>
+                          <XCircle className="h-3.5 w-3.5" /> Suspend
+                        </Button>
+                      ) : (
+                        <Button size="sm" variant="outline" className="h-8 gap-1 text-destructive" onClick={() => updateAgentStatus(agent, "rejected")}>
+                          <XCircle className="h-3.5 w-3.5" /> Reject
+                        </Button>
+                      )}
+                    </div>
+                  </TableCell>
                 </TableRow>
               ))}
               {agents.length === 0 && (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center text-muted-foreground py-8">No agents found</TableCell>
+                  <TableCell colSpan={8} className="text-center text-muted-foreground py-8">No agents found</TableCell>
                 </TableRow>
               )}
             </TableBody>

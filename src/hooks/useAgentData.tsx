@@ -31,9 +31,10 @@ export function useAgentData() {
       // Check agent role
       const { data: roleData } = await supabase
         .from("user_roles" as any)
-        .select("role")
+        .select("role, status")
         .eq("user_id", user.id)
         .eq("role", "agent")
+        .eq("status", "approved")
         .maybeSingle();
 
       if (!roleData) {

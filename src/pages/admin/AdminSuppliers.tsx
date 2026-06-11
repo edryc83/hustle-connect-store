@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
-import { Loader2, Plus, Copy } from "lucide-react";
+import { CheckCircle2, Loader2, Plus, Copy, XCircle } from "lucide-react";
 import { toast } from "sonner";
 
 export default function AdminSuppliers() {
@@ -22,6 +22,15 @@ export default function AdminSuppliers() {
     setRows(data || []); setLoading(false);
   };
   useEffect(() => { load(); }, []);
+
+  const updateStatus = async (supplierId: string, status: "approved" | "suspended" | "rejected") => {
+    const { error } = await supabase.from("suppliers" as any).update({ status }).eq("id", supplierId);
+    if (error) toast.error(error.message);
+    else {
+      toast.success(`Supplier ${status}`);
+      load();
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -40,16 +49,27 @@ export default function AdminSuppliers() {
                   <div className="flex items-center gap-2">
                     <p className="text-sm font-semibold truncate">{s.business_name}</p>
                     <Badge variant="outline" className="text-[10px]">{s.country}</Badge>
-                    <Badge variant={s.status === "active" ? "default" : "destructive"} className="text-[10px]">{s.status}</Badge>
+                    <Badge variant={s.status === "approved" ? "default" : s.status === "pending" ? "secondary" : "destructive"} className="text-[10px]">{s.status || "pending"}</Badge>
                   </div>
                   <p className="text-xs text-muted-foreground font-mono">{s.supplier_code} • {s.currency}</p>
                   <p className="text-xs text-muted-foreground">{s.email} {s.whatsapp && `• ${s.whatsapp}`}</p>
                 </div>
-                <Button size="sm" variant="outline" onClick={async () => {
-                  const newStatus = s.status === "active" ? "suspended" : "active";
-                  await supabase.from("suppliers" as any).update({ status: newStatus }).eq("id", s.id);
-                  load();
-                }}>{s.status === "active" ? "Suspend" : "Activate"}</Button>
+                <div className="flex flex-wrap justify-end gap-2">
+                  {s.status !== "approved" && (
+                    <Button size="sm" className="gap-1" onClick={() => updateStatus(s.id, "approved")}>
+                      <CheckCircle2 className="h-3.5 w-3.5" /> Approve
+                    </Button>
+                  )}
+                  {s.status === "approved" ? (
+                    <Button size="sm" variant="outline" className="gap-1" onClick={() => updateStatus(s.id, "suspended")}>
+                      <XCircle className="h-3.5 w-3.5" /> Suspend
+                    </Button>
+                  ) : (
+                    <Button size="sm" variant="outline" className="gap-1 text-destructive" onClick={() => updateStatus(s.id, "rejected")}>
+                      <XCircle className="h-3.5 w-3.5" /> Reject
+                    </Button>
+                  )}
+                </div>
               </CardContent>
             </Card>
           ))}

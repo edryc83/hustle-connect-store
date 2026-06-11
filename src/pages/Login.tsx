@@ -27,20 +27,35 @@ const Login = () => {
   // Redirect if already authenticated
   useEffect(() => {
     if (!user || checking || roleLoading) return;
-    if (role === "supplier") {
-      navigate("/supplier", { replace: true });
-      return;
-    }
-    if (role === "agent") {
-      navigate("/agent", { replace: true });
-      return;
-    }
-    if (needsOnboarding) {
-      sessionStorage.setItem("onboarding_redirect", "true");
-      navigate("/signup?step=2", { replace: true });
-    } else {
-      navigate("/dashboard", { replace: true });
-    }
+    let cancelled = false;
+    (async () => {
+      const { data: roles } = await (supabase
+        .from("user_roles" as any)
+        .select("role, status")
+        .eq("user_id", user.id) as any);
+      if (cancelled) return;
+      const blockedAgentRole = (roles || []).find((r: any) => r.role === "agent" && (r.status || "approved") !== "approved");
+      if (blockedAgentRole) {
+        await supabase.auth.signOut();
+        toast.error(blockedAgentRole.status === "pending" ? "Your agent account is pending admin approval." : "Your agent account is not approved for access.");
+        return;
+      }
+      if (role === "supplier") {
+        navigate("/supplier", { replace: true });
+        return;
+      }
+      if (role === "agent") {
+        navigate("/agent", { replace: true });
+        return;
+      }
+      if (needsOnboarding) {
+        sessionStorage.setItem("onboarding_redirect", "true");
+        navigate("/signup?step=2", { replace: true });
+      } else {
+        navigate("/dashboard", { replace: true });
+      }
+    })();
+    return () => { cancelled = true; };
   }, [user, checking, needsOnboarding, navigate, role, roleLoading]);
   const [loading, setLoading] = useState(false);
   const [forgotMode, setForgotMode] = useState(false);

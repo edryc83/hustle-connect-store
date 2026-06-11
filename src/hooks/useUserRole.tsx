@@ -17,13 +17,14 @@ export function useUserRole() {
       // Check admin via RPC
       const [{ data: adminFlag }, { data: roles }] = await Promise.all([
         supabase.rpc("is_admin", { _user_id: user.id }),
-        (supabase.from("user_roles" as any).select("role").eq("user_id", user.id) as any),
+        (supabase.from("user_roles" as any).select("role, status").eq("user_id", user.id) as any),
       ]);
       if (cancelled) return;
       let r: AppRole = null;
+      const approvedRoles = (roles || []).filter((x: any) => (x.status || "approved") === "approved");
       if (adminFlag) r = "admin";
-      else if (roles?.some((x: any) => x.role === "supplier")) r = "supplier";
-      else if (roles?.some((x: any) => x.role === "agent")) r = "agent";
+      else if (approvedRoles.some((x: any) => x.role === "supplier")) r = "supplier";
+      else if (approvedRoles.some((x: any) => x.role === "agent")) r = "agent";
       setRole(r);
       setLoading(false);
     })();
