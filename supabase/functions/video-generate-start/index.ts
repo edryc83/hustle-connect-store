@@ -32,15 +32,32 @@ Deno.serve(async (req) => {
 
     const admin = createClient(SUPABASE_URL, SERVICE_ROLE);
 
-    // Deduct tokens
-    const { error: deductErr } = await admin.rpc("deduct_tokens", { p_user_id: user.id, p_amount: TOKENS_PER_VIDEO });
-    if (deductErr) return json({ error: "insufficient_tokens" }, 402);
+    const { data: tokenConfig } = await admin
+      .from("app_config")
+      .select("value")
+      .eq("key", "tokens_enabled")
+      .maybeSingle();
+    const tokensEnabled = String(tokenConfig?.value || "").trim().toLowerCase() === "true";
+    const tokensCharged = tokensEnabled ? TOKENS_PER_VIDEO : 0;
+
+    // Deduct tokens only when token monetisation is enabled.
+    if (tokensCharged > 0) {
+      const { error: deductErr } = await admin.rpc("deduct_tokens", { p_user_id: user.id, p_amount: tokensCharged });
+      if (deductErr) {
+        return json({
+          error: "insufficient_tokens",
+          message: `You need ${TOKENS_PER_VIDEO} tokens to generate a Motion Reel.`,
+          required: TOKENS_PER_VIDEO,
+        }, 402);
+      }
+    }
 
     // Refund helper
     const refund = async (reason: string) => {
-      await admin.rpc("credit_tokens", { p_user_id: user.id, p_amount: TOKENS_PER_VIDEO });
+      if (tokensCharged <= 0) return;
+      await admin.rpc("credit_tokens", { p_user_id: user.id, p_amount: tokensCharged });
       await admin.from("token_transactions").insert({
-        user_id: user.id, amount: TOKENS_PER_VIDEO, type: "refund", description: `video: ${reason}`,
+        user_id: user.id, amount: tokensCharged, type: "refund", description: `video: ${reason}`,
       });
     };
 
@@ -65,7 +82,7 @@ Deno.serve(async (req) => {
         prompt: prompt || null,
         provider: "replicate",
         status: "queued",
-        tokens_charged: TOKENS_PER_VIDEO,
+        tokens_charged: tokensCharged,
       }).select("id").single();
       if (jobErr || !job) throw new Error("job_insert_failed");
 
