@@ -8,14 +8,12 @@ const REPLICATE_API_KEY = Deno.env.get("REPLICATE_API_KEY")!;
 const GW = "https://connector-gateway.lovable.dev/replicate/v1";
 const TOKENS_PER_COMMERCIAL = 80; // 2-3 shots at 40 tokens each
 
-const MODEL_OWNER = "wan-video";
-const MODEL_NAME = "wan-2.2-i2v-fast";
-const SHOT_CREATE_GAP_MS = 12_000;
-const MAX_429_RETRIES = 4;
+const MODEL_OWNER = "kwaivgi";
+const MODEL_NAME = "kling-v3-video";
 
-// Fires one Replicate prediction per shot in the template. Each shot's webhook
-// updates the matching commercial_shots row; the client stitches everything
-// together once all shots are ready.
+// Creates one complete commercial in the video model. This replaces the old
+// multi-shot + browser FFmpeg stitching flow, so low-end phones and blocked CDN
+// requests no longer break the final edit.
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
 
@@ -30,7 +28,7 @@ Deno.serve(async (req) => {
     const user = userRes?.user;
     if (!user) return json({ error: "unauthorized" }, 401);
 
-    const { imageBase64, mimeType, templateId, shots, productName, productId } = await req.json();
+    const { imageBase64, mimeType, templateId, shots, productName, productId, price, templateLabel, captions } = await req.json();
     if (!imageBase64 || !templateId || !Array.isArray(shots) || shots.length === 0) {
       return json({ error: "missing_input" }, 400);
     }
@@ -74,7 +72,7 @@ Deno.serve(async (req) => {
       if (signed.error || !signed.data) throw new Error("sign_failed");
       const sourceUrl = signed.data.signedUrl;
 
-      // Create parent job
+      // Create parent job. The webhook will persist the final rendered MP4 to result_url.
       const { data: job, error: jobErr } = await admin.from("commercial_jobs").insert({
         user_id: user.id,
         source_image_url: sourceUrl,
@@ -87,54 +85,58 @@ Deno.serve(async (req) => {
       }).select("id").single();
       if (jobErr || !job) throw new Error("job_insert_failed");
 
-      // Create shot rows, then fire predictions one-by-one. Some Replicate
-      // accounts are limited to a burst of 1 prediction create even when they
-      // have credit, so parallel creates can make the second shot fail with 429.
-      const shotRows = shots.map((_s: unknown, idx: number) => ({
-        job_id: job.id, shot_index: idx, status: "queued",
-      }));
-      const { data: insertedShots, error: shotErr } = await admin
-        .from("commercial_shots").insert(shotRows).select("id, shot_index");
-      if (shotErr || !insertedShots) throw new Error("shots_insert_failed");
-      // Attach the prompts client-provided at the same index (not stored in DB).
-      const shotsWithPrompt = insertedShots
-        .sort((a: any, b: any) => a.shot_index - b.shot_index)
-        .map((row: any) => ({ ...row, prompt: shots[row.shot_index]?.prompt || "" }));
+      const shotPlan = buildShotPlan(shots);
+      const duration = shotPlan.reduce((sum, s) => sum + s.duration, 0);
+      const captionLine = buildCaptionLine(captions, productName, price);
+      const prompt = buildCommercialPrompt({
+        productName,
+        templateLabel: templateLabel || templateId,
+        shots: shotPlan,
+        captionLine,
+      });
+      const webhookUrl = `${SUPABASE_URL}/functions/v1/commercial-shot-webhook?job_id=${job.id}`;
 
-      const results: Array<{ row: any; status: number; body: string }> = [];
-      for (let i = 0; i < shotsWithPrompt.length; i++) {
-        if (i > 0) await delay(SHOT_CREATE_GAP_MS);
-        const row = shotsWithPrompt[i];
-        const webhookUrl = `${SUPABASE_URL}/functions/v1/commercial-shot-webhook?shot_id=${row.id}`;
-        const result = await createPredictionWithBackoff(row, sourceUrl, webhookUrl);
-        results.push(result);
-        if (result.status === 402 || result.status < 200 || result.status >= 300) break;
-      }
+      const predRes = await fetch(`${GW}/models/${MODEL_OWNER}/${MODEL_NAME}/predictions`, {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${LOVABLE_API_KEY}`,
+          "X-Connection-Api-Key": REPLICATE_API_KEY,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          input: {
+            start_image: sourceUrl,
+            prompt,
+            multi_prompt: JSON.stringify(shotPlan.map((s) => ({ prompt: s.prompt, duration: s.duration }))),
+            duration,
+            mode: "standard",
+            aspect_ratio: "9:16",
+            generate_audio: true,
+            negative_prompt: "warped product, changed logo, wrong text, unreadable captions, duplicate products, extra fingers, blurry, low quality, watermark",
+          },
+          webhook: webhookUrl,
+          webhook_events_filter: ["completed"],
+        }),
+      });
 
-      const anyPaymentIssue = results.find((r) => r.status === 402);
-      const anyFailed = results.find((r) => r.status < 200 || r.status >= 300);
-      if (anyPaymentIssue) {
+      const body = await predRes.text();
+      if (predRes.status === 402) {
         await refund("provider_credit");
         await admin.from("commercial_jobs").update({ status: "failed", error: "provider_no_credit" }).eq("id", job.id);
         return json({ error: "provider_no_credit", message: "Video provider is out of credit. Please try later." }, 402);
       }
-      if (anyFailed) {
+      if (!predRes.ok) {
         await refund("provider_error");
         await admin.from("commercial_jobs").update({
-          status: "failed", error: `provider_${anyFailed.status}: ${anyFailed.body.slice(0, 200)}`,
+          status: "failed", error: `provider_${predRes.status}: ${body.slice(0, 200)}`,
         }).eq("id", job.id);
-        return json({ error: "provider_failed", status: anyFailed.status, details: anyFailed.body }, 502);
+        return json({ error: "provider_failed", status: predRes.status, details: body }, 502);
       }
 
-      // Attach provider IDs
-      await Promise.all(results.map(async (r) => {
-        const pred = JSON.parse(r.body);
-        await admin.from("commercial_shots").update({
-          provider_job_id: pred.id, status: "processing",
-        }).eq("id", r.row.id);
-      }));
+      const pred = JSON.parse(body);
+      await admin.from("commercial_jobs").update({ status: "processing" }).eq("id", job.id);
 
-      return json({ jobId: job.id, totalShots: insertedShots.length });
+      return json({ jobId: job.id, providerId: pred.id, totalShots: shotPlan.length });
     } catch (e: any) {
       await refund(e?.message?.slice(0, 80) || "unknown");
       return json({ error: e?.message || "start_failed" }, 500);
@@ -150,38 +152,54 @@ function json(body: any, status = 200) {
   });
 }
 
-function delay(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
+function buildShotPlan(shots: Array<{ prompt?: string; duration?: number }>) {
+  const raw = shots.map((s) => Math.max(1, Number(s.duration) || 5));
+  const rawTotal = raw.reduce((sum, d) => sum + d, 0) || shots.length * 5;
+  const total = Math.max(3, Math.min(15, Math.round(rawTotal)));
+  let remaining = total;
+
+  return shots.map((s, index) => {
+    const remainingSlots = shots.length - index - 1;
+    const duration = index === shots.length - 1
+      ? remaining
+      : Math.max(1, Math.min(remaining - remainingSlots, Math.round((raw[index] / rawTotal) * total)));
+    remaining -= duration;
+    return {
+      prompt: String(s.prompt || "A polished cinematic product commercial shot with smooth camera movement.").slice(0, 600),
+      duration,
+    };
+  });
 }
 
-async function createPredictionWithBackoff(row: any, sourceUrl: string, webhookUrl: string) {
-  let lastResult = { row, status: 500, body: "prediction_create_failed" };
+function buildCaptionLine(captions: any, productName?: string, price?: string) {
+  if (!Array.isArray(captions)) return "";
+  return captions
+    .map((c) => {
+      if (c?.text) return c.text;
+      if (c?.slot === "name") return productName || "";
+      if (c?.slot === "price") return price || "";
+      if (c?.slot === "cta") return "Order now";
+      if (c?.slot === "hook") return "New";
+      return "";
+    })
+    .filter(Boolean)
+    .join(" • ")
+    .slice(0, 220);
+}
 
-  for (let attempt = 0; attempt <= MAX_429_RETRIES; attempt++) {
-    const predRes = await fetch(`${GW}/models/${MODEL_OWNER}/${MODEL_NAME}/predictions`, {
-      method: "POST",
-      headers: {
-        "Authorization": `Bearer ${LOVABLE_API_KEY}`,
-        "X-Connection-Api-Key": REPLICATE_API_KEY,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        input: { image: sourceUrl, prompt: row.prompt },
-        webhook: webhookUrl,
-        webhook_events_filter: ["completed"],
-      }),
-    });
-
-    const body = await predRes.text();
-    lastResult = { row, status: predRes.status, body };
-    if (predRes.status !== 429) return lastResult;
-
-    const retryAfter = Number(predRes.headers.get("retry-after") || "0");
-    const waitMs = Number.isFinite(retryAfter) && retryAfter > 0
-      ? retryAfter * 1_000
-      : SHOT_CREATE_GAP_MS * (attempt + 1);
-    await delay(waitMs);
-  }
-
-  return lastResult;
+function buildCommercialPrompt(input: {
+  productName?: string;
+  templateLabel?: string;
+  shots: Array<{ prompt: string; duration: number }>;
+  captionLine?: string;
+}) {
+  const scenes = input.shots.map((s, i) => `Scene ${i + 1} (${s.duration}s): ${s.prompt}`).join(" ");
+  return [
+    `Create a polished vertical social media product commercial for ${input.productName || "this product"}.`,
+    "Use the uploaded photo as the hero product reference; keep the product identity, shape, color, material, and branding consistent.",
+    `Commercial style: ${input.templateLabel || "premium product ad"}.`,
+    scenes,
+    input.captionLine ? `Add tasteful, short, readable on-screen marketing captions: ${input.captionLine}.` : "Add tasteful, short, readable on-screen marketing captions.",
+    "Smooth cinematic camera movement, premium e-commerce lighting, strong product focus, ready for Instagram Reels, WhatsApp Status, and TikTok. Generate fitting upbeat commercial audio, no watermark.",
+  ].filter(Boolean).join("\n").slice(0, 2400);
 }
