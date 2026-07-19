@@ -126,12 +126,12 @@ const DashboardSettings = () => {
           setCountry(savedCountry);
           // Auto-detect country if not set
           if (!savedCountry) {
-            fetch("https://ipapi.co/json/")
+            fetch("https://ipwho.is/")
               .then((r) => r.json())
               .then((geo) => {
-                if (geo?.country_name) {
+                if (geo?.country) {
                   const match = SUPPORTED_COUNTRIES.find(
-                    (c) => c.toLowerCase() === geo.country_name.toLowerCase()
+                    (c) => c.toLowerCase() === geo.country.toLowerCase()
                   );
                   if (match) setCountry(match);
                 }
