@@ -276,6 +276,7 @@ export type Database = {
           updated_at: string
           user_id: string
           variants_text: string | null
+          view_count: number
           whatsapp_taps: number
         }
         Insert: {
@@ -295,6 +296,7 @@ export type Database = {
           updated_at?: string
           user_id: string
           variants_text?: string | null
+          view_count?: number
           whatsapp_taps?: number
         }
         Update: {
@@ -314,6 +316,7 @@ export type Database = {
           updated_at?: string
           user_id?: string
           variants_text?: string | null
+          view_count?: number
           whatsapp_taps?: number
         }
         Relationships: [
@@ -907,6 +910,54 @@ export type Database = {
         }
         Relationships: []
       }
+      video_jobs: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          error: string | null
+          id: string
+          prompt: string | null
+          provider: string
+          provider_job_id: string | null
+          result_url: string | null
+          source_image_url: string
+          status: string
+          template: string
+          tokens_charged: number
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          error?: string | null
+          id?: string
+          prompt?: string | null
+          provider?: string
+          provider_job_id?: string | null
+          result_url?: string | null
+          source_image_url: string
+          status?: string
+          template: string
+          tokens_charged?: number
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          error?: string | null
+          id?: string
+          prompt?: string | null
+          provider?: string
+          provider_job_id?: string | null
+          result_url?: string | null
+          source_image_url?: string
+          status?: string
+          template?: string
+          tokens_charged?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       suppliers_public: {
@@ -974,6 +1025,7 @@ export type Database = {
         Args: { payload: Json; queue_name: string }
         Returns: number
       }
+      increment_product_views: { Args: { p_id: string }; Returns: undefined }
       increment_store_views: { Args: { slug: string }; Returns: undefined }
       increment_whatsapp_taps: { Args: { p_id: string }; Returns: undefined }
       is_admin: { Args: { _user_id: string }; Returns: boolean }

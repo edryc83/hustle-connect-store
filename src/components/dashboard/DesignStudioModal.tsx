@@ -14,11 +14,12 @@ import { InsufficientTokensModal } from "@/components/tokens/InsufficientTokensM
 import { TOKENS_PER_DESIGN } from "@/lib/tokenPackages";
 import { Coins } from "lucide-react";
 import {
-  Loader2, Sparkles, Package, Wand2, ArrowLeft, Download, Share2, RefreshCw, Search, Shuffle, Check, Upload, Trash2, Copy, ImagePlus, X,
+  Loader2, Sparkles, Package, Wand2, ArrowLeft, Download, Share2, RefreshCw, Search, Shuffle, Check, Upload, Trash2, Copy, ImagePlus, X, Film,
 } from "lucide-react";
 import { Camera } from "lucide-react";
 import { AutoDesignModal } from "./AutoDesignModal";
 import { StudioShotModal } from "./StudioShotModal";
+import { StudioReelModal } from "./StudioReelModal";
 import { INSPIRATIONS, COLOR_THEMES, pickRandomInspiration } from "./designInspirations";
 import { POSTER_OCCASIONS, POSTER_OF_THE_DAY_TEMPLATES, getTodaysOccasions, type PosterOccasion } from "./posterOfTheDay";
 import { CalendarHeart } from "lucide-react";
@@ -65,6 +66,7 @@ export function DesignStudioModal({ open, onClose, initialProduct = null }: Prop
   const [copyMode, setCopyMode] = useState<CopyMode | null>(null);
   const [showInsufficientTokens, setShowInsufficientTokens] = useState(false);
   const [studioShotOpen, setStudioShotOpen] = useState(false);
+  const [studioReelOpen, setStudioReelOpen] = useState(false);
   const { balance, enabled: tokensEnabled, refetch: refetchTokens } = useTokens();
 
   useEffect(() => {
@@ -410,6 +412,10 @@ export function DesignStudioModal({ open, onClose, initialProduct = null }: Prop
       open={studioShotOpen}
       onClose={() => setStudioShotOpen(false)}
     />
+    <StudioReelModal
+      open={studioReelOpen}
+      onClose={() => setStudioReelOpen(false)}
+    />
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
       <DialogContent
         hideCloseButton
@@ -512,6 +518,14 @@ export function DesignStudioModal({ open, onClose, initialProduct = null }: Prop
                 desc: "Turn a phone pic into a clean studio photo",
                 tint: "from-pink-500/20 to-rose-500/10 text-pink-300 border-pink-500/30",
                 onClick: () => { setStudioShotOpen(true); },
+              },
+              {
+                id: "motionreel",
+                icon: Film,
+                title: "Motion Reel",
+                desc: "Turn your product photo into a cinematic video",
+                tint: "from-violet-500/20 to-fuchsia-500/10 text-violet-300 border-violet-500/30",
+                onClick: () => { setStudioReelOpen(true); },
               },
             ].map((opt) => {
               const Icon = opt.icon;
