@@ -1,5 +1,6 @@
 export const TOKENS_PER_DESIGN = 10;
 export const TOKENS_PER_ENHANCE = 5;
+export const TOKENS_PER_VIDEO = 40;
 export const TOKEN_VALUE_UGX = 200; // 1 token = UGX 200
 
 export interface TokenPackage {
