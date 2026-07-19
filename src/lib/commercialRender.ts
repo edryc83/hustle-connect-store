@@ -233,6 +233,8 @@ export async function renderCommercial(input: RenderInput): Promise<Blob> {
 
   onProgress?.("rendering", 0.98);
   const data = (await ffmpeg.readFile("out.mp4")) as Uint8Array;
+  const buf = new Uint8Array(data.byteLength);
+  buf.set(data);
 
   // Cleanup
   const cleanup = [
@@ -243,5 +245,5 @@ export async function renderCommercial(input: RenderInput): Promise<Blob> {
     try { await ffmpeg.deleteFile(f); } catch {}
   }
 
-  return new Blob([data], { type: "video/mp4" });
+  return new Blob([buf], { type: "video/mp4" });
 }
