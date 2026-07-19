@@ -28,7 +28,7 @@ Deno.serve(async (req) => {
     const user = userRes?.user;
     if (!user) return json({ error: "unauthorized" }, 401);
 
-    const { imageBase64, mimeType, templateId, shots, productName } = await req.json();
+    const { imageBase64, mimeType, templateId, shots, productName, productId } = await req.json();
     if (!imageBase64 || !templateId || !Array.isArray(shots) || shots.length === 0) {
       return json({ error: "missing_input" }, 400);
     }
@@ -77,22 +77,27 @@ Deno.serve(async (req) => {
         user_id: user.id,
         source_image_url: sourceUrl,
         template_id: templateId,
-        product_name: productName || null,
+        product_id: productId || null,
+        vibe_prompt: productName || null,
         status: "processing",
         tokens_charged: tokensCharged,
-        total_shots: shots.length,
+        shot_count: shots.length,
       }).select("id").single();
       if (jobErr || !job) throw new Error("job_insert_failed");
 
       // Create shot rows + fire predictions in parallel
-      const shotRows = shots.map((s: { prompt: string }, idx: number) => ({
-        job_id: job.id, user_id: user.id, shot_index: idx, prompt: s.prompt, status: "queued",
+      const shotRows = shots.map((_s: unknown, idx: number) => ({
+        job_id: job.id, shot_index: idx, status: "queued",
       }));
       const { data: insertedShots, error: shotErr } = await admin
-        .from("commercial_shots").insert(shotRows).select("id, shot_index, prompt");
+        .from("commercial_shots").insert(shotRows).select("id, shot_index");
       if (shotErr || !insertedShots) throw new Error("shots_insert_failed");
+      // Attach the prompts client-provided at the same index (not stored in DB).
+      const shotsWithPrompt = insertedShots
+        .sort((a: any, b: any) => a.shot_index - b.shot_index)
+        .map((row: any) => ({ ...row, prompt: shots[row.shot_index]?.prompt || "" }));
 
-      const results = await Promise.all(insertedShots.map(async (row: any) => {
+      const results = await Promise.all(shotsWithPrompt.map(async (row: any) => {
         const webhookUrl = `${SUPABASE_URL}/functions/v1/commercial-shot-webhook?shot_id=${row.id}`;
         const predRes = await fetch(`${GW}/models/${MODEL_OWNER}/${MODEL_NAME}/predictions`, {
           method: "POST",
