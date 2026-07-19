@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
@@ -52,6 +52,37 @@ export function StudioCommercialModal({ open, onClose }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [starting, setStarting] = useState(false);
   const [showInsufficient, setShowInsufficient] = useState(false);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+
+  const activeTemplate = COMMERCIAL_TEMPLATES.find((t) => t.id === templateId) || null;
+  const soundtrackUrl = activeTemplate?.music || null;
+
+  // Keep the soundtrack in lock-step with the (muted) video so the commercial
+  // always plays with music instead of AI-generated commentary.
+  useEffect(() => {
+    if (stage !== "result") return;
+    const v = videoRef.current;
+    const a = audioRef.current;
+    if (!v || !a) return;
+    a.volume = 0.85;
+    const sync = () => { try { a.currentTime = v.currentTime % (a.duration || 1); } catch {} };
+    const onPlay = () => { sync(); a.play().catch(() => {}); };
+    const onPause = () => a.pause();
+    const onSeeked = () => sync();
+    const onEnded = () => { a.pause(); a.currentTime = 0; };
+    v.addEventListener("play", onPlay);
+    v.addEventListener("pause", onPause);
+    v.addEventListener("seeked", onSeeked);
+    v.addEventListener("ended", onEnded);
+    return () => {
+      v.removeEventListener("play", onPlay);
+      v.removeEventListener("pause", onPause);
+      v.removeEventListener("seeked", onSeeked);
+      v.removeEventListener("ended", onEnded);
+      a.pause();
+    };
+  }, [stage, resultUrl, soundtrackUrl]);
 
   const { data: currency = "UGX" } = useQuery({
     queryKey: ["profile-currency", user?.id],
@@ -404,7 +435,19 @@ export function StudioCommercialModal({ open, onClose }: Props) {
           {stage === "result" && resultUrl && (
             <div className="space-y-3">
               <div className="aspect-[9/16] max-h-[60vh] mx-auto rounded-xl overflow-hidden bg-black">
-                <video src={resultUrl} className="w-full h-full object-contain" controls autoPlay loop playsInline />
+                <video
+                  ref={videoRef}
+                  src={resultUrl}
+                  className="w-full h-full object-contain"
+                  controls
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                />
+                {soundtrackUrl && (
+                  <audio ref={audioRef} src={soundtrackUrl} loop preload="auto" />
+                )}
               </div>
               <div className="grid grid-cols-3 gap-2">
                 <Button variant="outline" onClick={reset} className="gap-1.5">
