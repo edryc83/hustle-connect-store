@@ -907,6 +907,54 @@ export type Database = {
         }
         Relationships: []
       }
+      video_jobs: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          error: string | null
+          id: string
+          prompt: string | null
+          provider: string
+          provider_job_id: string | null
+          result_url: string | null
+          source_image_url: string
+          status: string
+          template: string
+          tokens_charged: number
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          error?: string | null
+          id?: string
+          prompt?: string | null
+          provider?: string
+          provider_job_id?: string | null
+          result_url?: string | null
+          source_image_url: string
+          status?: string
+          template: string
+          tokens_charged?: number
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          error?: string | null
+          id?: string
+          prompt?: string | null
+          provider?: string
+          provider_job_id?: string | null
+          result_url?: string | null
+          source_image_url?: string
+          status?: string
+          template?: string
+          tokens_charged?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       suppliers_public: {
