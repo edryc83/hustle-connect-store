@@ -109,10 +109,10 @@ Deno.serve(async (req) => {
             prompt,
             multi_prompt: JSON.stringify(shotPlan.map((s) => ({ prompt: s.prompt, duration: s.duration }))),
             duration,
-            mode: "standard",
+            mode: "pro",
             aspect_ratio: "9:16",
-            generate_audio: true,
-            negative_prompt: "warped product, changed logo, wrong text, unreadable captions, duplicate products, extra fingers, blurry, low quality, watermark",
+            generate_audio: false,
+            negative_prompt: "any spoken words, voiceover, narration, person talking, mouth movement, lip sync, subtitles burned in, warped product, changed logo, wrong text, unreadable captions, duplicate products, extra fingers, blurry, soft focus, low quality, low resolution, watermark, logo overlay, timestamp, plastic look, uncanny, artifacts, motion blur smear",
           },
           webhook: webhookUrl,
           webhook_events_filter: ["completed"],
@@ -195,11 +195,13 @@ function buildCommercialPrompt(input: {
 }) {
   const scenes = input.shots.map((s, i) => `Scene ${i + 1} (${s.duration}s): ${s.prompt}`).join(" ");
   return [
-    `Create a polished vertical social media product commercial for ${input.productName || "this product"}.`,
-    "Use the uploaded photo as the hero product reference; keep the product identity, shape, color, material, and branding consistent.",
-    `Commercial style: ${input.templateLabel || "premium product ad"}.`,
+    `Direct a world-class, award-winning vertical 9:16 product commercial for ${input.productName || "this product"} — the caliber of a Nike, Apple or Chanel campaign film.`,
+    "Treat the uploaded photo as the hero product reference and preserve its exact identity, silhouette, colors, materials, textures, labels and branding across every frame — no morphing, no distortion, no duplicates.",
+    `Creative style: ${input.templateLabel || "premium product ad"}.`,
     scenes,
-    input.captionLine ? `Add tasteful, short, readable on-screen marketing captions: ${input.captionLine}.` : "Add tasteful, short, readable on-screen marketing captions.",
-    "Smooth cinematic camera movement, premium e-commerce lighting, strong product focus, ready for Instagram Reels, WhatsApp Status, and TikTok. Generate fitting upbeat commercial audio, no watermark.",
+    "Shoot on a virtual full-frame cinema camera: hyper-realistic detail, razor sharp product, tack-focused hero, tasteful shallow depth of field, elegant parallax, silky smooth motion, subtle micro-movement, gorgeous physically-based lighting with soft key + rim + practical bounces, luxurious specular highlights, clean color grade with rich contrast, deep blacks and film-like highlight roll-off, ultra-fine grain, 4K master quality, 24fps cinematic cadence.",
+    "Silent film — absolutely no dialogue, no voiceover, no narration, no on-screen humans speaking, no lip movement. Music will be added later.",
+    input.captionLine ? `Overlay tasteful, minimal on-screen marketing captions, perfectly kerned typography, safely inside the vertical safe area: ${input.captionLine}.` : "Overlay one or two tasteful, minimal on-screen marketing captions with perfectly kerned typography, safely inside the vertical safe area.",
+    "Deliverable: a scroll-stopping premium commercial ready for Instagram Reels, TikTok and WhatsApp Status. No watermark, no logos other than the product's own, no timestamp, no UI chrome.",
   ].filter(Boolean).join("\n").slice(0, 2400);
 }
