@@ -1,0 +1,1 @@
+UPDATE app_config SET value = 'false' WHERE key = 'tokens_enabled';
