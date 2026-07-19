@@ -533,6 +533,14 @@ export function DesignStudioModal({ open, onClose, initialProduct = null }: Prop
                 tint: "from-violet-500/20 to-fuchsia-500/10 text-violet-300 border-violet-500/30",
                 onClick: () => { setStudioReelOpen(true); },
               },
+              {
+                id: "commercial",
+                icon: Clapperboard,
+                title: "Studio Commercial",
+                desc: "Multi-shot ad with music + captions from a product photo",
+                tint: "from-fuchsia-500/20 to-amber-500/10 text-fuchsia-300 border-fuchsia-500/30",
+                onClick: () => { setStudioCommercialOpen(true); },
+              },
             ].map((opt) => {
               const Icon = opt.icon;
               return (
