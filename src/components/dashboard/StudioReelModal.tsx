@@ -256,21 +256,44 @@ export function StudioReelModal({ open, onClose }: Props) {
                 <Sparkles className="h-7 w-7 mx-auto text-primary" />
                 <p className="text-sm font-bold">One photo. One cinematic reel.</p>
                 <p className="text-[11px] text-muted-foreground leading-snug">
-                  Turn a product picture into a 5-second commercial video for Reels, Status, or TikTok.
+                  Pick a product from your store — we'll turn it into a 5-second commercial video for Reels, Status, or TikTok.
                 </p>
               </div>
-              <button
-                onClick={() => fileInputRef.current?.click()}
-                className="w-full flex flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-border/60 hover:border-primary/50 hover:bg-primary/5 p-8 transition"
-              >
-                <ImagePlus className="h-10 w-10 text-muted-foreground" />
-                <span className="text-sm font-semibold">Tap to choose a product photo</span>
-                <span className="text-[11px] text-muted-foreground">Sharp, well-lit shots work best</span>
-              </button>
-              <input
-                ref={fileInputRef} type="file" accept="image/*" className="hidden"
-                onChange={(e) => { const f = e.target.files?.[0]; if (f) handlePick(f); e.target.value = ""; }}
-              />
+              {productsLoading ? (
+                <div className="flex items-center justify-center py-10">
+                  <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                </div>
+              ) : products.length === 0 ? (
+                <div className="rounded-2xl border-2 border-dashed border-border/60 p-8 text-center space-y-2">
+                  <Package className="h-10 w-10 mx-auto text-muted-foreground" />
+                  <p className="text-sm font-semibold">No products yet</p>
+                  <p className="text-[11px] text-muted-foreground">Add a product with a photo first, then come back to create its reel.</p>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <p className="text-[11px] font-semibold text-muted-foreground px-1">Choose a product</p>
+                  <div className="grid grid-cols-3 gap-2 max-h-[52vh] overflow-y-auto pr-1">
+                    {products.map((p) => (
+                      <button
+                        key={p.id}
+                        disabled={loadingProduct}
+                        onClick={() => handleSelectProduct(p)}
+                        className="group relative rounded-xl overflow-hidden border border-border hover:border-primary/60 transition aspect-square bg-muted"
+                      >
+                        <img src={p.image_url!} alt={p.name} className="w-full h-full object-cover" />
+                        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-1.5">
+                          <p className="text-[10px] text-white font-medium truncate">{p.name}</p>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                  {loadingProduct && (
+                    <p className="text-[11px] text-center text-muted-foreground flex items-center justify-center gap-1.5 pt-1">
+                      <Loader2 className="h-3 w-3 animate-spin" /> Loading product…
+                    </p>
+                  )}
+                </div>
+              )}
               {tokensEnabled && (
                 <p className="text-center text-[11px] text-muted-foreground flex items-center justify-center gap-1">
                   <Coins className="h-3 w-3 text-amber-400" /> {TOKENS_PER_VIDEO} tokens per reel
