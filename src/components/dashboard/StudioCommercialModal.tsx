@@ -15,7 +15,6 @@ import {
   ArrowLeft, Coins, Sparkles, Clapperboard, Check,
 } from "lucide-react";
 import { COMMERCIAL_TEMPLATES } from "./commercialTemplates";
-import { renderCommercial } from "@/lib/commercialRender";
 import { formatPrice } from "@/lib/currency";
 import { useQuery } from "@tanstack/react-query";
 
@@ -33,7 +32,7 @@ interface Props {
   onClose: () => void;
 }
 
-type Stage = "pick" | "template" | "processing" | "stitching" | "result";
+type Stage = "pick" | "template" | "processing" | "result";
 
 export function StudioCommercialModal({ open, onClose }: Props) {
   const { user } = useAuth();
@@ -53,8 +52,6 @@ export function StudioCommercialModal({ open, onClose }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [starting, setStarting] = useState(false);
   const [showInsufficient, setShowInsufficient] = useState(false);
-  const [stitchProgress, setStitchProgress] = useState(0);
-  const [stitchStage, setStitchStage] = useState<"loading" | "downloading" | "rendering">("loading");
 
   const { data: currency = "UGX" } = useQuery({
     queryKey: ["profile-currency", user?.id],
@@ -85,29 +82,13 @@ export function StudioCommercialModal({ open, onClose }: Props) {
       setOriginalUrl(null); setOriginalFile(null); setSelectedProduct(null);
       setTemplateId(null); setJobId(null); setShotStatuses([]);
       setResultUrl(null); setError(null); setStarting(false);
-      setStitchProgress(0); setStitchStage("loading");
     }
   }, [open]);
 
-  // Realtime per-shot status. When the job flips to "ready" we start client-side stitching.
+  // Realtime job status. The backend video model now returns the finished commercial,
+  // so the app no longer depends on on-device FFmpeg editing.
   useEffect(() => {
     if (!jobId || !user) return;
-    const tpl = COMMERCIAL_TEMPLATES.find((t) => t.id === templateId);
-
-    const shotsChannel = supabase
-      .channel(`commercial-shots-${jobId}`)
-      .on("postgres_changes", {
-        event: "*", schema: "public", table: "commercial_shots", filter: `job_id=eq.${jobId}`,
-      }, (payload) => {
-        const row: any = payload.new;
-        if (!row) return;
-        setShotStatuses((prev) => {
-          const others = prev.filter((s) => s.shot_index !== row.shot_index);
-          return [...others, { shot_index: row.shot_index, status: row.status, video_url: row.video_url }]
-            .sort((a, b) => a.shot_index - b.shot_index);
-        });
-      })
-      .subscribe();
 
     const jobChannel = supabase
       .channel(`commercial-job-${jobId}`)
@@ -121,48 +102,23 @@ export function StudioCommercialModal({ open, onClose }: Props) {
           refetchTokens();
           return;
         }
-        if (row.status === "ready" && tpl && selectedProduct) {
-          // Pull the final shot list ordered by index
-          const { data: shots } = await supabase
-            .from("commercial_shots")
-            .select("shot_index, video_url")
-            .eq("job_id", jobId)
-            .order("shot_index");
-          const urls = (shots || []).map((s: any) => s.video_url).filter(Boolean);
-          if (urls.length !== tpl.shots.length) {
-            setError("Shots incomplete — try again.");
+        if (row.status === "ready") {
+          if (!row.result_url) {
+            setError("Commercial finished, but no video URL was returned. Try again.");
             setStage("template");
             return;
           }
-          setStage("stitching");
-          try {
-            const priceStr = selectedProduct.price
-              ? formatPrice(Number(selectedProduct.price), currency)
-              : "";
-            const blob = await renderCommercial({
-              template: tpl,
-              shotUrls: urls,
-              productName: selectedProduct.name,
-              price: priceStr,
-              onProgress: (s, p) => { setStitchStage(s); setStitchProgress(p); },
-            });
-            const blobUrl = URL.createObjectURL(blob);
-            setResultUrl(blobUrl);
-            setStage("result");
-            refetchTokens();
-          } catch (e: any) {
-            setError("Editing failed on your device: " + (e?.message || "unknown"));
-            setStage("template");
-          }
+          setResultUrl(row.result_url);
+          setStage("result");
+          refetchTokens();
         }
       })
       .subscribe();
 
     return () => {
-      supabase.removeChannel(shotsChannel);
       supabase.removeChannel(jobChannel);
     };
-  }, [jobId, user, templateId, selectedProduct, currency, refetchTokens]);
+  }, [jobId, user, refetchTokens]);
 
   const handleSelectProduct = async (p: ProductLite) => {
     if (!p.image_url) return;
@@ -205,8 +161,13 @@ export function StudioCommercialModal({ open, onClose }: Props) {
         selectedProduct.description && `Details: ${selectedProduct.description}`,
       ].filter(Boolean).join(". ");
 
-      const shots = tpl.shots.map((cameraPrompt) => ({
+      const priceStr = selectedProduct.price
+        ? formatPrice(Number(selectedProduct.price), currency)
+        : "";
+
+      const shots = tpl.shots.map((cameraPrompt, index) => ({
         prompt: productContext ? `${cameraPrompt} ${productContext}` : cameraPrompt,
+        duration: tpl.shotDurations[index] ?? 5,
       }));
 
       const { data: { session } } = await supabase.auth.getSession();
@@ -224,6 +185,9 @@ export function StudioCommercialModal({ open, onClose }: Props) {
             mimeType: originalFile.type,
             templateId: tpl.id,
             shots,
+            captions: tpl.captions,
+            templateLabel: tpl.label,
+            price: priceStr,
             productName: selectedProduct.name,
             productId: selectedProduct.id,
           }),
@@ -289,11 +253,10 @@ export function StudioCommercialModal({ open, onClose }: Props) {
     setStage("pick");
     setOriginalUrl(null); setOriginalFile(null); setSelectedProduct(null);
     setTemplateId(null); setJobId(null); setShotStatuses([]);
-    setResultUrl(null); setError(null); setStitchProgress(0);
+    setResultUrl(null); setError(null);
   };
 
-  const readyShots = shotStatuses.filter((s) => s.status === "ready").length;
-  const totalShots = shotStatuses.length;
+  const totalShots = COMMERCIAL_TEMPLATES.find((t) => t.id === templateId)?.shots.length || shotStatuses.length;
 
   return (
     <>
@@ -303,7 +266,7 @@ export function StudioCommercialModal({ open, onClose }: Props) {
           <DialogHeader>
             <DialogTitle className="flex items-center justify-between">
               <span className="flex items-center gap-2">
-                {stage !== "pick" && stage !== "processing" && stage !== "stitching" && (
+                {stage !== "pick" && stage !== "processing" && (
                   <button
                     onClick={() => (stage === "result" ? reset() : setStage("pick"))}
                     className="text-muted-foreground hover:text-foreground"
@@ -420,50 +383,21 @@ export function StudioCommercialModal({ open, onClose }: Props) {
                 <div className="absolute inset-0 rounded-full bg-primary/20 blur-2xl animate-pulse" />
                 <Loader2 className="relative h-14 w-14 animate-spin text-primary" />
               </div>
-              <p className="text-sm font-semibold">Filming {totalShots} cinematic shots…</p>
+              <p className="text-sm font-semibold">Making your full commercial…</p>
               <div className="w-full max-w-[240px] space-y-1.5">
-                {shotStatuses.map((s) => (
-                  <div key={s.shot_index} className="flex items-center gap-2 text-[11px]">
-                    <div className={`h-4 w-4 rounded-full flex items-center justify-center ${
-                      s.status === "ready" ? "bg-emerald-500 text-white" :
-                      s.status === "failed" ? "bg-red-500 text-white" :
-                      "bg-muted"
-                    }`}>
-                      {s.status === "ready" ? <Check className="h-2.5 w-2.5" /> :
-                       s.status === "failed" ? "!" :
-                       <Loader2 className="h-2.5 w-2.5 animate-spin" />}
+                {Array.from({ length: totalShots || 1 }).map((_, i) => (
+                  <div key={i} className="flex items-center gap-2 text-[11px]">
+                    <div className="h-4 w-4 rounded-full flex items-center justify-center bg-muted">
+                      <Loader2 className="h-2.5 w-2.5 animate-spin" />
                     </div>
-                    <span className={s.status === "ready" ? "text-foreground" : "text-muted-foreground"}>
-                      Shot {s.shot_index + 1} — {s.status}
-                    </span>
+                    <span className="text-muted-foreground">Scene {i + 1} — rendering</span>
                   </div>
                 ))}
               </div>
               <p className="text-[11px] text-muted-foreground text-center max-w-[240px]">
-                {readyShots}/{totalShots} ready. Usually 1–3 minutes per shot. You can close and come back.
+                A single AI model is creating the scenes, motion, music, and final cut. Usually 2–5 minutes.
               </p>
               <Button variant="ghost" size="sm" onClick={onClose}>Close and come back later</Button>
-            </div>
-          )}
-
-          {stage === "stitching" && (
-            <div className="flex-1 flex flex-col items-center justify-center gap-3 py-8">
-              <div className="relative">
-                <div className="absolute inset-0 rounded-full bg-primary/20 blur-2xl animate-pulse" />
-                <Clapperboard className="relative h-14 w-14 text-primary animate-pulse" />
-              </div>
-              <p className="text-sm font-semibold">Editing your commercial…</p>
-              <div className="w-full max-w-[240px] h-2 rounded-full bg-muted overflow-hidden">
-                <div
-                  className="h-full bg-gradient-to-r from-fuchsia-500 to-amber-400 transition-all"
-                  style={{ width: `${Math.round(stitchProgress * 100)}%` }}
-                />
-              </div>
-              <p className="text-[11px] text-muted-foreground text-center max-w-[240px]">
-                {stitchStage === "loading" && "Loading the editor…"}
-                {stitchStage === "downloading" && "Downloading shots + music…"}
-                {stitchStage === "rendering" && "Cutting shots, overlaying captions, mixing music…"}
-              </p>
             </div>
           )}
 
