@@ -412,6 +412,10 @@ export function DesignStudioModal({ open, onClose, initialProduct = null }: Prop
       open={studioShotOpen}
       onClose={() => setStudioShotOpen(false)}
     />
+    <StudioReelModal
+      open={studioReelOpen}
+      onClose={() => setStudioReelOpen(false)}
+    />
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
       <DialogContent
         hideCloseButton
