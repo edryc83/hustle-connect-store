@@ -40,7 +40,7 @@ Deno.serve(async (req) => {
     const refund = async (reason: string) => {
       await admin.rpc("credit_tokens", { p_user_id: user.id, p_amount: TOKENS_PER_VIDEO });
       await admin.from("token_transactions").insert({
-        user_id: user.id, amount: TOKENS_PER_VIDEO, kind: "refund", note: `video: ${reason}`,
+        user_id: user.id, amount: TOKENS_PER_VIDEO, type: "refund", description: `video: ${reason}`,
       });
     };
 

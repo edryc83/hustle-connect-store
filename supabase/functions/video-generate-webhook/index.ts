@@ -62,6 +62,6 @@ async function refund(admin: any, job: any) {
   if (!job?.tokens_charged) return;
   await admin.rpc("credit_tokens", { p_user_id: job.user_id, p_amount: job.tokens_charged });
   await admin.from("token_transactions").insert({
-    user_id: job.user_id, amount: job.tokens_charged, kind: "refund", note: `video job ${job.id}`,
+    user_id: job.user_id, amount: job.tokens_charged, type: "refund", description: `video job ${job.id}`,
   });
 }
