@@ -521,14 +521,6 @@ export function DesignStudioModal({ open, onClose, initialProduct = null }: Prop
                 onClick: () => { setStudioShotOpen(true); },
               },
               {
-                id: "motionreel",
-                icon: Film,
-                title: "Motion Reel",
-                desc: "Turn your product photo into a cinematic video",
-                tint: "from-violet-500/20 to-fuchsia-500/10 text-violet-300 border-violet-500/30",
-                onClick: () => { setStudioReelOpen(true); },
-              },
-              {
                 id: "commercial",
                 icon: Clapperboard,
                 title: "Studio Commercial",
