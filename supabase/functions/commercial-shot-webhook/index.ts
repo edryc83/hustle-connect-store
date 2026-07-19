@@ -4,8 +4,8 @@ import { corsHeaders } from "npm:@supabase/supabase-js@2/cors";
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL")!;
 const SERVICE_ROLE = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
-// One webhook call per shot. When every shot in a job is ready we flip the
-// parent commercial_jobs row to "ready" so the client can start stitching.
+// Handles completed AI video callbacks. New Studio Commercial jobs return one
+// finished MP4 directly; the older per-shot path remains for old in-flight jobs.
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: corsHeaders });
   const url = new URL(req.url);
