@@ -65,6 +65,98 @@ export type Database = {
         }
         Relationships: []
       }
+      commercial_jobs: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          error: string | null
+          id: string
+          product_id: string | null
+          result_url: string | null
+          shot_count: number
+          source_image_url: string | null
+          status: string
+          template_id: string
+          tokens_charged: number
+          user_id: string
+          vibe_prompt: string | null
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          error?: string | null
+          id?: string
+          product_id?: string | null
+          result_url?: string | null
+          shot_count: number
+          source_image_url?: string | null
+          status?: string
+          template_id: string
+          tokens_charged?: number
+          user_id: string
+          vibe_prompt?: string | null
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          error?: string | null
+          id?: string
+          product_id?: string | null
+          result_url?: string | null
+          shot_count?: number
+          source_image_url?: string | null
+          status?: string
+          template_id?: string
+          tokens_charged?: number
+          user_id?: string
+          vibe_prompt?: string | null
+        }
+        Relationships: []
+      }
+      commercial_shots: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          error: string | null
+          id: string
+          job_id: string
+          provider_job_id: string | null
+          shot_index: number
+          status: string
+          video_url: string | null
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          error?: string | null
+          id?: string
+          job_id: string
+          provider_job_id?: string | null
+          shot_index: number
+          status?: string
+          video_url?: string | null
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          error?: string | null
+          id?: string
+          job_id?: string
+          provider_job_id?: string | null
+          shot_index?: number
+          status?: string
+          video_url?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "commercial_shots_job_id_fkey"
+            columns: ["job_id"]
+            isOneToOne: false
+            referencedRelation: "commercial_jobs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       email_send_log: {
         Row: {
           created_at: string

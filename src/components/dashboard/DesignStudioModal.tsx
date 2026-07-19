@@ -16,10 +16,11 @@ import { Coins } from "lucide-react";
 import {
   Loader2, Sparkles, Package, Wand2, ArrowLeft, Download, Share2, RefreshCw, Search, Shuffle, Check, Upload, Trash2, Copy, ImagePlus, X, Film,
 } from "lucide-react";
-import { Camera } from "lucide-react";
+import { Camera, Clapperboard } from "lucide-react";
 import { AutoDesignModal } from "./AutoDesignModal";
 import { StudioShotModal } from "./StudioShotModal";
 import { StudioReelModal } from "./StudioReelModal";
+import { StudioCommercialModal } from "./StudioCommercialModal";
 import { INSPIRATIONS, COLOR_THEMES, pickRandomInspiration } from "./designInspirations";
 import { POSTER_OCCASIONS, POSTER_OF_THE_DAY_TEMPLATES, getTodaysOccasions, type PosterOccasion } from "./posterOfTheDay";
 import { CalendarHeart } from "lucide-react";
@@ -67,6 +68,7 @@ export function DesignStudioModal({ open, onClose, initialProduct = null }: Prop
   const [showInsufficientTokens, setShowInsufficientTokens] = useState(false);
   const [studioShotOpen, setStudioShotOpen] = useState(false);
   const [studioReelOpen, setStudioReelOpen] = useState(false);
+  const [studioCommercialOpen, setStudioCommercialOpen] = useState(false);
   const { balance, enabled: tokensEnabled, refetch: refetchTokens } = useTokens();
 
   useEffect(() => {
@@ -416,6 +418,10 @@ export function DesignStudioModal({ open, onClose, initialProduct = null }: Prop
       open={studioReelOpen}
       onClose={() => setStudioReelOpen(false)}
     />
+    <StudioCommercialModal
+      open={studioCommercialOpen}
+      onClose={() => setStudioCommercialOpen(false)}
+    />
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
       <DialogContent
         hideCloseButton
@@ -526,6 +532,14 @@ export function DesignStudioModal({ open, onClose, initialProduct = null }: Prop
                 desc: "Turn your product photo into a cinematic video",
                 tint: "from-violet-500/20 to-fuchsia-500/10 text-violet-300 border-violet-500/30",
                 onClick: () => { setStudioReelOpen(true); },
+              },
+              {
+                id: "commercial",
+                icon: Clapperboard,
+                title: "Studio Commercial",
+                desc: "Multi-shot ad with music + captions from a product photo",
+                tint: "from-fuchsia-500/20 to-amber-500/10 text-fuchsia-300 border-fuchsia-500/30",
+                onClick: () => { setStudioCommercialOpen(true); },
               },
             ].map((opt) => {
               const Icon = opt.icon;
