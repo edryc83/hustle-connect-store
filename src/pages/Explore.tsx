@@ -173,10 +173,10 @@ const Explore = () => {
   };
 
   useEffect(() => {
-    fetch("https://ipapi.co/json/")
+    fetch("https://ipwho.is/")
       .then((r) => r.json())
       .then((data) => {
-        if (data?.country_name) setDetectedCountry(data.country_name);
+        if (data?.country) setDetectedCountry(data.country);
       })
       .catch(() => {});
   }, []);
