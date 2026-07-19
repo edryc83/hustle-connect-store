@@ -109,7 +109,7 @@ Deno.serve(async (req) => {
             prompt,
             multi_prompt: JSON.stringify(shotPlan.map((s) => ({ prompt: s.prompt, duration: s.duration }))),
             duration,
-            mode: "pro",
+            mode: "std",
             aspect_ratio: "9:16",
             generate_audio: false,
             negative_prompt: "any spoken words, voiceover, narration, person talking, mouth movement, lip sync, subtitles burned in, warped product, changed logo, wrong text, unreadable captions, duplicate products, extra fingers, blurry, soft focus, low quality, low resolution, watermark, logo overlay, timestamp, plastic look, uncanny, artifacts, motion blur smear",
