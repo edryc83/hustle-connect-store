@@ -19,7 +19,7 @@ import {
 import { Camera, Clapperboard } from "lucide-react";
 import { AutoDesignModal } from "./AutoDesignModal";
 import { StudioShotModal } from "./StudioShotModal";
-import { StudioReelModal } from "./StudioReelModal";
+// StudioReelModal removed
 import { StudioCommercialModal } from "./StudioCommercialModal";
 import { INSPIRATIONS, COLOR_THEMES, pickRandomInspiration } from "./designInspirations";
 import { POSTER_OCCASIONS, POSTER_OF_THE_DAY_TEMPLATES, getTodaysOccasions, type PosterOccasion } from "./posterOfTheDay";
@@ -67,7 +67,6 @@ export function DesignStudioModal({ open, onClose, initialProduct = null }: Prop
   const [copyMode, setCopyMode] = useState<CopyMode | null>(null);
   const [showInsufficientTokens, setShowInsufficientTokens] = useState(false);
   const [studioShotOpen, setStudioShotOpen] = useState(false);
-  const [studioReelOpen, setStudioReelOpen] = useState(false);
   const [studioCommercialOpen, setStudioCommercialOpen] = useState(false);
   const { balance, enabled: tokensEnabled, refetch: refetchTokens } = useTokens();
 
@@ -414,10 +413,6 @@ export function DesignStudioModal({ open, onClose, initialProduct = null }: Prop
       open={studioShotOpen}
       onClose={() => setStudioShotOpen(false)}
     />
-    <StudioReelModal
-      open={studioReelOpen}
-      onClose={() => setStudioReelOpen(false)}
-    />
     <StudioCommercialModal
       open={studioCommercialOpen}
       onClose={() => setStudioCommercialOpen(false)}
@@ -524,14 +519,6 @@ export function DesignStudioModal({ open, onClose, initialProduct = null }: Prop
                 desc: "Turn a phone pic into a clean studio photo",
                 tint: "from-pink-500/20 to-rose-500/10 text-pink-300 border-pink-500/30",
                 onClick: () => { setStudioShotOpen(true); },
-              },
-              {
-                id: "motionreel",
-                icon: Film,
-                title: "Motion Reel",
-                desc: "Turn your product photo into a cinematic video",
-                tint: "from-violet-500/20 to-fuchsia-500/10 text-violet-300 border-violet-500/30",
-                onClick: () => { setStudioReelOpen(true); },
               },
               {
                 id: "commercial",
