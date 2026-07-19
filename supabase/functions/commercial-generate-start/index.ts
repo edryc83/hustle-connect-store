@@ -10,6 +10,8 @@ const TOKENS_PER_COMMERCIAL = 80; // 2-3 shots at 40 tokens each
 
 const MODEL_OWNER = "wan-video";
 const MODEL_NAME = "wan-2.2-i2v-fast";
+const SHOT_CREATE_GAP_MS = 12_000;
+const MAX_429_RETRIES = 4;
 
 // Fires one Replicate prediction per shot in the template. Each shot's webhook
 // updates the matching commercial_shots row; the client stitches everything
@@ -85,7 +87,9 @@ Deno.serve(async (req) => {
       }).select("id").single();
       if (jobErr || !job) throw new Error("job_insert_failed");
 
-      // Create shot rows + fire predictions in parallel
+      // Create shot rows, then fire predictions one-by-one. Some Replicate
+      // accounts are limited to a burst of 1 prediction create even when they
+      // have credit, so parallel creates can make the second shot fail with 429.
       const shotRows = shots.map((_s: unknown, idx: number) => ({
         job_id: job.id, shot_index: idx, status: "queued",
       }));
@@ -97,23 +101,15 @@ Deno.serve(async (req) => {
         .sort((a: any, b: any) => a.shot_index - b.shot_index)
         .map((row: any) => ({ ...row, prompt: shots[row.shot_index]?.prompt || "" }));
 
-      const results = await Promise.all(shotsWithPrompt.map(async (row: any) => {
+      const results: Array<{ row: any; status: number; body: string }> = [];
+      for (let i = 0; i < shotsWithPrompt.length; i++) {
+        if (i > 0) await delay(SHOT_CREATE_GAP_MS);
+        const row = shotsWithPrompt[i];
         const webhookUrl = `${SUPABASE_URL}/functions/v1/commercial-shot-webhook?shot_id=${row.id}`;
-        const predRes = await fetch(`${GW}/models/${MODEL_OWNER}/${MODEL_NAME}/predictions`, {
-          method: "POST",
-          headers: {
-            "Authorization": `Bearer ${LOVABLE_API_KEY}`,
-            "X-Connection-Api-Key": REPLICATE_API_KEY,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            input: { image: sourceUrl, prompt: row.prompt },
-            webhook: webhookUrl,
-            webhook_events_filter: ["completed"],
-          }),
-        });
-        return { row, status: predRes.status, body: await predRes.text() };
-      }));
+        const result = await createPredictionWithBackoff(row, sourceUrl, webhookUrl);
+        results.push(result);
+        if (result.status === 402 || result.status < 200 || result.status >= 300) break;
+      }
 
       const anyPaymentIssue = results.find((r) => r.status === 402);
       const anyFailed = results.find((r) => r.status < 200 || r.status >= 300);
@@ -152,4 +148,40 @@ function json(body: any, status = 200) {
   return new Response(JSON.stringify(body), {
     status, headers: { ...corsHeaders, "Content-Type": "application/json" },
   });
+}
+
+function delay(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function createPredictionWithBackoff(row: any, sourceUrl: string, webhookUrl: string) {
+  let lastResult = { row, status: 500, body: "prediction_create_failed" };
+
+  for (let attempt = 0; attempt <= MAX_429_RETRIES; attempt++) {
+    const predRes = await fetch(`${GW}/models/${MODEL_OWNER}/${MODEL_NAME}/predictions`, {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${LOVABLE_API_KEY}`,
+        "X-Connection-Api-Key": REPLICATE_API_KEY,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        input: { image: sourceUrl, prompt: row.prompt },
+        webhook: webhookUrl,
+        webhook_events_filter: ["completed"],
+      }),
+    });
+
+    const body = await predRes.text();
+    lastResult = { row, status: predRes.status, body };
+    if (predRes.status !== 429) return lastResult;
+
+    const retryAfter = Number(predRes.headers.get("retry-after") || "0");
+    const waitMs = Number.isFinite(retryAfter) && retryAfter > 0
+      ? retryAfter * 1_000
+      : SHOT_CREATE_GAP_MS * (attempt + 1);
+    await delay(waitMs);
+  }
+
+  return lastResult;
 }
