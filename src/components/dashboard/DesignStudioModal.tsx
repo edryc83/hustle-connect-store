@@ -520,14 +520,8 @@ export function DesignStudioModal({ open, onClose, initialProduct = null }: Prop
                 tint: "from-pink-500/20 to-rose-500/10 text-pink-300 border-pink-500/30",
                 onClick: () => { setStudioShotOpen(true); },
               },
-              {
-                id: "commercial",
-                icon: Clapperboard,
-                title: "Studio Commercial",
-                desc: "Multi-shot ad with music + captions from a product photo",
-                tint: "from-fuchsia-500/20 to-amber-500/10 text-fuchsia-300 border-fuchsia-500/30",
-                onClick: () => { setStudioCommercialOpen(true); },
-              },
+              // Studio Commercial temporarily hidden — backend + modal kept for
+              // future re-enable once video pricing/quality improves.
             ].map((opt) => {
               const Icon = opt.icon;
               return (
