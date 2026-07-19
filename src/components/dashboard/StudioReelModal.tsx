@@ -163,11 +163,11 @@ export function StudioReelModal({ open, onClose }: Props) {
         }
       );
       const data = await resp.json();
-      if (resp.status === 402 || data?.error === "insufficient_tokens") {
+      if (data?.error === "insufficient_tokens") {
         setShowInsufficient(true);
         return;
       }
-      if (!resp.ok) throw new Error(data?.error || `Error ${resp.status}`);
+      if (!resp.ok) throw new Error(data?.message || data?.error || `Error ${resp.status}`);
       setJobId(data.jobId);
       setStage("processing");
       refetchTokens();
