@@ -16,7 +16,7 @@ import { Coins } from "lucide-react";
 import {
   Loader2, Sparkles, Package, Wand2, ArrowLeft, Download, Share2, RefreshCw, Search, Shuffle, Check, Upload, Trash2, Copy, ImagePlus, X, Film,
 } from "lucide-react";
-import { Camera } from "lucide-react";
+import { Camera, Clapperboard } from "lucide-react";
 import { AutoDesignModal } from "./AutoDesignModal";
 import { StudioShotModal } from "./StudioShotModal";
 import { StudioReelModal } from "./StudioReelModal";
@@ -417,6 +417,10 @@ export function DesignStudioModal({ open, onClose, initialProduct = null }: Prop
     <StudioReelModal
       open={studioReelOpen}
       onClose={() => setStudioReelOpen(false)}
+    />
+    <StudioCommercialModal
+      open={studioCommercialOpen}
+      onClose={() => setStudioCommercialOpen(false)}
     />
     <Dialog open={open} onOpenChange={(o) => !o && onClose()}>
       <DialogContent
