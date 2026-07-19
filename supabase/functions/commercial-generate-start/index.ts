@@ -197,7 +197,7 @@ function buildCommercialPrompt(input: {
   return [
     `Create a polished vertical social media product commercial for ${input.productName || "this product"}.`,
     "Use the uploaded photo as the hero product reference; keep the product identity, shape, color, material, and branding consistent.",
-    `Commercial style: ${input.templateLabel || "premium product ad"}.",
+    `Commercial style: ${input.templateLabel || "premium product ad"}.`,
     scenes,
     input.captionLine ? `Add tasteful, short, readable on-screen marketing captions: ${input.captionLine}.` : "Add tasteful, short, readable on-screen marketing captions.",
     "Smooth cinematic camera movement, premium e-commerce lighting, strong product focus, ready for Instagram Reels, WhatsApp Status, and TikTok. Generate fitting upbeat commercial audio, no watermark.",

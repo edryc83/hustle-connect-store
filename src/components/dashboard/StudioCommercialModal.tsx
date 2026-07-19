@@ -12,7 +12,7 @@ import { Filesystem, Directory } from "@capacitor/filesystem";
 import { Share } from "@capacitor/share";
 import {
   Package, Loader2, Download, Share2, RefreshCw,
-  ArrowLeft, Coins, Sparkles, Clapperboard, Check,
+  ArrowLeft, Coins, Sparkles, Clapperboard,
 } from "lucide-react";
 import { COMMERCIAL_TEMPLATES } from "./commercialTemplates";
 import { formatPrice } from "@/lib/currency";
