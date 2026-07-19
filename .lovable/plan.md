@@ -1,105 +1,97 @@
+# Afristall — Meta AI Responder + Product Video Studio
 
-# Afristall Import — v1 Plan
+Two new features, shipped as independent modules so we can release them separately.
 
-A trusted bridge between vetted UK/UAE suppliers and Ugandan shop owners. Buyers negotiate on WhatsApp (as today), then come back to Afristall to pay safely in UGX. Afristall holds the funds, settles to the supplier, and the buyer arranges shipping with a listed agent.
+---
 
-## 1. Roles & access
+## Feature 1 — Meta AI Responder (Facebook Page + Instagram)
 
-Add a new role `supplier` alongside existing `agent` and `admin`.
+**Goal:** When a customer DMs a seller's Facebook Page or Instagram business account outside working hours (or always, if the seller opts in), Afristall replies as the seller — grounded on their live product catalog — until a human takes over.
 
-- **Admin / Agent** (UK or UAE team) onboards a supplier from the agent portal: enters business name, country (UK/UAE), contact, WhatsApp, bank details, generates email + temporary password. Supplier gets a unique human ID like `SUP-UK-0007`.
-- **Supplier** logs in via the normal Afristall login. Role-based redirect: `supplier` → `/supplier` (own shell, not the seller dashboard). Forced password change on first login.
-- **Shop owner (buyer)** is any existing Afristall seller. Only logged-in sellers see the Import hub.
-- **Admin** gets a new "Supplier Payments" tab to approve bank transfers and mark settlements paid.
+### User flow
+1. Seller opens **Dashboard → AI Responder**.
+2. Taps **Connect Facebook** → Meta OAuth (Facebook Login for Business). Grants: `pages_messaging`, `pages_manage_metadata`, `pages_show_list`, `instagram_basic`, `instagram_manage_messages`.
+3. Picks which Page (and linked IG account) to connect.
+4. Configures:
+   - Mode: **Always on** / **After hours only** (with hours + timezone) / **Paused**.
+   - Tone: Friendly / Professional / Playful.
+   - Fallback WhatsApp number (defaults to store WhatsApp).
+   - Auto-handover keywords ("agent", "human", "call me").
+5. Sees a live **Inbox** with all incoming DMs, the AI reply, and a **Take over** button that mutes the AI for that thread for 6h.
 
-## 2. Supplier experience
+### Backend
+- Table `meta_connections` (seller_id, page_id, page_name, ig_user_id, page_access_token, status, mode, hours, tone, fallback_whatsapp, handover_keywords, created_at).
+- Table `meta_threads` (id, connection_id, platform, psid, customer_name, last_message_at, ai_muted_until, unread_count).
+- Table `meta_messages` (id, thread_id, direction in/out, sender ai/human/customer, text, attachments jsonb, meta_message_id, created_at).
+- Edge functions:
+  - `meta-oauth-callback` — exchanges code, fetches Pages, stores long-lived Page tokens.
+  - `meta-webhook` — receives Meta webhook events (messages, postbacks), routes to responder.
+  - `meta-responder` — the AI brain: loads seller catalog + recent thread history, calls Gemini 3 Flash with tools (`search_products`, `get_product_link`, `handover_to_human`), sends reply via Graph API.
+  - `meta-send-message` — used by seller when they type in the inbox.
+- Realtime on `meta_messages` so the Inbox updates live.
+- Cost control: responder runs on `google/gemini-3-flash-preview` (cheap + fast). No token charge to seller in v1 — flat included; add metering later if abuse.
 
-`/supplier` mirrors the seller dashboard pattern but simplified:
+### Grounding
+- On every reply, fetch top-N matching products via pg full-text on `products` table (name + description + tags).
+- Include product URL (`afristall.com/{username}/{product-slug}`) so Meta renders rich previews.
+- If no match, offer to notify seller and hand over.
 
-- **Products**: same AI-powered add flow as sellers (image → AI description, attributes, category) **plus** MOQ (units), unit price, currency (USD/GBP/AED/EUR), lead time (days). MOQ is informational — buyer pays whatever they negotiate.
-- **Payments received**: list of `supplier_payments` showing buyer name, amount in supplier currency, status (`funds_received` / `settled_to_supplier`), date. No bank details exposed to buyer.
-- **Profile**: business name, logo, country, bio, lead time defaults.
+### Secrets
+- `META_APP_ID`, `META_APP_SECRET`, `META_WEBHOOK_VERIFY_TOKEN` — request from user.
 
-## 3. Import hub for buyers (gated)
+### Out of scope for v1
+- WhatsApp Cloud API (defer; needs Meta Business verification).
+- Comment auto-reply on posts.
+- Voice notes / image understanding in DMs.
 
-- New route `/import` — auth-gated; non-sellers see a "Import is for verified Afristall shop owners" gate.
-- Browse suppliers and their products with country filter (UK / UAE), category, MOQ range.
-- Product detail page: photos, description, attributes, **MOQ + unit price in supplier currency**, supplier card, "Chat on WhatsApp" (existing wa.me flow with product URL for OG preview), and a primary **"Pay Supplier"** button.
+---
 
-## 4. Pay Supplier flow
+## Feature 2 — Product Video Studio (cinematic clips from a photo)
 
-Step 1 — Amount: select supplier (pre-filled if coming from product), currency (auto), enter amount, optional note/PO ref.
+**Goal:** Seller uploads a product photo, picks a camera-move template, gets a 5–8s vertical 9:16 cinematic video they can post to Reels/Status/TikTok.
 
-Step 2 — Confirmation (rate locked 15 min, countdown visible):
-```
-Supplier:      Acme Textiles Ltd (UK)  SUP-UK-0007
-Order amount:  USD 1,000.00
-Afristall fee (5%):  USD 50.00
-Total in USD:  USD 1,050.00
-Exchange rate: 1 USD = 3,820 UGX  (locked, 14:32 remaining)
-You pay:       UGX 4,011,000
-```
-"Rate refreshes if it expires before you pay."
+### User flow
+1. From Creative Studio, tap new **Motion Reel 🎬** entry (6th button).
+2. Upload product photo (reuse compressor).
+3. Pick a **template** (visual grid of 6):
+   - Orbit — slow 180° camera arc.
+   - Push-in — dolly toward product, subtle rack focus.
+   - Reveal — top-down descend with rim lighting.
+   - Float — product levitates, camera drifts.
+   - Turntable — product rotates on plinth.
+   - Splash — liquid/particle burst around product (for drinks / cosmetics).
+4. Optional: 1-line vibe prompt ("warm sunset light", "matte black studio").
+5. Confirm cost (e.g. **40 tokens**), tap **Generate**. Async job — modal shows "We'll notify you in ~2 min".
+6. When ready: preview, hold-to-compare with source photo, **Download** and **Share to WhatsApp Status**.
 
-Step 3 — Payment method:
-- **Mobile Money (Yo Uganda)**: phone → reuse existing `create-payment`/`yo-ipn` pattern in a new `supplier-pay-momo` function. Show "Enter PIN on your phone" screen, poll status, success screen with txn ref + supplier name.
-- **Bank Transfer**: show Afristall UGX bank details, upload payment slip (image/PDF to `payment-proofs` private bucket), submit. Status stays `pending_review` until admin approves.
+### Backend
+- Table `video_jobs` (id, user_id, source_image_url, template, prompt, provider, provider_job_id, status queued/processing/ready/failed, result_url, tokens_charged, error, created_at, completed_at).
+- Edge functions:
+  - `video-generate-start` — validates tokens, deducts via `deduct_tokens` RPC, uploads source to Storage, calls provider (Kling 2.1 via Replicate), inserts job row, returns job id.
+  - `video-generate-webhook` — Replicate webhook → marks ready + stores URL, or refunds tokens on failure.
+  - `video-job-status` — polling fallback.
+- Realtime on `video_jobs` for live status.
+- Storage bucket `product-videos` (public read).
+- Provider: **Replicate + Kling 2.1 image-to-video** (best product fidelity). Fallback provider slot in code for Runway/Veo later.
 
-Step 4 — Receipt + status timeline: Pending → Funds received → Settled to supplier.
+### Templates
+- Static array `videoTemplates.ts` with `id`, `label`, `emoji`, `previewUrl`, `cameraPrompt` (the deterministic motion instruction appended to user vibe).
 
-## 5. Shipping agents directory
+### Secrets
+- `REPLICATE_API_TOKEN` — request from user.
 
-- Admin/agent-onboarded. Fields: name, logo, lane (e.g. UAE → UG, UK → UG), mode (Air/Sea), rate (per kg or per CBM), typical duration, WhatsApp, notes.
-- New `/import/shipping` page — filter by lane, sort by rate or duration. "Contact on WhatsApp" deeplink. No bookings in v1; buyer arranges privately.
-- Surfaced inline on the payment success screen ("Now arrange shipping →").
+### Cost / tokens
+- 40 tokens/clip (Kling ~$0.35/clip; margin protects free-tier abuse).
+- Refund on provider failure automatic.
 
-## 6. Admin panel additions
+---
 
-- **Suppliers**: create, edit, suspend, view their products & payments.
-- **Shipping Agents**: CRUD.
-- **Supplier Payments**: list all `supplier_payments`. For `bank_transfer` + `pending_review`: view uploaded slip, Approve / Reject (with note). For any `funds_received`: "Mark settled to supplier" once you've paid them out via Wise/bank.
+## Shipping order
+1. Video Studio first — self-contained, no OAuth, immediate wow, drives token revenue.
+2. Meta Responder second — bigger scope, needs Meta app review + secrets.
 
-## 7. Technical details
-
-**New tables** (all RLS-protected, `service_role` full access):
-
-- `suppliers` — id, user_id (auth), supplier_code (`SUP-UK-####`), business_name, country, currency, contact_name, whatsapp, bank_details (jsonb, admin-only), status, created_by_agent.
-- `supplier_products` — id, supplier_id, name, description, images, category, attributes, moq, unit_price, currency, lead_time_days, active.
-- `supplier_payments` — id, buyer_id, supplier_id, supplier_product_id (nullable), amount_foreign, currency, fee_pct, amount_foreign_total, fx_rate, fx_locked_at, amount_ugx, method (`momo`|`bank_transfer`), momo_phone, yo_ref, bank_proof_url, status (`pending`|`funds_received`|`settled`|`failed`|`rejected`), admin_note, note, created_at, settled_at.
-- `shipping_agents` — id, name, logo_url, lane_from, lane_to, mode, rate_amount, rate_unit (`per_kg`|`per_cbm`), duration_days, whatsapp, notes, active, created_by_agent.
-
-**RLS highlights**:
-- `suppliers`: supplier reads own row; buyers read public fields via a view; admin full.
-- `supplier_products`: public read where `active` AND supplier.status='active' (gated client-side to logged-in sellers); supplier writes own; admin full.
-- `supplier_payments`: buyer reads own; supplier reads where supplier_id matches and only non-sensitive fields (no bank_proof_url); admin full.
-- `payment-proofs` storage bucket: private, signed URLs for admin only.
-
-**FX**: new edge function `fx-rate` calls `https://api.exchangerate.host/latest?base=USD&symbols=UGX,GBP,EUR,AED`, caches in `app_config` for 60s, returns rate + `locked_until` (now + 15 min). 5% markup applied client-side and re-validated server-side at payment creation.
-
-**Yo Uganda**: clone the existing `create-payment` / `yo-ipn` pattern into `supplier-pay-momo` / `supplier-pay-ipn`. On success IPN, set payment to `funds_received` and write a notification row for the supplier dashboard.
-
-**Bank transfer**: client uploads to `payment-proofs/<payment_id>.<ext>`, calls `supplier-pay-bank` to insert the row with `pending_review`. Admin approval flips it to `funds_received`.
-
-**Role routing**: `useAuth` already fetches the session; add a `useUserRole` hook reading `user_roles`. `App.tsx` routes wrap `/supplier/*` requiring `supplier`, `/import/*` requiring an authenticated seller profile, and post-login redirect picks the right shell.
-
-**Reuse**: image compression, AI description/attribute functions, WhatsApp deeplink helpers, OG-tag worker, glassmorphism design tokens — all reused as-is.
-
-## 8. What's NOT in v1 (call out for later)
-
-- Automatic supplier payouts (manual via Wise for now; admin marks "settled").
-- Shipping bookings / quotes inside the app.
-- Multi-currency wallet for suppliers.
-- Disputes / refunds UI (handled manually by admin reversing payment status).
-- MOQ hard-enforcement at checkout.
-
-## 9. Build order
-
-1. DB migration (roles, 4 tables, RLS, grants, `payment-proofs` bucket).
-2. Admin: Suppliers CRUD + Shipping Agents CRUD + temp-password generator.
-3. Supplier shell + login redirect + Products + Payments received.
-4. Import hub (browse + product detail, gated).
-5. Pay Supplier flow (FX function, confirmation, MoMo, Bank Transfer).
-6. Admin Supplier Payments tab (approve bank, mark settled).
-7. Shipping agents directory page + post-payment CTA.
-
-Approve and I'll start with the migration.
+## What I need from you before I build
+- Confirm shipping order above (Video first, then Meta) or flip it.
+- Confirm **40 tokens/clip** for videos.
+- For Meta: confirm you have (or will create) a Meta developer app so I can request `META_APP_ID` / `META_APP_SECRET` / `META_WEBHOOK_VERIFY_TOKEN`.
+- For Video: confirm you'll create a Replicate account so I can request `REPLICATE_API_TOKEN`.
