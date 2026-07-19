@@ -276,6 +276,7 @@ export type Database = {
           updated_at: string
           user_id: string
           variants_text: string | null
+          view_count: number
           whatsapp_taps: number
         }
         Insert: {
@@ -295,6 +296,7 @@ export type Database = {
           updated_at?: string
           user_id: string
           variants_text?: string | null
+          view_count?: number
           whatsapp_taps?: number
         }
         Update: {
@@ -314,6 +316,7 @@ export type Database = {
           updated_at?: string
           user_id?: string
           variants_text?: string | null
+          view_count?: number
           whatsapp_taps?: number
         }
         Relationships: [
@@ -1022,6 +1025,7 @@ export type Database = {
         Args: { payload: Json; queue_name: string }
         Returns: number
       }
+      increment_product_views: { Args: { p_id: string }; Returns: undefined }
       increment_store_views: { Args: { slug: string }; Returns: undefined }
       increment_whatsapp_taps: { Args: { p_id: string }; Returns: undefined }
       is_admin: { Args: { _user_id: string }; Returns: boolean }
