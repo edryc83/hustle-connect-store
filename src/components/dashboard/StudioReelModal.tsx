@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,16 +7,25 @@ import { useAuth } from "@/hooks/useAuth";
 import { useTokens } from "@/hooks/useTokens";
 import { TOKENS_PER_VIDEO } from "@/lib/tokenPackages";
 import { InsufficientTokensModal } from "@/components/tokens/InsufficientTokensModal";
-import { compressImage } from "@/lib/imageCompression";
 import { toast } from "sonner";
 import { Capacitor } from "@capacitor/core";
 import { Filesystem, Directory } from "@capacitor/filesystem";
 import { Share } from "@capacitor/share";
 import {
-  ImagePlus, Film, Loader2, Download, Share2, RefreshCw,
+  Package, Film, Loader2, Download, Share2, RefreshCw,
   ArrowLeft, Coins, Sparkles,
 } from "lucide-react";
 import { VIDEO_TEMPLATES } from "./videoTemplates";
+import { useQuery } from "@tanstack/react-query";
+
+interface ProductLite {
+  id: string;
+  name: string;
+  price: number | null;
+  image_url: string | null;
+  description: string | null;
+  category: string | null;
+}
 
 interface Props {
   open: boolean;
@@ -32,6 +41,8 @@ export function StudioReelModal({ open, onClose }: Props) {
   const [stage, setStage] = useState<Stage>("pick");
   const [originalUrl, setOriginalUrl] = useState<string | null>(null);
   const [originalFile, setOriginalFile] = useState<File | null>(null);
+  const [selectedProduct, setSelectedProduct] = useState<ProductLite | null>(null);
+  const [loadingProduct, setLoadingProduct] = useState(false);
   const [templateId, setTemplateId] = useState<string | null>(null);
   const [vibe, setVibe] = useState("");
   const [jobId, setJobId] = useState<string | null>(null);
@@ -39,13 +50,27 @@ export function StudioReelModal({ open, onClose }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [starting, setStarting] = useState(false);
   const [showInsufficient, setShowInsufficient] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const { data: products = [], isLoading: productsLoading } = useQuery({
+    queryKey: ["reel-products", user?.id],
+    enabled: !!user?.id && open,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("products")
+        .select("id, name, price, image_url, description, category")
+        .eq("user_id", user!.id)
+        .not("image_url", "is", null)
+        .order("created_at", { ascending: false });
+      return (data as ProductLite[]) || [];
+    },
+  });
 
   useEffect(() => {
     if (!open) {
       setStage("pick");
       setOriginalUrl(null);
       setOriginalFile(null);
+      setSelectedProduct(null);
       setTemplateId(null);
       setVibe("");
       setJobId(null);
@@ -78,14 +103,24 @@ export function StudioReelModal({ open, onClose }: Props) {
     return () => { supabase.removeChannel(channel); };
   }, [jobId, user, refetchTokens]);
 
-  const handlePick = async (file: File) => {
-    if (!file.type.startsWith("image/")) return toast.error("Please upload an image");
+  const handleSelectProduct = async (p: ProductLite) => {
+    if (!p.image_url) return;
+    setLoadingProduct(true);
     try {
-      const compressed = await compressImage(file, { maxSizeMB: 1.5, maxWidthOrHeight: 1600 });
-      setOriginalFile(compressed);
-      setOriginalUrl(URL.createObjectURL(compressed));
+      const r = await fetch(p.image_url);
+      const blob = await r.blob();
+      const mime = blob.type || "image/jpeg";
+      const ext = mime.split("/")[1] || "jpg";
+      const file = new File([blob], `${p.id}.${ext}`, { type: mime });
+      setSelectedProduct(p);
+      setOriginalFile(file);
+      setOriginalUrl(p.image_url);
       setStage("template");
-    } catch { toast.error("Could not read that image"); }
+    } catch {
+      toast.error("Could not load that product image");
+    } finally {
+      setLoadingProduct(false);
+    }
   };
 
   const handleGenerate = async () => {
@@ -117,7 +152,13 @@ export function StudioReelModal({ open, onClose }: Props) {
             mimeType: originalFile.type,
             template: tpl.id,
             cameraPrompt: tpl.cameraPrompt,
-            prompt: vibe.trim() || null,
+            prompt: [
+              vibe.trim(),
+              selectedProduct?.name && `Product: ${selectedProduct.name}`,
+              selectedProduct?.category && `Category: ${selectedProduct.category}`,
+              selectedProduct?.description && `Details: ${selectedProduct.description}`,
+            ].filter(Boolean).join(". ") || null,
+            productId: selectedProduct?.id ?? null,
           }),
         }
       );
@@ -179,7 +220,7 @@ export function StudioReelModal({ open, onClose }: Props) {
 
   const reset = () => {
     setStage("pick");
-    setOriginalUrl(null); setOriginalFile(null);
+    setOriginalUrl(null); setOriginalFile(null); setSelectedProduct(null);
     setTemplateId(null); setVibe(""); setJobId(null); setResultUrl(null); setError(null);
   };
 
@@ -215,21 +256,44 @@ export function StudioReelModal({ open, onClose }: Props) {
                 <Sparkles className="h-7 w-7 mx-auto text-primary" />
                 <p className="text-sm font-bold">One photo. One cinematic reel.</p>
                 <p className="text-[11px] text-muted-foreground leading-snug">
-                  Turn a product picture into a 5-second commercial video for Reels, Status, or TikTok.
+                  Pick a product from your store — we'll turn it into a 5-second commercial video for Reels, Status, or TikTok.
                 </p>
               </div>
-              <button
-                onClick={() => fileInputRef.current?.click()}
-                className="w-full flex flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-border/60 hover:border-primary/50 hover:bg-primary/5 p-8 transition"
-              >
-                <ImagePlus className="h-10 w-10 text-muted-foreground" />
-                <span className="text-sm font-semibold">Tap to choose a product photo</span>
-                <span className="text-[11px] text-muted-foreground">Sharp, well-lit shots work best</span>
-              </button>
-              <input
-                ref={fileInputRef} type="file" accept="image/*" className="hidden"
-                onChange={(e) => { const f = e.target.files?.[0]; if (f) handlePick(f); e.target.value = ""; }}
-              />
+              {productsLoading ? (
+                <div className="flex items-center justify-center py-10">
+                  <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+                </div>
+              ) : products.length === 0 ? (
+                <div className="rounded-2xl border-2 border-dashed border-border/60 p-8 text-center space-y-2">
+                  <Package className="h-10 w-10 mx-auto text-muted-foreground" />
+                  <p className="text-sm font-semibold">No products yet</p>
+                  <p className="text-[11px] text-muted-foreground">Add a product with a photo first, then come back to create its reel.</p>
+                </div>
+              ) : (
+                <div className="space-y-2">
+                  <p className="text-[11px] font-semibold text-muted-foreground px-1">Choose a product</p>
+                  <div className="grid grid-cols-3 gap-2 max-h-[52vh] overflow-y-auto pr-1">
+                    {products.map((p) => (
+                      <button
+                        key={p.id}
+                        disabled={loadingProduct}
+                        onClick={() => handleSelectProduct(p)}
+                        className="group relative rounded-xl overflow-hidden border border-border hover:border-primary/60 transition aspect-square bg-muted"
+                      >
+                        <img src={p.image_url!} alt={p.name} className="w-full h-full object-cover" />
+                        <div className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-black/80 to-transparent p-1.5">
+                          <p className="text-[10px] text-white font-medium truncate">{p.name}</p>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                  {loadingProduct && (
+                    <p className="text-[11px] text-center text-muted-foreground flex items-center justify-center gap-1.5 pt-1">
+                      <Loader2 className="h-3 w-3 animate-spin" /> Loading product…
+                    </p>
+                  )}
+                </div>
+              )}
               {tokensEnabled && (
                 <p className="text-center text-[11px] text-muted-foreground flex items-center justify-center gap-1">
                   <Coins className="h-3 w-3 text-amber-400" /> {TOKENS_PER_VIDEO} tokens per reel
