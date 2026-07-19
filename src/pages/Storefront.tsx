@@ -640,7 +640,7 @@ const StorefrontInner = () => {
       }
 
       // Check if this profile belongs to an agent — redirect to signup with referral
-      const { data: agentRole } = await supabase
+      const { data: agentRole } = await (supabase as any)
         .from("user_roles")
         .select("role, status")
         .eq("user_id", prof.id)
