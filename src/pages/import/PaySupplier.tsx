@@ -46,7 +46,7 @@ export default function PaySupplier() {
       .select("id, supplier_id, name, currency")
       .eq("id", productId)
       .maybeSingle()
-      .then(({ data }) => {
+      .then(({ data }: any) => {
         if (data) {
           setProductContext(data);
           setCurrency((current) => current || data.currency || "");
@@ -63,7 +63,7 @@ export default function PaySupplier() {
         .select("id, supplier_code, business_name, country, currency, whatsapp, bio, status")
         .eq("status", "approved");
       query = cleanSupplierParam.startsWith("SUP-") ? query.eq("supplier_code", cleanSupplierParam) : query.eq("id", initialSupplierParam);
-      const { data } = await query.maybeSingle();
+      const { data }: any = await query.maybeSingle();
       if (data) {
         setSupplier(data);
         setSupplierCode(data.supplier_code || "");
@@ -91,7 +91,7 @@ export default function PaySupplier() {
   useEffect(() => {
     if (!status?.paymentId) return;
     const t = window.setInterval(async () => {
-      const { data } = await supabase.from("supplier_payments" as any).select("status").eq("id", status.paymentId).single();
+      const { data }: any = await supabase.from("supplier_payments" as any).select("status").eq("id", status.paymentId).single();
       if (data?.status) setStatus((s: any) => ({ ...s, paymentStatus: data.status }));
     }, 4000);
     return () => window.clearInterval(t);
@@ -105,7 +105,7 @@ export default function PaySupplier() {
     if (!Number.isFinite(orderAmount) || orderAmount <= 0) return toast.error("Enter a valid order amount");
 
     setLoading(true);
-    const { data, error } = await supabase
+    const { data, error }: any = await supabase
       .from("suppliers" as any)
       .select("id, supplier_code, business_name, country, currency, whatsapp, bio, status")
       .eq("supplier_code", cleanCode)

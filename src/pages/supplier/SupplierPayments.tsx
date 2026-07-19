@@ -12,7 +12,7 @@ export default function SupplierPayments() {
   useEffect(() => {
     if (!user) return;
     (async () => {
-      const { data: supplier } = await supabase.from("suppliers" as any).select("id").eq("user_id", user.id).single();
+      const { data: supplier }: any = await supabase.from("suppliers" as any).select("id").eq("user_id", user.id).single();
       if (!supplier) return;
       const { data } = await supabase.from("supplier_payments" as any).select("*, profiles:buyer_id(first_name, store_name)").eq("supplier_id", supplier.id).order("created_at", { ascending: false });
       setPayments((data as any[]) || []);

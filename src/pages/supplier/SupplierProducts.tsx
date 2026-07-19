@@ -25,7 +25,7 @@ export default function SupplierProducts() {
 
   const load = async () => {
     if (!user) return;
-    const { data: sup } = await supabase.from("suppliers" as any).select("*").eq("user_id", user.id).single();
+    const { data: sup }: any = await supabase.from("suppliers" as any).select("*").eq("user_id", user.id).single();
     setSupplier(sup);
     if (sup) {
       setForm((f: any) => ({ ...f, currency: sup.currency || "USD", lead_time_days: sup.lead_time_days || "" }));
