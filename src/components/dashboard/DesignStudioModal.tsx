@@ -14,7 +14,7 @@ import { InsufficientTokensModal } from "@/components/tokens/InsufficientTokensM
 import { TOKENS_PER_DESIGN } from "@/lib/tokenPackages";
 import { Coins } from "lucide-react";
 import {
-  Loader2, Sparkles, Package, Wand2, ArrowLeft, Download, Share2, RefreshCw, Search, Shuffle, Check, Upload, Trash2, Copy, ImagePlus, X,
+  Loader2, Sparkles, Package, Wand2, ArrowLeft, Download, Share2, RefreshCw, Search, Shuffle, Check, Upload, Trash2, Copy, ImagePlus, X, Film,
 } from "lucide-react";
 import { Camera } from "lucide-react";
 import { AutoDesignModal } from "./AutoDesignModal";
