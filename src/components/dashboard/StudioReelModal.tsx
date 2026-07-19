@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -7,16 +7,25 @@ import { useAuth } from "@/hooks/useAuth";
 import { useTokens } from "@/hooks/useTokens";
 import { TOKENS_PER_VIDEO } from "@/lib/tokenPackages";
 import { InsufficientTokensModal } from "@/components/tokens/InsufficientTokensModal";
-import { compressImage } from "@/lib/imageCompression";
 import { toast } from "sonner";
 import { Capacitor } from "@capacitor/core";
 import { Filesystem, Directory } from "@capacitor/filesystem";
 import { Share } from "@capacitor/share";
 import {
-  ImagePlus, Film, Loader2, Download, Share2, RefreshCw,
+  Package, Film, Loader2, Download, Share2, RefreshCw,
   ArrowLeft, Coins, Sparkles,
 } from "lucide-react";
 import { VIDEO_TEMPLATES } from "./videoTemplates";
+import { useQuery } from "@tanstack/react-query";
+
+interface ProductLite {
+  id: string;
+  name: string;
+  price: number | null;
+  image_url: string | null;
+  description: string | null;
+  category: string | null;
+}
 
 interface Props {
   open: boolean;
@@ -32,6 +41,8 @@ export function StudioReelModal({ open, onClose }: Props) {
   const [stage, setStage] = useState<Stage>("pick");
   const [originalUrl, setOriginalUrl] = useState<string | null>(null);
   const [originalFile, setOriginalFile] = useState<File | null>(null);
+  const [selectedProduct, setSelectedProduct] = useState<ProductLite | null>(null);
+  const [loadingProduct, setLoadingProduct] = useState(false);
   const [templateId, setTemplateId] = useState<string | null>(null);
   const [vibe, setVibe] = useState("");
   const [jobId, setJobId] = useState<string | null>(null);
@@ -39,13 +50,27 @@ export function StudioReelModal({ open, onClose }: Props) {
   const [error, setError] = useState<string | null>(null);
   const [starting, setStarting] = useState(false);
   const [showInsufficient, setShowInsufficient] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const { data: products = [], isLoading: productsLoading } = useQuery({
+    queryKey: ["reel-products", user?.id],
+    enabled: !!user?.id && open,
+    queryFn: async () => {
+      const { data } = await supabase
+        .from("products")
+        .select("id, name, price, image_url, description, category")
+        .eq("user_id", user!.id)
+        .not("image_url", "is", null)
+        .order("created_at", { ascending: false });
+      return (data as ProductLite[]) || [];
+    },
+  });
 
   useEffect(() => {
     if (!open) {
       setStage("pick");
       setOriginalUrl(null);
       setOriginalFile(null);
+      setSelectedProduct(null);
       setTemplateId(null);
       setVibe("");
       setJobId(null);
@@ -78,14 +103,24 @@ export function StudioReelModal({ open, onClose }: Props) {
     return () => { supabase.removeChannel(channel); };
   }, [jobId, user, refetchTokens]);
 
-  const handlePick = async (file: File) => {
-    if (!file.type.startsWith("image/")) return toast.error("Please upload an image");
+  const handleSelectProduct = async (p: ProductLite) => {
+    if (!p.image_url) return;
+    setLoadingProduct(true);
     try {
-      const compressed = await compressImage(file, { maxSizeMB: 1.5, maxWidthOrHeight: 1600 });
-      setOriginalFile(compressed);
-      setOriginalUrl(URL.createObjectURL(compressed));
+      const r = await fetch(p.image_url);
+      const blob = await r.blob();
+      const mime = blob.type || "image/jpeg";
+      const ext = mime.split("/")[1] || "jpg";
+      const file = new File([blob], `${p.id}.${ext}`, { type: mime });
+      setSelectedProduct(p);
+      setOriginalFile(file);
+      setOriginalUrl(p.image_url);
       setStage("template");
-    } catch { toast.error("Could not read that image"); }
+    } catch {
+      toast.error("Could not load that product image");
+    } finally {
+      setLoadingProduct(false);
+    }
   };
 
   const handleGenerate = async () => {
@@ -117,7 +152,13 @@ export function StudioReelModal({ open, onClose }: Props) {
             mimeType: originalFile.type,
             template: tpl.id,
             cameraPrompt: tpl.cameraPrompt,
-            prompt: vibe.trim() || null,
+            prompt: [
+              vibe.trim(),
+              selectedProduct?.name && `Product: ${selectedProduct.name}`,
+              selectedProduct?.category && `Category: ${selectedProduct.category}`,
+              selectedProduct?.description && `Details: ${selectedProduct.description}`,
+            ].filter(Boolean).join(". ") || null,
+            productId: selectedProduct?.id ?? null,
           }),
         }
       );
@@ -179,7 +220,7 @@ export function StudioReelModal({ open, onClose }: Props) {
 
   const reset = () => {
     setStage("pick");
-    setOriginalUrl(null); setOriginalFile(null);
+    setOriginalUrl(null); setOriginalFile(null); setSelectedProduct(null);
     setTemplateId(null); setVibe(""); setJobId(null); setResultUrl(null); setError(null);
   };
 
