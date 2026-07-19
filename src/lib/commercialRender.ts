@@ -20,7 +20,7 @@ async function loadFFmpeg(onProgress?: (p: number) => void) {
       const ff: FFmpegModule = await import("@ffmpeg/ffmpeg");
       const util: UtilModule = await import("@ffmpeg/util");
       const ffmpeg = new ff.FFmpeg();
-      const base = "https://unpkg.com/@ffmpeg/[email protected]/dist/umd";
+      const base = "https://cdn.jsdelivr.net/npm/@ffmpeg/[email protected]/dist/umd";
       await ffmpeg.load({
         coreURL: await util.toBlobURL(`${base}/ffmpeg-core.js`, "text/javascript"),
         wasmURL: await util.toBlobURL(`${base}/ffmpeg-core.wasm`, "application/wasm"),
