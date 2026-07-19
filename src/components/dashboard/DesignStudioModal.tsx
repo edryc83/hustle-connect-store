@@ -20,6 +20,7 @@ import { Camera } from "lucide-react";
 import { AutoDesignModal } from "./AutoDesignModal";
 import { StudioShotModal } from "./StudioShotModal";
 import { StudioReelModal } from "./StudioReelModal";
+import { StudioCommercialModal } from "./StudioCommercialModal";
 import { INSPIRATIONS, COLOR_THEMES, pickRandomInspiration } from "./designInspirations";
 import { POSTER_OCCASIONS, POSTER_OF_THE_DAY_TEMPLATES, getTodaysOccasions, type PosterOccasion } from "./posterOfTheDay";
 import { CalendarHeart } from "lucide-react";
@@ -67,6 +68,7 @@ export function DesignStudioModal({ open, onClose, initialProduct = null }: Prop
   const [showInsufficientTokens, setShowInsufficientTokens] = useState(false);
   const [studioShotOpen, setStudioShotOpen] = useState(false);
   const [studioReelOpen, setStudioReelOpen] = useState(false);
+  const [studioCommercialOpen, setStudioCommercialOpen] = useState(false);
   const { balance, enabled: tokensEnabled, refetch: refetchTokens } = useTokens();
 
   useEffect(() => {
