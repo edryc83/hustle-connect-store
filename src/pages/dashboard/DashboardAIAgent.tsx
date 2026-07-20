@@ -8,6 +8,8 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { Loader2, Facebook, MessageSquare, Sparkles, Trash2, Zap, Send } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import { Checkbox } from "@/components/ui/checkbox";
 
 const META_APP_ID = "909108912234825";
 const SCOPES = [
@@ -51,6 +53,11 @@ export default function DashboardAIAgent() {
     auto_reply_enabled: true,
   });
   const [connecting, setConnecting] = useState(false);
+  const [availablePages, setAvailablePages] = useState<any[]>([]);
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const [selectedPageIds, setSelectedPageIds] = useState<string[]>([]);
+  const [fbShortToken, setFbShortToken] = useState<string | null>(null);
+  const [saving2, setSaving2] = useState(false);
   const [saving, setSaving] = useState(false);
   const [testQuestion, setTestQuestion] = useState("How much is your cheapest item?");
   const [testAnswer, setTestAnswer] = useState("");
@@ -150,15 +157,43 @@ export default function DashboardAIAgent() {
         return;
       }
       const { data, error } = await supabase.functions.invoke("meta-oauth-connect", {
-        body: { access_token: resp.authResponse.accessToken },
+        body: { access_token: resp.authResponse.accessToken, action: "list" },
       });
       if (error) throw error;
-      toast.success(`Connected ${data?.connected?.length || 0} page(s)`);
-      await refreshConnections();
+      const pages = (data as any)?.pages || [];
+      if (pages.length === 0) {
+        toast.error("No Facebook Pages found on this account");
+        return;
+      }
+      setFbShortToken(resp.authResponse.accessToken);
+      setAvailablePages(pages);
+      setSelectedPageIds(pages.length === 1 ? [pages[0].page_id] : []);
+      setPickerOpen(true);
     } catch (e: any) {
       toast.error(e.message || "Connection failed");
     } finally {
       setConnecting(false);
+    }
+  };
+
+  const confirmConnect = async () => {
+    if (!fbShortToken || selectedPageIds.length === 0) return;
+    setSaving2(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("meta-oauth-connect", {
+        body: { access_token: fbShortToken, action: "connect", page_ids: selectedPageIds },
+      });
+      if (error) throw error;
+      toast.success(`Connected ${(data as any)?.connected?.length || 0} page(s)`);
+      setPickerOpen(false);
+      setAvailablePages([]);
+      setSelectedPageIds([]);
+      setFbShortToken(null);
+      await refreshConnections();
+    } catch (e: any) {
+      toast.error(e.message || "Connection failed");
+    } finally {
+      setSaving2(false);
     }
   };
 
