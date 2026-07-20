@@ -16,6 +16,7 @@ import DashboardSettings from "./pages/dashboard/DashboardSettings";
 import DashboardProfile from "./pages/dashboard/DashboardProfile";
 import DashboardOrders from "./pages/dashboard/DashboardOrders";
 import DashboardAnalytics from "./pages/dashboard/DashboardAnalytics";
+import DashboardAIAgent from "./pages/dashboard/DashboardAIAgent";
 import AdminOverview from "./pages/admin/AdminOverview";
 import AdminSellers from "./pages/admin/AdminSellers";
 import AdminOrders from "./pages/admin/AdminOrders";
@@ -76,6 +77,7 @@ const App = () => (
               <Route path="/dashboard/settings" element={<DashboardLayout><DashboardSettings /></DashboardLayout>} />
               <Route path="/dashboard/orders" element={<DashboardLayout><DashboardOrders /></DashboardLayout>} />
               <Route path="/dashboard/analytics" element={<DashboardLayout><DashboardAnalytics /></DashboardLayout>} />
+              <Route path="/dashboard/ai-agent" element={<DashboardLayout><DashboardAIAgent /></DashboardLayout>} />
 
               <Route path="/admin" element={<AdminLayout><AdminOverview /></AdminLayout>} />
               <Route path="/admin/sellers" element={<AdminLayout><AdminSellers /></AdminLayout>} />
