@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Package, LayoutDashboard, User, Settings, LogOut, ClipboardList, BarChart3, Moon, Sun, Sparkles, Globe } from "lucide-react";
+import { Package, LayoutDashboard, User, Settings, LogOut, ClipboardList, BarChart3, Moon, Sun, Sparkles, Globe, Bot } from "lucide-react";
 import { NavLink } from "@/components/NavLink";
 import { DesignStudioModal } from "./DesignStudioModal";
 import { useAuth } from "@/hooks/useAuth";
@@ -35,6 +35,7 @@ export function DashboardSidebar() {
     { title: terms.plural, url: "/dashboard/products", icon: Package },
     { title: "Orders", url: "/dashboard/orders", icon: ClipboardList },
     { title: "Import", url: "/import", icon: Globe },
+    { title: "AI Concierge", url: "/dashboard/ai-agent", icon: Bot },
     { title: "Analytics", url: "/dashboard/analytics", icon: BarChart3 },
     { title: "Profile", url: "/dashboard/profile", icon: User },
     { title: "Settings", url: "/dashboard/settings", icon: Settings },
