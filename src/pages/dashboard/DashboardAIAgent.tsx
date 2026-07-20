@@ -415,6 +415,55 @@ export default function DashboardAIAgent() {
           <div className="rounded-lg bg-muted p-3 text-sm whitespace-pre-wrap">{testAnswer}</div>
         )}
       </section>
+
+      <Dialog open={pickerOpen} onOpenChange={setPickerOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Choose Page(s) to connect</DialogTitle>
+            <DialogDescription>
+              Select the Facebook Page you want the 24/7 Shop Assistant to manage. If the Page has a linked Instagram Business account, it will be connected too.
+            </DialogDescription>
+          </DialogHeader>
+          <ul className="max-h-72 overflow-y-auto space-y-1 -mx-1 px-1">
+            {availablePages.map((p) => {
+              const checked = selectedPageIds.includes(p.page_id);
+              return (
+                <li key={p.page_id}>
+                  <label className="flex items-center gap-3 rounded-lg border px-3 py-2 cursor-pointer hover:bg-muted/50">
+                    <Checkbox
+                      checked={checked}
+                      onCheckedChange={(v) => {
+                        setSelectedPageIds((prev) =>
+                          v ? [...prev, p.page_id] : prev.filter((id) => id !== p.page_id),
+                        );
+                      }}
+                    />
+                    {p.picture ? (
+                      <img src={p.picture} alt="" className="h-9 w-9 rounded-full object-cover" />
+                    ) : (
+                      <div className="h-9 w-9 rounded-full bg-muted flex items-center justify-center">
+                        <Facebook className="h-4 w-4 text-muted-foreground" />
+                      </div>
+                    )}
+                    <div className="min-w-0 flex-1">
+                      <div className="font-medium text-sm truncate">{p.name}</div>
+                      <div className="text-xs text-muted-foreground truncate">
+                        {p.ig_username ? `Instagram: @${p.ig_username}` : "Facebook only"}
+                      </div>
+                    </div>
+                  </label>
+                </li>
+              );
+            })}
+          </ul>
+          <DialogFooter>
+            <Button variant="ghost" onClick={() => setPickerOpen(false)} disabled={saving2}>Cancel</Button>
+            <Button onClick={confirmConnect} disabled={saving2 || selectedPageIds.length === 0}>
+              {saving2 ? <Loader2 className="h-4 w-4 animate-spin" /> : `Connect ${selectedPageIds.length || ""}`.trim()}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
