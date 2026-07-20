@@ -39,6 +39,8 @@ Deno.serve(async (req) => {
   let body: any;
   try { body = await req.json(); } catch { body = {}; }
   const shortToken = body.access_token;
+  const action: "list" | "connect" = body.action === "connect" ? "connect" : "list";
+  const selectedPageIds: string[] = Array.isArray(body.page_ids) ? body.page_ids : [];
   if (!shortToken) {
     return new Response(JSON.stringify({ error: "Missing access_token" }), {
       status: 400,
@@ -61,7 +63,7 @@ Deno.serve(async (req) => {
 
     // 2. Fetch pages with page access tokens (never expire) + linked IG account
     const pagesRes = await fetch(
-      `${GRAPH}/me/accounts?fields=id,name,access_token,instagram_business_account&access_token=${encodeURIComponent(longToken)}`,
+      `${GRAPH}/me/accounts?fields=id,name,access_token,picture{url},instagram_business_account{id,username,profile_picture_url}&access_token=${encodeURIComponent(longToken)}`,
     );
     const pages = await pagesRes.json();
     if (!pagesRes.ok) {
@@ -71,10 +73,31 @@ Deno.serve(async (req) => {
       });
     }
 
+    // Action: list — return pages for the picker without saving anything.
+    if (action === "list") {
+      const list = (pages.data || []).map((p: any) => ({
+        page_id: p.id,
+        name: p.name,
+        picture: p.picture?.data?.url || null,
+        long_token: longToken,
+        page_access_token: p.access_token,
+        ig_account_id: p.instagram_business_account?.id || null,
+        ig_username: p.instagram_business_account?.username || null,
+      }));
+      return new Response(JSON.stringify({ pages: list }), {
+        status: 200,
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+      });
+    }
+
     const admin = createClient(SUPABASE_URL, SERVICE_ROLE);
     const connected: any[] = [];
 
-    for (const page of pages.data || []) {
+    const toConnect = (pages.data || []).filter((p: any) =>
+      selectedPageIds.length === 0 ? true : selectedPageIds.includes(p.id),
+    );
+
+    for (const page of toConnect) {
       // 3. Subscribe page to webhook
       await fetch(
         `${GRAPH}/${page.id}/subscribed_apps?subscribed_fields=messages,messaging_postbacks,message_reactions,feed&access_token=${encodeURIComponent(page.access_token)}`,
