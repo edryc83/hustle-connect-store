@@ -94,6 +94,44 @@ async function sendMessage(platform: string, pageAccessToken: string, recipientI
   return true;
 }
 
+async function replyToComment(commentId: string, accessToken: string, text: string) {
+  const url = `${GRAPH}/${commentId}/comments?access_token=${encodeURIComponent(accessToken)}`;
+  const res = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ message: text }),
+  });
+  if (!res.ok) {
+    console.error("Meta comment reply failed", res.status, await res.text());
+    return false;
+  }
+  return true;
+}
+
+// Private reply (DM) triggered by a comment. Works for both Messenger (page)
+// and Instagram (ig account) via the same endpoint on the connected token.
+async function privateReplyToComment(
+  ownerId: string,
+  accessToken: string,
+  commentId: string,
+  text: string,
+) {
+  const url = `${GRAPH}/${ownerId}/messages?access_token=${encodeURIComponent(accessToken)}`;
+  const res = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      recipient: { comment_id: commentId },
+      message: { text },
+    }),
+  });
+  if (!res.ok) {
+    console.error("Meta private reply failed", res.status, await res.text());
+    return false;
+  }
+  return true;
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
@@ -213,6 +251,84 @@ Deno.serve(async (req) => {
           content: reply,
           ai_reply_generated: true,
           raw_event: { sent },
+        });
+      }
+
+      // ===== Comment events (Facebook Page feed + Instagram comments) =====
+      for (const change of entry.changes || []) {
+        const field = change.field;
+        const value = change.value || {};
+        const isFbComment = field === "feed" && value.item === "comment" && value.verb === "add";
+        const isIgComment = field === "comments";
+        if (!isFbComment && !isIgComment) continue;
+
+        const commentId = value.comment_id || value.id;
+        const commentText = value.message || value.text || "";
+        const fromId = value.from?.id;
+        const pageOrIgId = entry.id;
+        const platform = isFbComment ? "messenger" : "instagram";
+        if (!commentId || !commentText || !fromId) continue;
+        // Skip our own replies to avoid loops.
+        if (fromId === pageOrIgId) continue;
+
+        const { data: conn } = await admin
+          .from("meta_connections")
+          .select("user_id, page_access_token, ig_access_token")
+          .or(`page_id.eq.${pageOrIgId},ig_account_id.eq.${pageOrIgId}`)
+          .eq("is_active", true)
+          .maybeSingle();
+
+        await admin.from("meta_conversations").insert({
+          user_id: conn?.user_id ?? null,
+          platform,
+          external_user_id: fromId,
+          page_or_ig_id: pageOrIgId,
+          direction: "inbound",
+          content: `[comment] ${commentText}`,
+          raw_event: change,
+        });
+
+        if (!conn) continue;
+
+        const [{ data: profile }, { data: settings }, { data: products }] = await Promise.all([
+          admin.from("profiles").select("store_name, store_slug, first_name").eq("id", conn.user_id).maybeSingle(),
+          admin.from("agent_settings").select("*").eq("user_id", conn.user_id).maybeSingle(),
+          admin.from("products").select("name, price, description, category").eq("user_id", conn.user_id).limit(60),
+        ]);
+
+        if (settings && settings.auto_reply_enabled === false) continue;
+
+        const reply = await generateReply({
+          sellerName: profile?.store_name || profile?.first_name || "our shop",
+          storeSlug: profile?.store_slug ?? null,
+          agentName: settings?.agent_name || "Concierge",
+          tone: settings?.tone || "friendly, concise",
+          fallback: settings?.fallback_message || "Thanks for your comment! We'll DM you shortly.",
+          products: products || [],
+          question: commentText,
+        });
+
+        const token = conn.page_access_token || conn.ig_access_token;
+        if (!token) continue;
+
+        // Public reply under the comment (short & friendly).
+        const publicReply = reply.length > 240 ? reply.slice(0, 237) + "..." : reply;
+        const publicOk = await replyToComment(commentId, token, publicReply);
+
+        // Also send a private DM with the full answer + store link.
+        const storeUrl = profile?.store_slug ? `https://afristall.com/${profile.store_slug}` : "";
+        const dmText = storeUrl ? `${reply}\n\nBrowse the full shop: ${storeUrl}` : reply;
+        const dmOk = await privateReplyToComment(pageOrIgId, token, commentId, dmText);
+
+        await admin.from("meta_conversations").insert({
+          user_id: conn.user_id,
+          platform,
+          external_user_id: fromId,
+          page_or_ig_id: pageOrIgId,
+          direction: "outbound",
+          content: `[comment-reply] ${publicReply}${dmOk ? `\n[dm] ${dmText}` : ""}`,
+          ai_reply_generated: true,
+          raw_event: { publicOk, dmOk, commentId },
         });
       }
     }
