@@ -14,6 +14,45 @@ export type Database = {
   }
   public: {
     Tables: {
+      agent_settings: {
+        Row: {
+          agent_name: string | null
+          auto_reply_enabled: boolean | null
+          created_at: string | null
+          fallback_message: string | null
+          human_handoff_phrases: string[] | null
+          id: string
+          tone: string | null
+          updated_at: string | null
+          user_id: string
+          welcome_message: string | null
+        }
+        Insert: {
+          agent_name?: string | null
+          auto_reply_enabled?: boolean | null
+          created_at?: string | null
+          fallback_message?: string | null
+          human_handoff_phrases?: string[] | null
+          id?: string
+          tone?: string | null
+          updated_at?: string | null
+          user_id: string
+          welcome_message?: string | null
+        }
+        Update: {
+          agent_name?: string | null
+          auto_reply_enabled?: boolean | null
+          created_at?: string | null
+          fallback_message?: string | null
+          human_handoff_phrases?: string[] | null
+          id?: string
+          tone?: string | null
+          updated_at?: string | null
+          user_id?: string
+          welcome_message?: string | null
+        }
+        Relationships: []
+      }
       agent_withdrawals: {
         Row: {
           agent_id: string
@@ -241,6 +280,84 @@ export type Database = {
           id?: string
           token?: string
           used_at?: string | null
+        }
+        Relationships: []
+      }
+      meta_connections: {
+        Row: {
+          connected_at: string | null
+          id: string
+          ig_access_token: string | null
+          ig_account_id: string | null
+          is_active: boolean | null
+          page_access_token: string | null
+          page_id: string | null
+          platform: string
+          updated_at: string | null
+          user_id: string
+        }
+        Insert: {
+          connected_at?: string | null
+          id?: string
+          ig_access_token?: string | null
+          ig_account_id?: string | null
+          is_active?: boolean | null
+          page_access_token?: string | null
+          page_id?: string | null
+          platform: string
+          updated_at?: string | null
+          user_id: string
+        }
+        Update: {
+          connected_at?: string | null
+          id?: string
+          ig_access_token?: string | null
+          ig_account_id?: string | null
+          is_active?: boolean | null
+          page_access_token?: string | null
+          page_id?: string | null
+          platform?: string
+          updated_at?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      meta_conversations: {
+        Row: {
+          ai_reply_generated: boolean | null
+          content: string
+          created_at: string | null
+          direction: string
+          external_user_id: string
+          id: string
+          page_or_ig_id: string | null
+          platform: string
+          raw_event: Json | null
+          user_id: string | null
+        }
+        Insert: {
+          ai_reply_generated?: boolean | null
+          content: string
+          created_at?: string | null
+          direction: string
+          external_user_id: string
+          id?: string
+          page_or_ig_id?: string | null
+          platform: string
+          raw_event?: Json | null
+          user_id?: string | null
+        }
+        Update: {
+          ai_reply_generated?: boolean | null
+          content?: string
+          created_at?: string | null
+          direction?: string
+          external_user_id?: string
+          id?: string
+          page_or_ig_id?: string | null
+          platform?: string
+          raw_event?: Json | null
+          user_id?: string | null
         }
         Relationships: []
       }
