@@ -7,7 +7,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
-import { Loader2, Facebook, MessageSquare, Sparkles, Trash2 } from "lucide-react";
+import { Loader2, Facebook, MessageSquare, Sparkles, Trash2, Zap, Send } from "lucide-react";
 
 const META_APP_ID = "909108912234825";
 const SCOPES = [
@@ -56,18 +56,81 @@ export default function DashboardAIAgent() {
   const [testAnswer, setTestAnswer] = useState("");
   const [testing, setTesting] = useState(false);
 
+  // Autopilot state
+  const [autopilot, setAutopilot] = useState<any>({
+    enabled: false,
+    post_times: ["09:00", "13:00", "18:00"],
+    tone: "friendly",
+    timezone: "Africa/Kampala",
+  });
+  const [savingAuto, setSavingAuto] = useState(false);
+  const [postingNow, setPostingNow] = useState(false);
+  const [recentPosts, setRecentPosts] = useState<any[]>([]);
+
   useEffect(() => {
     if (!user) return;
     loadFbSdk();
     (async () => {
-      const [{ data: conns }, { data: s }] = await Promise.all([
+      const [{ data: conns }, { data: s }, { data: a }, { data: posts }] = await Promise.all([
         supabase.from("meta_connections").select("*").eq("user_id", user.id),
         supabase.from("agent_settings").select("*").eq("user_id", user.id).maybeSingle(),
+        (supabase.from("autopilot_settings" as any).select("*").eq("user_id", user.id).maybeSingle() as any),
+        (supabase.from("scheduled_posts" as any).select("*").eq("user_id", user.id).order("created_at", { ascending: false }).limit(10) as any),
       ]);
       setConnections(conns || []);
       if (s) setSettings(s);
+      if (a) setAutopilot({ ...autopilot, ...a });
+      setRecentPosts(posts || []);
     })();
   }, [user]);
+
+  const refreshPosts = async () => {
+    if (!user) return;
+    const { data } = await (supabase.from("scheduled_posts" as any)
+      .select("*").eq("user_id", user.id)
+      .order("created_at", { ascending: false }).limit(10) as any);
+    setRecentPosts(data || []);
+  };
+
+  const saveAutopilot = async (patch: Partial<any> = {}) => {
+    if (!user) return;
+    setSavingAuto(true);
+    const next = { ...autopilot, ...patch };
+    setAutopilot(next);
+    const { error } = await (supabase.from("autopilot_settings" as any).upsert({
+      user_id: user.id,
+      enabled: next.enabled,
+      post_times: next.post_times,
+      tone: next.tone,
+      timezone: next.timezone,
+    }, { onConflict: "user_id" }) as any);
+    setSavingAuto(false);
+    if (error) toast.error(error.message); else toast.success("Autopilot saved");
+  };
+
+  const postNow = async () => {
+    if (!user) return;
+    setPostingNow(true);
+    try {
+      const { data, error } = await supabase.functions.invoke("autopilot-run", {
+        body: { manual: true, userId: user.id },
+      });
+      if (error) throw error;
+      if ((data as any)?.status === "posted") toast.success(`Posted "${(data as any).product}"`);
+      else toast.error((data as any)?.error || (data as any)?.failed || "Nothing to post");
+      await refreshPosts();
+    } catch (e: any) {
+      toast.error(e.message || "Post failed");
+    } finally {
+      setPostingNow(false);
+    }
+  };
+
+  const updateTime = (i: number, v: string) => {
+    const next = [...autopilot.post_times];
+    next[i] = v;
+    setAutopilot({ ...autopilot, post_times: next });
+  };
 
   const refreshConnections = async () => {
     if (!user) return;
@@ -140,10 +203,10 @@ export default function DashboardAIAgent() {
     <div className="max-w-3xl mx-auto space-y-6">
       <div>
         <h1 className="text-2xl font-bold flex items-center gap-2">
-          <Sparkles className="h-6 w-6 text-primary" /> AI Concierge
+          <Sparkles className="h-6 w-6 text-primary" /> 24/7 Shop Assistant
         </h1>
         <p className="text-sm text-muted-foreground mt-1">
-          Auto-reply to Facebook Page &amp; Instagram DMs using your product catalog.
+          Your AI shop manager: auto-posts products, replies to DMs and comments on Facebook &amp; Instagram — around the clock.
         </p>
       </div>
 
@@ -178,6 +241,97 @@ export default function DashboardAIAgent() {
               </li>
             ))}
           </ul>
+        )}
+      </section>
+
+      {/* ===== Autopilot ===== */}
+      <section className="rounded-xl border bg-card p-5 space-y-4">
+        <div className="flex items-start justify-between gap-3">
+          <div>
+            <h2 className="font-semibold flex items-center gap-2">
+              <Zap className="h-4 w-4 text-primary" /> Autopilot posting
+            </h2>
+            <p className="text-xs text-muted-foreground mt-1">
+              Automatically post one of your products to Facebook &amp; Instagram at set times each day.
+            </p>
+          </div>
+          <div className="flex items-center gap-2 text-sm shrink-0">
+            <Switch
+              checked={!!autopilot.enabled}
+              onCheckedChange={(v) => saveAutopilot({ enabled: v })}
+              disabled={savingAuto || connections.length === 0}
+            />
+            <span className="text-muted-foreground">{autopilot.enabled ? "On" : "Off"}</span>
+          </div>
+        </div>
+
+        {connections.length === 0 && (
+          <div className="text-xs rounded-lg border border-dashed p-3 text-muted-foreground">
+            Connect a Facebook Page first to enable autopilot.
+          </div>
+        )}
+
+        <div className="grid gap-3">
+          <div>
+            <Label>Post times (24h, local time)</Label>
+            <div className="grid grid-cols-3 gap-2 mt-1">
+              {autopilot.post_times.map((t: string, i: number) => (
+                <Input key={i} type="time" value={t} onChange={(e) => updateTime(i, e.target.value)} />
+              ))}
+            </div>
+          </div>
+          <div>
+            <Label>Caption style</Label>
+            <select
+              className="w-full h-10 rounded-md border bg-background px-3 text-sm mt-1"
+              value={autopilot.tone}
+              onChange={(e) => setAutopilot({ ...autopilot, tone: e.target.value })}
+            >
+              <option value="friendly">Friendly</option>
+              <option value="fun">Fun</option>
+              <option value="professional">Professional</option>
+              <option value="bold">Bold</option>
+            </select>
+          </div>
+          <div className="flex gap-2">
+            <Button onClick={() => saveAutopilot()} disabled={savingAuto}>
+              {savingAuto ? <Loader2 className="h-4 w-4 animate-spin" /> : "Save schedule"}
+            </Button>
+            <Button variant="outline" onClick={postNow} disabled={postingNow || connections.length === 0} className="gap-2">
+              {postingNow ? <Loader2 className="h-4 w-4 animate-spin" /> : <Send className="h-4 w-4" />}
+              Post one now
+            </Button>
+          </div>
+        </div>
+
+        {recentPosts.length > 0 && (
+          <div className="pt-3 border-t space-y-2">
+            <div className="text-xs font-medium text-muted-foreground">Recent activity</div>
+            <ul className="space-y-2">
+              {recentPosts.map((p) => (
+                <li key={p.id} className="flex items-start gap-3 rounded-lg border p-2 text-xs">
+                  {p.image_url && (
+                    <img src={p.image_url} alt="" className="h-12 w-12 rounded object-cover shrink-0" />
+                  )}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <span className={`px-1.5 py-0.5 rounded text-[10px] font-medium ${
+                        p.status === "posted" ? "bg-green-500/10 text-green-600" :
+                        p.status === "failed" ? "bg-destructive/10 text-destructive" :
+                        "bg-muted text-muted-foreground"
+                      }`}>{p.status}</span>
+                      {p.slot && <span className="text-muted-foreground">{p.slot}</span>}
+                      <span className="text-muted-foreground ml-auto">
+                        {new Date(p.created_at).toLocaleString()}
+                      </span>
+                    </div>
+                    {p.caption && <div className="mt-1 line-clamp-2 text-foreground/80">{p.caption}</div>}
+                    {p.error && <div className="mt-1 text-destructive line-clamp-2">{p.error}</div>}
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
         )}
       </section>
 

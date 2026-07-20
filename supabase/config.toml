@@ -25,3 +25,5 @@ project_id = "rmhpdalhkcbsbrphhjre"
     verify_jwt = false
   [functions.commercial-shot-webhook]
     verify_jwt = false
+  [functions.autopilot-run]
+    verify_jwt = false
