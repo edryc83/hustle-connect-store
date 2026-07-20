@@ -104,6 +104,42 @@ export type Database = {
         }
         Relationships: []
       }
+      autopilot_settings: {
+        Row: {
+          created_at: string
+          enabled: boolean
+          last_run_at: string | null
+          last_slot: string | null
+          post_times: string[]
+          timezone: string
+          tone: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          enabled?: boolean
+          last_run_at?: string | null
+          last_slot?: string | null
+          post_times?: string[]
+          timezone?: string
+          tone?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          enabled?: boolean
+          last_run_at?: string | null
+          last_slot?: string | null
+          post_times?: string[]
+          timezone?: string
+          tone?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       commercial_jobs: {
         Row: {
           completed_at: string | null
@@ -675,6 +711,62 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      scheduled_posts: {
+        Row: {
+          caption: string | null
+          created_at: string
+          error: string | null
+          fb_post_id: string | null
+          id: string
+          ig_post_id: string | null
+          image_url: string | null
+          posted_at: string | null
+          product_id: string | null
+          scheduled_for: string
+          slot: string | null
+          status: string
+          user_id: string
+        }
+        Insert: {
+          caption?: string | null
+          created_at?: string
+          error?: string | null
+          fb_post_id?: string | null
+          id?: string
+          ig_post_id?: string | null
+          image_url?: string | null
+          posted_at?: string | null
+          product_id?: string | null
+          scheduled_for?: string
+          slot?: string | null
+          status?: string
+          user_id: string
+        }
+        Update: {
+          caption?: string | null
+          created_at?: string
+          error?: string | null
+          fb_post_id?: string | null
+          id?: string
+          ig_post_id?: string | null
+          image_url?: string | null
+          posted_at?: string | null
+          product_id?: string | null
+          scheduled_for?: string
+          slot?: string | null
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "scheduled_posts_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       shipping_agents: {
         Row: {

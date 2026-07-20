@@ -35,7 +35,7 @@ export function DashboardSidebar() {
     { title: terms.plural, url: "/dashboard/products", icon: Package },
     { title: "Orders", url: "/dashboard/orders", icon: ClipboardList },
     { title: "Import", url: "/import", icon: Globe },
-    { title: "AI Concierge", url: "/dashboard/ai-agent", icon: Bot },
+    { title: "Shop Assistant", url: "/dashboard/ai-agent", icon: Bot },
     { title: "Analytics", url: "/dashboard/analytics", icon: BarChart3 },
     { title: "Profile", url: "/dashboard/profile", icon: User },
     { title: "Settings", url: "/dashboard/settings", icon: Settings },
