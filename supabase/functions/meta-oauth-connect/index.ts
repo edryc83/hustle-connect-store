@@ -77,7 +77,7 @@ Deno.serve(async (req) => {
     for (const page of pages.data || []) {
       // 3. Subscribe page to webhook
       await fetch(
-        `${GRAPH}/${page.id}/subscribed_apps?subscribed_fields=messages,messaging_postbacks,message_reactions&access_token=${encodeURIComponent(page.access_token)}`,
+        `${GRAPH}/${page.id}/subscribed_apps?subscribed_fields=messages,messaging_postbacks,message_reactions,feed&access_token=${encodeURIComponent(page.access_token)}`,
         { method: "POST" },
       ).then(async (r) => {
         if (!r.ok) console.warn("subscribed_apps failed for", page.id, await r.text());
