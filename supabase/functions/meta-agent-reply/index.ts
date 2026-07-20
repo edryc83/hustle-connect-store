@@ -94,6 +94,44 @@ async function sendMessage(platform: string, pageAccessToken: string, recipientI
   return true;
 }
 
+async function replyToComment(commentId: string, accessToken: string, text: string) {
+  const url = `${GRAPH}/${commentId}/comments?access_token=${encodeURIComponent(accessToken)}`;
+  const res = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ message: text }),
+  });
+  if (!res.ok) {
+    console.error("Meta comment reply failed", res.status, await res.text());
+    return false;
+  }
+  return true;
+}
+
+// Private reply (DM) triggered by a comment. Works for both Messenger (page)
+// and Instagram (ig account) via the same endpoint on the connected token.
+async function privateReplyToComment(
+  ownerId: string,
+  accessToken: string,
+  commentId: string,
+  text: string,
+) {
+  const url = `${GRAPH}/${ownerId}/messages?access_token=${encodeURIComponent(accessToken)}`;
+  const res = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      recipient: { comment_id: commentId },
+      message: { text },
+    }),
+  });
+  if (!res.ok) {
+    console.error("Meta private reply failed", res.status, await res.text());
+    return false;
+  }
+  return true;
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response("ok", { headers: corsHeaders });
