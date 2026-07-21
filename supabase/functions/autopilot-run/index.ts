@@ -269,13 +269,35 @@ async function generateCaption(opts: {
 }
 
 async function postToFacebook(pageId: string, token: string, imageUrl: string, caption: string) {
-  const res = await fetch(`${GRAPH}/${pageId}/photos?access_token=${encodeURIComponent(token)}`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ url: imageUrl, caption, published: true }),
-  });
-  const data = await res.json();
-  if (!res.ok) throw new Error(`FB post failed: ${JSON.stringify(data)}`);
+  // Fetch the image once and upload via multipart `source`. FB's URL-fetch
+  // path frequently returns "(#1) Please reduce the amount of data you're
+  // asking for" for large PNGs (gpt-image-2 outputs ~2-4MB). Uploading the
+  // bytes directly is more reliable and lets us retry cleanly.
+  const imgResp = await fetch(imageUrl);
+  if (!imgResp.ok) throw new Error(`FB post failed: could not fetch image (${imgResp.status})`);
+  const buf = new Uint8Array(await imgResp.arrayBuffer());
+  const contentType = imgResp.headers.get("content-type") || "image/png";
+  const ext = contentType.includes("jpeg") ? "jpg" : "png";
+
+  const attempt = async () => {
+    const form = new FormData();
+    form.append("source", new File([buf], `poster.${ext}`, { type: contentType }));
+    form.append("caption", caption);
+    form.append("published", "true");
+    form.append("access_token", token);
+    const r = await fetch(`${GRAPH}/${pageId}/photos`, { method: "POST", body: form });
+    const d = await r.json().catch(() => ({}));
+    return { ok: r.ok, data: d };
+  };
+
+  let { ok, data } = await attempt();
+  // Retry once on transient FB errors (code 1, 2, 4, 17, 341).
+  const transient = new Set([1, 2, 4, 17, 341]);
+  if (!ok && transient.has(data?.error?.code)) {
+    await new Promise((r) => setTimeout(r, 1500));
+    ({ ok, data } = await attempt());
+  }
+  if (!ok) throw new Error(`FB post failed: ${JSON.stringify(data)}`);
   return data.post_id || data.id;
 }
 
