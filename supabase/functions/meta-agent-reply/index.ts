@@ -54,23 +54,6 @@ If you genuinely don't know (e.g. delivery, price not listed), say something hum
     { role: "user", content: opts.question },
   ];
 
-  if (LOVABLE_API_KEY) {
-    try {
-      const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-        method: "POST",
-        headers: { "Content-Type": "application/json", "Lovable-API-Key": LOVABLE_API_KEY },
-        body: JSON.stringify({ model: "google/gemini-3-flash-preview", messages }),
-      });
-      if (res.ok) {
-        const data = await res.json();
-        const txt = data.choices?.[0]?.message?.content?.trim();
-        if (txt) return txt;
-      } else {
-        console.error("AI gateway error", res.status, await res.text().catch(() => ""));
-      }
-    } catch (e) { console.error("AI reply lovable failed", e); }
-  }
-
   if (OPENAI_API_KEY) {
     try {
       const res = await fetch("https://api.openai.com/v1/chat/completions", {
@@ -86,6 +69,23 @@ If you genuinely don't know (e.g. delivery, price not listed), say something hum
         console.error("AI reply openai error", res.status, await res.text().catch(() => ""));
       }
     } catch (e) { console.error("AI reply openai failed", e); }
+  }
+
+  if (LOVABLE_API_KEY) {
+    try {
+      const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Lovable-API-Key": LOVABLE_API_KEY },
+        body: JSON.stringify({ model: "google/gemini-3-flash-preview", messages }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        const txt = data.choices?.[0]?.message?.content?.trim();
+        if (txt) return txt;
+      } else {
+        console.error("AI gateway error", res.status, await res.text().catch(() => ""));
+      }
+    } catch (e) { console.error("AI reply lovable failed", e); }
   }
 
   return opts.fallback;
