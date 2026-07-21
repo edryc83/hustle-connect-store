@@ -33,7 +33,8 @@ async function generateReply(opts: {
   question: string;
 }) {
   const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
-  if (!LOVABLE_API_KEY) return opts.fallback;
+  const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY");
+  if (!LOVABLE_API_KEY && !OPENAI_API_KEY) return opts.fallback;
 
   const catalog = opts.products.slice(0, 40).map((p) => {
     const price = p.price ? ` — UGX ${Number(p.price).toLocaleString()}` : "";
@@ -48,31 +49,46 @@ ${catalog || "(no products listed)"}
 ${storeUrl ? `Full store: ${storeUrl}` : ""}
 If the question can't be answered from the catalog, say: "${opts.fallback}"`;
 
-  try {
-    const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Lovable-API-Key": LOVABLE_API_KEY,
-      },
-      body: JSON.stringify({
-        model: "google/gemini-3-flash-preview",
-        messages: [
-          { role: "system", content: system },
-          { role: "user", content: opts.question },
-        ],
-      }),
-    });
-    if (!res.ok) {
-      console.error("AI gateway error", res.status, await res.text());
-      return opts.fallback;
-    }
-    const data = await res.json();
-    return data.choices?.[0]?.message?.content?.trim() || opts.fallback;
-  } catch (e) {
-    console.error("AI reply failed", e);
-    return opts.fallback;
+  const messages = [
+    { role: "system", content: system },
+    { role: "user", content: opts.question },
+  ];
+
+  if (LOVABLE_API_KEY) {
+    try {
+      const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Lovable-API-Key": LOVABLE_API_KEY },
+        body: JSON.stringify({ model: "google/gemini-3-flash-preview", messages }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        const txt = data.choices?.[0]?.message?.content?.trim();
+        if (txt) return txt;
+      } else {
+        console.error("AI gateway error", res.status, await res.text().catch(() => ""));
+      }
+    } catch (e) { console.error("AI reply lovable failed", e); }
   }
+
+  if (OPENAI_API_KEY) {
+    try {
+      const res = await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${OPENAI_API_KEY}` },
+        body: JSON.stringify({ model: "gpt-4o-mini", messages, temperature: 0.6 }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        const txt = data.choices?.[0]?.message?.content?.trim();
+        if (txt) return txt;
+      } else {
+        console.error("AI reply openai error", res.status, await res.text().catch(() => ""));
+      }
+    } catch (e) { console.error("AI reply openai failed", e); }
+  }
+
+  return opts.fallback;
 }
 
 async function sendMessage(platform: string, pageAccessToken: string, recipientId: string, text: string) {
