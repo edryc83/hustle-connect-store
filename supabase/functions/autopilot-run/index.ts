@@ -1,4 +1,5 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
+import { INSPIRATIONS } from "../_shared/inspirations.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -17,7 +18,28 @@ function formatPrice(amount: number, currency: string): string {
 
 // On-the-fly Studio poster generation for autopilot posts. Best-effort:
 // returns a designed poster URL, or null so the caller falls back to the raw photo.
-async function generateDesignedPoster(admin: any, product: any, profile: any): Promise<string | null> {
+async function pickInspiration(admin: any, userId: string): Promise<typeof INSPIRATIONS[number]> {
+  // Get template_ids used in this user's last N posts, avoid repeating them.
+  const AVOID_WINDOW = Math.min(INSPIRATIONS.length - 1, 40);
+  const { data: recent } = await admin
+    .from("scheduled_posts")
+    .select("template_id")
+    .eq("user_id", userId)
+    .not("template_id", "is", null)
+    .order("created_at", { ascending: false })
+    .limit(AVOID_WINDOW);
+  const used = new Set((recent || []).map((r: any) => r.template_id));
+  const pool = INSPIRATIONS.filter((t) => !used.has(t.id));
+  const source = pool.length ? pool : INSPIRATIONS;
+  return source[Math.floor(Math.random() * source.length)];
+}
+
+async function generateDesignedPoster(
+  admin: any,
+  product: any,
+  profile: any,
+  inspiration: typeof INSPIRATIONS[number],
+): Promise<string | null> {
   const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY");
   if (!OPENAI_API_KEY || !product?.image_url) {
     (globalThis as any).__lastDesignError = !OPENAI_API_KEY ? "no OPENAI_API_KEY" : "no product image";
@@ -32,9 +54,10 @@ async function generateDesignedPoster(admin: any, product: any, profile: any): P
     const storeName = profile?.store_name || "";
 
     const prompt = [
-      "Design a PREMIUM EDITORIAL PRODUCT AD POSTER, 1:1 square, gallery-grade — must clearly read as a real advertisement, not just a product photo.",
-      "Use the supplied product image as the hero subject, clean and color-graded with a soft realistic shadow. Compose like a magazine ad: strong layout, intentional alignment, deliberate negative space, premium background (soft gradient, paper grain, or subtle solid).",
-      `Use ${accent} as a tasteful brand accent (thin line, dot, chip, or underline). Restrained, premium palette — no neon, no clutter, no stickers, no emojis, no fake badges or stars.`,
+      "Design a PREMIUM PRODUCT AD POSTER, 1:1 square, gallery-grade — clearly a real advertisement, not just a product photo.",
+      `TEMPLATE STYLE TO EMULATE: ${inspiration.prompt}`,
+      "Use the FIRST supplied image as the product hero (subject). Use the SECOND supplied image ONLY as visual style reference for layout, palette, typography and composition — DO NOT copy its subject or text.",
+      `Optionally blend in ${accent} as a subtle brand accent where it fits the template.`,
       "Typography: clean modern sans-serif with TIGHT hierarchy. Render ALL of the following text elements crisply and legibly — NO MISSPELLINGS, NO GIBBERISH:",
       `1. TITLE (large, bold, hero): "${product.name}"`,
       `2. SUBTITLE / TAGLINE (medium, one short punchy line you invent that sells this product — max 6 words).`,
@@ -44,9 +67,7 @@ async function generateDesignedPoster(admin: any, product: any, profile: any): P
         : `4. CTA BUTTON — ONE single clean pill-shaped button, ${accent} background, crisp white text reading EXACTLY "Order Now". Rounded-full corners, generous padding, no duplicate buttons.`,
       `5. MANDATORY VISIBLE SIGNATURE: render the exact text "Designed by Afristall" in a bottom corner (bottom-right preferred). SMALL but CLEARLY LEGIBLE at thumbnail size.`,
       storeName ? `6. Small store name "${storeName}" near the top or opposite corner.` : "",
-      "Layout rule: title + subtitle on one side, product hero on the other (or stacked top/bottom). CTA button must be visible and tappable-looking. Everything aligned to a clear grid.",
       "Strictly avoid: paragraphs, multiple prices, watermarks across the product, drop shadows on text, decorative emojis, flags, hashtags, lorem ipsum, broken letters.",
-      "Final result must look like a high-end Apple / Nike / fashion-house product advertisement.",
     ].filter(Boolean).join("\n");
 
     const imgResp = await fetch(product.image_url);
@@ -55,6 +76,20 @@ async function generateDesignedPoster(admin: any, product: any, profile: any): P
     const imgType = imgResp.headers.get("content-type") || "image/png";
     const imgFile = new File([imgBuf], "product.png", { type: imgType });
 
+    // Fetch the template reference image (public URL on afristall.com).
+    const tmplUrl = inspiration.image.startsWith("http")
+      ? inspiration.image
+      : `https://afristall.com${inspiration.image}`;
+    let tmplFile: File | null = null;
+    try {
+      const tr = await fetch(tmplUrl);
+      if (tr.ok) {
+        const tb = await tr.arrayBuffer();
+        const tt = tr.headers.get("content-type") || "image/jpeg";
+        tmplFile = new File([tb], "template.jpg", { type: tt });
+      }
+    } catch { /* non-fatal; proceed without style ref */ }
+
     const form = new FormData();
     form.append("model", "gpt-image-2");
     form.append("prompt", prompt);
@@ -62,6 +97,7 @@ async function generateDesignedPoster(admin: any, product: any, profile: any): P
     form.append("quality", "medium");
     form.append("n", "1");
     form.append("image[]", imgFile);
+    if (tmplFile) form.append("image[]", tmplFile);
 
     const openaiResp = await fetch("https://api.openai.com/v1/images/edits", {
       method: "POST",
