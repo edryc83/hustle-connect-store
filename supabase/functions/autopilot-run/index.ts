@@ -19,7 +19,10 @@ function formatPrice(amount: number, currency: string): string {
 // returns a designed poster URL, or null so the caller falls back to the raw photo.
 async function generateDesignedPoster(admin: any, product: any, profile: any): Promise<string | null> {
   const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY");
-  if (!OPENAI_API_KEY || !product?.image_url) return null;
+  if (!OPENAI_API_KEY || !product?.image_url) {
+    (globalThis as any).__lastDesignError = !OPENAI_API_KEY ? "no OPENAI_API_KEY" : "no product image";
+    return null;
+  }
   try {
     const currency = profile?.currency || "UGX";
     const priceNum = product.discount_price ?? product.price;
@@ -66,12 +69,14 @@ async function generateDesignedPoster(admin: any, product: any, profile: any): P
       body: form,
     });
     if (!openaiResp.ok) {
-      console.warn("autopilot design failed", openaiResp.status, await openaiResp.text().catch(() => ""));
+      const errTxt = await openaiResp.text().catch(() => "");
+      console.warn("autopilot design failed", openaiResp.status, errTxt);
+      (globalThis as any).__lastDesignError = `openai ${openaiResp.status}: ${errTxt.slice(0, 200)}`;
       return null;
     }
     const j = await openaiResp.json();
     const b64: string | undefined = j?.data?.[0]?.b64_json;
-    if (!b64) return null;
+    if (!b64) { (globalThis as any).__lastDesignError = "openai returned no b64"; return null; }
     const bin = atob(b64);
     const bytes = new Uint8Array(bin.length);
     for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
@@ -82,12 +87,14 @@ async function generateDesignedPoster(admin: any, product: any, profile: any): P
       .upload(path, bytes, { contentType: "image/png", upsert: true });
     if (upErr) {
       console.warn("autopilot design upload failed", upErr.message);
+      (globalThis as any).__lastDesignError = `upload: ${upErr.message}`;
       return null;
     }
     const { data: pub } = admin.storage.from("product-images").getPublicUrl(path);
     return pub?.publicUrl || null;
-  } catch (e) {
+  } catch (e: any) {
     console.warn("autopilot design error", e);
+    (globalThis as any).__lastDesignError = `exception: ${e?.message || e}`;
     return null;
   }
 }
@@ -124,10 +131,8 @@ function pickDueSlot(times: string[], nowHHMM: string): string | null {
 
 async function generateCaption(opts: {
   productName: string; price: number | null; description: string | null;
-  storeName: string; storeUrl: string; tone: string;
+  storeName: string; storeUrl: string; tone: string; category?: string | null;
 }): Promise<string> {
-  const key = Deno.env.get("LOVABLE_API_KEY");
-  if (!key) return `${opts.productName} — available now at ${opts.storeName}. ${opts.storeUrl}`;
   const toneMap: Record<string, string> = {
     fun: "playful, upbeat, with 1-2 emojis",
     professional: "polished, confident, minimal emojis",
@@ -136,23 +141,65 @@ async function generateCaption(opts: {
   };
   const style = toneMap[opts.tone] || toneMap.friendly;
   const priceLine = opts.price ? `Price: UGX ${Number(opts.price).toLocaleString()}.` : "";
-  const system = `You write short social media captions for African small businesses. Tone: ${style}. Max 220 characters. End with 4-6 relevant hashtags on a new line. Include the store link.`;
-  const user = `Product: ${opts.productName}\n${priceLine}\nShop: ${opts.storeName}\nLink: ${opts.storeUrl}\n${opts.description ? `Notes: ${opts.description.slice(0, 200)}` : ""}`;
-  try {
-    const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "Lovable-API-Key": key },
-      body: JSON.stringify({
-        model: "google/gemini-3-flash-preview",
-        messages: [{ role: "system", content: system }, { role: "user", content: user }],
-      }),
-    });
-    if (!res.ok) return `${opts.productName} — ${opts.storeUrl}`;
-    const data = await res.json();
-    return data.choices?.[0]?.message?.content?.trim() || `${opts.productName} — ${opts.storeUrl}`;
-  } catch {
-    return `${opts.productName} — ${opts.storeUrl}`;
+  const system = `You write high-converting social media captions for African small businesses on Facebook & Instagram. Tone: ${style}. Write 2-4 short lines (max 280 chars of body), include the product name, a benefit-led hook, and the store link. Then ONE blank line. Then 6-10 highly relevant lowercase hashtags separated by spaces (e.g. #kampala #uganda #shoplocal + product/category tags). No markdown, no quotes.`;
+  const user = `Product: ${opts.productName}\n${priceLine}\nCategory: ${opts.category || "general"}\nShop: ${opts.storeName}\nLink: ${opts.storeUrl}\n${opts.description ? `Notes: ${opts.description.slice(0, 300)}` : ""}`;
+
+  const fallback = () => {
+    const slug = (opts.productName || "").toLowerCase().replace(/[^a-z0-9]+/g, "");
+    const cat = (opts.category || "").toLowerCase().replace(/[^a-z0-9]+/g, "");
+    const priceTxt = opts.price ? ` Just UGX ${Number(opts.price).toLocaleString()}.` : "";
+    const tags = ["#afristall", "#shoplocal", "#uganda", "#kampala", "#smallbusiness", "#madeinafrica"];
+    if (slug) tags.push(`#${slug}`);
+    if (cat && cat !== slug) tags.push(`#${cat}`);
+    return `${opts.productName} is here! 🔥${priceTxt}\nOrder now from ${opts.storeName} 👉 ${opts.storeUrl}\n\n${tags.slice(0, 8).join(" ")}`;
+  };
+
+  // 1) Try Lovable AI Gateway.
+  const lovKey = Deno.env.get("LOVABLE_API_KEY");
+  if (lovKey) {
+    try {
+      const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "Lovable-API-Key": lovKey },
+        body: JSON.stringify({
+          model: "google/gemini-3-flash-preview",
+          messages: [{ role: "system", content: system }, { role: "user", content: user }],
+        }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        const txt = data.choices?.[0]?.message?.content?.trim();
+        if (txt) return txt;
+      } else {
+        console.warn("caption lovable failed", res.status, await res.text().catch(() => ""));
+      }
+    } catch (e) { console.warn("caption lovable error", e); }
   }
+
+  // 2) Fallback to OpenAI (gpt-4o-mini) if available.
+  const oaKey = Deno.env.get("OPENAI_API_KEY");
+  if (oaKey) {
+    try {
+      const res = await fetch("https://api.openai.com/v1/chat/completions", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${oaKey}` },
+        body: JSON.stringify({
+          model: "gpt-4o-mini",
+          messages: [{ role: "system", content: system }, { role: "user", content: user }],
+          temperature: 0.8,
+        }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        const txt = data.choices?.[0]?.message?.content?.trim();
+        if (txt) return txt;
+      } else {
+        console.warn("caption openai failed", res.status, await res.text().catch(() => ""));
+      }
+    } catch (e) { console.warn("caption openai error", e); }
+  }
+
+  return fallback();
 }
 
 async function postToFacebook(pageId: string, token: string, imageUrl: string, caption: string) {
@@ -264,11 +311,13 @@ async function runForUser(admin: any, s: any, opts: { userId?: string; forceProd
       })[0];
 
   // On-the-fly Studio poster: prefer designed image, fall back to raw product photo.
+  (globalThis as any).__lastDesignError = null;
   const designedUrl = await generateDesignedPoster(admin, product, profile);
+  const designError = designedUrl ? null : (globalThis as any).__lastDesignError;
   const imageUrl = designedUrl || product.image_url;
   const caption = await generateCaption({
     productName: product.name, price: product.price, description: product.description,
-    storeName, storeUrl, tone: s.tone || "friendly",
+    storeName, storeUrl, tone: s.tone || "friendly", category: product.category,
   });
 
   let fbPostId: string | null = null;
@@ -294,12 +343,14 @@ async function runForUser(admin: any, s: any, opts: { userId?: string; forceProd
   }
 
   const status = (fbPostId || igPostId) ? "posted" : "failed";
+  const combinedError = [designError ? `design fallback: ${designError}` : null, error]
+    .filter(Boolean).join(" | ") || null;
   await admin.from("scheduled_posts").insert({
     user_id: s.user_id, product_id: product.id, slot, status,
     caption, image_url: imageUrl,
     fb_post_id: fbPostId, ig_post_id: igPostId,
     posted_at: status === "posted" ? new Date().toISOString() : null,
-    error,
+    error: combinedError,
   });
   if (!opts.manual) {
     await admin.from("autopilot_settings").update({
