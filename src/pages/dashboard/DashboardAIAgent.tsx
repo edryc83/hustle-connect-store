@@ -200,7 +200,12 @@ export default function DashboardAIAgent() {
   };
 
   const handleDisconnect = async (id: string) => {
-    await supabase.from("meta_connections").update({ is_active: false }).eq("id", id);
+    const { error } = await supabase.from("meta_connections").delete().eq("id", id);
+    if (error) {
+      toast.error(error.message || "Failed to remove connection");
+      return;
+    }
+    toast.success("Page removed. You can now reconnect it.");
     await refreshConnections();
   };
 
