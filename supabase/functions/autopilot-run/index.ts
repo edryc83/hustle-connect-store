@@ -223,7 +223,7 @@ async function runForUser(admin: any, s: any, opts: { userId?: string; forceProd
   // Load profile.
   const { data: profile } = await admin
     .from("profiles")
-    .select("store_name, store_slug, first_name")
+    .select("store_name, store_slug, first_name, whatsapp_number, accent_color, currency")
     .eq("id", s.user_id)
     .maybeSingle();
   const storeName = profile?.store_name || profile?.first_name || "our shop";
@@ -232,7 +232,7 @@ async function runForUser(admin: any, s: any, opts: { userId?: string; forceProd
   // Pick next product (least recently posted, has image).
   let productQuery = admin
     .from("products")
-    .select("id, name, price, description, image_url, category")
+    .select("id, user_id, name, price, discount_price, description, image_url, category")
     .eq("user_id", s.user_id)
     .not("image_url", "is", null);
   if (opts.forceProductId) productQuery = productQuery.eq("id", opts.forceProductId);
@@ -263,7 +263,9 @@ async function runForUser(admin: any, s: any, opts: { userId?: string; forceProd
         return la.localeCompare(lb);
       })[0];
 
-  const imageUrl = product.image_url;
+  // On-the-fly Studio poster: prefer designed image, fall back to raw product photo.
+  const designedUrl = await generateDesignedPoster(admin, product, profile);
+  const imageUrl = designedUrl || product.image_url;
   const caption = await generateCaption({
     productName: product.name, price: product.price, description: product.description,
     storeName, storeUrl, tone: s.tone || "friendly",
