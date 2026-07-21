@@ -200,7 +200,12 @@ export default function DashboardAIAgent() {
   };
 
   const handleDisconnect = async (id: string) => {
-    await supabase.from("meta_connections").update({ is_active: false }).eq("id", id);
+    const { error } = await supabase.from("meta_connections").delete().eq("id", id);
+    if (error) {
+      toast.error(error.message || "Failed to remove connection");
+      return;
+    }
+    toast.success("Page removed. You can now reconnect it.");
     await refreshConnections();
   };
 
@@ -272,7 +277,7 @@ export default function DashboardAIAgent() {
                     {c.platform} {c.ig_account_id ? `• IG ${c.ig_account_id}` : ""} • {c.is_active ? "Active" : "Disabled"}
                   </div>
                 </div>
-                <Button variant="ghost" size="icon" onClick={() => handleDisconnect(c.id)}>
+                <Button variant="ghost" size="icon" aria-label="Delete connection" title="Delete connection" onClick={() => handleDisconnect(c.id)}>
                   <Trash2 className="h-4 w-4" />
                 </Button>
               </li>
