@@ -117,10 +117,15 @@ async function generateDesignedPoster(
     const bytes = new Uint8Array(bin.length);
     for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
 
+    // Strip C2PA / provenance metadata that triggers Meta's "AI info" label.
+    // gpt-image-2 embeds C2PA in ancillary PNG text chunks (iTXt/tEXt/zTXt) and
+    // sometimes eXIf. Keep only chunks required to render the image.
+    const cleaned = stripPngMetadata(bytes);
+
     const path = `${product.user_id}/autopilot-${product.id}-${Date.now()}.png`;
     const { error: upErr } = await admin.storage
       .from("product-images")
-      .upload(path, bytes, { contentType: "image/png", upsert: true });
+      .upload(path, cleaned, { contentType: "image/png", upsert: true });
     if (upErr) {
       console.warn("autopilot design upload failed", upErr.message);
       (globalThis as any).__lastDesignError = `upload: ${upErr.message}`;
