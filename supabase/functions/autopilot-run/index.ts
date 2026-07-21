@@ -8,6 +8,31 @@ const corsHeaders = {
 
 const GRAPH = "https://graph.facebook.com/v19.0";
 
+// Strip ancillary PNG chunks (C2PA/XMP/EXIF) so Meta doesn't tag posts as
+// "AI info". Keeps only chunks required for rendering.
+function stripPngMetadata(input: Uint8Array): Uint8Array {
+  const sig = [137, 80, 78, 71, 13, 10, 26, 10];
+  if (input.length < 8) return input;
+  for (let i = 0; i < 8; i++) if (input[i] !== sig[i]) return input; // not PNG
+  const KEEP = new Set(["IHDR", "PLTE", "IDAT", "IEND", "tRNS", "gAMA", "cHRM", "sRGB"]);
+  const out: number[] = [];
+  for (let i = 0; i < 8; i++) out.push(input[i]);
+  let p = 8;
+  const dv = new DataView(input.buffer, input.byteOffset, input.byteLength);
+  while (p + 8 <= input.length) {
+    const len = dv.getUint32(p);
+    const type = String.fromCharCode(input[p + 4], input[p + 5], input[p + 6], input[p + 7]);
+    const total = 12 + len; // length(4) + type(4) + data(len) + crc(4)
+    if (p + total > input.length) break;
+    if (KEEP.has(type)) {
+      for (let k = 0; k < total; k++) out.push(input[p + k]);
+    }
+    p += total;
+    if (type === "IEND") break;
+  }
+  return new Uint8Array(out);
+}
+
 function formatPrice(amount: number, currency: string): string {
   try {
     return new Intl.NumberFormat("en-US", { style: "currency", currency, maximumFractionDigits: 0 }).format(amount);
@@ -117,10 +142,15 @@ async function generateDesignedPoster(
     const bytes = new Uint8Array(bin.length);
     for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
 
+    // Strip C2PA / provenance metadata that triggers Meta's "AI info" label.
+    // gpt-image-2 embeds C2PA in ancillary PNG text chunks (iTXt/tEXt/zTXt) and
+    // sometimes eXIf. Keep only chunks required to render the image.
+    const cleaned = stripPngMetadata(bytes);
+
     const path = `${product.user_id}/autopilot-${product.id}-${Date.now()}.png`;
     const { error: upErr } = await admin.storage
       .from("product-images")
-      .upload(path, bytes, { contentType: "image/png", upsert: true });
+      .upload(path, cleaned, { contentType: "image/png", upsert: true });
     if (upErr) {
       console.warn("autopilot design upload failed", upErr.message);
       (globalThis as any).__lastDesignError = `upload: ${upErr.message}`;
