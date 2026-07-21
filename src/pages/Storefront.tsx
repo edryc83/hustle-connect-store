@@ -609,7 +609,7 @@ const StorefrontInner = () => {
   const { user } = useAuth();
   const { storeSlug, productId } = useParams<{ storeSlug: string; productId?: string }>();
   const navigate = useNavigate();
-  const [profile, setProfile] = useState<Profile | null>(null);
+  const [profile, setProfile] = useState<Partial<Profile> | null>(null);
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
