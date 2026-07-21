@@ -125,9 +125,20 @@ export default function DashboardAIAgent() {
         body: { manual: true, userId: user.id },
       });
       if (error) throw error;
-      if ((data as any)?.status === "posted") toast.success(`Posted "${(data as any).product}"`);
-      else toast.error((data as any)?.error || (data as any)?.failed || "Nothing to post");
-      await refreshPosts();
+      if ((data as any)?.status === "queued") {
+        toast.success("Post queued — designing your flyer. This can take up to 2 minutes.");
+        // Poll a few times so the row appears without a manual refresh.
+        for (let i = 0; i < 12; i++) {
+          await new Promise((r) => setTimeout(r, 10000));
+          await refreshPosts();
+        }
+      } else if ((data as any)?.status === "posted") {
+        toast.success(`Posted "${(data as any).product}"`);
+        await refreshPosts();
+      } else {
+        toast.error((data as any)?.error || (data as any)?.failed || "Nothing to post");
+        await refreshPosts();
+      }
     } catch (e: any) {
       toast.error(e.message || "Post failed");
     } finally {
