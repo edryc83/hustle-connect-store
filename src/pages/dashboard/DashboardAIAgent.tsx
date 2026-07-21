@@ -277,7 +277,7 @@ export default function DashboardAIAgent() {
                     {c.platform} {c.ig_account_id ? `• IG ${c.ig_account_id}` : ""} • {c.is_active ? "Active" : "Disabled"}
                   </div>
                 </div>
-                <Button variant="ghost" size="icon" onClick={() => handleDisconnect(c.id)}>
+                <Button variant="ghost" size="icon" aria-label="Delete connection" title="Delete connection" onClick={() => handleDisconnect(c.id)}>
                   <Trash2 className="h-4 w-4" />
                 </Button>
               </li>
