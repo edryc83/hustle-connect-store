@@ -726,6 +726,7 @@ export type Database = {
           scheduled_for: string
           slot: string | null
           status: string
+          template_id: string | null
           user_id: string
         }
         Insert: {
@@ -741,6 +742,7 @@ export type Database = {
           scheduled_for?: string
           slot?: string | null
           status?: string
+          template_id?: string | null
           user_id: string
         }
         Update: {
@@ -756,6 +758,7 @@ export type Database = {
           scheduled_for?: string
           slot?: string | null
           status?: string
+          template_id?: string | null
           user_id?: string
         }
         Relationships: [
