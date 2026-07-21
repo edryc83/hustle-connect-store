@@ -348,7 +348,8 @@ async function runForUser(admin: any, s: any, opts: { userId?: string; forceProd
 
   // On-the-fly Studio poster: prefer designed image, fall back to raw product photo.
   (globalThis as any).__lastDesignError = null;
-  const designedUrl = await generateDesignedPoster(admin, product, profile);
+  const inspiration = await pickInspiration(admin, s.user_id);
+  const designedUrl = await generateDesignedPoster(admin, product, profile, inspiration);
   const designError = designedUrl ? null : (globalThis as any).__lastDesignError;
   const imageUrl = designedUrl || product.image_url;
   const caption = await generateCaption({
@@ -387,6 +388,7 @@ async function runForUser(admin: any, s: any, opts: { userId?: string; forceProd
     fb_post_id: fbPostId, ig_post_id: igPostId,
     posted_at: status === "posted" ? new Date().toISOString() : null,
     error: combinedError,
+    template_id: inspiration.id,
   });
   if (!opts.manual) {
     await admin.from("autopilot_settings").update({
