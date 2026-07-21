@@ -415,8 +415,27 @@ Deno.serve(async (req) => {
     const settings = s || {
       user_id: bodyIn.userId, post_times: [], tone: "friendly", timezone: "Africa/Kampala",
     };
-    const result = await runForUser(admin, settings, { manual: true, forceProductId: bodyIn.productId });
-    return new Response(JSON.stringify(result), {
+    // Designed-poster generation (gpt-image-2) can take 60-150s, which exceeds
+    // the edge gateway's request timeout and returns a 504 to the browser even
+    // when the post eventually succeeds. Run the work in the background and
+    // return immediately; the dashboard polls scheduled_posts for the result.
+    const bg = runForUser(admin, settings, { manual: true, forceProductId: bodyIn.productId })
+      .catch(async (e: any) => {
+        console.error("manual autopilot bg error", e);
+        try {
+          await admin.from("scheduled_posts").insert({
+            user_id: settings.user_id, slot: "manual", status: "failed",
+            error: `bg: ${e?.message || e}`,
+          });
+        } catch { /* noop */ }
+      });
+    // @ts-ignore - EdgeRuntime is provided by Supabase Edge Runtime.
+    if (typeof EdgeRuntime !== "undefined" && EdgeRuntime?.waitUntil) {
+      // @ts-ignore
+      EdgeRuntime.waitUntil(bg);
+    }
+    return new Response(JSON.stringify({ status: "queued" }), {
+      status: 202,
       headers: { ...corsHeaders, "Content-Type": "application/json" },
     });
   }
