@@ -7,6 +7,91 @@ const corsHeaders = {
 
 const GRAPH = "https://graph.facebook.com/v19.0";
 
+function formatPrice(amount: number, currency: string): string {
+  try {
+    return new Intl.NumberFormat("en-US", { style: "currency", currency, maximumFractionDigits: 0 }).format(amount);
+  } catch {
+    return `${currency} ${Math.round(amount).toLocaleString("en-US")}`;
+  }
+}
+
+// On-the-fly Studio poster generation for autopilot posts. Best-effort:
+// returns a designed poster URL, or null so the caller falls back to the raw photo.
+async function generateDesignedPoster(admin: any, product: any, profile: any): Promise<string | null> {
+  const OPENAI_API_KEY = Deno.env.get("OPENAI_API_KEY");
+  if (!OPENAI_API_KEY || !product?.image_url) return null;
+  try {
+    const currency = profile?.currency || "UGX";
+    const priceNum = product.discount_price ?? product.price;
+    const priceStr = priceNum ? formatPrice(Number(priceNum), currency) : "";
+    const phone = profile?.whatsapp_number?.trim() || "";
+    const accent = profile?.accent_color || "#F97316";
+    const storeName = profile?.store_name || "";
+
+    const prompt = [
+      "Design a PREMIUM EDITORIAL PRODUCT AD POSTER, 1:1 square, gallery-grade — must clearly read as a real advertisement, not just a product photo.",
+      "Use the supplied product image as the hero subject, clean and color-graded with a soft realistic shadow. Compose like a magazine ad: strong layout, intentional alignment, deliberate negative space, premium background (soft gradient, paper grain, or subtle solid).",
+      `Use ${accent} as a tasteful brand accent (thin line, dot, chip, or underline). Restrained, premium palette — no neon, no clutter, no stickers, no emojis, no fake badges or stars.`,
+      "Typography: clean modern sans-serif with TIGHT hierarchy. Render ALL of the following text elements crisply and legibly — NO MISSPELLINGS, NO GIBBERISH:",
+      `1. TITLE (large, bold, hero): "${product.name}"`,
+      `2. SUBTITLE / TAGLINE (medium, one short punchy line you invent that sells this product — max 6 words).`,
+      priceStr ? `3. PRICE chip in ${accent}: "${priceStr}"` : "",
+      phone
+        ? `4. CTA BUTTON — ONE single clean pill-shaped button, ${accent} background, crisp white text reading EXACTLY "Order on WhatsApp", with the phone number "${phone}" rendered as a small clean line directly beneath the pill (not inside it). Include a tiny WhatsApp glyph inside the pill, left of the text. Rounded-full corners, generous padding, no duplicate buttons.`
+        : `4. CTA BUTTON — ONE single clean pill-shaped button, ${accent} background, crisp white text reading EXACTLY "Order Now". Rounded-full corners, generous padding, no duplicate buttons.`,
+      `5. MANDATORY VISIBLE SIGNATURE: render the exact text "Designed by Afristall" in a bottom corner (bottom-right preferred). SMALL but CLEARLY LEGIBLE at thumbnail size.`,
+      storeName ? `6. Small store name "${storeName}" near the top or opposite corner.` : "",
+      "Layout rule: title + subtitle on one side, product hero on the other (or stacked top/bottom). CTA button must be visible and tappable-looking. Everything aligned to a clear grid.",
+      "Strictly avoid: paragraphs, multiple prices, watermarks across the product, drop shadows on text, decorative emojis, flags, hashtags, lorem ipsum, broken letters.",
+      "Final result must look like a high-end Apple / Nike / fashion-house product advertisement.",
+    ].filter(Boolean).join("\n");
+
+    const imgResp = await fetch(product.image_url);
+    if (!imgResp.ok) return null;
+    const imgBuf = await imgResp.arrayBuffer();
+    const imgType = imgResp.headers.get("content-type") || "image/png";
+    const imgFile = new File([imgBuf], "product.png", { type: imgType });
+
+    const form = new FormData();
+    form.append("model", "gpt-image-2");
+    form.append("prompt", prompt);
+    form.append("size", "1024x1024");
+    form.append("quality", "medium");
+    form.append("n", "1");
+    form.append("image[]", imgFile);
+
+    const openaiResp = await fetch("https://api.openai.com/v1/images/edits", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${OPENAI_API_KEY}` },
+      body: form,
+    });
+    if (!openaiResp.ok) {
+      console.warn("autopilot design failed", openaiResp.status, await openaiResp.text().catch(() => ""));
+      return null;
+    }
+    const j = await openaiResp.json();
+    const b64: string | undefined = j?.data?.[0]?.b64_json;
+    if (!b64) return null;
+    const bin = atob(b64);
+    const bytes = new Uint8Array(bin.length);
+    for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+
+    const path = `${product.user_id}/autopilot-${product.id}-${Date.now()}.png`;
+    const { error: upErr } = await admin.storage
+      .from("product-images")
+      .upload(path, bytes, { contentType: "image/png", upsert: true });
+    if (upErr) {
+      console.warn("autopilot design upload failed", upErr.message);
+      return null;
+    }
+    const { data: pub } = admin.storage.from("product-images").getPublicUrl(path);
+    return pub?.publicUrl || null;
+  } catch (e) {
+    console.warn("autopilot design error", e);
+    return null;
+  }
+}
+
 // Return HH:MM in a given IANA timezone.
 function localHHMM(tz: string, d = new Date()): string {
   const fmt = new Intl.DateTimeFormat("en-GB", {
@@ -138,7 +223,7 @@ async function runForUser(admin: any, s: any, opts: { userId?: string; forceProd
   // Load profile.
   const { data: profile } = await admin
     .from("profiles")
-    .select("store_name, store_slug, first_name")
+    .select("store_name, store_slug, first_name, whatsapp_number, accent_color, currency")
     .eq("id", s.user_id)
     .maybeSingle();
   const storeName = profile?.store_name || profile?.first_name || "our shop";
@@ -147,7 +232,7 @@ async function runForUser(admin: any, s: any, opts: { userId?: string; forceProd
   // Pick next product (least recently posted, has image).
   let productQuery = admin
     .from("products")
-    .select("id, name, price, description, image_url, category")
+    .select("id, user_id, name, price, discount_price, description, image_url, category")
     .eq("user_id", s.user_id)
     .not("image_url", "is", null);
   if (opts.forceProductId) productQuery = productQuery.eq("id", opts.forceProductId);
@@ -178,7 +263,9 @@ async function runForUser(admin: any, s: any, opts: { userId?: string; forceProd
         return la.localeCompare(lb);
       })[0];
 
-  const imageUrl = product.image_url;
+  // On-the-fly Studio poster: prefer designed image, fall back to raw product photo.
+  const designedUrl = await generateDesignedPoster(admin, product, profile);
+  const imageUrl = designedUrl || product.image_url;
   const caption = await generateCaption({
     productName: product.name, price: product.price, description: product.description,
     storeName, storeUrl, tone: s.tone || "friendly",
