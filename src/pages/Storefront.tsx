@@ -629,7 +629,7 @@ const StorefrontInner = () => {
     const fetchStore = async () => {
       const { data: prof } = await supabase
         .from("profiles")
-        .select("*")
+        .select("id, store_name, store_slug, profile_picture_url, category, city, whatsapp_number, created_at, last_active_at, store_bio, delivery_areas, currency, first_name, business_type, view_count, welcome_message, cover_photo_url, country, district, shop_number, building, street, is_online_only, instagram_url, tiktok_url, ai_assistant_enabled, facebook_url, accent_color")
         .eq("store_slug", storeSlug)
         .single();
 
@@ -654,7 +654,7 @@ const StorefrontInner = () => {
         return;
       }
 
-      setProfile(prof);
+      setProfile(prof as Profile);
 
       supabase.rpc("increment_store_views", { slug: storeSlug! }).then(() => {});
 
