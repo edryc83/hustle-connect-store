@@ -19,10 +19,6 @@ const SCOPES = [
   "pages_read_engagement",
   "pages_manage_posts",
   "pages_manage_engagement",
-  "instagram_basic",
-  "instagram_manage_messages",
-  "instagram_manage_comments",
-  "instagram_content_publish",
 ].join(",");
 
 declare global {
@@ -261,7 +257,7 @@ export default function DashboardAIAgent() {
           <Sparkles className="h-6 w-6 text-primary" /> 24/7 Shop Assistant
         </h1>
         <p className="text-sm text-muted-foreground mt-1">
-          Your AI shop manager: auto-posts products, replies to DMs and comments on Facebook &amp; Instagram — around the clock.
+          Your AI shop manager: auto-posts products, replies to DMs and comments on Facebook — around the clock.
         </p>
       </div>
 
@@ -269,7 +265,7 @@ export default function DashboardAIAgent() {
         <div className="flex items-center justify-between">
           <div>
             <h2 className="font-semibold flex items-center gap-2"><Facebook className="h-4 w-4" /> Connected accounts</h2>
-            <p className="text-xs text-muted-foreground">Link the Facebook Page (and its Instagram Business account).</p>
+            <p className="text-xs text-muted-foreground">Link your Facebook Page.</p>
           </div>
           <Button onClick={handleConnect} disabled={connecting}>
             {connecting ? <Loader2 className="h-4 w-4 animate-spin" /> : "Connect Facebook"}
@@ -307,7 +303,7 @@ export default function DashboardAIAgent() {
               <Zap className="h-4 w-4 text-primary" /> Autopilot posting
             </h2>
             <p className="text-xs text-muted-foreground mt-1">
-              Automatically post one of your products to Facebook &amp; Instagram at set times each day.
+              Automatically post one of your products to your Facebook Page at set times each day.
             </p>
           </div>
           <div className="flex items-center gap-2 text-sm shrink-0">
