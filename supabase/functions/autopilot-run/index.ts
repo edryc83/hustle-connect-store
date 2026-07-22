@@ -78,24 +78,27 @@ async function generateDesignedPoster(
     const accent = profile?.accent_color || "#F97316";
     const storeName = profile?.store_name || "";
 
+    // Mirror the Creative Studio (auto-design-product) prompt exactly, so
+    // autopilot posts get the same quality of designed flyer users see when
+    // they click Creative Studio → pick product → pick template → design.
     const prompt = [
-      "TASK: Recreate the FIRST supplied image (the TEMPLATE) EXACTLY as-is — same background, same colours, same shapes, same layout, same typography weights and positions, same decorative elements. Then perform ONLY these two substitutions:",
-      "  A) Replace the template's hero product/subject with the product shown in the SECOND supplied image. Preserve the product's real appearance, colours, packaging and branding — do NOT restyle it, do NOT redraw its logo, do NOT invent new branding on it.",
-      "  B) Replace the template's placeholder text with the exact strings listed below, keeping the template's original text placement, size hierarchy, colours and alignment.",
-      "STRICT RULES:",
-      "  - The FIRST image is the authoritative layout. Do NOT change composition, do NOT add or remove elements, do NOT invent new logos, badges, watermarks, mascots or brand marks.",
-      "  - Do NOT generate an 'Afristall' logo or any fake brand logo. If the template has a logo slot, leave it empty or fill it with the plain store name text only.",
-      "  - Keep the product's original logo/branding untouched. Never redesign, recolour or replace any logo that appears on the product itself.",
-      "  - Render all text crisply — NO misspellings, NO gibberish, NO lorem ipsum, NO extra paragraphs.",
-      "TEXT SUBSTITUTIONS (map to the template's existing text slots by role):",
-      `  • HEADLINE / product title → "${product.name}"`,
-      `  • SUBHEAD / tagline slot → one short punchy line you invent (max 6 words) that sells this product`,
-      priceStr ? `  • PRICE slot → "${priceStr}"${accent ? ` (may use ${accent} if the template's price element is coloured)` : ""}` : "",
+      "Design a PREMIUM EDITORIAL PRODUCT AD POSTER, 1:1 square, gallery-grade — must clearly read as a real advertisement, not just a product photo.",
+      "Use the supplied product image as the hero subject, clean and color-graded with a soft realistic shadow. Compose like a magazine ad: strong layout, intentional alignment, deliberate negative space, premium background (soft gradient, paper grain, or subtle solid).",
+      "A second reference image is attached as a STRICT STYLE & LAYOUT TEMPLATE. Treat it as a PERFECT REPLICA target: match its EXACT composition, proportions, background treatment, color palette, typography hierarchy, headline placement, accent shapes, CTA style and overall energy. CRITICALLY: match the SAME NUMBER OF TEXT BLOCKS and approximately the SAME WORD COUNT per block as the template. Match the SAME RELATIVE SIZE of every element (headline scale, product scale, CTA scale, contact bar scale). DO NOT copy the template's products, photos, logos, watermarks, brand names, phone numbers or text — replace ALL of them with this product's content while keeping the same skeleton.",
+      inspiration?.prompt ? `Inspiration / style direction: ${inspiration.prompt}` : "",
+      `Use ${accent} as a tasteful brand accent (thin line, dot, chip, or underline). Restrained, premium palette — no neon, no clutter, no stickers, no emojis, no fake badges or stars.`,
+      "Typography: clean modern sans-serif with TIGHT hierarchy. Render ALL of the following text elements crisply and legibly — NO MISSPELLINGS, NO GIBBERISH:",
+      `1. TITLE (large, bold, hero): "${product.name}"`,
+      `2. SUBTITLE / TAGLINE (medium, one short punchy line you invent that sells this product — max 6 words).`,
+      priceStr ? `3. PRICE chip in ${accent}: "${priceStr}"` : "",
       phone
-        ? `  • CTA button slot → exactly "Order on WhatsApp"; render "${phone}" as small text near the CTA if the template has a contact line. Keep the template's CTA shape/colour.`
-        : `  • CTA button slot → exactly "Order Now". Keep the template's CTA shape/colour.`,
-      storeName ? `  • Store-name / handle slot (if the template has one) → "${storeName}" as plain text (no logo mark).` : "",
-      `  • Do NOT add any "Designed by" signature, watermark or credit line anywhere.`,
+        ? `4. CTA BUTTON — ONE single clean pill-shaped button, ${accent} background, crisp white text reading EXACTLY "Order on WhatsApp", with the phone number "${phone}" rendered as a small clean line directly beneath the pill (not inside it). Include a tiny WhatsApp glyph inside the pill, left of the text. Rounded-full corners, generous padding, no gradients, no duplicate buttons.`
+        : `4. CTA BUTTON — ONE single clean pill-shaped button, ${accent} background, crisp white text reading EXACTLY "Order Now". Rounded-full corners, generous padding, no gradients, no duplicate buttons.`,
+      storeName ? `5. Small store name "${storeName}" near the top or opposite corner.` : "",
+      "Layout rule: title + subtitle on one side, product hero on the other (or stacked top/bottom). CTA button must be visible and tappable-looking. Everything aligned to a clear grid.",
+      "Strictly avoid: paragraphs, multiple prices, watermarks across the product, drop shadows on text, decorative emojis, flags, hashtags, lorem ipsum, broken letters, fake 'Afristall' logos, invented brand marks.",
+      "Keep the product's own real logo/branding untouched — never redesign or replace any logo that appears on the product itself.",
+      "Final result must look like a high-end Apple / Nike / fashion-house product advertisement.",
     ].filter(Boolean).join("\n");
 
     const imgResp = await fetch(product.image_url);
@@ -124,10 +127,11 @@ async function generateDesignedPoster(
     form.append("size", "1024x1024");
     form.append("quality", "medium");
     form.append("n", "1");
-    // Order matters: template FIRST so the model treats it as the canonical
-    // layout to preserve, product SECOND as the subject to drop in.
-    if (tmplFile) form.append("image[]", tmplFile);
+    // Same order as auto-design-product: product FIRST (hero subject),
+    // template SECOND (style/layout reference). Reversing this order made
+    // the model treat the raw product as the layout and drift/skip design.
     form.append("image[]", imgFile);
+    if (tmplFile) form.append("image[]", tmplFile);
 
     const openaiResp = await fetch("https://api.openai.com/v1/images/edits", {
       method: "POST",
