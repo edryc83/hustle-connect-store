@@ -78,7 +78,6 @@ async function generateDesignedPoster(
     const accent = profile?.accent_color || "#F97316";
     const storeName = profile?.store_name || "";
 
-    const prompt = [
     // Mirror the Creative Studio (auto-design-product) prompt exactly, so
     // autopilot posts get the same quality of designed flyer users see when
     // they click Creative Studio → pick product → pick template → design.
