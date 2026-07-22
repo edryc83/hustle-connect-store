@@ -283,7 +283,7 @@ export default function DashboardAIAgent() {
                 <div className="text-sm">
                   <div className="font-medium">Page ID: {c.page_id}</div>
                   <div className="text-xs text-muted-foreground">
-                    {c.platform} {c.ig_account_id ? `• IG ${c.ig_account_id}` : ""} • {c.is_active ? "Active" : "Disabled"}
+                    Facebook Page • {c.is_active ? "Active" : "Disabled"}
                   </div>
                 </div>
                 <Button variant="ghost" size="icon" aria-label="Delete connection" title="Delete connection" onClick={() => handleDisconnect(c.id)}>
