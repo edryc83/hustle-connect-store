@@ -63,7 +63,7 @@ Deno.serve(async (req) => {
 
     // 2. Fetch pages with page access tokens (never expire) + linked IG account
     const pagesRes = await fetch(
-      `${GRAPH}/me/accounts?fields=id,name,access_token,picture{url},instagram_business_account{id,username,profile_picture_url}&access_token=${encodeURIComponent(longToken)}`,
+      `${GRAPH}/me/accounts?fields=id,name,access_token,picture{url}&access_token=${encodeURIComponent(longToken)}`,
     );
     const pages = await pagesRes.json();
     if (!pagesRes.ok) {
@@ -81,8 +81,6 @@ Deno.serve(async (req) => {
         picture: p.picture?.data?.url || null,
         long_token: longToken,
         page_access_token: p.access_token,
-        ig_account_id: p.instagram_business_account?.id || null,
-        ig_username: p.instagram_business_account?.username || null,
       }));
       return new Response(JSON.stringify({ pages: list }), {
         status: 200,
@@ -106,8 +104,6 @@ Deno.serve(async (req) => {
         if (!r.ok) console.warn("subscribed_apps failed for", page.id, await r.text());
       });
 
-      const igId = page.instagram_business_account?.id || null;
-
       // Ensure default agent settings exist for this seller
       await admin.from("agent_settings").upsert({
         user_id: user.id,
@@ -121,17 +117,17 @@ Deno.serve(async (req) => {
       // Upsert connection
       const { data, error } = await admin.from("meta_connections").upsert({
         user_id: user.id,
-        platform: igId ? "instagram_and_messenger" : "messenger",
+        platform: "messenger",
         page_id: page.id,
-        ig_account_id: igId,
+        ig_account_id: null,
         page_access_token: page.access_token,
-        ig_access_token: igId ? page.access_token : null,
+        ig_access_token: null,
         is_active: true,
         updated_at: new Date().toISOString(),
       }, { onConflict: "page_id" }).select().single();
 
       if (error) console.error("meta_connections upsert error", error);
-      else connected.push({ id: data.id, page_id: page.id, name: page.name, ig_id: igId });
+      else connected.push({ id: data.id, page_id: page.id, name: page.name });
     }
 
     return new Response(JSON.stringify({ connected }), {
