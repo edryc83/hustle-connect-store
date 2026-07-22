@@ -79,20 +79,23 @@ async function generateDesignedPoster(
     const storeName = profile?.store_name || "";
 
     const prompt = [
-      "Design a PREMIUM PRODUCT AD POSTER, 1:1 square, gallery-grade — clearly a real advertisement, not just a product photo.",
-      `TEMPLATE STYLE TO EMULATE: ${inspiration.prompt}`,
-      "Use the FIRST supplied image as the product hero (subject). Use the SECOND supplied image ONLY as visual style reference for layout, palette, typography and composition — DO NOT copy its subject or text.",
-      `Optionally blend in ${accent} as a subtle brand accent where it fits the template.`,
-      "Typography: clean modern sans-serif with TIGHT hierarchy. Render ALL of the following text elements crisply and legibly — NO MISSPELLINGS, NO GIBBERISH:",
-      `1. TITLE (large, bold, hero): "${product.name}"`,
-      `2. SUBTITLE / TAGLINE (medium, one short punchy line you invent that sells this product — max 6 words).`,
-      priceStr ? `3. PRICE chip in ${accent}: "${priceStr}"` : "",
+      "TASK: Recreate the FIRST supplied image (the TEMPLATE) EXACTLY as-is — same background, same colours, same shapes, same layout, same typography weights and positions, same decorative elements. Then perform ONLY these two substitutions:",
+      "  A) Replace the template's hero product/subject with the product shown in the SECOND supplied image. Preserve the product's real appearance, colours, packaging and branding — do NOT restyle it, do NOT redraw its logo, do NOT invent new branding on it.",
+      "  B) Replace the template's placeholder text with the exact strings listed below, keeping the template's original text placement, size hierarchy, colours and alignment.",
+      "STRICT RULES:",
+      "  - The FIRST image is the authoritative layout. Do NOT change composition, do NOT add or remove elements, do NOT invent new logos, badges, watermarks, mascots or brand marks.",
+      "  - Do NOT generate an 'Afristall' logo or any fake brand logo. If the template has a logo slot, leave it empty or fill it with the plain store name text only.",
+      "  - Keep the product's original logo/branding untouched. Never redesign, recolour or replace any logo that appears on the product itself.",
+      "  - Render all text crisply — NO misspellings, NO gibberish, NO lorem ipsum, NO extra paragraphs.",
+      "TEXT SUBSTITUTIONS (map to the template's existing text slots by role):",
+      `  • HEADLINE / product title → "${product.name}"`,
+      `  • SUBHEAD / tagline slot → one short punchy line you invent (max 6 words) that sells this product`,
+      priceStr ? `  • PRICE slot → "${priceStr}"${accent ? ` (may use ${accent} if the template's price element is coloured)` : ""}` : "",
       phone
-        ? `4. CTA BUTTON — ONE single clean pill-shaped button, ${accent} background, crisp white text reading EXACTLY "Order on WhatsApp", with the phone number "${phone}" rendered as a small clean line directly beneath the pill (not inside it). Include a tiny WhatsApp glyph inside the pill, left of the text. Rounded-full corners, generous padding, no duplicate buttons.`
-        : `4. CTA BUTTON — ONE single clean pill-shaped button, ${accent} background, crisp white text reading EXACTLY "Order Now". Rounded-full corners, generous padding, no duplicate buttons.`,
-      `5. MANDATORY VISIBLE SIGNATURE: render the exact text "Designed by Afristall" in a bottom corner (bottom-right preferred). SMALL but CLEARLY LEGIBLE at thumbnail size.`,
-      storeName ? `6. Small store name "${storeName}" near the top or opposite corner.` : "",
-      "Strictly avoid: paragraphs, multiple prices, watermarks across the product, drop shadows on text, decorative emojis, flags, hashtags, lorem ipsum, broken letters.",
+        ? `  • CTA button slot → exactly "Order on WhatsApp"; render "${phone}" as small text near the CTA if the template has a contact line. Keep the template's CTA shape/colour.`
+        : `  • CTA button slot → exactly "Order Now". Keep the template's CTA shape/colour.`,
+      storeName ? `  • Store-name / handle slot (if the template has one) → "${storeName}" as plain text (no logo mark).` : "",
+      `  • Do NOT add any "Designed by" signature, watermark or credit line anywhere.`,
     ].filter(Boolean).join("\n");
 
     const imgResp = await fetch(product.image_url);
@@ -121,8 +124,10 @@ async function generateDesignedPoster(
     form.append("size", "1024x1024");
     form.append("quality", "medium");
     form.append("n", "1");
-    form.append("image[]", imgFile);
+    // Order matters: template FIRST so the model treats it as the canonical
+    // layout to preserve, product SECOND as the subject to drop in.
     if (tmplFile) form.append("image[]", tmplFile);
+    form.append("image[]", imgFile);
 
     const openaiResp = await fetch("https://api.openai.com/v1/images/edits", {
       method: "POST",
