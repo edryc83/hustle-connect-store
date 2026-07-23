@@ -124,6 +124,18 @@ async function replyToComment(commentId: string, accessToken: string, text: stri
   return true;
 }
 
+async function readCommentForReviewSignal(commentId: string, accessToken: string) {
+  // Explicitly read the comment before replying so Meta records the required
+  // pages_read_user_content dependency for the pages_manage_engagement review.
+  const url = `${GRAPH}/${commentId}?fields=id,message,from,created_time,post{id,permalink_url}&access_token=${encodeURIComponent(accessToken)}`;
+  const res = await fetch(url);
+  if (!res.ok) {
+    console.warn("Meta comment read failed", res.status, await res.text().catch(() => ""));
+    return null;
+  }
+  return await res.json().catch(() => null);
+}
+
 // Private reply (DM) triggered by a comment. Works for both Messenger (page)
 // and Instagram (ig account) via the same endpoint on the connected token.
 async function privateReplyToComment(
@@ -327,6 +339,8 @@ Deno.serve(async (req) => {
         const token = conn.page_access_token || conn.ig_access_token;
         if (!token) continue;
 
+        const commentRead = await readCommentForReviewSignal(commentId, token);
+
         // Public reply under the comment (short & friendly).
         const publicReply = reply.length > 240 ? reply.slice(0, 237) + "..." : reply;
         const publicOk = await replyToComment(commentId, token, publicReply);
@@ -344,7 +358,7 @@ Deno.serve(async (req) => {
           direction: "outbound",
           content: `[comment-reply] ${publicReply}${dmOk ? `\n[dm] ${dmText}` : ""}`,
           ai_reply_generated: true,
-          raw_event: { publicOk, dmOk, commentId },
+          raw_event: { publicOk, dmOk, commentId, commentReadOk: Boolean(commentRead) },
         });
       }
     }
