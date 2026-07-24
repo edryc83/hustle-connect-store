@@ -29,8 +29,8 @@ Deno.serve(async (req) => {
     const { data: profile } = await supabase
       .from("profiles")
       .select("store_name, store_bio, profile_picture_url, category, city, country, id")
-      .eq("store_slug", slug)
-      .single();
+      .ilike("store_slug", slug)
+      .maybeSingle();
 
     if (!profile) {
       return Response.redirect(`${APP_URL}/${slug}`, 302);
